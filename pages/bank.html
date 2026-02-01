@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#3b82f6">
+    <link rel="manifest" href="../manifest.json">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏦</text></svg>">
+    <title>חשבונות בנק - ניהול פיננסי</title>
+    <link rel="stylesheet" href="../css/app.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .nav-link.active { background: var(--color-bank) !important; }
+        .page-header h1 { color: var(--color-bank); }
+        .btn-primary { background: var(--color-bank); }
+        .btn-primary:hover { background: #2563eb; }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <span class="logo">💰</span>
+                <h1 data-i18n="dashboard.title">ניהול פיננסי אישי</h1>
+            </div>
+
+            <nav>
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a href="../index.html" class="nav-link" data-category="dashboard">
+                            <span class="icon">🏠</span>
+                            <span data-i18n="nav.dashboard">דאשבורד</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="bank.html" class="nav-link active" data-category="bank">
+                            <span class="icon">🏦</span>
+                            <span data-i18n="nav.bankAccounts">חשבונות בנק</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="credit.html" class="nav-link" data-category="credit">
+                            <span class="icon">💳</span>
+                            <span data-i18n="nav.creditCards">כרטיסי אשראי</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="stocks.html" class="nav-link" data-category="stocks">
+                            <span class="icon">📈</span>
+                            <span data-i18n="nav.stocks">מניות</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <span class="nav-link" style="cursor: default;">
+                            <span class="icon">📊</span>
+                            <span data-i18n="nav.fundsAndPension">קרנות ופנסיה</span>
+                        </span>
+                        <ul class="nav-submenu">
+                            <li class="nav-item">
+                                <a href="training.html" class="nav-link" data-category="training">
+                                    <span data-i18n="nav.trainingFunds">קרנות השתלמות</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="pension.html" class="nav-link" data-category="pension">
+                                    <span data-i18n="nav.pension">פנסיה</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="gemel.html" class="nav-link" data-category="gemel">
+                                    <span data-i18n="nav.gemel">קופות גמל</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a href="assets.html" class="nav-link" data-category="assets">
+                            <span class="icon">🏠</span>
+                            <span data-i18n="nav.assets">נכסים</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button class="lang-toggle" onclick="I18n.toggleLanguage()">English</button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="page-header">
+                <h1>
+                    <span>🏦</span>
+                    <span data-i18n="bank.title">חשבונות בנק</span>
+                </h1>
+            </header>
+
+            <!-- Total Balance Card -->
+            <div class="net-worth-banner" style="border-color: var(--color-bank);">
+                <div class="label" data-i18n="bank.balance">יתרה כוללת</div>
+                <div class="value" id="totalBalance" style="background: linear-gradient(90deg, var(--color-bank), #60a5fa);">₪0</div>
+            </div>
+
+            <!-- Add Account Button -->
+            <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+                <button class="btn btn-primary" onclick="openAddModal()">
+                    <span>➕</span>
+                    <span data-i18n="bank.addAccount">הוסף חשבון</span>
+                </button>
+                <button class="btn btn-secondary" onclick="importCSV()">
+                    <span>📥</span>
+                    <span>ייבוא CSV</span>
+                </button>
+            </div>
+
+            <!-- Accounts List -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <span class="icon">📋</span>
+                        <span data-i18n="bank.title">חשבונות בנק</span>
+                    </h2>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th data-i18n="bank.accountName">שם החשבון</th>
+                                <th data-i18n="bank.bankName">בנק</th>
+                                <th data-i18n="bank.accountNumber">מספר חשבון</th>
+                                <th data-i18n="bank.balance">יתרה</th>
+                                <th data-i18n="common.actions">פעולות</th>
+                            </tr>
+                        </thead>
+                        <tbody id="accountsTable">
+                            <!-- Will be populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Balance History Chart -->
+            <div class="card" id="historyCard" style="display: none;">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <span class="icon">📈</span>
+                        <span data-i18n="bank.balanceHistory">היסטוריית יתרות</span>
+                    </h2>
+                </div>
+                <div class="chart-container">
+                    <canvas id="balanceHistoryChart"></canvas>
+                </div>
+            </div>
+        </main>
+
+        <!-- Mobile Menu Toggle -->
+        <button class="mobile-menu-toggle">☰</button>
+    </div>
+
+    <!-- Add/Edit Account Modal -->
+    <div class="modal-overlay" id="accountModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 id="modalTitle" data-i18n="bank.addAccount">הוסף חשבון</h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="accountForm">
+                    <input type="hidden" id="accountId">
+
+                    <div class="form-group">
+                        <label data-i18n="bank.accountName">שם החשבון</label>
+                        <input type="text" class="form-control" id="accountName" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label data-i18n="bank.bankName">בנק</label>
+                        <select class="form-control" id="bankName" required>
+                            <option value="leumi" data-i18n="bank.banks.leumi">בנק לאומי</option>
+                            <option value="hapoalim" data-i18n="bank.banks.hapoalim">בנק הפועלים</option>
+                            <option value="discount" data-i18n="bank.banks.discount">בנק דיסקונט</option>
+                            <option value="mizrahi" data-i18n="bank.banks.mizrahi">בנק מזרחי טפחות</option>
+                            <option value="international" data-i18n="bank.banks.international">הבנק הבינלאומי</option>
+                            <option value="mercantile" data-i18n="bank.banks.mercantile">בנק מרכנתיל</option>
+                            <option value="otsar" data-i18n="bank.banks.otsar">אוצר החייל</option>
+                            <option value="yahav" data-i18n="bank.banks.yahav">בנק יהב</option>
+                            <option value="massad" data-i18n="bank.banks.massad">בנק מסד</option>
+                            <option value="other" data-i18n="bank.banks.other">אחר</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label data-i18n="bank.accountNumber">מספר חשבון (4 ספרות אחרונות)</label>
+                        <input type="text" class="form-control" id="accountNumber" maxlength="4" pattern="[0-9]{4}">
+                    </div>
+
+                    <div class="form-group">
+                        <label data-i18n="bank.balance">יתרה</label>
+                        <input type="number" class="form-control" id="balance" step="0.01" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal()" data-i18n="common.cancel">ביטול</button>
+                <button class="btn btn-primary" onclick="saveAccount()" data-i18n="common.save">שמור</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Update Balance Modal -->
+    <div class="modal-overlay" id="updateBalanceModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 data-i18n="bank.updateBalance">עדכן יתרה</h2>
+                <button class="modal-close" onclick="closeUpdateModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="updateBalanceForm">
+                    <input type="hidden" id="updateAccountId">
+                    <div class="form-group">
+                        <label data-i18n="bank.balance">יתרה חדשה</label>
+                        <input type="number" class="form-control" id="newBalance" step="0.01" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeUpdateModal()" data-i18n="common.cancel">ביטול</button>
+                <button class="btn btn-primary" onclick="updateBalance()" data-i18n="common.update">עדכן</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/storage.js"></script>
+    <script src="../js/i18n.js"></script>
+    <script src="../js/charts.js"></script>
+    <script src="../js/csv-import.js"></script>
+    <script src="../js/app.js"></script>
+    <script>
+        // Page specific code
+        document.addEventListener('DOMContentLoaded', () => {
+            App.currentPage = 'bank';
+            loadAccounts();
+        });
+
+        function loadAccounts() {
+            const accounts = Storage.getBankAccounts();
+            const tbody = document.getElementById('accountsTable');
+            const totalEl = document.getElementById('totalBalance');
+
+            if (accounts.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--color-text-secondary);">${I18n.t('bank.noAccounts')}</td></tr>`;
+                totalEl.textContent = I18n.formatCurrency(0);
+                document.getElementById('historyCard').style.display = 'none';
+                return;
+            }
+
+            const total = accounts.reduce((sum, acc) => sum + (acc.balance || 0), 0);
+            totalEl.textContent = I18n.formatCurrency(total);
+
+            tbody.innerHTML = accounts.map(acc => `
+                <tr>
+                    <td>${I18n.currentLanguage === 'he' ? acc.nameHe || acc.nameEn : acc.nameEn || acc.nameHe}</td>
+                    <td>${I18n.t('bank.banks.' + acc.bank) || acc.bank}</td>
+                    <td>****${acc.accountNumber}</td>
+                    <td>${I18n.formatCurrency(acc.balance)}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn btn-secondary btn-sm" onclick="openUpdateBalanceModal('${acc.id}', ${acc.balance})" title="${I18n.t('bank.updateBalance')}">💰</button>
+                            <button class="btn btn-secondary btn-sm" onclick="editAccount('${acc.id}')" title="${I18n.t('common.edit')}">✏️</button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteAccount('${acc.id}')" title="${I18n.t('common.delete')}">🗑️</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+
+            // Show history chart with combined history
+            document.getElementById('historyCard').style.display = 'block';
+            const combinedHistory = [];
+            accounts.forEach(acc => {
+                if (acc.history) {
+                    acc.history.forEach(h => {
+                        const existing = combinedHistory.find(ch => ch.date === h.date);
+                        if (existing) {
+                            existing.balance += h.balance;
+                        } else {
+                            combinedHistory.push({ date: h.date, balance: h.balance });
+                        }
+                    });
+                }
+            });
+            if (combinedHistory.length > 0) {
+                Charts.createBalanceHistory('balanceHistoryChart', combinedHistory, I18n.t('bank.balance'), '#3b82f6');
+            }
+        }
+
+        function openAddModal() {
+            document.getElementById('modalTitle').textContent = I18n.t('bank.addAccount');
+            document.getElementById('accountForm').reset();
+            document.getElementById('accountId').value = '';
+            document.getElementById('accountModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('accountModal').classList.remove('active');
+        }
+
+        function editAccount(id) {
+            const accounts = Storage.getBankAccounts();
+            const account = accounts.find(a => a.id === id);
+            if (!account) return;
+
+            document.getElementById('modalTitle').textContent = I18n.t('common.edit');
+            document.getElementById('accountId').value = account.id;
+            document.getElementById('accountName').value = account.nameHe || account.nameEn || '';
+            document.getElementById('bankName').value = account.bank;
+            document.getElementById('accountNumber').value = account.accountNumber;
+            document.getElementById('balance').value = account.balance;
+            document.getElementById('accountModal').classList.add('active');
+        }
+
+        function saveAccount() {
+            const id = document.getElementById('accountId').value;
+            const nameHe = document.getElementById('accountName').value;
+            const bank = document.getElementById('bankName').value;
+            const accountNumber = document.getElementById('accountNumber').value;
+            const balance = parseFloat(document.getElementById('balance').value);
+
+            if (!nameHe || !balance) {
+                App.notify('Please fill all required fields', 'error');
+                return;
+            }
+
+            if (id) {
+                // Update existing
+                Storage.updateBankAccount(id, { nameHe, nameEn: nameHe, bank, accountNumber, balance });
+            } else {
+                // Add new
+                Storage.addBankAccount({ nameHe, nameEn: nameHe, bank, accountNumber, balance, currency: 'ILS' });
+            }
+
+            closeModal();
+            loadAccounts();
+            App.notify(I18n.t('common.save') + ' ✓', 'success');
+        }
+
+        function openUpdateBalanceModal(id, currentBalance) {
+            document.getElementById('updateAccountId').value = id;
+            document.getElementById('newBalance').value = currentBalance;
+            document.getElementById('updateBalanceModal').classList.add('active');
+        }
+
+        function closeUpdateModal() {
+            document.getElementById('updateBalanceModal').classList.remove('active');
+        }
+
+        function updateBalance() {
+            const id = document.getElementById('updateAccountId').value;
+            const newBalance = parseFloat(document.getElementById('newBalance').value);
+
+            Storage.updateBankAccount(id, { balance: newBalance });
+            closeUpdateModal();
+            loadAccounts();
+            App.notify(I18n.t('bank.updateBalance') + ' ✓', 'success');
+        }
+
+        function deleteAccount(id) {
+            if (confirm(I18n.t('common.confirmDelete'))) {
+                Storage.deleteBankAccount(id);
+                loadAccounts();
+                App.notify(I18n.t('common.delete') + ' ✓', 'success');
+            }
+        }
+
+        async function importCSV() {
+            const format = CSVImport.showImportHelp('bank');
+            const confirmed = confirm(
+                `${format.title}\n\n` +
+                `עמודות נדרשות:\n${format.columns.join(', ')}\n\n` +
+                `דוגמה:\n${format.example}\n\n` +
+                `להמשיך?`
+            );
+
+            if (!confirmed) return;
+
+            const result = await CSVImport.openFilePicker('bank');
+
+            if (result.success) {
+                App.notify(`יובאו ${result.imported} רשומות בהצלחה`, 'success');
+                loadAccounts();
+            } else {
+                App.notify(result.error || 'שגיאה בייבוא', 'error');
+            }
+
+            if (result.errors && result.errors.length > 0) {
+                console.log('Import errors:', result.errors);
+            }
+        }
+    </script>
+</body>
+</html>

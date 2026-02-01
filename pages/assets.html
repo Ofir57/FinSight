@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#f59e0b">
+    <link rel="manifest" href="../manifest.json">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏠</text></svg>">
+    <title>נכסים - ניהול פיננסי</title>
+    <link rel="stylesheet" href="../css/app.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .nav-link.active { background: var(--color-assets) !important; }
+        .page-header h1 { color: var(--color-assets); }
+        .btn-primary { background: var(--color-assets); }
+        .btn-primary:hover { background: #d97706; }
+        .asset-icon {
+            font-size: 2rem;
+            margin-left: 10px;
+        }
+        .asset-card {
+            background: var(--color-bg-card);
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            transition: transform 0.2s;
+        }
+        .asset-card:hover {
+            transform: translateY(-2px);
+        }
+        .asset-card .info {
+            flex: 1;
+        }
+        .asset-card .name {
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+        .asset-card .meta {
+            color: var(--color-text-secondary);
+            font-size: 0.9rem;
+        }
+        .asset-card .value {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--color-assets);
+        }
+        .asset-card .depreciation {
+            font-size: 0.85rem;
+            color: var(--color-negative);
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <span class="logo">💰</span>
+                <h1 data-i18n="dashboard.title">ניהול פיננסי אישי</h1>
+            </div>
+
+            <nav>
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a href="../index.html" class="nav-link" data-category="dashboard">
+                            <span class="icon">🏠</span>
+                            <span data-i18n="nav.dashboard">דאשבורד</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="bank.html" class="nav-link" data-category="bank">
+                            <span class="icon">🏦</span>
+                            <span data-i18n="nav.bankAccounts">חשבונות בנק</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="credit.html" class="nav-link" data-category="credit">
+                            <span class="icon">💳</span>
+                            <span data-i18n="nav.creditCards">כרטיסי אשראי</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="stocks.html" class="nav-link" data-category="stocks">
+                            <span class="icon">📈</span>
+                            <span data-i18n="nav.stocks">מניות</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <span class="nav-link" style="cursor: default;">
+                            <span class="icon">📊</span>
+                            <span data-i18n="nav.fundsAndPension">קרנות ופנסיה</span>
+                        </span>
+                        <ul class="nav-submenu">
+                            <li class="nav-item"><a href="training.html" class="nav-link" data-category="training"><span data-i18n="nav.trainingFunds">קרנות השתלמות</span></a></li>
+                            <li class="nav-item"><a href="pension.html" class="nav-link" data-category="pension"><span data-i18n="nav.pension">פנסיה</span></a></li>
+                            <li class="nav-item"><a href="gemel.html" class="nav-link" data-category="gemel"><span data-i18n="nav.gemel">קופות גמל</span></a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a href="assets.html" class="nav-link active" data-category="assets">
+                            <span class="icon">🏠</span>
+                            <span data-i18n="nav.assets">נכסים</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button class="lang-toggle" onclick="I18n.toggleLanguage()">English</button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="page-header">
+                <h1>
+                    <span>🏠</span>
+                    <span data-i18n="assets.title">נכסים נוספים</span>
+                </h1>
+            </header>
+
+            <!-- Total Assets Value -->
+            <div class="net-worth-banner" style="border-color: var(--color-assets);">
+                <div class="label" data-i18n="assets.estimatedValue">שווי מוערך</div>
+                <div class="value" id="totalAssetsValue" style="background: linear-gradient(90deg, var(--color-assets), #fbbf24);">₪0</div>
+            </div>
+
+            <!-- Add Asset Button -->
+            <div style="margin-bottom: 20px;">
+                <button class="btn btn-primary" onclick="openAssetModal()">
+                    <span>➕</span>
+                    <span data-i18n="assets.addAsset">הוסף נכס</span>
+                </button>
+            </div>
+
+            <!-- Assets List -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <span class="icon">📋</span>
+                        <span data-i18n="assets.title">נכסים</span>
+                    </h2>
+                </div>
+                <div id="assetsContainer">
+                    <!-- Will be populated by JS -->
+                </div>
+            </div>
+
+            <!-- Distribution Chart -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <span class="icon">📊</span>
+                        <span>חלוקת נכסים לפי סוג</span>
+                    </h2>
+                </div>
+                <div class="chart-container">
+                    <canvas id="assetsChart"></canvas>
+                </div>
+            </div>
+        </main>
+
+        <!-- Mobile Menu Toggle -->
+        <button class="mobile-menu-toggle">☰</button>
+    </div>
+
+    <!-- Add/Edit Asset Modal -->
+    <div class="modal-overlay" id="assetModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 id="modalTitle" data-i18n="assets.addAsset">הוסף נכס</h2>
+                <button class="modal-close" onclick="closeAssetModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="assetForm">
+                    <input type="hidden" id="assetId">
+
+                    <div class="form-group">
+                        <label data-i18n="assets.assetType">סוג נכס</label>
+                        <select class="form-control" id="assetType" required>
+                            <option value="car">🚗 רכב</option>
+                            <option value="property">🏠 נדל״ן</option>
+                            <option value="savings">💵 חסכונות</option>
+                            <option value="jewelry">💎 תכשיטים</option>
+                            <option value="electronics">💻 אלקטרוניקה</option>
+                            <option value="other">📦 אחר</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label data-i18n="assets.assetName">שם הנכס</label>
+                        <input type="text" class="form-control" id="assetName" required placeholder="טויוטה קורולה 2022">
+                    </div>
+
+                    <div class="form-group">
+                        <label data-i18n="assets.estimatedValue">שווי מוערך</label>
+                        <input type="number" class="form-control" id="assetValue" step="100" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label data-i18n="assets.purchaseDate">תאריך רכישה</label>
+                        <input type="date" class="form-control" id="purchaseDate">
+                    </div>
+
+                    <div class="form-group">
+                        <label data-i18n="assets.purchasePrice">מחיר רכישה</label>
+                        <input type="number" class="form-control" id="purchasePrice" step="100">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeAssetModal()" data-i18n="common.cancel">ביטול</button>
+                <button class="btn btn-primary" onclick="saveAsset()" data-i18n="common.save">שמור</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/storage.js"></script>
+    <script src="../js/i18n.js"></script>
+    <script src="../js/charts.js"></script>
+    <script src="../js/app.js"></script>
+    <script>
+        const typeIcons = {
+            car: '🚗',
+            property: '🏠',
+            savings: '💵',
+            jewelry: '💎',
+            electronics: '💻',
+            other: '📦'
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            App.currentPage = 'assets';
+            loadAssets();
+        });
+
+        function loadAssets() {
+            const assets = Storage.getAssets();
+            const container = document.getElementById('assetsContainer');
+            const totalEl = document.getElementById('totalAssetsValue');
+
+            if (assets.length === 0) {
+                container.innerHTML = `<div class="empty-state"><div class="icon">📦</div><p>${I18n.t('assets.noAssets')}</p></div>`;
+                totalEl.textContent = I18n.formatCurrency(0);
+                return;
+            }
+
+            const total = assets.reduce((sum, a) => sum + (a.value || 0), 0);
+            totalEl.textContent = I18n.formatCurrency(total);
+
+            container.innerHTML = assets.map(asset => {
+                const depreciation = asset.purchasePrice ? asset.purchasePrice - asset.value : 0;
+                const name = I18n.currentLanguage === 'he' ? asset.nameHe || asset.nameEn : asset.nameEn || asset.nameHe;
+
+                return `
+                    <div class="asset-card">
+                        <div class="asset-icon">${typeIcons[asset.type] || '📦'}</div>
+                        <div class="info">
+                            <div class="name">${name}</div>
+                            <div class="meta">
+                                ${I18n.t('assets.types.' + asset.type)}
+                                ${asset.purchaseDate ? ' • ' + I18n.formatDate(asset.purchaseDate) : ''}
+                            </div>
+                        </div>
+                        <div style="text-align: left;">
+                            <div class="value">${I18n.formatCurrency(asset.value)}</div>
+                            ${depreciation > 0 ? `<div class="depreciation">פחת: -${I18n.formatCurrency(depreciation)}</div>` : ''}
+                        </div>
+                        <div class="action-buttons">
+                            <button class="btn btn-secondary btn-sm" onclick="editAsset('${asset.id}')" title="${I18n.t('common.edit')}">✏️</button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteAsset('${asset.id}')" title="${I18n.t('common.delete')}">🗑️</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Update chart
+            updateAssetsChart(assets);
+        }
+
+        function updateAssetsChart(assets) {
+            const ctx = document.getElementById('assetsChart');
+            const typeGroups = {};
+
+            assets.forEach(asset => {
+                typeGroups[asset.type] = (typeGroups[asset.type] || 0) + asset.value;
+            });
+
+            const types = Object.keys(typeGroups);
+            const colors = {
+                car: '#3b82f6',
+                property: '#10b981',
+                savings: '#f59e0b',
+                jewelry: '#ec4899',
+                electronics: '#8b5cf6',
+                other: '#6b7280'
+            };
+
+            const chartData = {
+                labels: types.map(t => I18n.t('assets.types.' + t)),
+                datasets: [{
+                    data: Object.values(typeGroups),
+                    backgroundColor: types.map(t => colors[t] || colors.other),
+                    borderWidth: 0
+                }]
+            };
+
+            if (Charts.charts.assetsChart) {
+                Charts.charts.assetsChart.data = chartData;
+                Charts.charts.assetsChart.update();
+            } else {
+                Charts.charts.assetsChart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: chartData,
+                    options: {
+                        ...Charts.defaultOptions,
+                        cutout: '50%',
+                        plugins: {
+                            ...Charts.defaultOptions.plugins,
+                            tooltip: {
+                                callbacks: {
+                                    label: (context) => {
+                                        const value = context.raw;
+                                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                        const percentage = ((value / total) * 100).toFixed(1);
+                                        return `${context.label}: ${I18n.formatCurrency(value)} (${percentage}%)`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        function openAssetModal() {
+            document.getElementById('modalTitle').textContent = I18n.t('assets.addAsset');
+            document.getElementById('assetForm').reset();
+            document.getElementById('assetId').value = '';
+            document.getElementById('assetModal').classList.add('active');
+        }
+
+        function closeAssetModal() {
+            document.getElementById('assetModal').classList.remove('active');
+        }
+
+        function editAsset(id) {
+            const assets = Storage.getAssets();
+            const asset = assets.find(a => a.id === id);
+            if (!asset) return;
+
+            document.getElementById('modalTitle').textContent = I18n.t('common.edit');
+            document.getElementById('assetId').value = asset.id;
+            document.getElementById('assetType').value = asset.type;
+            document.getElementById('assetName').value = asset.nameHe || asset.nameEn || '';
+            document.getElementById('assetValue').value = asset.value;
+            document.getElementById('purchaseDate').value = asset.purchaseDate || '';
+            document.getElementById('purchasePrice').value = asset.purchasePrice || '';
+            document.getElementById('assetModal').classList.add('active');
+        }
+
+        function saveAsset() {
+            const id = document.getElementById('assetId').value;
+            const type = document.getElementById('assetType').value;
+            const nameHe = document.getElementById('assetName').value;
+            const value = parseFloat(document.getElementById('assetValue').value);
+            const purchaseDate = document.getElementById('purchaseDate').value;
+            const purchasePrice = parseFloat(document.getElementById('purchasePrice').value) || null;
+
+            if (!type || !nameHe || !value) {
+                App.notify('Please fill all required fields', 'error');
+                return;
+            }
+
+            if (id) {
+                Storage.updateAsset(id, { type, nameHe, nameEn: nameHe, value, purchaseDate, purchasePrice });
+            } else {
+                Storage.addAsset({ type, nameHe, nameEn: nameHe, value, purchaseDate, purchasePrice });
+            }
+
+            closeAssetModal();
+            loadAssets();
+            App.notify(I18n.t('common.save') + ' ✓', 'success');
+        }
+
+        function deleteAsset(id) {
+            if (confirm(I18n.t('common.confirmDelete'))) {
+                Storage.deleteAsset(id);
+                loadAssets();
+                App.notify(I18n.t('common.delete') + ' ✓', 'success');
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#10b981">
+    <link rel="manifest" href="../manifest.json">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>">
+    <title>עדכון נתוני שוק - ניהול פיננסי</title>
+    <link rel="stylesheet" href="../css/app.css">
+    <style>
+        .nav-link.active { background: #10b981 !important; }
+        .page-header h1 { color: #10b981; }
+        .btn-primary { background: #10b981; }
+        .btn-primary:hover { background: #059669; }
+
+        .update-status {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 20px;
+            background: var(--color-bg-card);
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            margin-bottom: 25px;
+        }
+
+        .status-icon { font-size: 2.5rem; }
+
+        .status-info h3 { margin-bottom: 5px; }
+        .status-info p { color: var(--color-text-secondary); font-size: 0.9rem; }
+
+        .status-ok { border-color: var(--color-positive); }
+        .status-warning { border-color: #f59e0b; }
+        .status-old { border-color: var(--color-negative); }
+
+        .update-section {
+            background: var(--color-bg-card);
+            border: 1px solid var(--color-border);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+
+        .update-section h2 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .source-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid #10b981;
+            border-radius: 8px;
+            color: #10b981;
+            text-decoration: none;
+            margin-bottom: 15px;
+            transition: all 0.3s;
+        }
+
+        .source-link:hover {
+            background: #10b981;
+            color: white;
+        }
+
+        .instructions {
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .instructions h4 {
+            margin-bottom: 10px;
+            color: #10b981;
+        }
+
+        .instructions ol {
+            margin: 0;
+            padding-right: 20px;
+        }
+
+        .instructions li {
+            margin-bottom: 8px;
+            color: var(--color-text-secondary);
+        }
+
+        .paste-area {
+            width: 100%;
+            min-height: 200px;
+            padding: 15px;
+            background: var(--color-bg-main);
+            border: 2px dashed var(--color-border);
+            border-radius: 12px;
+            color: white;
+            font-family: monospace;
+            font-size: 0.9rem;
+            resize: vertical;
+            transition: border-color 0.3s;
+        }
+
+        .paste-area:focus {
+            outline: none;
+            border-color: #10b981;
+        }
+
+        .paste-area::placeholder {
+            color: var(--color-text-secondary);
+        }
+
+        .preview-section {
+            margin-top: 20px;
+            display: none;
+        }
+
+        .preview-section.active {
+            display: block;
+        }
+
+        .preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .preview-count {
+            background: #10b981;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+        }
+
+        .preview-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        .preview-table th,
+        .preview-table td {
+            padding: 10px;
+            text-align: right;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .preview-table th {
+            background: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+        }
+
+        .preview-table tr:hover {
+            background: rgba(255,255,255,0.05);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .success-message {
+            display: none;
+            padding: 15px;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid #10b981;
+            border-radius: 10px;
+            color: #10b981;
+            margin-top: 15px;
+        }
+
+        .success-message.active {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .tab-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            padding: 10px 20px;
+            background: var(--color-bg-main);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            color: var(--color-text-secondary);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .tab-btn:hover {
+            background: rgba(255,255,255,0.05);
+        }
+
+        .tab-btn.active {
+            background: #10b981;
+            color: white;
+            border-color: #10b981;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <span class="logo">💰</span>
+                <h1>ניהול פיננסי אישי</h1>
+            </div>
+
+            <nav>
+                <ul class="nav-menu">
+                    <li class="nav-item"><a href="../index.html" class="nav-link"><span class="icon">🏠</span><span>דאשבורד</span></a></li>
+                    <li class="nav-item"><a href="bank.html" class="nav-link"><span class="icon">🏦</span><span>חשבונות בנק</span></a></li>
+                    <li class="nav-item"><a href="credit.html" class="nav-link"><span class="icon">💳</span><span>כרטיסי אשראי</span></a></li>
+                    <li class="nav-item"><a href="stocks.html" class="nav-link"><span class="icon">📈</span><span>מניות</span></a></li>
+                    <li class="nav-item">
+                        <span class="nav-link" style="cursor: default;"><span class="icon">📊</span><span>קרנות ופנסיה</span></span>
+                        <ul class="nav-submenu">
+                            <li class="nav-item"><a href="training.html" class="nav-link"><span>קרנות השתלמות</span></a></li>
+                            <li class="nav-item"><a href="pension.html" class="nav-link"><span>פנסיה</span></a></li>
+                            <li class="nav-item"><a href="gemel.html" class="nav-link"><span>קופות גמל</span></a></li>
+                            <li class="nav-item"><a href="funds-update.html" class="nav-link"><span>עדכון חודשי</span></a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item"><a href="assets.html" class="nav-link"><span class="icon">🏠</span><span>נכסים</span></a></li>
+                    <li class="nav-item"><a href="goals.html" class="nav-link"><span class="icon">🎯</span><span>יעדי חיסכון</span></a></li>
+                    <li class="nav-item"><a href="reports.html" class="nav-link"><span class="icon">📋</span><span>דוחות</span></a></li>
+                    <li class="nav-item"><a href="market-update.html" class="nav-link active"><span class="icon">📊</span><span>עדכון נתוני שוק</span></a></li>
+                    <li class="nav-item"><a href="settings.html" class="nav-link"><span class="icon">⚙️</span><span>הגדרות</span></a></li>
+                </ul>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button class="lang-toggle" onclick="I18n.toggleLanguage()">English</button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="page-header">
+                <h1>📊 עדכון נתוני שוק</h1>
+                <p>עדכון נתוני קרנות השתלמות, פנסיה וגמל מהשוק</p>
+            </header>
+
+            <!-- Update Status -->
+            <div class="update-status" id="updateStatus">
+                <div class="status-icon">📅</div>
+                <div class="status-info">
+                    <h3>עדכון אחרון: <span id="lastUpdateDate">טוען...</span></h3>
+                    <p id="statusMessage">בודק מצב...</p>
+                </div>
+            </div>
+
+            <!-- Tab Buttons -->
+            <div class="tab-buttons">
+                <button class="tab-btn active" onclick="switchTab('training')">📚 קרנות השתלמות</button>
+                <button class="tab-btn" onclick="switchTab('pension')">👴 פנסיה</button>
+                <button class="tab-btn" onclick="switchTab('gemel')">💰 קופות גמל</button>
+            </div>
+
+            <!-- Training Funds Tab -->
+            <div class="tab-content active" id="tab-training">
+                <div class="update-section">
+                    <h2><span>📚</span> עדכון קרנות השתלמות</h2>
+
+                    <a href="https://www.supermarker.themarker.com/Gemel/CompareHishtalmutFunds.aspx" target="_blank" class="source-link">
+                        <span>🔗</span>
+                        <span>פתח את TheMarker - קרנות השתלמות</span>
+                        <span>↗</span>
+                    </a>
+
+                    <div class="instructions">
+                        <h4>📋 הוראות:</h4>
+                        <ol>
+                            <li>לחץ על הקישור למעלה לפתיחת אתר TheMarker</li>
+                            <li>סמן את כל הטבלה (Ctrl+A על הטבלה)</li>
+                            <li>העתק (Ctrl+C)</li>
+                            <li>הדבק כאן למטה (Ctrl+V)</li>
+                        </ol>
+                    </div>
+
+                    <textarea class="paste-area" id="pasteTraining"
+                        placeholder="הדבק כאן את הנתונים מ-TheMarker...
+
+לדוגמה:
+שם הקרן    חברה מנהלת    תשואה חודשית    תשואה שנתית    תשואה 3 שנים    תשואה 5 שנים
+אינפיניטי השתלמות    אינפיניטי    2.86%    48.74%    110.99%    128.34%
+..."
+                        oninput="parseAndPreview('training')"></textarea>
+
+                    <div class="preview-section" id="preview-training">
+                        <div class="preview-header">
+                            <h4>👁️ תצוגה מקדימה</h4>
+                            <span class="preview-count" id="count-training">0 קרנות</span>
+                        </div>
+                        <div style="overflow-x: auto;">
+                            <table class="preview-table">
+                                <thead>
+                                    <tr>
+                                        <th>שם קרן</th>
+                                        <th>חברה</th>
+                                        <th>חודש</th>
+                                        <th>שנה</th>
+                                        <th>3 שנים</th>
+                                        <th>5 שנים</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbody-training"></tbody>
+                            </table>
+                        </div>
+                        <div class="action-buttons">
+                            <button class="btn btn-primary" onclick="saveData('training')">
+                                <span>💾</span>
+                                <span>שמור נתונים</span>
+                            </button>
+                            <button class="btn btn-secondary" onclick="clearPreview('training')">
+                                <span>🗑️</span>
+                                <span>נקה</span>
+                            </button>
+                        </div>
+                        <div class="success-message" id="success-training">
+                            <span>✅</span>
+                            <span>הנתונים נשמרו בהצלחה!</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pension Tab -->
+            <div class="tab-content" id="tab-pension">
+                <div class="update-section">
+                    <h2><span>👴</span> עדכון קרנות פנסיה</h2>
+
+                    <a href="https://www.supermarker.themarker.com/pension/ComparePensionFunds.aspx" target="_blank" class="source-link">
+                        <span>🔗</span>
+                        <span>פתח את TheMarker - פנסיה</span>
+                        <span>↗</span>
+                    </a>
+
+                    <div class="instructions">
+                        <h4>📋 הוראות:</h4>
+                        <ol>
+                            <li>לחץ על הקישור למעלה לפתיחת אתר TheMarker</li>
+                            <li>סמן את כל הטבלה (Ctrl+A על הטבלה)</li>
+                            <li>העתק (Ctrl+C)</li>
+                            <li>הדבק כאן למטה (Ctrl+V)</li>
+                        </ol>
+                    </div>
+
+                    <textarea class="paste-area" id="pastePension"
+                        placeholder="הדבק כאן את הנתונים מ-TheMarker..."
+                        oninput="parseAndPreview('pension')"></textarea>
+
+                    <div class="preview-section" id="preview-pension">
+                        <div class="preview-header">
+                            <h4>👁️ תצוגה מקדימה</h4>
+                            <span class="preview-count" id="count-pension">0 קרנות</span>
+                        </div>
+                        <div style="overflow-x: auto;">
+                            <table class="preview-table">
+                                <thead>
+                                    <tr>
+                                        <th>שם קרן</th>
+                                        <th>חברה</th>
+                                        <th>חודש</th>
+                                        <th>שנה</th>
+                                        <th>3 שנים</th>
+                                        <th>5 שנים</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbody-pension"></tbody>
+                            </table>
+                        </div>
+                        <div class="action-buttons">
+                            <button class="btn btn-primary" onclick="saveData('pension')">
+                                <span>💾</span>
+                                <span>שמור נתונים</span>
+                            </button>
+                            <button class="btn btn-secondary" onclick="clearPreview('pension')">
+                                <span>🗑️</span>
+                                <span>נקה</span>
+                            </button>
+                        </div>
+                        <div class="success-message" id="success-pension">
+                            <span>✅</span>
+                            <span>הנתונים נשמרו בהצלחה!</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gemel Tab -->
+            <div class="tab-content" id="tab-gemel">
+                <div class="update-section">
+                    <h2><span>💰</span> עדכון קופות גמל</h2>
+
+                    <a href="https://www.supermarker.themarker.com/Gemel/CompareGemelFunds.aspx" target="_blank" class="source-link">
+                        <span>🔗</span>
+                        <span>פתח את TheMarker - קופות גמל</span>
+                        <span>↗</span>
+                    </a>
+
+                    <div class="instructions">
+                        <h4>📋 הוראות:</h4>
+                        <ol>
+                            <li>לחץ על הקישור למעלה לפתיחת אתר TheMarker</li>
+                            <li>סמן את כל הטבלה (Ctrl+A על הטבלה)</li>
+                            <li>העתק (Ctrl+C)</li>
+                            <li>הדבק כאן למטה (Ctrl+V)</li>
+                        </ol>
+                    </div>
+
+                    <textarea class="paste-area" id="pasteGemel"
+                        placeholder="הדבק כאן את הנתונים מ-TheMarker..."
+                        oninput="parseAndPreview('gemel')"></textarea>
+
+                    <div class="preview-section" id="preview-gemel">
+                        <div class="preview-header">
+                            <h4>👁️ תצוגה מקדימה</h4>
+                            <span class="preview-count" id="count-gemel">0 קרנות</span>
+                        </div>
+                        <div style="overflow-x: auto;">
+                            <table class="preview-table">
+                                <thead>
+                                    <tr>
+                                        <th>שם קרן</th>
+                                        <th>חברה</th>
+                                        <th>חודש</th>
+                                        <th>שנה</th>
+                                        <th>3 שנים</th>
+                                        <th>5 שנים</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbody-gemel"></tbody>
+                            </table>
+                        </div>
+                        <div class="action-buttons">
+                            <button class="btn btn-primary" onclick="saveData('gemel')">
+                                <span>💾</span>
+                                <span>שמור נתונים</span>
+                            </button>
+                            <button class="btn btn-secondary" onclick="clearPreview('gemel')">
+                                <span>🗑️</span>
+                                <span>נקה</span>
+                            </button>
+                        </div>
+                        <div class="success-message" id="success-gemel">
+                            <span>✅</span>
+                            <span>הנתונים נשמרו בהצלחה!</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+
+        <button class="mobile-menu-toggle">☰</button>
+    </div>
+
+    <script src="../js/storage.js"></script>
+    <script src="../js/i18n.js"></script>
+    <script src="../data/market-funds.js"></script>
+    <script src="../js/app.js"></script>
+    <script>
+        // Parsed data storage
+        const parsedData = {
+            training: [],
+            pension: [],
+            gemel: []
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            App.currentPage = 'market-update';
+            updateStatusDisplay();
+        });
+
+        function updateStatusDisplay() {
+            const lastUpdate = MarketFunds.getLastUpdate();
+            const needsUpdate = MarketFunds.needsUpdate();
+            const statusEl = document.getElementById('updateStatus');
+            const dateEl = document.getElementById('lastUpdateDate');
+            const msgEl = document.getElementById('statusMessage');
+
+            dateEl.textContent = lastUpdate || 'לא עודכן';
+
+            if (!lastUpdate) {
+                statusEl.className = 'update-status status-old';
+                msgEl.textContent = 'לא נמצאו נתונים - יש לעדכן';
+            } else if (needsUpdate) {
+                statusEl.className = 'update-status status-warning';
+                msgEl.textContent = 'הנתונים מהחודש שעבר - מומלץ לעדכן';
+            } else {
+                statusEl.className = 'update-status status-ok';
+                msgEl.textContent = 'הנתונים מעודכנים';
+            }
+        }
+
+        function switchTab(type) {
+            // Update tab buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Update tab content
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            document.getElementById(`tab-${type}`).classList.add('active');
+        }
+
+        function parseAndPreview(type) {
+            const textareaId = type === 'training' ? 'pasteTraining' :
+                              type === 'pension' ? 'pastePension' : 'pasteGemel';
+            const text = document.getElementById(textareaId).value;
+
+            if (!text.trim()) {
+                document.getElementById(`preview-${type}`).classList.remove('active');
+                parsedData[type] = [];
+                return;
+            }
+
+            const funds = parseTableData(text);
+            parsedData[type] = funds;
+
+            // Update preview
+            const tbody = document.getElementById(`tbody-${type}`);
+            tbody.innerHTML = funds.map(fund => `
+                <tr>
+                    <td>${fund.nameHe}</td>
+                    <td>${fund.companyHe}</td>
+                    <td>${formatPercent(fund.month)}</td>
+                    <td>${formatPercent(fund.year1)}</td>
+                    <td>${formatPercent(fund.year3)}</td>
+                    <td>${formatPercent(fund.year5)}</td>
+                </tr>
+            `).join('');
+
+            document.getElementById(`count-${type}`).textContent = `${funds.length} קרנות`;
+            document.getElementById(`preview-${type}`).classList.add('active');
+            document.getElementById(`success-${type}`).classList.remove('active');
+        }
+
+        function parseTableData(text) {
+            const lines = text.trim().split('\n');
+            const funds = [];
+
+            // Skip header lines (usually first 1-2 lines)
+            let startIndex = 0;
+            for (let i = 0; i < Math.min(3, lines.length); i++) {
+                if (lines[i].includes('שם') || lines[i].includes('תשואה') ||
+                    lines[i].includes('חברה') || lines[i].includes('Name')) {
+                    startIndex = i + 1;
+                }
+            }
+
+            for (let i = startIndex; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (!line) continue;
+
+                // Split by tabs or multiple spaces
+                const parts = line.split(/\t+|\s{2,}/).filter(p => p.trim());
+
+                if (parts.length >= 4) {
+                    const fund = {
+                        nameHe: parts[0]?.trim() || '',
+                        nameEn: parts[0]?.trim() || '', // Will be same as Hebrew for now
+                        companyHe: extractCompany(parts),
+                        companyEn: extractCompany(parts),
+                        month: parsePercent(findPercentValue(parts, 0)),
+                        year1: parsePercent(findPercentValue(parts, 1)),
+                        year3: parsePercent(findPercentValue(parts, 2)),
+                        year5: parsePercent(findPercentValue(parts, 3)),
+                        fee: null,
+                        assets: null
+                    };
+
+                    // Only add if we have at least name and one return value
+                    if (fund.nameHe && (fund.month !== null || fund.year1 !== null)) {
+                        funds.push(fund);
+                    }
+                }
+            }
+
+            return funds;
+        }
+
+        function extractCompany(parts) {
+            // Company is usually the second column
+            if (parts.length >= 2) {
+                const company = parts[1].trim();
+                // Check if it looks like a company name (not a percentage)
+                if (!company.includes('%') && !company.match(/^[\d.-]+$/)) {
+                    return company;
+                }
+            }
+            return 'לא ידוע';
+        }
+
+        function findPercentValue(parts, index) {
+            // Find percentage values in the parts array
+            const percentValues = parts.filter(p =>
+                p.includes('%') || p.match(/^-?[\d.]+$/)
+            );
+            return percentValues[index] || null;
+        }
+
+        function parsePercent(value) {
+            if (!value) return null;
+            // Remove % sign and convert to number
+            const num = parseFloat(value.replace('%', '').replace(',', '.').trim());
+            return isNaN(num) ? null : num;
+        }
+
+        function formatPercent(value) {
+            if (value === null || value === undefined) return '-';
+            const className = value >= 0 ? 'color: var(--color-positive)' : 'color: var(--color-negative)';
+            return `<span style="${className}">${value.toFixed(2)}%</span>`;
+        }
+
+        function saveData(type) {
+            if (parsedData[type].length === 0) {
+                App.notify('אין נתונים לשמירה', 'error');
+                return;
+            }
+
+            const success = MarketFunds.updateData(type, parsedData[type]);
+
+            if (success) {
+                document.getElementById(`success-${type}`).classList.add('active');
+                updateStatusDisplay();
+                App.notify(`נשמרו ${parsedData[type].length} קרנות`, 'success');
+            } else {
+                App.notify('שגיאה בשמירת הנתונים', 'error');
+            }
+        }
+
+        function clearPreview(type) {
+            const textareaId = type === 'training' ? 'pasteTraining' :
+                              type === 'pension' ? 'pastePension' : 'pasteGemel';
+            document.getElementById(textareaId).value = '';
+            document.getElementById(`preview-${type}`).classList.remove('active');
+            document.getElementById(`success-${type}`).classList.remove('active');
+            parsedData[type] = [];
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,1487 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#8b5cf6">
+    <link rel="manifest" href="../manifest.json">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📈</text></svg>">
+    <title>תיק מניות - ניהול פיננסי</title>
+    <link rel="stylesheet" href="../css/app.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .nav-link.active { background: var(--color-stocks) !important; }
+        .page-header h1 { color: var(--color-stocks); }
+        .btn-primary { background: var(--color-stocks); }
+        .btn-primary:hover { background: #7c3aed; }
+        .stock-symbol {
+            font-weight: bold;
+            font-family: monospace;
+            font-size: 1.1rem;
+        }
+        .profit { color: var(--color-positive); }
+        .loss { color: var(--color-negative); }
+        .stock-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .metric-card {
+            background: var(--color-bg-card);
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+        }
+        .metric-card .label {
+            color: var(--color-text-secondary);
+            font-size: 0.85rem;
+            margin-bottom: 5px;
+        }
+        .metric-card .value {
+            font-size: 1.3rem;
+            font-weight: bold;
+        }
+
+        /* MA150 Chart Styles */
+        .ma150-chart-info {
+            padding: 15px 20px;
+            background: var(--color-bg-hover);
+            border-radius: 8px;
+            margin: 0 20px 15px;
+        }
+        .ma150-metrics {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: space-around;
+        }
+        .ma150-metric {
+            text-align: center;
+        }
+        .ma150-metric .label {
+            display: block;
+            font-size: 0.8rem;
+            color: var(--color-text-secondary);
+            margin-bottom: 4px;
+        }
+        .ma150-metric .value {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+        .ma150-metric .value.above { color: var(--color-positive); }
+        .ma150-metric .value.below { color: var(--color-negative); }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <span class="logo">💰</span>
+                <h1 data-i18n="dashboard.title">ניהול פיננסי אישי</h1>
+            </div>
+
+            <nav>
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a href="../index.html" class="nav-link" data-category="dashboard">
+                            <span class="icon">🏠</span>
+                            <span data-i18n="nav.dashboard">דאשבורד</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="bank.html" class="nav-link" data-category="bank">
+                            <span class="icon">🏦</span>
+                            <span data-i18n="nav.bankAccounts">חשבונות בנק</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="credit.html" class="nav-link" data-category="credit">
+                            <span class="icon">💳</span>
+                            <span data-i18n="nav.creditCards">כרטיסי אשראי</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="stocks.html" class="nav-link active" data-category="stocks">
+                            <span class="icon">📈</span>
+                            <span data-i18n="nav.stocks">מניות</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <span class="nav-link" style="cursor: default;">
+                            <span class="icon">📊</span>
+                            <span data-i18n="nav.fundsAndPension">קרנות ופנסיה</span>
+                        </span>
+                        <ul class="nav-submenu">
+                            <li class="nav-item"><a href="training.html" class="nav-link" data-category="training"><span data-i18n="nav.trainingFunds">קרנות השתלמות</span></a></li>
+                            <li class="nav-item"><a href="pension.html" class="nav-link" data-category="pension"><span data-i18n="nav.pension">פנסיה</span></a></li>
+                            <li class="nav-item"><a href="gemel.html" class="nav-link" data-category="gemel"><span data-i18n="nav.gemel">קופות גמל</span></a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a href="assets.html" class="nav-link" data-category="assets">
+                            <span class="icon">🏠</span>
+                            <span data-i18n="nav.assets">נכסים</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button class="lang-toggle" onclick="I18n.toggleLanguage()">English</button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="page-header">
+                <h1>
+                    <span>📈</span>
+                    <span data-i18n="stocks.title">תיק מניות</span>
+                </h1>
+            </header>
+
+            <!-- Active Alerts Banner -->
+            <div id="stockAlertsBar" class="alerts-bar" style="display: none;"></div>
+
+            <!-- Portfolio Summary -->
+            <div class="stock-metrics">
+                <div class="metric-card">
+                    <div class="label" data-i18n="stocks.totalValue">שווי כולל</div>
+                    <div class="value" id="totalValue" style="color: var(--color-stocks);">₪0</div>
+                </div>
+                <div class="metric-card">
+                    <div class="label">עלות</div>
+                    <div class="value" id="totalCost">₪0</div>
+                </div>
+                <div class="metric-card">
+                    <div class="label" data-i18n="stocks.profitLoss">רווח/הפסד</div>
+                    <div class="value" id="totalProfitLoss">₪0</div>
+                </div>
+                <div class="metric-card">
+                    <div class="label">תשואה</div>
+                    <div class="value" id="totalReturn">0%</div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+                <button class="btn btn-primary" onclick="openStockModal()">
+                    <span>➕</span>
+                    <span data-i18n="stocks.addStock">הוסף מניה</span>
+                </button>
+                <button class="btn btn-secondary" onclick="refreshAllPrices()" id="refreshBtn">
+                    <span>🔄</span>
+                    <span>עדכן מחירים</span>
+                </button>
+                <button class="btn btn-secondary" onclick="importCSV()">
+                    <span>📥</span>
+                    <span>ייבוא CSV</span>
+                </button>
+                <label class="auto-refresh-toggle" style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                    <input type="checkbox" id="autoRefreshToggle" onchange="toggleAutoRefresh()" checked>
+                    <span style="font-size: 0.9rem; color: var(--color-text-secondary);">רענון אוטומטי</span>
+                </label>
+            </div>
+
+            <!-- Holdings Table -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <span class="icon">📋</span>
+                        <span>אחזקות</span>
+                    </h2>
+                    <span id="lastUpdateTime" style="color: var(--color-text-secondary); font-size: 0.85rem;"></span>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th data-i18n="stocks.symbol">סימול</th>
+                                <th data-i18n="stocks.companyName">שם</th>
+                                <th data-i18n="stocks.quantity">כמות</th>
+                                <th data-i18n="stocks.avgPrice">מחיר ממוצע</th>
+                                <th data-i18n="stocks.currentPrice">מחיר נוכחי</th>
+                                <th>MA150</th>
+                                <th>מיקום</th>
+                                <th data-i18n="stocks.totalValue">שווי</th>
+                                <th data-i18n="stocks.profitLoss">רווח/הפסד</th>
+                                <th data-i18n="common.actions">פעולות</th>
+                            </tr>
+                        </thead>
+                        <tbody id="holdingsTable">
+                            <!-- Will be populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Watchlist Section -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <span class="icon">📋</span>
+                        <span>רשימת מעקב</span>
+                    </h2>
+                    <button class="btn btn-sm btn-secondary" onclick="openAddWatchlistModal()">
+                        <span>➕</span>
+                        <span>הוסף מניה למעקב</span>
+                    </button>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>סימול</th>
+                                <th>שם</th>
+                                <th>שוק</th>
+                                <th>מחיר נוכחי</th>
+                                <th>שינוי</th>
+                                <th>MA150</th>
+                                <th>מיקום</th>
+                                <th>התראות</th>
+                                <th>פעולות</th>
+                            </tr>
+                        </thead>
+                        <tbody id="watchlistTable">
+                            <tr><td colspan="9" style="text-align: center; color: var(--color-text-secondary);">אין מניות ברשימת המעקב</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Charts -->
+            <div class="charts-grid">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">
+                            <span class="icon">📊</span>
+                            <span data-i18n="stocks.portfolioDistribution">חלוקת תיק</span>
+                        </h2>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="portfolioChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Interactive MA150 Chart -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <span class="icon">📈</span>
+                        <span>גרף מחיר ו-MA150</span>
+                    </h2>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <select id="ma150ChartSelect" class="form-control" style="width: auto; min-width: 150px;" onchange="updateMA150Chart()">
+                            <option value="">בחר מניה...</option>
+                        </select>
+                        <select id="ma150TimeRange" class="form-control" style="width: auto;" onchange="updateMA150Chart()">
+                            <option value="3m">3 חודשים</option>
+                            <option value="6m" selected>6 חודשים</option>
+                            <option value="1y">שנה</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="ma150-chart-info" id="ma150ChartInfo" style="display: none;">
+                    <div class="ma150-metrics">
+                        <div class="ma150-metric">
+                            <span class="label">מחיר נוכחי</span>
+                            <span class="value" id="chartCurrentPrice">-</span>
+                        </div>
+                        <div class="ma150-metric">
+                            <span class="label">MA150</span>
+                            <span class="value" id="chartMA150">-</span>
+                        </div>
+                        <div class="ma150-metric">
+                            <span class="label">מיקום</span>
+                            <span class="value" id="chartPosition">-</span>
+                        </div>
+                        <div class="ma150-metric">
+                            <span class="label">שינוי 30 יום</span>
+                            <span class="value" id="chart30DayChange">-</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="chart-container" style="height: 350px;">
+                    <canvas id="ma150Chart"></canvas>
+                </div>
+                <div id="ma150ChartEmpty" style="text-align: center; padding: 60px 20px; color: var(--color-text-secondary);">
+                    <span style="font-size: 3rem;">📊</span>
+                    <p style="margin-top: 15px;">בחר מניה מהרשימה לצפייה בגרף המחיר וה-MA150</p>
+                </div>
+            </div>
+
+            <!-- Transaction History -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <span class="icon">📜</span>
+                        <span data-i18n="stocks.transactions">היסטוריית פעולות</span>
+                    </h2>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th data-i18n="common.date">תאריך</th>
+                                <th data-i18n="common.type">סוג</th>
+                                <th data-i18n="stocks.symbol">סימול</th>
+                                <th data-i18n="stocks.quantity">כמות</th>
+                                <th>מחיר</th>
+                                <th data-i18n="common.total">סה״כ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transactionsTable">
+                            <!-- Will be populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+
+        <!-- Mobile Menu Toggle -->
+        <button class="mobile-menu-toggle">☰</button>
+    </div>
+
+    <!-- Add Stock Modal -->
+    <div class="modal-overlay" id="stockModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 data-i18n="stocks.addStock">הוסף מניה</h2>
+                <button class="modal-close" onclick="closeStockModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="stockForm">
+                    <div class="form-group">
+                        <label data-i18n="stocks.symbol">סימול (Symbol)</label>
+                        <input type="text" class="form-control" id="stockSymbol" required placeholder="AAPL" style="text-transform: uppercase;">
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="stocks.companyName">שם החברה</label>
+                        <input type="text" class="form-control" id="stockName" placeholder="Apple Inc.">
+                    </div>
+                    <div class="form-group">
+                        <label>שוק</label>
+                        <select class="form-control" id="stockMarket">
+                            <option value="US">ארה"ב (NYSE/NASDAQ)</option>
+                            <option value="IL">ישראל (TASE)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="stocks.quantity">כמות</label>
+                        <input type="number" class="form-control" id="stockQuantity" min="0.01" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="stocks.avgPrice">מחיר קנייה</label>
+                        <input type="number" class="form-control" id="stockPrice" min="0.01" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="stocks.currentPrice">מחיר נוכחי (אופציונלי)</label>
+                        <input type="number" class="form-control" id="stockCurrentPrice" min="0.01" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="bank.currency">מטבע</label>
+                        <select class="form-control" id="stockCurrency">
+                            <option value="ILS">₪ ILS</option>
+                            <option value="USD" selected>$ USD</option>
+                            <option value="EUR">€ EUR</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeStockModal()" data-i18n="common.cancel">ביטול</button>
+                <button class="btn btn-primary" onclick="saveStock()" data-i18n="common.save">שמור</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Update Price Modal -->
+    <div class="modal-overlay" id="updatePriceModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 data-i18n="stocks.updatePrice">עדכן מחיר</h2>
+                <button class="modal-close" onclick="closeUpdatePriceModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="updatePriceForm">
+                    <input type="hidden" id="updateSymbol">
+                    <div class="form-group">
+                        <label data-i18n="stocks.currentPrice">מחיר נוכחי</label>
+                        <input type="number" class="form-control" id="newPrice" min="0.01" step="0.01" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeUpdatePriceModal()" data-i18n="common.cancel">ביטול</button>
+                <button class="btn btn-primary" onclick="updatePrice()" data-i18n="common.update">עדכן</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sell Modal -->
+    <div class="modal-overlay" id="sellModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 data-i18n="stocks.sell">מכירה</h2>
+                <button class="modal-close" onclick="closeSellModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="sellForm">
+                    <input type="hidden" id="sellSymbol">
+                    <p id="sellInfo" style="margin-bottom: 15px; color: var(--color-text-secondary);"></p>
+                    <div class="form-group">
+                        <label data-i18n="stocks.quantity">כמות למכירה</label>
+                        <input type="number" class="form-control" id="sellQuantity" min="0.01" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label>מחיר מכירה</label>
+                        <input type="number" class="form-control" id="sellPrice" min="0.01" step="0.01" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeSellModal()" data-i18n="common.cancel">ביטול</button>
+                <button class="btn btn-danger" onclick="sellStock()" data-i18n="stocks.sell">מכור</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add to Watchlist Modal -->
+    <div class="modal-overlay" id="watchlistModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>הוסף מניה למעקב</h2>
+                <button class="modal-close" onclick="closeAddWatchlistModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="watchlistForm">
+                    <div class="form-group">
+                        <label>חפש מניה</label>
+                        <input type="text" class="form-control" id="watchlistSearch" placeholder="הקלד סימול או שם..." oninput="searchStocks()">
+                        <div id="searchResults" class="search-results"></div>
+                    </div>
+                    <div class="form-group">
+                        <label>סימול</label>
+                        <input type="text" class="form-control" id="watchlistSymbol" required placeholder="AAPL" style="text-transform: uppercase;">
+                    </div>
+                    <div class="form-group">
+                        <label>שם החברה</label>
+                        <input type="text" class="form-control" id="watchlistName" placeholder="Apple Inc.">
+                    </div>
+                    <div class="form-group">
+                        <label>שוק</label>
+                        <select class="form-control" id="watchlistMarket">
+                            <option value="US">ארה"ב (NYSE/NASDAQ)</option>
+                            <option value="IL">ישראל (TASE)</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeAddWatchlistModal()">ביטול</button>
+                <button class="btn btn-primary" onclick="addToWatchlist()">הוסף למעקב</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Alert Modal -->
+    <div class="modal-overlay" id="alertModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>הוסף התראה</h2>
+                <button class="modal-close" onclick="closeAlertModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="alertForm">
+                    <input type="hidden" id="alertSymbol">
+                    <p id="alertInfo" style="margin-bottom: 15px; color: var(--color-text-secondary);"></p>
+                    <div class="form-group">
+                        <label>סוג התראה</label>
+                        <select class="form-control" id="alertType" onchange="updateAlertValueLabel()">
+                            <option value="price_above">מחיר מעל</option>
+                            <option value="price_below">מחיר מתחת</option>
+                            <option value="percent_change">שינוי אחוזי</option>
+                            <option value="ma150_cross_above">חציית MA150 מלמעלה</option>
+                            <option value="ma150_cross_below">חציית MA150 מלמטה</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="alertValueGroup">
+                        <label id="alertValueLabel">מחיר יעד</label>
+                        <input type="number" class="form-control" id="alertValue" step="0.01" placeholder="0">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeAlertModal()">ביטול</button>
+                <button class="btn btn-primary" onclick="saveAlert()">הוסף התראה</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Alerts Modal -->
+    <div class="modal-overlay" id="viewAlertsModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 id="viewAlertsTitle">התראות</h2>
+                <button class="modal-close" onclick="closeViewAlertsModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="alertsList"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeViewAlertsModal()">סגור</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/storage.js"></script>
+    <script src="../js/i18n.js"></script>
+    <script src="../js/charts.js"></script>
+    <script src="../js/csv-import.js"></script>
+    <script src="../js/stock-api.js"></script>
+    <script src="../js/stock-alerts.js"></script>
+    <script src="../js/notifications.js"></script>
+    <script src="../js/app.js"></script>
+    <script>
+        // State
+        let refreshInterval = null;
+        let priceCache = {};
+        let isRefreshing = false;
+        let searchTimeout = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            App.currentPage = 'stocks';
+            loadStocks();
+            loadWatchlist();
+            checkTriggeredAlerts();
+
+            // Start auto-refresh if enabled
+            const settings = StockAlerts.getSettings();
+            document.getElementById('autoRefreshToggle').checked = settings.autoRefresh;
+            if (settings.autoRefresh) {
+                startAutoRefresh();
+            }
+
+            // Initial price fetch
+            refreshAllPrices();
+        });
+
+        function loadStocks() {
+            const data = Storage.getStocks();
+            const holdingsTable = document.getElementById('holdingsTable');
+            const transactionsTable = document.getElementById('transactionsTable');
+
+            // Calculate totals
+            let totalValue = 0;
+            let totalCost = 0;
+
+            if (data.holdings.length === 0) {
+                holdingsTable.innerHTML = `<tr><td colspan="10" style="text-align: center; color: var(--color-text-secondary);">${I18n.t('stocks.noStocks')}</td></tr>`;
+            } else {
+                holdingsTable.innerHTML = data.holdings.map(h => {
+                    const cached = priceCache[h.symbol] || {};
+                    const currentPrice = cached.currentPrice || h.currentPrice || h.avgPrice;
+                    const ma150 = cached.ma150;
+                    const ma150Position = cached.ma150Position;
+                    const ma150PositionPercent = cached.ma150PositionPercent;
+
+                    const value = h.quantity * currentPrice;
+                    const cost = h.quantity * h.avgPrice;
+                    const profitLoss = value - cost;
+                    const profitLossPercent = ((profitLoss / cost) * 100).toFixed(2);
+
+                    totalValue += value;
+                    totalCost += cost;
+
+                    const isProfit = profitLoss >= 0;
+
+                    // MA150 display
+                    let ma150Display = '<span class="ma150-na">-</span>';
+                    let positionDisplay = '<span class="ma150-na">-</span>';
+
+                    if (ma150 !== null && ma150 !== undefined) {
+                        ma150Display = formatStockPrice(ma150, h.currency);
+                        const positionIcon = ma150Position === 'above' ? '🟢' : '🔴';
+                        const positionPercent = ma150PositionPercent?.toFixed(1) || '0';
+                        const positionSign = ma150PositionPercent >= 0 ? '+' : '';
+                        positionDisplay = `<span class="${ma150Position === 'above' ? 'profit' : 'loss'}">${positionIcon} ${positionSign}${positionPercent}%</span>`;
+                    }
+
+                    return `
+                        <tr>
+                            <td class="stock-symbol">${h.symbol}</td>
+                            <td>${h.name || '-'}</td>
+                            <td>${h.quantity}</td>
+                            <td>${formatStockPrice(h.avgPrice, h.currency)}</td>
+                            <td>${formatStockPrice(currentPrice, h.currency)}</td>
+                            <td>${ma150Display}</td>
+                            <td>${positionDisplay}</td>
+                            <td>${formatStockPrice(value, h.currency)}</td>
+                            <td class="${isProfit ? 'profit' : 'loss'}">
+                                ${isProfit ? '+' : ''}${formatStockPrice(profitLoss, h.currency)}
+                                <br><small>(${isProfit ? '+' : ''}${profitLossPercent}%)</small>
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn btn-secondary btn-sm" onclick="openAlertModal('${h.symbol}', ${currentPrice})" title="הוסף התראה">🔔</button>
+                                    <button class="btn btn-secondary btn-sm" onclick="openUpdatePriceModal('${h.symbol}', ${currentPrice})" title="${I18n.t('stocks.updatePrice')}">💰</button>
+                                    <button class="btn btn-secondary btn-sm" onclick="openSellModal('${h.symbol}', ${h.quantity}, ${currentPrice})" title="${I18n.t('stocks.sell')}">📤</button>
+                                    <button class="btn btn-danger btn-sm" onclick="deleteStock('${h.symbol}')" title="${I18n.t('common.delete')}">🗑️</button>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+
+                // Update portfolio chart
+                Charts.createPortfolioChart('portfolioChart', data.holdings);
+            }
+
+            // Update summary metrics
+            const totalProfitLoss = totalValue - totalCost;
+            const totalReturn = totalCost > 0 ? ((totalProfitLoss / totalCost) * 100).toFixed(2) : 0;
+            const isProfit = totalProfitLoss >= 0;
+
+            document.getElementById('totalValue').textContent = I18n.formatCurrency(totalValue);
+            document.getElementById('totalCost').textContent = I18n.formatCurrency(totalCost);
+            document.getElementById('totalProfitLoss').textContent = (isProfit ? '+' : '') + I18n.formatCurrency(totalProfitLoss);
+            document.getElementById('totalProfitLoss').className = isProfit ? 'value profit' : 'value loss';
+            document.getElementById('totalReturn').textContent = (isProfit ? '+' : '') + totalReturn + '%';
+            document.getElementById('totalReturn').className = isProfit ? 'value profit' : 'value loss';
+
+            // Load transactions
+            if (data.transactions.length === 0) {
+                transactionsTable.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--color-text-secondary);">${I18n.t('common.noData')}</td></tr>`;
+            } else {
+                transactionsTable.innerHTML = data.transactions
+                    .sort((a, b) => new Date(b.date) - new Date(a.date))
+                    .slice(0, 20)
+                    .map(tx => `
+                        <tr>
+                            <td>${I18n.formatDate(tx.date)}</td>
+                            <td class="${tx.type === 'buy' ? 'positive' : 'negative'}">${tx.type === 'buy' ? I18n.t('stocks.buy') : I18n.t('stocks.sell')}</td>
+                            <td class="stock-symbol">${tx.symbol}</td>
+                            <td>${tx.quantity}</td>
+                            <td>${I18n.formatCurrency(tx.price)}</td>
+                            <td>${I18n.formatCurrency(tx.quantity * tx.price)}</td>
+                        </tr>
+                    `).join('');
+            }
+        }
+
+        function loadWatchlist() {
+            const watchlist = StockAlerts.getWatchlist();
+            const watchlistTable = document.getElementById('watchlistTable');
+
+            if (watchlist.length === 0) {
+                watchlistTable.innerHTML = `<tr><td colspan="9" style="text-align: center; color: var(--color-text-secondary);">אין מניות ברשימת המעקב</td></tr>`;
+                return;
+            }
+
+            watchlistTable.innerHTML = watchlist.map(item => {
+                const cached = priceCache[item.symbol] || {};
+                const currentPrice = cached.currentPrice;
+                const priceChange = cached.priceChange;
+                const priceChangePercent = cached.priceChangePercent;
+                const ma150 = cached.ma150;
+                const ma150Position = cached.ma150Position;
+                const ma150PositionPercent = cached.ma150PositionPercent;
+                const currency = cached.currency || 'USD';
+
+                // Alerts for this symbol
+                const alerts = StockAlerts.getAlertsForSymbol(item.symbol);
+                const activeAlerts = alerts.filter(a => a.enabled && !a.triggered).length;
+
+                // Price display
+                let priceDisplay = '<span class="ma150-na">טוען...</span>';
+                let changeDisplay = '<span class="ma150-na">-</span>';
+
+                if (currentPrice !== undefined) {
+                    priceDisplay = formatStockPrice(currentPrice, currency);
+                    if (priceChangePercent !== undefined) {
+                        const isPositive = priceChangePercent >= 0;
+                        changeDisplay = `<span class="${isPositive ? 'profit' : 'loss'}">${isPositive ? '+' : ''}${priceChangePercent.toFixed(2)}%</span>`;
+                    }
+                }
+
+                // MA150 display
+                let ma150Display = '<span class="ma150-na">-</span>';
+                let positionDisplay = '<span class="ma150-na">-</span>';
+
+                if (ma150 !== null && ma150 !== undefined) {
+                    ma150Display = formatStockPrice(ma150, currency);
+                    const positionIcon = ma150Position === 'above' ? '🟢' : '🔴';
+                    const positionPercent = ma150PositionPercent?.toFixed(1) || '0';
+                    const positionSign = ma150PositionPercent >= 0 ? '+' : '';
+                    positionDisplay = `<span class="${ma150Position === 'above' ? 'profit' : 'loss'}">${positionIcon} ${positionSign}${positionPercent}%</span>`;
+                }
+
+                const marketDisplay = item.market === 'IL' ? '🇮🇱' : '🇺🇸';
+
+                return `
+                    <tr>
+                        <td class="stock-symbol">${item.symbol}</td>
+                        <td>${item.name || '-'}</td>
+                        <td>${marketDisplay} ${item.market}</td>
+                        <td>${priceDisplay}</td>
+                        <td>${changeDisplay}</td>
+                        <td>${ma150Display}</td>
+                        <td>${positionDisplay}</td>
+                        <td>
+                            <span class="badge ${activeAlerts > 0 ? 'badge-info' : ''}">${activeAlerts > 0 ? activeAlerts : '-'}</span>
+                        </td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn btn-secondary btn-sm" onclick="openAlertModal('${item.symbol}', ${currentPrice || 0})" title="הוסף התראה">🔔</button>
+                                <button class="btn btn-secondary btn-sm" onclick="viewAlerts('${item.symbol}')" title="צפה בהתראות">👁️</button>
+                                <button class="btn btn-danger btn-sm" onclick="removeFromWatchlist('${item.symbol}')" title="הסר מהמעקב">🗑️</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function formatStockPrice(price, currency = 'ILS') {
+            const symbols = { ILS: '₪', USD: '$', EUR: '€' };
+            return `${symbols[currency] || ''}${price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        }
+
+        // ========== Price Refresh ==========
+
+        async function refreshAllPrices() {
+            if (isRefreshing) return;
+
+            isRefreshing = true;
+            const refreshBtn = document.getElementById('refreshBtn');
+            refreshBtn.disabled = true;
+            refreshBtn.innerHTML = '<span class="spin">🔄</span><span>מעדכן...</span>';
+
+            try {
+                // Get all symbols to fetch (holdings + watchlist)
+                const holdings = Storage.getStocks().holdings;
+                const watchlist = StockAlerts.getWatchlist();
+
+                const symbolsToFetch = [
+                    ...holdings.map(h => ({ symbol: h.symbol, market: h.market })),
+                    ...watchlist.map(w => ({ symbol: w.symbol, market: w.market }))
+                ];
+
+                // Remove duplicates
+                const uniqueSymbols = [...new Map(symbolsToFetch.map(s => [s.symbol, s])).values()];
+
+                if (uniqueSymbols.length === 0) {
+                    return;
+                }
+
+                // Fetch prices
+                const results = await StockAPI.fetchMultiple(uniqueSymbols);
+
+                // Update cache
+                Object.values(results).forEach(result => {
+                    if (result.success) {
+                        priceCache[result.symbol] = result;
+                        StockAlerts.updatePriceCache(result.symbol, result);
+
+                        // Store for MA150 chart
+                        if (result.historicalData && result.historicalData.length > 0) {
+                            ma150ChartData[result.symbol] = result;
+                        }
+
+                        // Update storage price for holdings
+                        const holding = holdings.find(h => h.symbol === result.symbol);
+                        if (holding) {
+                            Storage.updateStockPrice(result.symbol, result.currentPrice);
+                        }
+                    }
+                });
+
+                // Check alerts
+                const triggered = StockAlerts.checkAlerts(priceCache);
+                if (triggered.length > 0) {
+                    showTriggeredAlerts(triggered);
+                }
+
+                // Update last update time
+                document.getElementById('lastUpdateTime').textContent = `עדכון אחרון: ${new Date().toLocaleTimeString('he-IL')}`;
+
+                // Reload displays
+                loadStocks();
+                loadWatchlist();
+                checkTriggeredAlerts();
+                populateMA150ChartDropdown();
+
+            } catch (error) {
+                console.error('Error refreshing prices:', error);
+                App.notify('שגיאה בעדכון מחירים', 'error');
+            } finally {
+                isRefreshing = false;
+                refreshBtn.disabled = false;
+                refreshBtn.innerHTML = '<span>🔄</span><span>עדכן מחירים</span>';
+            }
+        }
+
+        function startAutoRefresh() {
+            const settings = StockAlerts.getSettings();
+            if (refreshInterval) {
+                clearInterval(refreshInterval);
+            }
+            refreshInterval = setInterval(refreshAllPrices, settings.refreshInterval * 1000);
+        }
+
+        function stopAutoRefresh() {
+            if (refreshInterval) {
+                clearInterval(refreshInterval);
+                refreshInterval = null;
+            }
+        }
+
+        function toggleAutoRefresh() {
+            const enabled = document.getElementById('autoRefreshToggle').checked;
+            StockAlerts.updateSettings({ autoRefresh: enabled });
+
+            if (enabled) {
+                startAutoRefresh();
+                App.notify('רענון אוטומטי הופעל', 'info');
+            } else {
+                stopAutoRefresh();
+                App.notify('רענון אוטומטי בוטל', 'info');
+            }
+        }
+
+        // ========== Alerts ==========
+
+        function checkTriggeredAlerts() {
+            const triggered = StockAlerts.getTriggeredAlerts();
+            const alertsBar = document.getElementById('stockAlertsBar');
+
+            if (triggered.length === 0) {
+                alertsBar.style.display = 'none';
+                return;
+            }
+
+            alertsBar.style.display = 'block';
+            alertsBar.innerHTML = `
+                <div class="alerts-bar-content">
+                    <span class="alerts-icon">🔔</span>
+                    <span class="alerts-count">${triggered.length} התראות פעילות</span>
+                    <div class="alerts-list">
+                        ${triggered.slice(0, 3).map(a => `
+                            <span class="alert-item">${a.symbol}: ${StockAlerts.getAlertTypeName(a.type)}</span>
+                        `).join('')}
+                        ${triggered.length > 3 ? `<span class="alert-more">+${triggered.length - 3} נוספות</span>` : ''}
+                    </div>
+                    <button class="btn btn-sm" onclick="dismissTriggeredAlerts()">סגור הכל</button>
+                </div>
+            `;
+        }
+
+        function showTriggeredAlerts(triggered) {
+            triggered.forEach(alert => {
+                const message = StockAlerts.formatAlertMessage(alert, alert.currentData);
+                App.notify(message, 'info');
+
+                // Send push notification if enabled
+                if (Notifications && Notifications.getSettings().stockAlerts) {
+                    Notifications.notifyStockAlert(alert, alert.currentData);
+                }
+            });
+        }
+
+        function dismissTriggeredAlerts() {
+            const triggered = StockAlerts.getTriggeredAlerts();
+            triggered.forEach(alert => {
+                StockAlerts.resetAlert(alert.id);
+            });
+            checkTriggeredAlerts();
+        }
+
+        function openAlertModal(symbol, currentPrice) {
+            document.getElementById('alertSymbol').value = symbol;
+            document.getElementById('alertInfo').textContent = `${symbol} - מחיר נוכחי: ${currentPrice ? currentPrice.toFixed(2) : 'לא זמין'}`;
+            document.getElementById('alertType').value = 'price_above';
+            document.getElementById('alertValue').value = currentPrice ? (currentPrice * 1.05).toFixed(2) : '';
+            updateAlertValueLabel();
+            document.getElementById('alertModal').classList.add('active');
+        }
+
+        function closeAlertModal() {
+            document.getElementById('alertModal').classList.remove('active');
+        }
+
+        function updateAlertValueLabel() {
+            const type = document.getElementById('alertType').value;
+            const valueGroup = document.getElementById('alertValueGroup');
+            const valueLabel = document.getElementById('alertValueLabel');
+
+            if (type === 'ma150_cross_above' || type === 'ma150_cross_below') {
+                valueGroup.style.display = 'none';
+            } else {
+                valueGroup.style.display = 'block';
+                if (type === 'percent_change') {
+                    valueLabel.textContent = 'אחוז שינוי (%)';
+                } else {
+                    valueLabel.textContent = 'מחיר יעד';
+                }
+            }
+        }
+
+        function saveAlert() {
+            const symbol = document.getElementById('alertSymbol').value;
+            const type = document.getElementById('alertType').value;
+            const value = document.getElementById('alertValue').value;
+
+            if (!type.includes('ma150') && !value) {
+                App.notify('נא להזין ערך', 'error');
+                return;
+            }
+
+            StockAlerts.addAlert(symbol, type, value || 0);
+            closeAlertModal();
+            loadWatchlist();
+            App.notify('התראה נוספה בהצלחה', 'success');
+        }
+
+        function viewAlerts(symbol) {
+            const alerts = StockAlerts.getAlertsForSymbol(symbol);
+            document.getElementById('viewAlertsTitle').textContent = `התראות - ${symbol}`;
+
+            if (alerts.length === 0) {
+                document.getElementById('alertsList').innerHTML = '<p style="color: var(--color-text-secondary);">אין התראות למניה זו</p>';
+            } else {
+                document.getElementById('alertsList').innerHTML = alerts.map(alert => `
+                    <div class="alert-row ${alert.triggered ? 'triggered' : ''} ${!alert.enabled ? 'disabled' : ''}">
+                        <div class="alert-info">
+                            <span class="alert-type">${StockAlerts.getAlertTypeName(alert.type)}</span>
+                            ${!alert.type.includes('ma150') ? `<span class="alert-value">${alert.value}</span>` : ''}
+                            ${alert.triggered ? '<span class="badge badge-success">התקיים</span>' : ''}
+                            ${!alert.enabled ? '<span class="badge badge-danger">מושבת</span>' : ''}
+                        </div>
+                        <div class="alert-actions">
+                            <button class="btn btn-sm btn-secondary" onclick="toggleAlertEnabled('${alert.id}')">${alert.enabled ? '⏸️' : '▶️'}</button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteAlert('${alert.id}')">🗑️</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            document.getElementById('viewAlertsModal').classList.add('active');
+        }
+
+        function closeViewAlertsModal() {
+            document.getElementById('viewAlertsModal').classList.remove('active');
+        }
+
+        function toggleAlertEnabled(alertId) {
+            StockAlerts.toggleAlert(alertId);
+            const symbol = document.getElementById('alertSymbol').value;
+            if (symbol) {
+                viewAlerts(symbol);
+            }
+            loadWatchlist();
+        }
+
+        function deleteAlert(alertId) {
+            if (confirm('האם למחוק התראה זו?')) {
+                StockAlerts.removeAlert(alertId);
+                const title = document.getElementById('viewAlertsTitle').textContent;
+                const symbol = title.replace('התראות - ', '');
+                viewAlerts(symbol);
+                loadWatchlist();
+                App.notify('התראה נמחקה', 'success');
+            }
+        }
+
+        // ========== Watchlist ==========
+
+        function openAddWatchlistModal() {
+            document.getElementById('watchlistForm').reset();
+            document.getElementById('searchResults').innerHTML = '';
+            document.getElementById('watchlistModal').classList.add('active');
+        }
+
+        function closeAddWatchlistModal() {
+            document.getElementById('watchlistModal').classList.remove('active');
+        }
+
+        async function searchStocks() {
+            const query = document.getElementById('watchlistSearch').value.trim();
+            const resultsDiv = document.getElementById('searchResults');
+
+            if (query.length < 2) {
+                resultsDiv.innerHTML = '';
+                return;
+            }
+
+            // Debounce
+            if (searchTimeout) {
+                clearTimeout(searchTimeout);
+            }
+
+            searchTimeout = setTimeout(async () => {
+                resultsDiv.innerHTML = '<div class="search-loading">מחפש...</div>';
+
+                try {
+                    const results = await StockAPI.searchStock(query);
+
+                    if (results.length === 0) {
+                        resultsDiv.innerHTML = '<div class="search-empty">לא נמצאו תוצאות</div>';
+                        return;
+                    }
+
+                    resultsDiv.innerHTML = results.map(r => `
+                        <div class="search-result-item" onclick="selectSearchResult('${r.symbol}', '${r.name.replace(/'/g, "\\'")}', '${r.market}')">
+                            <span class="result-symbol">${r.symbol}</span>
+                            <span class="result-name">${r.name}</span>
+                            <span class="result-market">${r.market === 'IL' ? '🇮🇱' : '🇺🇸'}</span>
+                        </div>
+                    `).join('');
+                } catch (error) {
+                    resultsDiv.innerHTML = '<div class="search-error">שגיאה בחיפוש</div>';
+                }
+            }, 300);
+        }
+
+        function selectSearchResult(symbol, name, market) {
+            document.getElementById('watchlistSymbol').value = symbol;
+            document.getElementById('watchlistName').value = name;
+            document.getElementById('watchlistMarket').value = market;
+            document.getElementById('searchResults').innerHTML = '';
+            document.getElementById('watchlistSearch').value = '';
+        }
+
+        function addToWatchlist() {
+            const symbol = document.getElementById('watchlistSymbol').value.trim().toUpperCase();
+            const name = document.getElementById('watchlistName').value.trim();
+            const market = document.getElementById('watchlistMarket').value;
+
+            if (!symbol) {
+                App.notify('נא להזין סימול', 'error');
+                return;
+            }
+
+            const result = StockAlerts.addToWatchlist(symbol, name, market);
+
+            if (result) {
+                closeAddWatchlistModal();
+                loadWatchlist();
+                refreshAllPrices();
+                App.notify('מניה נוספה לרשימת המעקב', 'success');
+            } else {
+                App.notify('מניה זו כבר ברשימת המעקב', 'error');
+            }
+        }
+
+        function removeFromWatchlist(symbol) {
+            if (confirm(`האם להסיר את ${symbol} מרשימת המעקב?`)) {
+                StockAlerts.removeFromWatchlist(symbol);
+                loadWatchlist();
+                App.notify('מניה הוסרה מרשימת המעקב', 'success');
+            }
+        }
+
+        // ========== Stock CRUD ==========
+
+        function openStockModal() {
+            document.getElementById('stockForm').reset();
+            document.getElementById('stockModal').classList.add('active');
+        }
+
+        function closeStockModal() {
+            document.getElementById('stockModal').classList.remove('active');
+        }
+
+        function saveStock() {
+            const symbol = document.getElementById('stockSymbol').value.toUpperCase();
+            const name = document.getElementById('stockName').value;
+            const market = document.getElementById('stockMarket').value;
+            const quantity = parseFloat(document.getElementById('stockQuantity').value);
+            const avgPrice = parseFloat(document.getElementById('stockPrice').value);
+            const currentPrice = parseFloat(document.getElementById('stockCurrentPrice').value) || avgPrice;
+            const currency = document.getElementById('stockCurrency').value;
+
+            if (!symbol || !quantity || !avgPrice) {
+                App.notify('Please fill all required fields', 'error');
+                return;
+            }
+
+            // Format symbol based on market
+            const formattedSymbol = StockAPI.formatSymbol(symbol, market);
+
+            Storage.addStock({ symbol: formattedSymbol, name, quantity, avgPrice, currentPrice, currency, market });
+            closeStockModal();
+            loadStocks();
+            refreshAllPrices();
+            App.notify(I18n.t('common.save') + ' ✓', 'success');
+        }
+
+        // Update Price Modal
+        function openUpdatePriceModal(symbol, currentPrice) {
+            document.getElementById('updateSymbol').value = symbol;
+            document.getElementById('newPrice').value = currentPrice;
+            document.getElementById('updatePriceModal').classList.add('active');
+        }
+
+        function closeUpdatePriceModal() {
+            document.getElementById('updatePriceModal').classList.remove('active');
+        }
+
+        function updatePrice() {
+            const symbol = document.getElementById('updateSymbol').value;
+            const newPrice = parseFloat(document.getElementById('newPrice').value);
+
+            Storage.updateStockPrice(symbol, newPrice);
+            closeUpdatePriceModal();
+            loadStocks();
+            App.notify(I18n.t('stocks.updatePrice') + ' ✓', 'success');
+        }
+
+        // Sell Modal
+        function openSellModal(symbol, maxQuantity, currentPrice) {
+            document.getElementById('sellSymbol').value = symbol;
+            document.getElementById('sellInfo').textContent = `${symbol} - כמות זמינה: ${maxQuantity}`;
+            document.getElementById('sellQuantity').max = maxQuantity;
+            document.getElementById('sellQuantity').value = '';
+            document.getElementById('sellPrice').value = currentPrice;
+            document.getElementById('sellModal').classList.add('active');
+        }
+
+        function closeSellModal() {
+            document.getElementById('sellModal').classList.remove('active');
+        }
+
+        function sellStock() {
+            const symbol = document.getElementById('sellSymbol').value;
+            const quantity = parseFloat(document.getElementById('sellQuantity').value);
+            const price = parseFloat(document.getElementById('sellPrice').value);
+
+            if (!quantity || !price) {
+                App.notify('Please fill all required fields', 'error');
+                return;
+            }
+
+            const result = Storage.sellStock(symbol, quantity, price);
+            if (result) {
+                closeSellModal();
+                loadStocks();
+                App.notify(I18n.t('stocks.sell') + ' ✓', 'success');
+            } else {
+                App.notify('Insufficient quantity', 'error');
+            }
+        }
+
+        function deleteStock(symbol) {
+            if (confirm(I18n.t('common.confirmDelete'))) {
+                Storage.deleteStock(symbol);
+                loadStocks();
+                App.notify(I18n.t('common.delete') + ' ✓', 'success');
+            }
+        }
+
+        async function importCSV() {
+            const format = CSVImport.showImportHelp('stocks');
+            const confirmed = confirm(
+                `${format.title}\n\n` +
+                `עמודות נדרשות:\n${format.columns.join(', ')}\n\n` +
+                `דוגמה:\n${format.example}\n\n` +
+                `להמשיך?`
+            );
+
+            if (!confirmed) return;
+
+            const result = await CSVImport.openFilePicker('stocks');
+
+            if (result.success) {
+                App.notify(`יובאו ${result.imported} מניות בהצלחה`, 'success');
+                loadStocks();
+            } else {
+                App.notify(result.error || 'שגיאה בייבוא', 'error');
+            }
+
+            if (result.errors && result.errors.length > 0) {
+                console.log('Import errors:', result.errors);
+            }
+        }
+
+        // ========== Interactive MA150 Chart ==========
+
+        let ma150ChartInstance = null;
+        let ma150ChartData = {};
+
+        function populateMA150ChartDropdown() {
+            const select = document.getElementById('ma150ChartSelect');
+            const holdings = Storage.getStocks().holdings;
+            const watchlist = StockAlerts.getWatchlist();
+
+            // Clear existing options except first
+            select.innerHTML = '<option value="">בחר מניה...</option>';
+
+            // Add holdings
+            if (holdings.length > 0) {
+                const holdingsGroup = document.createElement('optgroup');
+                holdingsGroup.label = '📋 אחזקות';
+                holdings.forEach(h => {
+                    const option = document.createElement('option');
+                    option.value = h.symbol;
+                    option.textContent = `${h.symbol} - ${h.name || ''}`;
+                    holdingsGroup.appendChild(option);
+                });
+                select.appendChild(holdingsGroup);
+            }
+
+            // Add watchlist
+            if (watchlist.length > 0) {
+                const watchlistGroup = document.createElement('optgroup');
+                watchlistGroup.label = '👁️ רשימת מעקב';
+                watchlist.forEach(w => {
+                    const option = document.createElement('option');
+                    option.value = w.symbol;
+                    option.textContent = `${w.symbol} - ${w.name || ''}`;
+                    watchlistGroup.appendChild(option);
+                });
+                select.appendChild(watchlistGroup);
+            }
+        }
+
+        async function updateMA150Chart() {
+            const symbol = document.getElementById('ma150ChartSelect').value;
+            const timeRange = document.getElementById('ma150TimeRange').value;
+            const chartContainer = document.getElementById('ma150Chart').parentElement;
+            const emptyState = document.getElementById('ma150ChartEmpty');
+            const infoSection = document.getElementById('ma150ChartInfo');
+
+            if (!symbol) {
+                emptyState.style.display = 'block';
+                infoSection.style.display = 'none';
+                if (ma150ChartInstance) {
+                    ma150ChartInstance.destroy();
+                    ma150ChartInstance = null;
+                }
+                return;
+            }
+
+            emptyState.style.display = 'none';
+            infoSection.style.display = 'block';
+
+            // Check if we have cached data
+            let stockData = ma150ChartData[symbol];
+
+            if (!stockData || !stockData.historicalData || stockData.historicalData.length === 0) {
+                // Fetch fresh data
+                const holdings = Storage.getStocks().holdings;
+                const holding = holdings.find(h => h.symbol === symbol);
+                const market = holding?.market || StockAPI.detectMarket(symbol);
+
+                stockData = await StockAPI.fetchStockData(symbol, market);
+                ma150ChartData[symbol] = stockData;
+            }
+
+            if (!stockData.success || !stockData.historicalData || stockData.historicalData.length === 0) {
+                emptyState.innerHTML = '<span style="font-size: 3rem;">⚠️</span><p style="margin-top: 15px;">לא ניתן לטעון נתונים עבור מניה זו</p>';
+                emptyState.style.display = 'block';
+                infoSection.style.display = 'none';
+                return;
+            }
+
+            // Update info metrics
+            updateChartMetrics(stockData);
+
+            // Filter data by time range
+            const filteredData = filterByTimeRange(stockData.historicalData, timeRange);
+            const filteredMA150 = filterByTimeRange(stockData.ma150Series, timeRange);
+
+            // Render chart
+            renderMA150Chart(filteredData, filteredMA150, stockData.currency, symbol);
+        }
+
+        function updateChartMetrics(stockData) {
+            const currency = stockData.currency || 'USD';
+            const symbols = { ILS: '₪', USD: '$', EUR: '€' };
+            const currSymbol = symbols[currency] || '';
+
+            document.getElementById('chartCurrentPrice').textContent =
+                `${currSymbol}${stockData.currentPrice?.toFixed(2) || '-'}`;
+
+            document.getElementById('chartMA150').textContent =
+                stockData.ma150 ? `${currSymbol}${stockData.ma150.toFixed(2)}` : '-';
+
+            const positionEl = document.getElementById('chartPosition');
+            if (stockData.ma150Position) {
+                const icon = stockData.ma150Position === 'above' ? '🟢' : '🔴';
+                const percent = stockData.ma150PositionPercent?.toFixed(1) || '0';
+                const sign = stockData.ma150PositionPercent >= 0 ? '+' : '';
+                positionEl.innerHTML = `${icon} ${sign}${percent}%`;
+                positionEl.className = `value ${stockData.ma150Position}`;
+            } else {
+                positionEl.textContent = '-';
+                positionEl.className = 'value';
+            }
+
+            // Calculate 30-day change
+            const changeEl = document.getElementById('chart30DayChange');
+            if (stockData.historicalData && stockData.historicalData.length >= 30) {
+                const price30DaysAgo = stockData.historicalData[stockData.historicalData.length - 30].close;
+                const currentPrice = stockData.currentPrice;
+                const change = ((currentPrice - price30DaysAgo) / price30DaysAgo) * 100;
+                const sign = change >= 0 ? '+' : '';
+                changeEl.textContent = `${sign}${change.toFixed(1)}%`;
+                changeEl.className = `value ${change >= 0 ? 'above' : 'below'}`;
+            } else {
+                changeEl.textContent = '-';
+                changeEl.className = 'value';
+            }
+        }
+
+        function filterByTimeRange(data, timeRange) {
+            if (!data || data.length === 0) return [];
+
+            const now = new Date();
+            let cutoffDate = new Date();
+
+            switch (timeRange) {
+                case '3m':
+                    cutoffDate.setMonth(now.getMonth() - 3);
+                    break;
+                case '6m':
+                    cutoffDate.setMonth(now.getMonth() - 6);
+                    break;
+                case '1y':
+                    cutoffDate.setFullYear(now.getFullYear() - 1);
+                    break;
+            }
+
+            return data.filter(d => {
+                const date = d.date instanceof Date ? d.date : new Date(d.date);
+                return date >= cutoffDate;
+            });
+        }
+
+        function renderMA150Chart(priceData, ma150Data, currency, symbol) {
+            const ctx = document.getElementById('ma150Chart').getContext('2d');
+            const symbols = { ILS: '₪', USD: '$', EUR: '€' };
+            const currSymbol = symbols[currency] || '';
+
+            // Prepare datasets
+            const priceLabels = priceData.map(d => {
+                const date = d.date instanceof Date ? d.date : new Date(d.date);
+                return date.toLocaleDateString('he-IL', { day: 'numeric', month: 'short' });
+            });
+
+            const priceValues = priceData.map(d => d.close);
+
+            // Align MA150 data with price data by date
+            const ma150Map = new Map();
+            ma150Data.forEach(d => {
+                const date = d.date instanceof Date ? d.date : new Date(d.date);
+                const key = date.toDateString();
+                ma150Map.set(key, d.value);
+            });
+
+            const ma150Values = priceData.map(d => {
+                const date = d.date instanceof Date ? d.date : new Date(d.date);
+                return ma150Map.get(date.toDateString()) || null;
+            });
+
+            if (ma150ChartInstance) {
+                ma150ChartInstance.destroy();
+            }
+
+            ma150ChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: priceLabels,
+                    datasets: [
+                        {
+                            label: `מחיר ${symbol}`,
+                            data: priceValues,
+                            borderColor: '#8b5cf6',
+                            backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.1,
+                            pointRadius: 0,
+                            pointHoverRadius: 5
+                        },
+                        {
+                            label: 'MA150',
+                            data: ma150Values,
+                            borderColor: '#f97316',
+                            backgroundColor: 'transparent',
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            fill: false,
+                            tension: 0.1,
+                            pointRadius: 0,
+                            pointHoverRadius: 5
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            labels: {
+                                color: getComputedStyle(document.body).getPropertyValue('--color-text-primary') || '#fff',
+                                usePointStyle: true,
+                                padding: 20
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const value = context.parsed.y;
+                                    if (value === null) return null;
+                                    return `${context.dataset.label}: ${currSymbol}${value.toFixed(2)}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            display: true,
+                            ticks: {
+                                color: getComputedStyle(document.body).getPropertyValue('--color-text-secondary') || '#888',
+                                maxRotation: 45,
+                                minRotation: 0,
+                                autoSkip: true,
+                                maxTicksLimit: 12
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.05)'
+                            }
+                        },
+                        y: {
+                            display: true,
+                            ticks: {
+                                color: getComputedStyle(document.body).getPropertyValue('--color-text-secondary') || '#888',
+                                callback: function(value) {
+                                    return `${currSymbol}${value.toFixed(0)}`;
+                                }
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.05)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Update dropdown when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            populateMA150ChartDropdown();
+        });
+    </script>
+</body>
+</html>

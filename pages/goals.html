@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#10b981">
+    <link rel="manifest" href="../manifest.json">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎯</text></svg>">
+    <title>יעדי חיסכון - ניהול פיננסי</title>
+    <link rel="stylesheet" href="../css/app.css">
+    <style>
+        .nav-link.active { background: var(--color-dashboard) !important; }
+        .page-header h1 { color: var(--color-dashboard); }
+        .btn-primary { background: var(--color-dashboard); }
+        .btn-primary:hover { background: #059669; }
+
+        .goal-card {
+            background: var(--color-bg-card);
+            border: 1px solid var(--color-border);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .goal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .goal-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .goal-icon {
+            font-size: 2rem;
+        }
+
+        .goal-deadline {
+            color: var(--color-text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .progress-bar-container {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            height: 20px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            border-radius: 10px;
+            background: linear-gradient(90deg, var(--color-dashboard), #34d399);
+            transition: width 0.5s ease;
+        }
+
+        .progress-bar.warning {
+            background: linear-gradient(90deg, #f59e0b, #fbbf24);
+        }
+
+        .progress-bar.complete {
+            background: linear-gradient(90deg, #10b981, #34d399);
+        }
+
+        .goal-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            text-align: center;
+        }
+
+        .goal-stat .label {
+            color: var(--color-text-secondary);
+            font-size: 0.85rem;
+            margin-bottom: 5px;
+        }
+
+        .goal-stat .value {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .goal-stat .value.positive { color: var(--color-positive); }
+
+        .goals-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .summary-item {
+            background: var(--color-bg-card);
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .summary-item .icon { font-size: 2rem; margin-bottom: 5px; }
+        .summary-item .value { font-size: 1.5rem; font-weight: bold; color: var(--color-dashboard); }
+        .summary-item .label { color: var(--color-text-secondary); font-size: 0.85rem; }
+
+        .add-amount-btn {
+            background: var(--color-dashboard);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .empty-goals {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--color-text-secondary);
+        }
+
+        .empty-goals .icon { font-size: 4rem; margin-bottom: 20px; opacity: 0.5; }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <span class="logo">💰</span>
+                <h1>ניהול פיננסי אישי</h1>
+            </div>
+
+            <nav>
+                <ul class="nav-menu">
+                    <li class="nav-item"><a href="../index.html" class="nav-link"><span class="icon">🏠</span><span>דאשבורד</span></a></li>
+                    <li class="nav-item"><a href="bank.html" class="nav-link"><span class="icon">🏦</span><span>חשבונות בנק</span></a></li>
+                    <li class="nav-item"><a href="credit.html" class="nav-link"><span class="icon">💳</span><span>כרטיסי אשראי</span></a></li>
+                    <li class="nav-item"><a href="stocks.html" class="nav-link"><span class="icon">📈</span><span>מניות</span></a></li>
+                    <li class="nav-item">
+                        <span class="nav-link" style="cursor: default;"><span class="icon">📊</span><span>קרנות ופנסיה</span></span>
+                        <ul class="nav-submenu">
+                            <li class="nav-item"><a href="training.html" class="nav-link"><span>קרנות השתלמות</span></a></li>
+                            <li class="nav-item"><a href="pension.html" class="nav-link"><span>פנסיה</span></a></li>
+                            <li class="nav-item"><a href="gemel.html" class="nav-link"><span>קופות גמל</span></a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item"><a href="assets.html" class="nav-link"><span class="icon">🏠</span><span>נכסים</span></a></li>
+                    <li class="nav-item"><a href="goals.html" class="nav-link active"><span class="icon">🎯</span><span>יעדי חיסכון</span></a></li>
+                    <li class="nav-item"><a href="reports.html" class="nav-link"><span class="icon">📋</span><span>דוחות</span></a></li>
+                    <li class="nav-item"><a href="settings.html" class="nav-link"><span class="icon">⚙️</span><span>הגדרות</span></a></li>
+                </ul>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button class="lang-toggle" onclick="I18n.toggleLanguage()">English</button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="page-header">
+                <h1>🎯 יעדי חיסכון</h1>
+                <p>עקוב אחר ההתקדמות שלך ליעדים פיננסיים</p>
+            </header>
+
+            <!-- Summary -->
+            <div class="goals-summary" id="goalsSummary">
+                <!-- Populated by JS -->
+            </div>
+
+            <!-- Add Goal Button -->
+            <div style="margin-bottom: 20px;">
+                <button class="btn btn-primary" onclick="openGoalModal()">
+                    <span>➕</span>
+                    <span>הוסף יעד חדש</span>
+                </button>
+            </div>
+
+            <!-- Goals List -->
+            <div id="goalsList">
+                <!-- Populated by JS -->
+            </div>
+        </main>
+
+        <button class="mobile-menu-toggle">☰</button>
+    </div>
+
+    <!-- Add/Edit Goal Modal -->
+    <div class="modal-overlay" id="goalModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 id="modalTitle">הוסף יעד חדש</h2>
+                <button class="modal-close" onclick="closeGoalModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="goalForm">
+                    <input type="hidden" id="goalId">
+
+                    <div class="form-group">
+                        <label>אייקון</label>
+                        <select class="form-control" id="goalIcon">
+                            <option value="🏠">🏠 בית</option>
+                            <option value="🚗">🚗 רכב</option>
+                            <option value="✈️">✈️ טיול</option>
+                            <option value="💍">💍 חתונה</option>
+                            <option value="🎓">🎓 לימודים</option>
+                            <option value="💻">💻 טכנולוגיה</option>
+                            <option value="🏖️">🏖️ חופשה</option>
+                            <option value="👶">👶 תינוק</option>
+                            <option value="💰">💰 חיסכון</option>
+                            <option value="🎯">🎯 יעד</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>שם היעד</label>
+                        <input type="text" class="form-control" id="goalName" required placeholder="לדוגמה: מקדמה לדירה">
+                    </div>
+
+                    <div class="form-group">
+                        <label>סכום יעד</label>
+                        <input type="number" class="form-control" id="goalTarget" required min="1" step="100">
+                    </div>
+
+                    <div class="form-group">
+                        <label>סכום נוכחי (אופציונלי)</label>
+                        <input type="number" class="form-control" id="goalCurrent" min="0" step="100" value="0">
+                    </div>
+
+                    <div class="form-group">
+                        <label>תאריך יעד (אופציונלי)</label>
+                        <input type="date" class="form-control" id="goalDeadline">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeGoalModal()">ביטול</button>
+                <button class="btn btn-primary" onclick="saveGoal()">שמור</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Amount Modal -->
+    <div class="modal-overlay" id="addAmountModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>הוסף סכום ליעד</h2>
+                <button class="modal-close" onclick="closeAddAmountModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="addAmountForm">
+                    <input type="hidden" id="addAmountGoalId">
+                    <div class="form-group">
+                        <label>סכום להוספה</label>
+                        <input type="number" class="form-control" id="amountToAdd" required min="1" step="100">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeAddAmountModal()">ביטול</button>
+                <button class="btn btn-primary" onclick="addAmount()">הוסף</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/storage.js"></script>
+    <script src="../js/i18n.js"></script>
+    <script src="../js/goals.js"></script>
+    <script src="../js/app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            App.currentPage = 'goals';
+            loadGoals();
+        });
+
+        function loadGoals() {
+            const goals = Goals.getAll();
+            const summary = Goals.getSummary();
+
+            // Render summary
+            document.getElementById('goalsSummary').innerHTML = `
+                <div class="summary-item">
+                    <div class="icon">🎯</div>
+                    <div class="value">${summary.total}</div>
+                    <div class="label">סה״כ יעדים</div>
+                </div>
+                <div class="summary-item">
+                    <div class="icon">⏳</div>
+                    <div class="value">${summary.active}</div>
+                    <div class="label">בתהליך</div>
+                </div>
+                <div class="summary-item">
+                    <div class="icon">✅</div>
+                    <div class="value">${summary.completed}</div>
+                    <div class="label">הושלמו</div>
+                </div>
+                <div class="summary-item">
+                    <div class="icon">💰</div>
+                    <div class="value">${I18n.formatCurrency(summary.totalCurrent)}</div>
+                    <div class="label">נחסך עד כה</div>
+                </div>
+            `;
+
+            // Render goals
+            const container = document.getElementById('goalsList');
+
+            if (goals.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-goals">
+                        <div class="icon">🎯</div>
+                        <h3>אין יעדים עדיין</h3>
+                        <p>הוסף יעד חיסכון חדש כדי להתחיל לעקוב אחר ההתקדמות שלך</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = goals.map(goal => {
+                const progress = Goals.getProgress(goal);
+                const progressClass = progress.isComplete ? 'complete' : (progress.percentage >= 80 ? 'warning' : '');
+
+                return `
+                    <div class="goal-card">
+                        <div class="goal-header">
+                            <div>
+                                <div class="goal-title">
+                                    <span class="goal-icon">${goal.icon || '🎯'}</span>
+                                    <span>${goal.name}</span>
+                                    ${progress.isComplete ? '<span class="badge badge-success">הושלם!</span>' : ''}
+                                </div>
+                                ${goal.deadline ? `<div class="goal-deadline">יעד: ${I18n.formatDate(goal.deadline)}</div>` : ''}
+                            </div>
+                            <div class="action-buttons">
+                                <button class="add-amount-btn" onclick="openAddAmountModal('${goal.id}')">➕ הוסף</button>
+                                <button class="btn btn-secondary btn-sm" onclick="editGoal('${goal.id}')">✏️</button>
+                                <button class="btn btn-danger btn-sm" onclick="deleteGoal('${goal.id}')">🗑️</button>
+                            </div>
+                        </div>
+
+                        <div class="progress-bar-container">
+                            <div class="progress-bar ${progressClass}" style="width: ${progress.percentage}%"></div>
+                        </div>
+
+                        <div class="goal-stats">
+                            <div class="goal-stat">
+                                <div class="label">נחסך</div>
+                                <div class="value positive">${I18n.formatCurrency(goal.currentAmount)}</div>
+                            </div>
+                            <div class="goal-stat">
+                                <div class="label">יעד</div>
+                                <div class="value">${I18n.formatCurrency(goal.targetAmount)}</div>
+                            </div>
+                            <div class="goal-stat">
+                                <div class="label">נותר</div>
+                                <div class="value">${I18n.formatCurrency(progress.remaining)}</div>
+                            </div>
+                        </div>
+
+                        ${progress.monthlyNeeded > 0 ? `
+                            <div style="margin-top: 15px; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 8px; text-align: center; color: var(--color-text-secondary);">
+                                כדי להגיע ליעד בזמן, יש לחסוך <strong style="color: var(--color-dashboard);">${I18n.formatCurrency(progress.monthlyNeeded)}</strong> בחודש
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function openGoalModal() {
+            document.getElementById('modalTitle').textContent = 'הוסף יעד חדש';
+            document.getElementById('goalForm').reset();
+            document.getElementById('goalId').value = '';
+            document.getElementById('goalCurrent').value = '0';
+            document.getElementById('goalModal').classList.add('active');
+        }
+
+        function closeGoalModal() {
+            document.getElementById('goalModal').classList.remove('active');
+        }
+
+        function editGoal(id) {
+            const goals = Goals.getAll();
+            const goal = goals.find(g => g.id === id);
+            if (!goal) return;
+
+            document.getElementById('modalTitle').textContent = 'ערוך יעד';
+            document.getElementById('goalId').value = goal.id;
+            document.getElementById('goalIcon').value = goal.icon || '🎯';
+            document.getElementById('goalName').value = goal.name;
+            document.getElementById('goalTarget').value = goal.targetAmount;
+            document.getElementById('goalCurrent').value = goal.currentAmount || 0;
+            document.getElementById('goalDeadline').value = goal.deadline || '';
+            document.getElementById('goalModal').classList.add('active');
+        }
+
+        function saveGoal() {
+            const id = document.getElementById('goalId').value;
+            const icon = document.getElementById('goalIcon').value;
+            const name = document.getElementById('goalName').value;
+            const targetAmount = parseFloat(document.getElementById('goalTarget').value);
+            const currentAmount = parseFloat(document.getElementById('goalCurrent').value) || 0;
+            const deadline = document.getElementById('goalDeadline').value || null;
+
+            if (!name || !targetAmount) {
+                App.notify('נא למלא את כל השדות', 'error');
+                return;
+            }
+
+            if (id) {
+                Goals.update(id, { icon, name, targetAmount, currentAmount, deadline });
+            } else {
+                Goals.add({ icon, name, targetAmount, currentAmount, deadline });
+            }
+
+            closeGoalModal();
+            loadGoals();
+            App.notify('היעד נשמר בהצלחה', 'success');
+        }
+
+        function deleteGoal(id) {
+            if (confirm('האם למחוק את היעד?')) {
+                Goals.delete(id);
+                loadGoals();
+                App.notify('היעד נמחק', 'success');
+            }
+        }
+
+        function openAddAmountModal(id) {
+            document.getElementById('addAmountGoalId').value = id;
+            document.getElementById('amountToAdd').value = '';
+            document.getElementById('addAmountModal').classList.add('active');
+        }
+
+        function closeAddAmountModal() {
+            document.getElementById('addAmountModal').classList.remove('active');
+        }
+
+        function addAmount() {
+            const id = document.getElementById('addAmountGoalId').value;
+            const amount = parseFloat(document.getElementById('amountToAdd').value);
+
+            if (!amount || amount <= 0) {
+                App.notify('נא להזין סכום תקין', 'error');
+                return;
+            }
+
+            Goals.addAmount(id, amount);
+            closeAddAmountModal();
+            loadGoals();
+            App.notify(`נוספו ${I18n.formatCurrency(amount)} ליעד`, 'success');
+        }
+    </script>
+</body>
+</html>

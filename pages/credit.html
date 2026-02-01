@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#ef4444">
+    <link rel="manifest" href="../manifest.json">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💳</text></svg>">
+    <title>כרטיסי אשראי - ניהול פיננסי</title>
+    <link rel="stylesheet" href="../css/app.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .nav-link.active { background: var(--color-credit) !important; }
+        .page-header h1 { color: var(--color-credit); }
+        .btn-primary { background: var(--color-credit); }
+        .btn-primary:hover { background: #dc2626; }
+        .card-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, #1a1a2e, #2d2d44);
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin: 10px;
+            border: 1px solid var(--color-border);
+        }
+        .card-chip .number {
+            font-family: monospace;
+            font-size: 1.1rem;
+            letter-spacing: 2px;
+        }
+        .month-selector {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .month-selector select {
+            padding: 8px 15px;
+            background: var(--color-bg-card);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            color: white;
+            font-size: 1rem;
+        }
+        .search-filter {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .search-filter input {
+            padding: 8px 15px;
+            background: var(--color-bg-card);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            color: white;
+            min-width: 200px;
+        }
+        .search-filter select {
+            padding: 8px 15px;
+            background: var(--color-bg-card);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            color: white;
+        }
+        .alert {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+        }
+        .alert-warning {
+            background: rgba(245, 158, 11, 0.2);
+            border: 1px solid #f59e0b;
+        }
+        .alert-danger {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid #ef4444;
+        }
+        .alert-icon { font-size: 1.5rem; }
+        .alert-content strong { display: block; margin-bottom: 3px; }
+        .budget-progress {
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            height: 8px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+        .budget-progress-bar {
+            height: 100%;
+            border-radius: 8px;
+            transition: width 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <span class="logo">💰</span>
+                <h1 data-i18n="dashboard.title">ניהול פיננסי אישי</h1>
+            </div>
+
+            <nav>
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a href="../index.html" class="nav-link" data-category="dashboard">
+                            <span class="icon">🏠</span>
+                            <span data-i18n="nav.dashboard">דאשבורד</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="bank.html" class="nav-link" data-category="bank">
+                            <span class="icon">🏦</span>
+                            <span data-i18n="nav.bankAccounts">חשבונות בנק</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="credit.html" class="nav-link active" data-category="credit">
+                            <span class="icon">💳</span>
+                            <span data-i18n="nav.creditCards">כרטיסי אשראי</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="stocks.html" class="nav-link" data-category="stocks">
+                            <span class="icon">📈</span>
+                            <span data-i18n="nav.stocks">מניות</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <span class="nav-link" style="cursor: default;">
+                            <span class="icon">📊</span>
+                            <span data-i18n="nav.fundsAndPension">קרנות ופנסיה</span>
+                        </span>
+                        <ul class="nav-submenu">
+                            <li class="nav-item"><a href="training.html" class="nav-link" data-category="training"><span data-i18n="nav.trainingFunds">קרנות השתלמות</span></a></li>
+                            <li class="nav-item"><a href="pension.html" class="nav-link" data-category="pension"><span data-i18n="nav.pension">פנסיה</span></a></li>
+                            <li class="nav-item"><a href="gemel.html" class="nav-link" data-category="gemel"><span data-i18n="nav.gemel">קופות גמל</span></a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a href="assets.html" class="nav-link" data-category="assets">
+                            <span class="icon">🏠</span>
+                            <span data-i18n="nav.assets">נכסים</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button class="lang-toggle" onclick="I18n.toggleLanguage()">English</button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="page-header">
+                <h1>
+                    <span>💳</span>
+                    <span data-i18n="credit.title">כרטיסי אשראי</span>
+                </h1>
+            </header>
+
+            <!-- Budget Alerts -->
+            <div id="budgetAlerts"></div>
+
+            <!-- Monthly Total with Budget Progress -->
+            <div class="net-worth-banner" style="border-color: var(--color-credit);">
+                <div class="label" data-i18n="credit.monthlyTotal">סה״כ חודשי</div>
+                <div class="value" id="monthlyTotal" style="background: linear-gradient(90deg, var(--color-credit), #f87171);">₪0</div>
+                <div id="budgetProgressContainer" style="display: none; width: 100%; max-width: 400px; margin-top: 15px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--color-text-secondary);">
+                        <span id="budgetSpent">₪0</span>
+                        <span id="budgetLimit">מתוך ₪0</span>
+                    </div>
+                    <div class="budget-progress">
+                        <div class="budget-progress-bar" id="budgetProgressBar" style="width: 0%; background: var(--color-credit);"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cards Section -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <span class="icon">💳</span>
+                        <span data-i18n="credit.title">כרטיסי אשראי</span>
+                    </h2>
+                    <button class="btn btn-primary btn-sm" onclick="openCardModal()">
+                        <span>➕</span>
+                        <span data-i18n="credit.addCard">הוסף כרטיס</span>
+                    </button>
+                </div>
+                <div id="cardsContainer">
+                    <!-- Cards will be populated here -->
+                </div>
+            </div>
+
+            <!-- Expenses Section -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <span class="icon">📋</span>
+                        <span>הוצאות</span>
+                    </h2>
+                    <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                        <button class="btn btn-primary btn-sm" onclick="openExpenseModal()">
+                            <span>➕</span>
+                            <span data-i18n="credit.addExpense">הוסף הוצאה</span>
+                        </button>
+                        <button class="btn btn-secondary btn-sm" onclick="importCSV()">
+                            <span>📥</span>
+                            <span>ייבוא CSV</span>
+                        </button>
+                    </div>
+                </div>
+                <!-- Search and Filter -->
+                <div class="search-filter" style="margin-top: 15px;">
+                    <select id="monthFilter" onchange="loadExpenses()">
+                        <!-- Will be populated by JS -->
+                    </select>
+                    <select id="categoryFilter" onchange="loadExpenses()">
+                        <option value="">כל הקטגוריות</option>
+                        <option value="food">מזון ומסעדות</option>
+                        <option value="transport">תחבורה ודלק</option>
+                        <option value="shopping">קניות</option>
+                        <option value="entertainment">בילויים</option>
+                        <option value="bills">חשבונות קבועים</option>
+                        <option value="health">בריאות</option>
+                        <option value="education">חינוך</option>
+                        <option value="other">אחר</option>
+                    </select>
+                    <input type="text" id="searchFilter" placeholder="🔍 חיפוש לפי תיאור..." oninput="loadExpenses()">
+                    <button class="btn btn-secondary btn-sm" onclick="clearFilters()">נקה סינון</button>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th data-i18n="credit.expenseDate">תאריך</th>
+                                <th>כרטיס</th>
+                                <th data-i18n="credit.expenseCategory">קטגוריה</th>
+                                <th data-i18n="credit.expenseDescription">תיאור</th>
+                                <th data-i18n="credit.expenseAmount">סכום</th>
+                                <th data-i18n="common.actions">פעולות</th>
+                            </tr>
+                        </thead>
+                        <tbody id="expensesTable">
+                            <!-- Will be populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Charts -->
+            <div class="charts-grid">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">
+                            <span class="icon">📊</span>
+                            <span>חלוקה לפי קטגוריות</span>
+                        </h2>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="categoryChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Mobile Menu Toggle -->
+        <button class="mobile-menu-toggle">☰</button>
+    </div>
+
+    <!-- Add Card Modal -->
+    <div class="modal-overlay" id="cardModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 data-i18n="credit.addCard">הוסף כרטיס</h2>
+                <button class="modal-close" onclick="closeCardModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="cardForm">
+                    <input type="hidden" id="cardId">
+                    <div class="form-group">
+                        <label data-i18n="credit.cardName">שם הכרטיס</label>
+                        <input type="text" class="form-control" id="cardName" required placeholder="ויזה כאל">
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="credit.lastFour">4 ספרות אחרונות</label>
+                        <input type="text" class="form-control" id="lastFour" maxlength="4" pattern="[0-9]{4}" required>
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="credit.creditLimit">מסגרת אשראי</label>
+                        <input type="number" class="form-control" id="creditLimit" step="100">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeCardModal()" data-i18n="common.cancel">ביטול</button>
+                <button class="btn btn-primary" onclick="saveCard()" data-i18n="common.save">שמור</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Expense Modal -->
+    <div class="modal-overlay" id="expenseModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 data-i18n="credit.addExpense">הוסף הוצאה</h2>
+                <button class="modal-close" onclick="closeExpenseModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="expenseForm">
+                    <input type="hidden" id="expenseId">
+                    <div class="form-group">
+                        <label>כרטיס</label>
+                        <select class="form-control" id="expenseCard" required>
+                            <!-- Will be populated by JS -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="credit.expenseDate">תאריך</label>
+                        <input type="date" class="form-control" id="expenseDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="credit.expenseAmount">סכום</label>
+                        <input type="number" class="form-control" id="expenseAmount" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="credit.expenseCategory">קטגוריה</label>
+                        <select class="form-control" id="expenseCategory" required>
+                            <option value="food">מזון ומסעדות</option>
+                            <option value="transport">תחבורה ודלק</option>
+                            <option value="shopping">קניות</option>
+                            <option value="entertainment">בילויים</option>
+                            <option value="bills">חשבונות קבועים</option>
+                            <option value="health">בריאות</option>
+                            <option value="education">חינוך</option>
+                            <option value="other">אחר</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="credit.expenseDescription">תיאור</label>
+                        <input type="text" class="form-control" id="expenseDescription">
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="isRecurring">
+                            <span data-i18n="credit.recurring">הוצאה קבועה</span>
+                        </label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeExpenseModal()" data-i18n="common.cancel">ביטול</button>
+                <button class="btn btn-primary" onclick="saveExpense()" data-i18n="common.save">שמור</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/storage.js"></script>
+    <script src="../js/i18n.js"></script>
+    <script src="../js/charts.js"></script>
+    <script src="../js/csv-import.js"></script>
+    <script src="../js/alerts.js"></script>
+    <script src="../js/tags.js"></script>
+    <script src="../js/app.js"></script>
+    <script>
+        let selectedMonth = '';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            App.currentPage = 'credit';
+            initMonthSelector();
+            loadCards();
+            loadExpenses();
+        });
+
+        function initMonthSelector() {
+            const select = document.getElementById('monthFilter');
+            const now = new Date();
+            const months = [];
+
+            for (let i = 0; i < 12; i++) {
+                const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+                const value = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+                const label = I18n.translations[I18n.currentLanguage].months[date.getMonth()] + ' ' + date.getFullYear();
+                months.push({ value, label });
+            }
+
+            select.innerHTML = months.map((m, i) =>
+                `<option value="${m.value}" ${i === 0 ? 'selected' : ''}>${m.label}</option>`
+            ).join('');
+
+            selectedMonth = months[0].value;
+        }
+
+        function loadCards() {
+            const data = Storage.getCreditCards();
+            const container = document.getElementById('cardsContainer');
+
+            if (data.cards.length === 0) {
+                container.innerHTML = `<p style="text-align: center; color: var(--color-text-secondary); padding: 20px;">${I18n.t('credit.noCards')}</p>`;
+                return;
+            }
+
+            container.innerHTML = data.cards.map(card => `
+                <div class="card-chip">
+                    <span>💳</span>
+                    <span class="number">**** ${card.lastFour}</span>
+                    <span>${card.name}</span>
+                    <button class="btn btn-danger btn-sm" onclick="deleteCard('${card.id}')" style="margin-right: 10px;">🗑️</button>
+                </div>
+            `).join('');
+
+            // Update expense card selector
+            const cardSelect = document.getElementById('expenseCard');
+            cardSelect.innerHTML = data.cards.map(card =>
+                `<option value="${card.id}">${card.name} (**** ${card.lastFour})</option>`
+            ).join('');
+        }
+
+        function loadExpenses() {
+            selectedMonth = document.getElementById('monthFilter').value;
+            const categoryFilter = document.getElementById('categoryFilter').value;
+            const searchFilter = document.getElementById('searchFilter').value.toLowerCase();
+
+            const data = Storage.getCreditCards();
+            const tbody = document.getElementById('expensesTable');
+
+            let monthExpenses = data.expenses
+                .filter(exp => exp.date.startsWith(selectedMonth));
+
+            // Calculate total before filtering
+            const totalAll = monthExpenses.reduce((sum, exp) => sum + exp.amount, 0);
+
+            // Apply category filter
+            if (categoryFilter) {
+                monthExpenses = monthExpenses.filter(exp => exp.category === categoryFilter);
+            }
+
+            // Apply search filter
+            if (searchFilter) {
+                monthExpenses = monthExpenses.filter(exp =>
+                    (exp.description || '').toLowerCase().includes(searchFilter)
+                );
+            }
+
+            // Sort by date
+            monthExpenses.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            const total = monthExpenses.reduce((sum, exp) => sum + exp.amount, 0);
+            document.getElementById('monthlyTotal').textContent = I18n.formatCurrency(totalAll);
+
+            // Show budget progress
+            updateBudgetProgress(totalAll);
+
+            // Show alerts
+            Alerts.renderAlerts('budgetAlerts');
+
+            if (monthExpenses.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--color-text-secondary);">${I18n.t('credit.noExpenses')}</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = monthExpenses.map(exp => {
+                const card = data.cards.find(c => c.id === exp.cardId);
+                return `
+                    <tr>
+                        <td>${I18n.formatDate(exp.date)}</td>
+                        <td>${card ? card.name : '-'}</td>
+                        <td>${I18n.t('credit.categories.' + exp.category)}</td>
+                        <td>${exp.description}${exp.isRecurring ? ' 🔄' : ''}</td>
+                        <td class="negative">${I18n.formatCurrency(exp.amount)}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn btn-secondary btn-sm" onclick="editExpense('${exp.id}')">✏️</button>
+                                <button class="btn btn-danger btn-sm" onclick="deleteExpense('${exp.id}')">🗑️</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            // Update category chart
+            updateCategoryChart(monthExpenses);
+        }
+
+        function updateCategoryChart(expenses) {
+            const categoryTotals = {};
+            expenses.forEach(exp => {
+                categoryTotals[exp.category] = (categoryTotals[exp.category] || 0) + exp.amount;
+            });
+
+            const ctx = document.getElementById('categoryChart');
+            const categories = Object.keys(categoryTotals);
+
+            if (categories.length === 0) return;
+
+            const chartData = {
+                labels: categories.map(cat => I18n.t('credit.categories.' + cat)),
+                datasets: [{
+                    data: Object.values(categoryTotals),
+                    backgroundColor: categories.map(cat => Charts.colors.categories[cat] || Charts.colors.categories.other),
+                    borderWidth: 0
+                }]
+            };
+
+            if (Charts.charts.categoryChart) {
+                Charts.charts.categoryChart.data = chartData;
+                Charts.charts.categoryChart.update();
+            } else {
+                Charts.charts.categoryChart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: chartData,
+                    options: {
+                        ...Charts.defaultOptions,
+                        cutout: '50%',
+                        plugins: {
+                            ...Charts.defaultOptions.plugins,
+                            tooltip: {
+                                callbacks: {
+                                    label: (context) => {
+                                        const value = context.raw;
+                                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                        const percentage = ((value / total) * 100).toFixed(1);
+                                        return `${context.label}: ${I18n.formatCurrency(value)} (${percentage}%)`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        // Card Modal Functions
+        function openCardModal() {
+            document.getElementById('cardForm').reset();
+            document.getElementById('cardId').value = '';
+            document.getElementById('cardModal').classList.add('active');
+        }
+
+        function closeCardModal() {
+            document.getElementById('cardModal').classList.remove('active');
+        }
+
+        function saveCard() {
+            const name = document.getElementById('cardName').value;
+            const lastFour = document.getElementById('lastFour').value;
+            const creditLimit = parseFloat(document.getElementById('creditLimit').value) || 0;
+
+            if (!name || !lastFour) {
+                App.notify('Please fill all required fields', 'error');
+                return;
+            }
+
+            Storage.addCreditCard({ name, lastFour, creditLimit });
+            closeCardModal();
+            loadCards();
+            App.notify(I18n.t('common.save') + ' ✓', 'success');
+        }
+
+        function deleteCard(id) {
+            if (confirm(I18n.t('common.confirmDelete'))) {
+                Storage.deleteCreditCard(id);
+                loadCards();
+                loadExpenses();
+                App.notify(I18n.t('common.delete') + ' ✓', 'success');
+            }
+        }
+
+        // Expense Modal Functions
+        function openExpenseModal() {
+            const data = Storage.getCreditCards();
+            if (data.cards.length === 0) {
+                App.notify(I18n.currentLanguage === 'he' ? 'יש להוסיף כרטיס אשראי תחילה' : 'Please add a credit card first', 'error');
+                return;
+            }
+
+            document.getElementById('expenseForm').reset();
+            document.getElementById('expenseId').value = '';
+            document.getElementById('expenseDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('expenseModal').classList.add('active');
+        }
+
+        function closeExpenseModal() {
+            document.getElementById('expenseModal').classList.remove('active');
+        }
+
+        function editExpense(id) {
+            const data = Storage.getCreditCards();
+            const expense = data.expenses.find(e => e.id === id);
+            if (!expense) return;
+
+            document.getElementById('expenseId').value = expense.id;
+            document.getElementById('expenseCard').value = expense.cardId;
+            document.getElementById('expenseDate').value = expense.date;
+            document.getElementById('expenseAmount').value = expense.amount;
+            document.getElementById('expenseCategory').value = expense.category;
+            document.getElementById('expenseDescription').value = expense.description || '';
+            document.getElementById('isRecurring').checked = expense.isRecurring || false;
+            document.getElementById('expenseModal').classList.add('active');
+        }
+
+        function saveExpense() {
+            const id = document.getElementById('expenseId').value;
+            const cardId = document.getElementById('expenseCard').value;
+            const date = document.getElementById('expenseDate').value;
+            const amount = parseFloat(document.getElementById('expenseAmount').value);
+            const category = document.getElementById('expenseCategory').value;
+            const description = document.getElementById('expenseDescription').value;
+            const isRecurring = document.getElementById('isRecurring').checked;
+
+            if (!cardId || !date || !amount || !category) {
+                App.notify('Please fill all required fields', 'error');
+                return;
+            }
+
+            if (id) {
+                Storage.updateExpense(id, { cardId, date, amount, category, description, isRecurring });
+            } else {
+                Storage.addExpense({ cardId, date, amount, category, description, isRecurring });
+            }
+
+            closeExpenseModal();
+            loadExpenses();
+            App.notify(I18n.t('common.save') + ' ✓', 'success');
+        }
+
+        function deleteExpense(id) {
+            if (confirm(I18n.t('common.confirmDelete'))) {
+                Storage.deleteExpense(id);
+                loadExpenses();
+                App.notify(I18n.t('common.delete') + ' ✓', 'success');
+            }
+        }
+
+        function clearFilters() {
+            document.getElementById('categoryFilter').value = '';
+            document.getElementById('searchFilter').value = '';
+            loadExpenses();
+        }
+
+        function updateBudgetProgress(spent) {
+            const budgets = Alerts.getBudgets();
+            const thresholds = Alerts.getThresholds();
+            const container = document.getElementById('budgetProgressContainer');
+            const bar = document.getElementById('budgetProgressBar');
+
+            if (budgets.total > 0) {
+                container.style.display = 'block';
+                const percentage = (spent / budgets.total) * 100;
+
+                document.getElementById('budgetSpent').textContent = I18n.formatCurrency(spent);
+                document.getElementById('budgetLimit').textContent = `מתוך ${I18n.formatCurrency(budgets.total)}`;
+
+                bar.style.width = `${Math.min(100, percentage)}%`;
+
+                if (percentage >= thresholds.danger) {
+                    bar.style.background = 'var(--color-negative)';
+                } else if (percentage >= thresholds.warning) {
+                    bar.style.background = '#f59e0b';
+                } else {
+                    bar.style.background = 'var(--color-positive)';
+                }
+            } else {
+                container.style.display = 'none';
+            }
+        }
+
+        async function importCSV() {
+            const format = CSVImport.showImportHelp('expenses');
+            const confirmed = confirm(
+                `${format.title}\n\n` +
+                `עמודות נדרשות:\n${format.columns.join(', ')}\n\n` +
+                `דוגמה:\n${format.example}\n\n` +
+                `קטגוריות אפשריות: מזון, תחבורה, קניות, בילויים, חשבונות, בריאות, חינוך\n\n` +
+                `להמשיך?`
+            );
+
+            if (!confirmed) return;
+
+            const result = await CSVImport.openFilePicker('expenses');
+
+            if (result.success) {
+                App.notify(`יובאו ${result.imported} הוצאות בהצלחה`, 'success');
+                loadCards();
+                loadExpenses();
+            } else {
+                App.notify(result.error || 'שגיאה בייבוא', 'error');
+            }
+
+            if (result.errors && result.errors.length > 0) {
+                console.log('Import errors:', result.errors);
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finance Dashboard - מיי גמל נט</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            color: #fff;
+            padding: 20px;
+        }
+
+        body.ltr {
+            direction: ltr;
+        }
+
+        .dashboard {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #00d2ff, #3a7bd5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        header p {
+            color: #8892b0;
+            font-size: 1.1rem;
+        }
+
+        .nav-links {
+            margin-top: 15px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .nav-links a {
+            color: #00d2ff;
+            text-decoration: none;
+            padding: 8px 16px;
+            border: 1px solid #00d2ff;
+            border-radius: 20px;
+            transition: all 0.3s;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            background: #00d2ff;
+            color: #1a1a2e;
+        }
+
+        .source-badge {
+            display: inline-block;
+            background: #00d2ff;
+            color: #1a1a2e;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            margin-top: 15px;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 40px;
+        }
+
+        .fund-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .fund-card:hover {
+            transform: translateY(-5px);
+            border-color: #00d2ff;
+            box-shadow: 0 10px 40px rgba(0, 210, 255, 0.2);
+        }
+
+        .fund-card .icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .fund-card h2 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: #00d2ff;
+        }
+
+        .fund-card p {
+            color: #8892b0;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .fund-card .count {
+            margin-top: 15px;
+            padding: 8px 16px;
+            background: rgba(0, 210, 255, 0.1);
+            border-radius: 20px;
+            font-size: 0.85rem;
+            display: inline-block;
+        }
+
+        .info-section {
+            background: rgba(0, 210, 255, 0.05);
+            border: 1px solid rgba(0, 210, 255, 0.2);
+            border-radius: 16px;
+            padding: 25px;
+            margin-top: 40px;
+        }
+
+        .info-section h3 {
+            color: #00d2ff;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .info-section ul {
+            list-style: none;
+            color: #8892b0;
+        }
+
+        .info-section li {
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .info-section li:last-child {
+            border-bottom: none;
+        }
+
+        .update-link {
+            display: inline-block;
+            margin-top: 30px;
+            background: linear-gradient(90deg, #00d2ff, #3a7bd5);
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .update-link:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(0, 210, 255, 0.3);
+        }
+
+        .data-source {
+            text-align: center;
+            margin-top: 40px;
+            color: #8892b0;
+            font-size: 0.9rem;
+        }
+
+        .data-source a {
+            color: #00d2ff;
+            text-decoration: none;
+        }
+
+        .last-update {
+            margin-top: 10px;
+            font-size: 0.85rem;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.8rem;
+            }
+
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <header>
+            <h1 data-he="קרנות ופנסיה - iGemel-Net" data-en="Funds & Pension - iGemel-Net">קרנות ופנסיה - iGemel-Net</h1>
+            <p data-he="השוואת קופות גמל, קרנות השתלמות וקרנות פנסיה - נתונים אמיתיים" data-en="Compare Provident Funds, Training Funds and Pension Funds - Real Data">השוואת קופות גמל, קרנות השתלמות וקרנות פנסיה - נתונים אמיתיים</p>
+            <span class="source-badge">iGemel-Net - דצמבר 2025</span>
+            <div class="nav-links">
+                <a href="../index.html" data-he="🏠 דאשבורד ראשי" data-en="🏠 Main Dashboard">🏠 דאשבורד ראשי</a>
+                <a href="training.html" data-he="TheMarker - השתלמות" data-en="TheMarker - Training">TheMarker - השתלמות</a>
+                <a href="pension.html" data-he="TheMarker - פנסיה" data-en="TheMarker - Pension">TheMarker - פנסיה</a>
+                <a href="gemel.html" data-he="TheMarker - גמל" data-en="TheMarker - Gemel">TheMarker - גמל</a>
+            </div>
+        </header>
+
+        <div class="cards-grid">
+            <a href="mygemel-training.html" class="fund-card">
+                <div class="icon">📚</div>
+                <h2 data-he="קרנות השתלמות" data-en="Training Funds">קרנות השתלמות</h2>
+                <p data-he="השוואת קרנות השתלמות - תשואות, דמי ניהול והשוואה בין חברות" data-en="Compare training funds - returns, fees, and company comparison">השוואת קרנות השתלמות - תשואות, דמי ניהול והשוואה בין חברות</p>
+                <span class="count" id="trainingCount" data-he="טוען..." data-en="Loading...">טוען...</span>
+            </a>
+
+            <a href="mygemel-pension.html" class="fund-card">
+                <div class="icon">🏦</div>
+                <h2 data-he="קרנות פנסיה" data-en="Pension Funds">קרנות פנסיה</h2>
+                <p data-he="השוואת קרנות פנסיה - מסלולים, תשואות ודמי ניהול" data-en="Compare pension funds - tracks, returns, and management fees">השוואת קרנות פנסיה - מסלולים, תשואות ודמי ניהול</p>
+                <span class="count" id="pensionCount" data-he="טוען..." data-en="Loading...">טוען...</span>
+            </a>
+
+            <a href="mygemel-gemel.html" class="fund-card">
+                <div class="icon">💰</div>
+                <h2 data-he="קופות גמל להשקעה" data-en="Provident Funds">קופות גמל להשקעה</h2>
+                <p data-he="השוואת קופות גמל להשקעה - מסלולים, תשואות ודמי ניהול" data-en="Compare provident funds - tracks, returns, and fees">השוואת קופות גמל להשקעה - מסלולים, תשואות ודמי ניהול</p>
+                <span class="count" id="gemelCount" data-he="טוען..." data-en="Loading...">טוען...</span>
+            </a>
+        </div>
+
+        <div class="info-section">
+            <h3>
+                <span>ℹ️</span>
+                <span data-he="מידע על הנתונים" data-en="About the Data">מידע על הנתונים</span>
+            </h3>
+            <ul>
+                <li data-he="• נתונים רשמיים מרשות שוק ההון ומשרד האוצר" data-en="• Official data from Capital Market Authority and Ministry of Finance">• נתונים רשמיים מרשות שוק ההון ומשרד האוצר</li>
+                <li data-he="• תשואות מצטברות וממוצעות של כלל העמיתים" data-en="• Cumulative and average returns of all members">• תשואות מצטברות וממוצעות של כלל העמיתים</li>
+                <li data-he="• תשואות ברוטו - לפני ניכוי דמי ניהול" data-en="• Gross returns - before management fee deduction">• תשואות ברוטו - לפני ניכוי דמי ניהול</li>
+                <li data-he="• דירוג לפי תשואות בתקופות שונות" data-en="• Ranking by returns over different periods">• דירוג לפי תשואות בתקופות שונות</li>
+            </ul>
+        </div>
+
+        <div class="data-source">
+            <span data-he="מקור הנתונים:" data-en="Data source:">מקור הנתונים:</span>
+            <a href="https://www.igemel-net.co.il/" target="_blank">iGemel-Net.co.il</a>
+            <div class="last-update">
+                <span data-he="עדכון אחרון:" data-en="Last update:">עדכון אחרון:</span>
+                <span id="lastUpdate">טוען...</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="../data/mygemel-funds.js"></script>
+    <script>
+        let currentLang = 'he';
+
+        function loadLanguage() {
+            try {
+                const settings = JSON.parse(localStorage.getItem('finance_settings') || '{}');
+                currentLang = settings.language || 'he';
+            } catch (e) {
+                currentLang = 'he';
+            }
+
+            document.body.classList.toggle('ltr', currentLang === 'en');
+            document.documentElement.lang = currentLang;
+            document.documentElement.dir = currentLang === 'he' ? 'rtl' : 'ltr';
+
+            document.querySelectorAll('[data-he][data-en]').forEach(el => {
+                el.textContent = el.getAttribute(`data-${currentLang}`);
+            });
+        }
+
+        function updateCounts() {
+            const training = MyGemelFunds.getData('training');
+            const pension = MyGemelFunds.getData('pension');
+            const gemel = MyGemelFunds.getData('gemel');
+
+            const trainingText = currentLang === 'he' ? `${training.length} קרנות` : `${training.length} funds`;
+            const pensionText = currentLang === 'he' ? `${pension.length} קרנות` : `${pension.length} funds`;
+            const gemelText = currentLang === 'he' ? `${gemel.length} קופות` : `${gemel.length} funds`;
+
+            document.getElementById('trainingCount').textContent = trainingText;
+            document.getElementById('pensionCount').textContent = pensionText;
+            document.getElementById('gemelCount').textContent = gemelText;
+
+            // Update last update date
+            const lastUpdate = MyGemelFunds.getLastUpdate();
+            if (lastUpdate) {
+                const [year, month] = lastUpdate.split('-');
+                const monthNames = {
+                    he: { '01': 'ינואר', '02': 'פברואר', '03': 'מרץ', '04': 'אפריל', '05': 'מאי', '06': 'יוני', '07': 'יולי', '08': 'אוגוסט', '09': 'ספטמבר', '10': 'אוקטובר', '11': 'נובמבר', '12': 'דצמבר' },
+                    en: { '01': 'January', '02': 'February', '03': 'March', '04': 'April', '05': 'May', '06': 'June', '07': 'July', '08': 'August', '09': 'September', '10': 'October', '11': 'November', '12': 'December' }
+                };
+                const monthName = monthNames[currentLang][month] || month;
+                document.getElementById('lastUpdate').textContent = `${monthName} ${year}`;
+            }
+        }
+
+        // Initialize
+        loadLanguage();
+        updateCounts();
+    </script>
+</body>
+</html>

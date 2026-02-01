@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>מחשבון פנסיה - ניהול פיננסי</title>
+    <link rel="stylesheet" href="../css/app.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .calc-container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .calc-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        @media (max-width: 900px) {
+            .calc-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .calc-inputs {
+            background: var(--color-bg-card);
+            border-radius: 16px;
+            padding: 25px;
+            border: 1px solid var(--color-border);
+        }
+
+        .calc-inputs h2 {
+            margin-bottom: 20px;
+            color: var(--color-primary);
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--color-text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .input-group input,
+        .input-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            background: var(--color-bg);
+            color: var(--color-text-primary);
+            font-size: 1rem;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--color-primary);
+        }
+
+        .input-group .input-with-unit {
+            position: relative;
+        }
+
+        .input-group .unit {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--color-text-secondary);
+        }
+
+        .input-group .input-with-unit input {
+            padding-left: 40px;
+        }
+
+        .calc-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, var(--color-primary), #8b5cf6);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .calc-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(16, 185, 129, 0.3);
+        }
+
+        .results-container {
+            background: var(--color-bg-card);
+            border-radius: 16px;
+            padding: 25px;
+            border: 1px solid var(--color-border);
+        }
+
+        .results-container h2 {
+            margin-bottom: 20px;
+            color: var(--color-primary);
+        }
+
+        .result-summary {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .result-card {
+            background: var(--color-bg-hover);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .result-card .label {
+            font-size: 0.85rem;
+            color: var(--color-text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .result-card .value {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .result-card .value.highlight {
+            color: var(--color-primary);
+        }
+
+        .result-card .value.positive {
+            color: var(--color-positive);
+        }
+
+        .chart-container {
+            height: 300px;
+            margin-top: 20px;
+        }
+
+        .projection-table {
+            margin-top: 25px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .projection-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .projection-table th,
+        .projection-table td {
+            padding: 10px;
+            text-align: center;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .projection-table th {
+            background: var(--color-bg-hover);
+            position: sticky;
+            top: 0;
+        }
+
+        .disclaimer {
+            margin-top: 30px;
+            padding: 15px;
+            background: rgba(251, 191, 36, 0.1);
+            border: 1px solid rgba(251, 191, 36, 0.3);
+            border-radius: 10px;
+            font-size: 0.85rem;
+            color: var(--color-text-secondary);
+        }
+
+        .disclaimer strong {
+            color: #fbbf24;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--color-text-secondary);
+        }
+
+        .empty-state .icon {
+            font-size: 4rem;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <span class="logo">💰</span>
+                <h1 data-i18n="dashboard.title">ניהול פיננסי אישי</h1>
+            </div>
+
+            <nav>
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a href="../index.html" class="nav-link" data-category="dashboard">
+                            <span class="icon">🏠</span>
+                            <span data-i18n="nav.dashboard">דאשבורד</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="bank.html" class="nav-link" data-category="bank">
+                            <span class="icon">🏦</span>
+                            <span data-i18n="nav.bankAccounts">חשבונות בנק</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="credit.html" class="nav-link" data-category="credit">
+                            <span class="icon">💳</span>
+                            <span data-i18n="nav.creditCards">כרטיסי אשראי</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="stocks.html" class="nav-link" data-category="stocks">
+                            <span class="icon">📈</span>
+                            <span data-i18n="nav.stocks">מניות</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <span class="nav-link" style="cursor: default;">
+                            <span class="icon">📊</span>
+                            <span data-i18n="nav.fundsAndPension">קרנות ופנסיה</span>
+                        </span>
+                        <ul class="nav-submenu">
+                            <li class="nav-item"><a href="training.html" class="nav-link" data-category="training"><span data-i18n="nav.trainingFunds">קרנות השתלמות</span></a></li>
+                            <li class="nav-item"><a href="pension.html" class="nav-link" data-category="pension"><span data-i18n="nav.pension">פנסיה</span></a></li>
+                            <li class="nav-item"><a href="gemel.html" class="nav-link" data-category="gemel"><span data-i18n="nav.gemel">קופות גמל</span></a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a href="assets.html" class="nav-link" data-category="assets">
+                            <span class="icon">🏠</span>
+                            <span data-i18n="nav.assets">נכסים</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="pension-calc.html" class="nav-link active">
+                            <span class="icon">🧮</span>
+                            <span>מחשבון פנסיה</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button class="lang-toggle" onclick="toggleLanguage()">English</button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="page-header">
+                <h1>
+                    <span>🧮</span>
+                    <span data-he="מחשבון פנסיה" data-en="Pension Calculator">מחשבון פנסיה</span>
+                </h1>
+                <p data-he="תחזית חיסכון לגיל פרישה" data-en="Retirement savings projection">תחזית חיסכון לגיל פרישה</p>
+            </header>
+
+            <div class="calc-container">
+                <div class="calc-grid">
+                    <!-- Input Section -->
+                    <div class="calc-inputs">
+                        <h2 data-he="📝 פרטים אישיים" data-en="📝 Personal Details">📝 פרטים אישיים</h2>
+
+                        <div class="input-group">
+                            <label data-he="גיל נוכחי" data-en="Current Age">גיל נוכחי</label>
+                            <input type="number" id="currentAge" min="18" max="80" value="30">
+                        </div>
+
+                        <div class="input-group">
+                            <label data-he="גיל פרישה מתוכנן" data-en="Planned Retirement Age">גיל פרישה מתוכנן</label>
+                            <input type="number" id="retirementAge" min="55" max="80" value="67">
+                        </div>
+
+                        <div class="input-group">
+                            <label data-he="תוחלת חיים (לחישוב תשלום חודשי)" data-en="Life Expectancy">תוחלת חיים (לחישוב תשלום חודשי)</label>
+                            <input type="number" id="lifeExpectancy" min="70" max="100" value="85">
+                        </div>
+
+                        <h2 style="margin-top: 30px;" data-he="💰 נתונים פיננסיים" data-en="💰 Financial Data">💰 נתונים פיננסיים</h2>
+
+                        <div class="input-group">
+                            <label data-he="סכום פנסיה נוכחי (₪)" data-en="Current Pension Balance (₪)">סכום פנסיה נוכחי (₪)</label>
+                            <div class="input-with-unit">
+                                <input type="number" id="currentBalance" min="0" value="100000">
+                                <span class="unit">₪</span>
+                            </div>
+                        </div>
+
+                        <div class="input-group">
+                            <label data-he="הפקדה חודשית (עובד + מעסיק)" data-en="Monthly Deposit (Employee + Employer)">הפקדה חודשית (עובד + מעסיק)</label>
+                            <div class="input-with-unit">
+                                <input type="number" id="monthlyDeposit" min="0" value="3000">
+                                <span class="unit">₪</span>
+                            </div>
+                        </div>
+
+                        <div class="input-group">
+                            <label data-he="תשואה שנתית צפויה (%)" data-en="Expected Annual Return (%)">תשואה שנתית צפויה (%)</label>
+                            <div class="input-with-unit">
+                                <input type="number" id="expectedReturn" min="0" max="20" step="0.5" value="5">
+                                <span class="unit">%</span>
+                            </div>
+                        </div>
+
+                        <div class="input-group">
+                            <label data-he="דמי ניהול מצבירה (%)" data-en="Management Fee (%)">דמי ניהול מצבירה (%)</label>
+                            <div class="input-with-unit">
+                                <input type="number" id="managementFee" min="0" max="2" step="0.1" value="0.5">
+                                <span class="unit">%</span>
+                            </div>
+                        </div>
+
+                        <button class="calc-btn" onclick="calculatePension()" data-he="חשב תחזית" data-en="Calculate Projection">
+                            🔮 חשב תחזית
+                        </button>
+                    </div>
+
+                    <!-- Results Section -->
+                    <div class="results-container">
+                        <h2 data-he="📊 תוצאות התחזית" data-en="📊 Projection Results">📊 תוצאות התחזית</h2>
+
+                        <div id="resultsEmpty" class="empty-state">
+                            <div class="icon">🧮</div>
+                            <p data-he="הזן את הנתונים ולחץ על 'חשב תחזית'" data-en="Enter your data and click 'Calculate Projection'">הזן את הנתונים ולחץ על 'חשב תחזית'</p>
+                        </div>
+
+                        <div id="resultsContent" style="display: none;">
+                            <div class="result-summary">
+                                <div class="result-card">
+                                    <div class="label" data-he="צבירה צפויה בפרישה" data-en="Expected Balance at Retirement">צבירה צפויה בפרישה</div>
+                                    <div class="value highlight" id="totalAtRetirement">₪0</div>
+                                </div>
+                                <div class="result-card">
+                                    <div class="label" data-he="שנים עד פרישה" data-en="Years to Retirement">שנים עד פרישה</div>
+                                    <div class="value" id="yearsToRetirement">0</div>
+                                </div>
+                                <div class="result-card">
+                                    <div class="label" data-he="סה״כ הפקדות" data-en="Total Deposits">סה״כ הפקדות</div>
+                                    <div class="value" id="totalDeposits">₪0</div>
+                                </div>
+                                <div class="result-card">
+                                    <div class="label" data-he="רווחים מתשואה" data-en="Returns Earned">רווחים מתשואה</div>
+                                    <div class="value positive" id="totalReturns">₪0</div>
+                                </div>
+                            </div>
+
+                            <div class="result-summary" style="margin-top: 15px;">
+                                <div class="result-card">
+                                    <div class="label" data-he="קצבה חודשית משוערת" data-en="Estimated Monthly Pension">קצבה חודשית משוערת</div>
+                                    <div class="value highlight" id="monthlyPension">₪0</div>
+                                </div>
+                                <div class="result-card">
+                                    <div class="label" data-he="תשואה נטו (לאחר דמי ניהול)" data-en="Net Return (After Fees)">תשואה נטו (לאחר דמי ניהול)</div>
+                                    <div class="value" id="netReturn">0%</div>
+                                </div>
+                            </div>
+
+                            <div class="chart-container">
+                                <canvas id="projectionChart"></canvas>
+                            </div>
+
+                            <div class="projection-table" id="projectionTableContainer">
+                                <h3 style="margin-bottom: 15px;" data-he="📅 פירוט שנתי" data-en="📅 Yearly Breakdown">📅 פירוט שנתי</h3>
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th data-he="גיל" data-en="Age">גיל</th>
+                                            <th data-he="הפקדות" data-en="Deposits">הפקדות</th>
+                                            <th data-he="תשואה" data-en="Returns">תשואה</th>
+                                            <th data-he="צבירה" data-en="Balance">צבירה</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="projectionTable">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="disclaimer">
+                    <strong data-he="⚠️ שים לב:" data-en="⚠️ Note:">⚠️ שים לב:</strong>
+                    <span data-he="חישוב זה הוא אומדן בלבד ומבוסס על הנחות פשטניות. התשואות בפועל עשויות להשתנות. מומלץ להתייעץ עם יועץ פנסיוני מוסמך." data-en="This calculation is an estimate only and is based on simplified assumptions. Actual returns may vary. It is recommended to consult a certified pension advisor.">
+                        חישוב זה הוא אומדן בלבד ומבוסס על הנחות פשטניות. התשואות בפועל עשויות להשתנות. מומלץ להתייעץ עם יועץ פנסיוני מוסמך.
+                    </span>
+                </div>
+            </div>
+        </main>
+
+        <!-- Mobile Menu Toggle -->
+        <button class="mobile-menu-toggle">☰</button>
+    </div>
+
+    <script src="../js/storage.js"></script>
+    <script src="../js/i18n.js"></script>
+    <script src="../js/app.js"></script>
+    <script>
+        let currentLang = 'he';
+        let projectionChartInstance = null;
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'he' ? 'en' : 'he';
+            try {
+                const settings = JSON.parse(localStorage.getItem('finance_settings') || '{}');
+                settings.language = currentLang;
+                localStorage.setItem('finance_settings', JSON.stringify(settings));
+            } catch (e) {}
+            loadLanguage();
+        }
+
+        function loadLanguage() {
+            try {
+                const settings = JSON.parse(localStorage.getItem('finance_settings') || '{}');
+                currentLang = settings.language || 'he';
+            } catch (e) {
+                currentLang = 'he';
+            }
+
+            document.body.classList.toggle('ltr', currentLang === 'en');
+            document.documentElement.lang = currentLang;
+            document.documentElement.dir = currentLang === 'he' ? 'rtl' : 'ltr';
+
+            document.querySelectorAll('[data-he][data-en]').forEach(el => {
+                el.textContent = el.getAttribute(`data-${currentLang}`);
+            });
+
+            const langBtn = document.querySelector('.lang-toggle');
+            if (langBtn) {
+                langBtn.textContent = currentLang === 'he' ? 'English' : 'עברית';
+            }
+        }
+
+        function formatCurrency(amount) {
+            return '₪' + Math.round(amount).toLocaleString();
+        }
+
+        function calculatePension() {
+            const currentAge = parseInt(document.getElementById('currentAge').value);
+            const retirementAge = parseInt(document.getElementById('retirementAge').value);
+            const lifeExpectancy = parseInt(document.getElementById('lifeExpectancy').value);
+            const currentBalance = parseFloat(document.getElementById('currentBalance').value) || 0;
+            const monthlyDeposit = parseFloat(document.getElementById('monthlyDeposit').value) || 0;
+            const expectedReturn = parseFloat(document.getElementById('expectedReturn').value) || 0;
+            const managementFee = parseFloat(document.getElementById('managementFee').value) || 0;
+
+            // Validate inputs
+            if (currentAge >= retirementAge) {
+                alert(currentLang === 'he' ? 'גיל פרישה חייב להיות גדול מהגיל הנוכחי' : 'Retirement age must be greater than current age');
+                return;
+            }
+
+            const yearsToRetirement = retirementAge - currentAge;
+            const netReturn = expectedReturn - managementFee;
+            const monthlyReturn = netReturn / 12 / 100;
+
+            // Calculate projection year by year
+            let balance = currentBalance;
+            let totalDeposits = currentBalance;
+            const projectionData = [];
+            const chartLabels = [];
+            const chartBalance = [];
+            const chartDeposits = [];
+
+            for (let year = 0; year <= yearsToRetirement; year++) {
+                const age = currentAge + year;
+                chartLabels.push(age);
+                chartBalance.push(Math.round(balance));
+                chartDeposits.push(Math.round(totalDeposits));
+
+                if (year < yearsToRetirement) {
+                    let yearStartBalance = balance;
+                    let yearDeposits = 0;
+
+                    // Monthly compounding
+                    for (let month = 0; month < 12; month++) {
+                        balance += monthlyDeposit;
+                        balance *= (1 + monthlyReturn);
+                        yearDeposits += monthlyDeposit;
+                    }
+
+                    const yearReturns = balance - yearStartBalance - yearDeposits;
+                    totalDeposits += yearDeposits;
+
+                    projectionData.push({
+                        age: age + 1,
+                        deposits: yearDeposits,
+                        returns: yearReturns,
+                        balance: balance
+                    });
+                }
+            }
+
+            const totalReturns = balance - totalDeposits;
+
+            // Calculate monthly pension (simple annuity)
+            const retirementYears = lifeExpectancy - retirementAge;
+            const monthlyPension = balance / (retirementYears * 12);
+
+            // Update results
+            document.getElementById('resultsEmpty').style.display = 'none';
+            document.getElementById('resultsContent').style.display = 'block';
+
+            document.getElementById('totalAtRetirement').textContent = formatCurrency(balance);
+            document.getElementById('yearsToRetirement').textContent = yearsToRetirement;
+            document.getElementById('totalDeposits').textContent = formatCurrency(totalDeposits);
+            document.getElementById('totalReturns').textContent = formatCurrency(totalReturns);
+            document.getElementById('monthlyPension').textContent = formatCurrency(monthlyPension);
+            document.getElementById('netReturn').textContent = netReturn.toFixed(1) + '%';
+
+            // Update table
+            const tableBody = document.getElementById('projectionTable');
+            tableBody.innerHTML = projectionData.map(row => `
+                <tr>
+                    <td>${row.age}</td>
+                    <td>${formatCurrency(row.deposits)}</td>
+                    <td style="color: var(--color-positive);">${formatCurrency(row.returns)}</td>
+                    <td style="font-weight: 600;">${formatCurrency(row.balance)}</td>
+                </tr>
+            `).join('');
+
+            // Update chart
+            renderProjectionChart(chartLabels, chartBalance, chartDeposits);
+        }
+
+        function renderProjectionChart(labels, balance, deposits) {
+            const ctx = document.getElementById('projectionChart').getContext('2d');
+
+            if (projectionChartInstance) {
+                projectionChartInstance.destroy();
+            }
+
+            projectionChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: currentLang === 'he' ? 'צבירה כוללת' : 'Total Balance',
+                            data: balance,
+                            borderColor: '#10b981',
+                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.3
+                        },
+                        {
+                            label: currentLang === 'he' ? 'סה״כ הפקדות' : 'Total Deposits',
+                            data: deposits,
+                            borderColor: '#8b5cf6',
+                            backgroundColor: 'transparent',
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            fill: false,
+                            tension: 0.3
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            labels: {
+                                color: getComputedStyle(document.body).getPropertyValue('--color-text-primary') || '#fff',
+                                usePointStyle: true
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.dataset.label}: ${formatCurrency(context.parsed.y)}`;
+                                },
+                                title: function(context) {
+                                    return (currentLang === 'he' ? 'גיל ' : 'Age ') + context[0].label;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            display: true,
+                            title: {
+                                display: true,
+                                text: currentLang === 'he' ? 'גיל' : 'Age',
+                                color: getComputedStyle(document.body).getPropertyValue('--color-text-secondary') || '#888'
+                            },
+                            ticks: {
+                                color: getComputedStyle(document.body).getPropertyValue('--color-text-secondary') || '#888'
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.05)'
+                            }
+                        },
+                        y: {
+                            display: true,
+                            title: {
+                                display: true,
+                                text: currentLang === 'he' ? 'סכום (₪)' : 'Amount (₪)',
+                                color: getComputedStyle(document.body).getPropertyValue('--color-text-secondary') || '#888'
+                            },
+                            ticks: {
+                                color: getComputedStyle(document.body).getPropertyValue('--color-text-secondary') || '#888',
+                                callback: function(value) {
+                                    if (value >= 1000000) {
+                                        return '₪' + (value / 1000000).toFixed(1) + 'M';
+                                    } else if (value >= 1000) {
+                                        return '₪' + (value / 1000).toFixed(0) + 'K';
+                                    }
+                                    return '₪' + value;
+                                }
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.05)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Load saved values from funds if available
+        function loadFromExistingData() {
+            try {
+                const funds = Storage.getFunds();
+                const pensionFunds = funds.filter(f => f.type === 'pension');
+
+                if (pensionFunds.length > 0) {
+                    const totalBalance = pensionFunds.reduce((sum, f) => sum + (f.currentValue || 0), 0);
+                    const totalDeposit = pensionFunds.reduce((sum, f) => sum + (f.monthlyDeposit || 0), 0);
+
+                    if (totalBalance > 0) {
+                        document.getElementById('currentBalance').value = totalBalance;
+                    }
+                    if (totalDeposit > 0) {
+                        document.getElementById('monthlyDeposit').value = totalDeposit;
+                    }
+                }
+            } catch (e) {
+                console.log('Could not load existing fund data');
+            }
+        }
+
+        // Initialize
+        loadLanguage();
+        loadFromExistingData();
+        calculatePension(); // Calculate with defaults
+    </script>
+</body>
+</html>

@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#6b7280">
+    <link rel="manifest" href="../manifest.json">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚙️</text></svg>">
+    <title>הגדרות - ניהול פיננסי</title>
+    <link rel="stylesheet" href="../css/app.css">
+    <style>
+        .nav-link.active { background: #6b7280 !important; }
+
+        .settings-section {
+            background: var(--color-bg-card);
+            border: 1px solid var(--color-border);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+
+        .settings-section h2 {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .setting-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .setting-row:last-child { border-bottom: none; }
+
+        .setting-label {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .setting-label span:first-child { font-weight: 500; }
+        .setting-label span:last-child { font-size: 0.85rem; color: var(--color-text-secondary); }
+
+        .budget-input {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .budget-input input {
+            width: 120px;
+            padding: 8px 12px;
+            background: var(--color-bg-card);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            color: white;
+            text-align: left;
+        }
+
+        .category-budget {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .category-budget:last-child { border-bottom: none; }
+
+        .category-icon { font-size: 1.5rem; }
+
+        .category-name { flex: 1; }
+
+        .custom-category-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .color-preview {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+
+        .danger-zone {
+            border-color: var(--color-credit);
+        }
+
+        .danger-zone h2 { color: var(--color-credit); }
+
+        /* Toggle switch */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 26px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--color-border);
+            transition: .3s;
+            border-radius: 26px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .3s;
+            border-radius: 50%;
+        }
+
+        .toggle-switch input:checked + .toggle-slider {
+            background-color: var(--color-positive);
+        }
+
+        .toggle-switch input:checked + .toggle-slider:before {
+            transform: translateX(24px);
+        }
+
+        .notification-granted { color: var(--color-positive); }
+        .notification-denied { color: var(--color-negative); }
+        .notification-default { color: var(--color-text-secondary); }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <span class="logo">💰</span>
+                <h1>ניהול פיננסי אישי</h1>
+            </div>
+
+            <nav>
+                <ul class="nav-menu">
+                    <li class="nav-item"><a href="../index.html" class="nav-link"><span class="icon">🏠</span><span>דאשבורד</span></a></li>
+                    <li class="nav-item"><a href="bank.html" class="nav-link"><span class="icon">🏦</span><span>חשבונות בנק</span></a></li>
+                    <li class="nav-item"><a href="credit.html" class="nav-link"><span class="icon">💳</span><span>כרטיסי אשראי</span></a></li>
+                    <li class="nav-item"><a href="stocks.html" class="nav-link"><span class="icon">📈</span><span>מניות</span></a></li>
+                    <li class="nav-item">
+                        <span class="nav-link" style="cursor: default;"><span class="icon">📊</span><span>קרנות ופנסיה</span></span>
+                        <ul class="nav-submenu">
+                            <li class="nav-item"><a href="training.html" class="nav-link"><span>קרנות השתלמות</span></a></li>
+                            <li class="nav-item"><a href="pension.html" class="nav-link"><span>פנסיה</span></a></li>
+                            <li class="nav-item"><a href="gemel.html" class="nav-link"><span>קופות גמל</span></a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item"><a href="assets.html" class="nav-link"><span class="icon">🏠</span><span>נכסים</span></a></li>
+                    <li class="nav-item"><a href="goals.html" class="nav-link"><span class="icon">🎯</span><span>יעדי חיסכון</span></a></li>
+                    <li class="nav-item"><a href="reports.html" class="nav-link"><span class="icon">📋</span><span>דוחות</span></a></li>
+                    <li class="nav-item"><a href="settings.html" class="nav-link active"><span class="icon">⚙️</span><span>הגדרות</span></a></li>
+                </ul>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button class="lang-toggle" onclick="I18n.toggleLanguage()">English</button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="page-header">
+                <h1>⚙️ הגדרות</h1>
+                <p>התאמה אישית של האפליקציה</p>
+            </header>
+
+            <!-- Budget Settings -->
+            <div class="settings-section">
+                <h2>💰 תקציב חודשי</h2>
+                <p style="color: var(--color-text-secondary); margin-bottom: 20px;">הגדר תקציב להתראות כשחורגים</p>
+
+                <div class="setting-row">
+                    <div class="setting-label">
+                        <span>תקציב כולל</span>
+                        <span>סה״כ הוצאות מותרות בחודש</span>
+                    </div>
+                    <div class="budget-input">
+                        <span>₪</span>
+                        <input type="number" id="totalBudget" step="100" onchange="saveTotalBudget()">
+                    </div>
+                </div>
+
+                <h3 style="margin: 25px 0 15px; font-size: 1.1rem;">⚠️ סף התראות</h3>
+
+                <div class="setting-row">
+                    <div class="setting-label">
+                        <span>התראת אזהרה (צהוב)</span>
+                        <span>הצג התראה כשמגיעים לאחוז זה</span>
+                    </div>
+                    <div class="budget-input">
+                        <input type="number" id="warningThreshold" min="1" max="100" step="5" onchange="saveThresholds()">
+                        <span>%</span>
+                    </div>
+                </div>
+
+                <div class="setting-row">
+                    <div class="setting-label">
+                        <span>התראת חריגה (אדום)</span>
+                        <span>הצג התראה כשמגיעים לאחוז זה</span>
+                    </div>
+                    <div class="budget-input">
+                        <input type="number" id="dangerThreshold" min="1" max="150" step="5" onchange="saveThresholds()">
+                        <span>%</span>
+                    </div>
+                </div>
+
+                <h3 style="margin: 25px 0 15px; font-size: 1.1rem;">תקציב לפי קטגוריה</h3>
+                <div id="categoryBudgets">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <!-- Custom Categories -->
+            <div class="settings-section">
+                <h2>🏷️ קטגוריות מותאמות אישית</h2>
+                <p style="color: var(--color-text-secondary); margin-bottom: 20px;">הוסף קטגוריות משלך להוצאות</p>
+
+                <div id="customCategories">
+                    <!-- Populated by JS -->
+                </div>
+
+                <button class="btn btn-primary" onclick="openCategoryModal()" style="margin-top: 15px;">
+                    <span>➕</span>
+                    <span>הוסף קטגוריה</span>
+                </button>
+            </div>
+
+            <!-- Notification Settings -->
+            <div class="settings-section" id="notificationSection">
+                <h2>🔔 התראות</h2>
+                <p style="color: var(--color-text-secondary); margin-bottom: 20px;">הגדר התראות push לאירועים חשובים</p>
+
+                <div class="setting-row">
+                    <div class="setting-label">
+                        <span>הפעל התראות</span>
+                        <span id="notificationStatus">בודק הרשאות...</span>
+                    </div>
+                    <button class="btn btn-primary" id="notificationToggle" onclick="toggleNotifications()">
+                        הפעל
+                    </button>
+                </div>
+
+                <div id="notificationOptions" style="display: none;">
+                    <div class="setting-row">
+                        <div class="setting-label">
+                            <span>התראות מניות</span>
+                            <span>קבל התראה כשמניה מגיעה ליעד</span>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="stockAlertsToggle" onchange="saveNotificationSettings()">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="setting-row">
+                        <div class="setting-label">
+                            <span>התראות תקציב</span>
+                            <span>קבל התראה כשחורגים מתקציב</span>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="budgetAlertsToggle" onchange="saveNotificationSettings()">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="setting-row">
+                        <div class="setting-label">
+                            <span>תזכורת חודשית</span>
+                            <span>תזכורת לעדכון קרנות וקופות</span>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="monthlyReminderToggle" onchange="saveNotificationSettings()">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="setting-row">
+                        <div class="setting-label">
+                            <span>יום התזכורת</span>
+                            <span>באיזה יום בחודש לשלוח תזכורת</span>
+                        </div>
+                        <div class="budget-input">
+                            <input type="number" id="reminderDay" min="1" max="28" value="1" onchange="saveNotificationSettings()">
+                            <span>בחודש</span>
+                        </div>
+                    </div>
+
+                    <div class="setting-row">
+                        <div class="setting-label">
+                            <span>בדוק התראות</span>
+                            <span>שלח התראת בדיקה</span>
+                        </div>
+                        <button class="btn btn-secondary" onclick="sendTestNotification()">
+                            <span>📤</span>
+                            <span>שלח בדיקה</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Data Management -->
+            <div class="settings-section">
+                <h2>📦 ניהול נתונים</h2>
+
+                <div class="setting-row">
+                    <div class="setting-label">
+                        <span>ייצוא נתונים</span>
+                        <span>הורד את כל הנתונים כקובץ JSON</span>
+                    </div>
+                    <button class="btn btn-secondary" onclick="App.exportData()">
+                        <span>📤</span>
+                        <span>ייצוא</span>
+                    </button>
+                </div>
+
+                <div class="setting-row">
+                    <div class="setting-label">
+                        <span>ייבוא נתונים</span>
+                        <span>שחזר נתונים מקובץ JSON</span>
+                    </div>
+                    <button class="btn btn-secondary" onclick="App.importData()">
+                        <span>📥</span>
+                        <span>ייבוא</span>
+                    </button>
+                </div>
+
+                <div class="setting-row">
+                    <div class="setting-label">
+                        <span>טען נתוני דוגמה</span>
+                        <span>מילוי האפליקציה בנתוני הדגמה</span>
+                    </div>
+                    <button class="btn btn-secondary" onclick="loadSampleData()">
+                        <span>📋</span>
+                        <span>טען דוגמה</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Danger Zone -->
+            <div class="settings-section danger-zone">
+                <h2>⚠️ אזור סכנה</h2>
+
+                <div class="setting-row">
+                    <div class="setting-label">
+                        <span>מחק את כל הנתונים</span>
+                        <span>פעולה זו לא ניתנת לביטול!</span>
+                    </div>
+                    <button class="btn btn-danger" onclick="clearAllData()">
+                        <span>🗑️</span>
+                        <span>מחק הכל</span>
+                    </button>
+                </div>
+            </div>
+        </main>
+
+        <button class="mobile-menu-toggle">☰</button>
+    </div>
+
+    <!-- Add Category Modal -->
+    <div class="modal-overlay" id="categoryModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>הוסף קטגוריה</h2>
+                <button class="modal-close" onclick="closeCategoryModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="categoryForm">
+                    <div class="form-group">
+                        <label>אייקון</label>
+                        <select class="form-control" id="catIcon">
+                            <option value="🛒">🛒 קניות</option>
+                            <option value="🎁">🎁 מתנות</option>
+                            <option value="🐕">🐕 חיות מחמד</option>
+                            <option value="🏋️">🏋️ ספורט</option>
+                            <option value="💇">💇 טיפוח</option>
+                            <option value="🏠">🏠 בית</option>
+                            <option value="👶">👶 ילדים</option>
+                            <option value="📱">📱 טכנולוגיה</option>
+                            <option value="🎵">🎵 מוזיקה</option>
+                            <option value="📚">📚 ספרים</option>
+                            <option value="✈️">✈️ נסיעות</option>
+                            <option value="🍷">🍷 אלכוהול</option>
+                            <option value="☕">☕ קפה</option>
+                            <option value="💊">💊 תרופות</option>
+                            <option value="🔧">🔧 תיקונים</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>שם בעברית</label>
+                        <input type="text" class="form-control" id="catNameHe" required placeholder="לדוגמה: חיות מחמד">
+                    </div>
+
+                    <div class="form-group">
+                        <label>שם באנגלית</label>
+                        <input type="text" class="form-control" id="catNameEn" placeholder="e.g. Pets">
+                    </div>
+
+                    <div class="form-group">
+                        <label>צבע</label>
+                        <input type="color" class="form-control" id="catColor" value="#6366f1" style="height: 50px; padding: 5px;">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeCategoryModal()">ביטול</button>
+                <button class="btn btn-primary" onclick="saveCategory()">שמור</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/storage.js"></script>
+    <script src="../js/i18n.js"></script>
+    <script src="../js/alerts.js"></script>
+    <script src="../js/tags.js"></script>
+    <script src="../js/notifications.js"></script>
+    <script src="../data/sample-data.js"></script>
+    <script src="../js/app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            App.currentPage = 'settings';
+            loadSettings();
+            loadNotificationSettings();
+        });
+
+        function loadSettings() {
+            // Load budget settings
+            const budgets = Alerts.getBudgets();
+            document.getElementById('totalBudget').value = budgets.total || '';
+
+            // Load thresholds
+            const thresholds = Alerts.getThresholds();
+            document.getElementById('warningThreshold').value = thresholds.warning || 80;
+            document.getElementById('dangerThreshold').value = thresholds.danger || 100;
+
+            // Render category budgets
+            const categories = Tags.getCategories();
+            document.getElementById('categoryBudgets').innerHTML = categories.map(cat => {
+                const budget = budgets.categories[cat.id] || '';
+                return `
+                    <div class="category-budget">
+                        <span class="category-icon">${cat.icon}</span>
+                        <span class="category-name">${I18n.currentLanguage === 'he' ? cat.nameHe : cat.nameEn}</span>
+                        <div class="budget-input">
+                            <span>₪</span>
+                            <input type="number" value="${budget}" step="100"
+                                   onchange="saveCategoryBudget('${cat.id}', this.value)"
+                                   placeholder="ללא הגבלה">
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Render custom categories
+            const customData = Tags.getCustomData();
+            const customContainer = document.getElementById('customCategories');
+
+            if (customData.categories.length === 0) {
+                customContainer.innerHTML = '<p style="color: var(--color-text-secondary);">אין קטגוריות מותאמות אישית</p>';
+            } else {
+                customContainer.innerHTML = customData.categories.map(cat => `
+                    <div class="custom-category-item">
+                        <span style="font-size: 1.5rem;">${cat.icon}</span>
+                        <div class="color-preview" style="background: ${cat.color};"></div>
+                        <span style="flex: 1;">${I18n.currentLanguage === 'he' ? cat.nameHe : cat.nameEn}</span>
+                        <button class="btn btn-danger btn-sm" onclick="deleteCustomCategory('${cat.id}')">🗑️</button>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function saveTotalBudget() {
+            const amount = parseFloat(document.getElementById('totalBudget').value) || 0;
+            Alerts.setTotalBudget(amount);
+            App.notify('התקציב נשמר', 'success');
+        }
+
+        function saveThresholds() {
+            const warning = parseInt(document.getElementById('warningThreshold').value) || 80;
+            const danger = parseInt(document.getElementById('dangerThreshold').value) || 100;
+
+            if (warning >= danger) {
+                App.notify('סף האזהרה חייב להיות נמוך מסף החריגה', 'error');
+                return;
+            }
+
+            Alerts.setThresholds(warning, danger);
+            App.notify('סף ההתראות נשמר', 'success');
+        }
+
+        function saveCategoryBudget(category, value) {
+            const amount = parseFloat(value) || 0;
+            Alerts.setCategoryBudget(category, amount);
+            App.notify('התקציב נשמר', 'success');
+        }
+
+        function openCategoryModal() {
+            document.getElementById('categoryForm').reset();
+            document.getElementById('categoryModal').classList.add('active');
+        }
+
+        function closeCategoryModal() {
+            document.getElementById('categoryModal').classList.remove('active');
+        }
+
+        function saveCategory() {
+            const icon = document.getElementById('catIcon').value;
+            const nameHe = document.getElementById('catNameHe').value;
+            const nameEn = document.getElementById('catNameEn').value || nameHe;
+            const color = document.getElementById('catColor').value;
+
+            if (!nameHe) {
+                App.notify('נא להזין שם', 'error');
+                return;
+            }
+
+            Tags.addCategory({ icon, nameHe, nameEn, color });
+            closeCategoryModal();
+            loadSettings();
+            App.notify('הקטגוריה נוספה', 'success');
+        }
+
+        function deleteCustomCategory(id) {
+            if (confirm('למחוק את הקטגוריה?')) {
+                Tags.deleteCategory(id);
+                loadSettings();
+                App.notify('הקטגוריה נמחקה', 'success');
+            }
+        }
+
+        function loadSampleData() {
+            if (confirm('פעולה זו תוסיף נתוני דוגמה. להמשיך?')) {
+                SampleData.load();
+            }
+        }
+
+        function clearAllData() {
+            if (confirm('האם אתה בטוח? כל הנתונים יימחקו לצמיתות!')) {
+                if (confirm('בטוח בטוח? אין דרך חזרה!')) {
+                    SampleData.clear();
+                }
+            }
+        }
+
+        // Notification Settings
+        function loadNotificationSettings() {
+            const statusEl = document.getElementById('notificationStatus');
+            const toggleBtn = document.getElementById('notificationToggle');
+            const optionsEl = document.getElementById('notificationOptions');
+
+            if (!Notifications.isSupported()) {
+                statusEl.textContent = 'התראות אינן נתמכות בדפדפן זה';
+                statusEl.className = 'notification-denied';
+                toggleBtn.disabled = true;
+                toggleBtn.textContent = 'לא נתמך';
+                return;
+            }
+
+            const permission = Notifications.getPermission();
+            const settings = Notifications.getSettings();
+
+            switch (permission) {
+                case 'granted':
+                    statusEl.textContent = 'התראות מופעלות';
+                    statusEl.className = 'notification-granted';
+                    toggleBtn.textContent = 'מופעל ✓';
+                    toggleBtn.classList.remove('btn-primary');
+                    toggleBtn.classList.add('btn-secondary');
+                    optionsEl.style.display = 'block';
+                    break;
+                case 'denied':
+                    statusEl.textContent = 'התראות נחסמו - יש לאפשר בהגדרות הדפדפן';
+                    statusEl.className = 'notification-denied';
+                    toggleBtn.textContent = 'נחסם';
+                    toggleBtn.disabled = true;
+                    break;
+                default:
+                    statusEl.textContent = 'לחץ להפעלת התראות';
+                    statusEl.className = 'notification-default';
+                    toggleBtn.textContent = 'הפעל';
+            }
+
+            // Load settings
+            document.getElementById('stockAlertsToggle').checked = settings.stockAlerts;
+            document.getElementById('budgetAlertsToggle').checked = settings.budgetWarnings;
+            document.getElementById('monthlyReminderToggle').checked = settings.monthlyReminder;
+            document.getElementById('reminderDay').value = settings.reminderDay || 1;
+        }
+
+        async function toggleNotifications() {
+            const result = await Notifications.requestPermission();
+
+            if (result.success) {
+                App.notify('התראות הופעלו בהצלחה', 'success');
+            } else if (result.permission === 'denied') {
+                App.notify('ההתראות נחסמו. אנא אפשר בהגדרות הדפדפן', 'error');
+            }
+
+            loadNotificationSettings();
+        }
+
+        function saveNotificationSettings() {
+            const settings = {
+                stockAlerts: document.getElementById('stockAlertsToggle').checked,
+                budgetWarnings: document.getElementById('budgetAlertsToggle').checked,
+                monthlyReminder: document.getElementById('monthlyReminderToggle').checked,
+                reminderDay: parseInt(document.getElementById('reminderDay').value) || 1
+            };
+
+            Notifications.updateSettings(settings);
+            App.notify('ההגדרות נשמרו', 'success');
+        }
+
+        async function sendTestNotification() {
+            const success = await Notifications.show('🔔 התראת בדיקה', {
+                body: 'ההתראות עובדות! תקבל התראות על מניות, תקציב ועוד.',
+                type: 'test'
+            });
+
+            if (success) {
+                App.notify('התראת בדיקה נשלחה', 'success');
+            } else {
+                App.notify('שגיאה בשליחת התראה', 'error');
+            }
+        }
+    </script>
+</body>
+</html>
