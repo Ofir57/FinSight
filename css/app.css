@@ -643,6 +643,10 @@ select.form-control {
         transform: translateX(0);
     }
 
+    body.ltr .sidebar.open {
+        transform: translateX(0);
+    }
+
     .main-content {
         margin-right: 0;
         margin-left: 0;
