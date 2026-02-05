@@ -2,7 +2,8 @@
  * Stock API Module - Fetches stock data from Yahoo Finance
  */
 const StockAPI = {
-    BASE_URL: 'https://query1.finance.yahoo.com/v8/finance/chart',
+    YAHOO_URL: 'https://query2.finance.yahoo.com/v8/finance/chart',
+    PROXY_URL: 'https://api.allorigins.win/raw?url=',
 
     /**
      * Format symbol for Yahoo Finance API
@@ -43,7 +44,8 @@ const StockAPI = {
         const formattedSymbol = this.formatSymbol(symbol, detectedMarket);
 
         try {
-            const url = `${this.BASE_URL}/${encodeURIComponent(formattedSymbol)}?interval=1d&range=1y&includePrePost=false`;
+            const yahooUrl = `${this.YAHOO_URL}/${encodeURIComponent(formattedSymbol)}?interval=1d&range=1y&includePrePost=false`;
+            const url = `${this.PROXY_URL}${encodeURIComponent(yahooUrl)}`;
             const response = await fetch(url);
 
             if (!response.ok) {
@@ -208,8 +210,9 @@ const StockAPI = {
      */
     async searchStock(query) {
         try {
-            // Yahoo Finance search endpoint
-            const url = `https://query1.finance.yahoo.com/v1/finance/search?q=${encodeURIComponent(query)}&quotesCount=6&newsCount=0`;
+            // Yahoo Finance search endpoint via CORS proxy
+            const yahooUrl = `https://query2.finance.yahoo.com/v1/finance/search?q=${encodeURIComponent(query)}&quotesCount=6&newsCount=0`;
+            const url = `${this.PROXY_URL}${encodeURIComponent(yahooUrl)}`;
             const response = await fetch(url);
 
             if (!response.ok) {
