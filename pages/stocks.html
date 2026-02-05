@@ -180,6 +180,11 @@
                     <span>📥</span>
                     <span>ייבוא CSV</span>
                 </button>
+                <button class="btn btn-secondary" onclick="importBrokerXLS()">
+                    <span>📂</span>
+                    <span>ייבוא מברוקר (XLS)</span>
+                </button>
+                <input type="file" id="brokerFileInput" accept=".xls,.xlsx,.xml" style="display: none;" onchange="handleBrokerFile(event)">
                 <label class="auto-refresh-toggle" style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
                     <input type="checkbox" id="autoRefreshToggle" onchange="toggleAutoRefresh()" checked>
                     <span style="font-size: 0.9rem; color: var(--color-text-secondary);">רענון אוטומטי</span>
@@ -1476,6 +1481,186 @@
                     }
                 }
             });
+        }
+
+        // ========== Broker XLS Import ==========
+
+        function importBrokerXLS() {
+            document.getElementById('brokerFileInput').click();
+        }
+
+        async function handleBrokerFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            try {
+                const text = await file.text();
+                const holdings = parseBrokerXLS(text);
+
+                if (holdings.length === 0) {
+                    App.notify('לא נמצאו אחזקות בקובץ', 'error');
+                    return;
+                }
+
+                // Show confirmation
+                const totalValue = holdings.reduce((sum, h) => sum + (h.quantity * h.currentPrice), 0);
+                const confirmed = confirm(
+                    `נמצאו ${holdings.length} אחזקות\n` +
+                    `שווי כולל: $${totalValue.toLocaleString(undefined, {minimumFractionDigits: 2})}\n\n` +
+                    `רשימת מניות:\n${holdings.map(h => `  ${h.symbol} - ${h.name} (${h.quantity} יח')`).join('\n')}\n\n` +
+                    `לייבא את כל האחזקות?`
+                );
+
+                if (!confirmed) return;
+
+                // Clear existing holdings and import fresh
+                const existingData = Storage.getStocks();
+                const clearExisting = existingData.holdings.length > 0 ?
+                    confirm('האם למחוק אחזקות קיימות לפני הייבוא?\n\nכן = החלף הכל\nלא = הוסף לקיימות') : true;
+
+                if (clearExisting) {
+                    Storage.saveStocks({ holdings: [], transactions: existingData.transactions || [] });
+                }
+
+                // Import each holding (without creating fake transactions)
+                let imported = 0;
+                holdings.forEach(h => {
+                    Storage.importStock(h);
+                    imported++;
+                });
+
+                App.notify(`יובאו ${imported} אחזקות בהצלחה!`, 'success');
+                loadStocks();
+                refreshAllPrices();
+
+            } catch (error) {
+                console.error('Broker import error:', error);
+                App.notify('שגיאה בקריאת הקובץ: ' + error.message, 'error');
+            }
+
+            // Reset file input
+            event.target.value = '';
+        }
+
+        function parseBrokerXLS(content) {
+            const holdings = [];
+
+            // Find all Row elements using regex (handles XML-based XLS from Israeli brokers)
+            const rowPattern = /<(?:ss:)?Row[^>]*>([\s\S]*?)<\/(?:ss:)?Row>/g;
+            const dataPattern = /<(?:ss:)?Data[^>]*>([\s\S]*?)<\/(?:ss:)?Data>/g;
+            const tagClean = /<[^>]+>/g;
+
+            const rows = [];
+            let match;
+            while ((match = rowPattern.exec(content)) !== null) {
+                const rowContent = match[1];
+                const cells = [];
+                let cellMatch;
+                const dp = new RegExp(dataPattern.source, 'g');
+                while ((cellMatch = dp.exec(rowContent)) !== null) {
+                    cells.push(cellMatch[1].replace(tagClean, '').trim());
+                }
+                rows.push(cells);
+            }
+
+            // Find header row (contains 'שם הנייר' or 'שער קניה')
+            let headerIdx = -1;
+            for (let i = 0; i < rows.length; i++) {
+                if (rows[i].some(c => c.includes('שם הנייר') || c.includes('שער קניה'))) {
+                    headerIdx = i;
+                    break;
+                }
+            }
+
+            if (headerIdx === -1) {
+                throw new Error('לא נמצא פורמט מוכר בקובץ');
+            }
+
+            // Parse data rows after header
+            for (let i = headerIdx + 1; i < rows.length; i++) {
+                const row = rows[i];
+                if (row.length < 6) continue;
+
+                const securityId = row[0];
+                const name = row[1];
+                const avgPrice = parseFloat(row[2]?.replace(/,/g, ''));
+                const quantity = parseFloat(row[3]?.replace(/,/g, ''));
+                const currentPrice = parseFloat(row[4]?.replace(/,/g, ''));
+
+                if (!name || isNaN(quantity) || isNaN(avgPrice)) continue;
+
+                // Extract symbol from name
+                const symbolInfo = extractSymbolFromName(name, securityId);
+
+                holdings.push({
+                    symbol: symbolInfo.symbol,
+                    name: symbolInfo.displayName,
+                    quantity: quantity,
+                    avgPrice: avgPrice,
+                    currentPrice: currentPrice || avgPrice,
+                    currency: symbolInfo.currency,
+                    market: symbolInfo.market
+                });
+            }
+
+            return holdings;
+        }
+
+        function extractSymbolFromName(name, securityId) {
+            // Pattern 1: "(Hebrew description) SYMBOL" e.g. "(ספיידר S&P 500) SPY"
+            const parenMatch = name.match(/\)\s*([A-Za-z\s&.]+)$/);
+            if (parenMatch) {
+                let symbol = parenMatch[1].trim();
+                let market = 'US';
+                let currency = 'USD';
+
+                // London stock exchange
+                if (symbol.endsWith(' LN')) {
+                    symbol = symbol.replace(' LN', '.L');
+                    market = 'UK';
+                    currency = 'GBP';
+                }
+
+                // Clean up display name - get Hebrew part
+                const hebrewMatch = name.match(/\(([^)]+)\)/);
+                const displayName = hebrewMatch ? hebrewMatch[1] : name;
+
+                return { symbol, displayName, market, currency };
+            }
+
+            // Pattern 2: Israeli security (no English symbol in parens)
+            // Check if it's an Israeli fund/stock by the security ID format
+            if (securityId && securityId.length <= 8 && !securityId.startsWith('7')) {
+                // Israeli fund - use security number with .TA suffix
+                return {
+                    symbol: securityId + '.TA',
+                    displayName: name,
+                    market: 'IL',
+                    currency: 'ILS'
+                };
+            }
+
+            // Pattern 3: English name without parens e.g. "gamestop corp"
+            const knownMappings = {
+                'gamestop corp': { symbol: 'GME', displayName: 'GameStop Corp' },
+                'apple inc': { symbol: 'AAPL', displayName: 'Apple Inc.' },
+                'microsoft': { symbol: 'MSFT', displayName: 'Microsoft Corp' },
+                'tesla': { symbol: 'TSLA', displayName: 'Tesla Inc.' },
+                'nvidia': { symbol: 'NVDA', displayName: 'NVIDIA Corp' },
+            };
+
+            const nameLower = name.toLowerCase().trim();
+            if (knownMappings[nameLower]) {
+                return { ...knownMappings[nameLower], market: 'US', currency: 'USD' };
+            }
+
+            // Default: use security ID or name as symbol
+            return {
+                symbol: securityId || name.replace(/\s+/g, ''),
+                displayName: name,
+                market: 'US',
+                currency: 'USD'
+            };
         }
 
         // Update dropdown when page loads

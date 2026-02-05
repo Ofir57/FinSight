@@ -187,6 +187,23 @@ const Storage = {
         return holding;
     },
 
+    // Import stock directly without creating a transaction (for broker imports)
+    importStock(holding) {
+        const data = this.getStocks();
+        const existing = data.holdings.find(h => h.symbol === holding.symbol);
+        if (existing) {
+            const totalQuantity = existing.quantity + holding.quantity;
+            existing.avgPrice = ((existing.avgPrice * existing.quantity) + (holding.avgPrice * holding.quantity)) / totalQuantity;
+            existing.quantity = totalQuantity;
+            existing.currentPrice = holding.currentPrice || existing.currentPrice;
+        } else {
+            holding.id = this.generateId();
+            data.holdings.push(holding);
+        }
+        this.saveStocks(data);
+        return holding;
+    },
+
     updateStockPrice(symbol, currentPrice) {
         const data = this.getStocks();
         const holding = data.holdings.find(h => h.symbol === symbol);

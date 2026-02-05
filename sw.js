@@ -1,4 +1,4 @@
-const CACHE_NAME = 'finzilla-v10';
+const CACHE_NAME = 'finzilla-v11';
 const ASSETS_TO_CACHE = [
     './',
     './index.html',
