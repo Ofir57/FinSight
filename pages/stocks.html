@@ -222,10 +222,10 @@
                                 <th data-i18n="stocks.companyName" style="cursor: pointer;" onclick="setSortBy('name')">שם</th>
                                 <th data-i18n="stocks.quantity" style="cursor: pointer;" onclick="setSortBy('quantity')">כמות</th>
                                 <th style="cursor: pointer;" onclick="setSortBy('avgPrice')">עלות ליח'</th>
-                                <th style="cursor: pointer;" onclick="setSortBy('currentPrice')">שווי ליח'</th>
                                 <th data-i18n="stocks.totalValue" style="cursor: pointer;" onclick="setSortBy('value')">שווי כולל</th>
-                                <th data-i18n="stocks.profitLoss" style="cursor: pointer;" onclick="setSortBy('profitLoss')">רווח/הפסד</th>
+                                <th style="cursor: pointer;" onclick="setSortBy('currentPrice')">מחיר נוכחי</th>
                                 <th>MA150</th>
+                                <th data-i18n="stocks.profitLoss" style="cursor: pointer;" onclick="setSortBy('profitLoss')">רווח/הפסד</th>
                                 <th data-i18n="common.actions">פעולות</th>
                             </tr>
                         </thead>
@@ -681,13 +681,13 @@
                             <td>${h.name || '-'}</td>
                             <td>${h.quantity.toLocaleString()}</td>
                             <td>₪${h.avgPrice.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
-                            <td>₪${currentPrice.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
                             <td><strong>₪${value.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}</strong></td>
+                            <td>₪${currentPrice.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                            <td>${ma150Display}</td>
                             <td class="${isProfit ? 'profit' : 'loss'}">
                                 ${isProfit ? '+' : ''}₪${profitLoss.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}
                                 <br><small>(${isProfit ? '+' : ''}${profitLossPercent}%)</small>
                             </td>
-                            <td>${ma150Display}</td>
                             <td>
                                 <div class="action-buttons">
                                     <button class="btn btn-secondary btn-sm" onclick="openAlertModal('${h.symbol}', ${currentPrice})" title="הוסף התראה">🔔</button>
