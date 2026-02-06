@@ -198,19 +198,33 @@
                         <span class="icon">📋</span>
                         <span>אחזקות</span>
                     </h2>
-                    <span id="lastUpdateTime" style="color: var(--color-text-secondary); font-size: 0.85rem;"></span>
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <div style="display: flex; align-items: center; gap: 5px;">
+                            <label style="font-size: 0.85rem; color: var(--color-text-secondary);">מיון:</label>
+                            <select id="sortBy" onchange="loadStocks()" style="padding: 5px 10px; border-radius: 5px; background: var(--color-card-bg); color: var(--color-text); border: 1px solid var(--color-border);">
+                                <option value="symbol">סימול</option>
+                                <option value="name">שם</option>
+                                <option value="value" selected>שווי כולל</option>
+                                <option value="profitLoss">רווח/הפסד ₪</option>
+                                <option value="profitPercent">רווח/הפסד %</option>
+                                <option value="quantity">כמות</option>
+                            </select>
+                            <button onclick="toggleSortDirection()" id="sortDirBtn" class="btn btn-sm btn-secondary" style="padding: 5px 8px;">⬇️</button>
+                        </div>
+                        <span id="lastUpdateTime" style="color: var(--color-text-secondary); font-size: 0.85rem;"></span>
+                    </div>
                 </div>
                 <div class="table-container">
                     <table>
                         <thead>
                             <tr>
-                                <th data-i18n="stocks.symbol">סימול</th>
-                                <th data-i18n="stocks.companyName">שם</th>
-                                <th data-i18n="stocks.quantity">כמות</th>
-                                <th>עלות ליח'</th>
-                                <th>שווי ליח'</th>
-                                <th data-i18n="stocks.totalValue">שווי כולל</th>
-                                <th data-i18n="stocks.profitLoss">רווח/הפסד</th>
+                                <th data-i18n="stocks.symbol" style="cursor: pointer;" onclick="setSortBy('symbol')">סימול</th>
+                                <th data-i18n="stocks.companyName" style="cursor: pointer;" onclick="setSortBy('name')">שם</th>
+                                <th data-i18n="stocks.quantity" style="cursor: pointer;" onclick="setSortBy('quantity')">כמות</th>
+                                <th style="cursor: pointer;" onclick="setSortBy('avgPrice')">עלות ליח'</th>
+                                <th style="cursor: pointer;" onclick="setSortBy('currentPrice')">שווי ליח'</th>
+                                <th data-i18n="stocks.totalValue" style="cursor: pointer;" onclick="setSortBy('value')">שווי כולל</th>
+                                <th data-i18n="stocks.profitLoss" style="cursor: pointer;" onclick="setSortBy('profitLoss')">רווח/הפסד</th>
                                 <th>MA150</th>
                                 <th data-i18n="common.actions">פעולות</th>
                             </tr>
@@ -557,6 +571,23 @@
         let priceCache = {};
         let isRefreshing = false;
         let searchTimeout = null;
+        let sortDirection = 'desc'; // 'asc' or 'desc'
+
+        function toggleSortDirection() {
+            sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+            document.getElementById('sortDirBtn').textContent = sortDirection === 'asc' ? '⬆️' : '⬇️';
+            loadStocks();
+        }
+
+        function setSortBy(field) {
+            const select = document.getElementById('sortBy');
+            if (select.value === field) {
+                toggleSortDirection();
+            } else {
+                select.value = field;
+                loadStocks();
+            }
+        }
 
         document.addEventListener('DOMContentLoaded', () => {
             App.currentPage = 'stocks';
@@ -587,17 +618,47 @@
             if (data.holdings.length === 0) {
                 holdingsTable.innerHTML = `<tr><td colspan="9" style="text-align: center; color: var(--color-text-secondary);">${I18n.t('stocks.noStocks')}</td></tr>`;
             } else {
-                holdingsTable.innerHTML = data.holdings.map(h => {
+                // Get sort criteria
+                const sortBy = document.getElementById('sortBy')?.value || 'value';
+
+                // Prepare holdings with calculated values for sorting
+                const holdingsWithCalc = data.holdings.map(h => {
                     const cached = priceCache[h.symbol] || {};
                     const currentPrice = cached.currentPrice || h.currentPrice || h.avgPrice;
+                    const value = h.quantity * currentPrice;
+                    const cost = h.quantity * h.avgPrice;
+                    const profitLoss = value - cost;
+                    const profitPercent = cost > 0 ? (profitLoss / cost) * 100 : 0;
+                    return { ...h, currentPrice, value, cost, profitLoss, profitPercent, cached };
+                });
+
+                // Sort holdings
+                holdingsWithCalc.sort((a, b) => {
+                    let aVal, bVal;
+                    switch (sortBy) {
+                        case 'symbol': aVal = a.symbol; bVal = b.symbol; break;
+                        case 'name': aVal = a.name || ''; bVal = b.name || ''; break;
+                        case 'quantity': aVal = a.quantity; bVal = b.quantity; break;
+                        case 'avgPrice': aVal = a.avgPrice; bVal = b.avgPrice; break;
+                        case 'currentPrice': aVal = a.currentPrice; bVal = b.currentPrice; break;
+                        case 'value': aVal = a.value; bVal = b.value; break;
+                        case 'profitLoss': aVal = a.profitLoss; bVal = b.profitLoss; break;
+                        case 'profitPercent': aVal = a.profitPercent; bVal = b.profitPercent; break;
+                        default: aVal = a.value; bVal = b.value;
+                    }
+                    if (typeof aVal === 'string') {
+                        return sortDirection === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+                    }
+                    return sortDirection === 'asc' ? aVal - bVal : bVal - aVal;
+                });
+
+                holdingsTable.innerHTML = holdingsWithCalc.map(h => {
+                    const { currentPrice, value, cost, profitLoss, profitPercent, cached } = h;
                     const ma150 = cached.ma150;
                     const ma150Position = cached.ma150Position;
                     const ma150PositionPercent = cached.ma150PositionPercent;
 
-                    const value = h.quantity * currentPrice;
-                    const cost = h.quantity * h.avgPrice;
-                    const profitLoss = value - cost;
-                    const profitLossPercent = cost > 0 ? ((profitLoss / cost) * 100).toFixed(2) : 0;
+                    const profitLossPercent = profitPercent.toFixed(2);
                     const isProfit = profitLoss >= 0;
 
                     totalValue += value;
