@@ -1538,16 +1538,32 @@
 
                 if (!confirmed) return;
 
-                // Clear existing holdings and import fresh
+                // Smart merge: update broker holdings, keep manual holdings untouched
                 const existingData = Storage.getStocks();
-                const clearExisting = existingData.holdings.length > 0 ?
-                    confirm('האם למחוק אחזקות קיימות לפני הייבוא?\n\nכן = החלף הכל\nלא = הוסף לקיימות') : true;
+                const brokerSymbols = holdings.map(h => h.symbol);
 
-                if (clearExisting) {
-                    Storage.saveStocks({ holdings: [], transactions: existingData.transactions || [] });
+                let importMode = 'smart'; // default: smart merge
+                if (existingData.holdings.length > 0) {
+                    const manualHoldings = existingData.holdings.filter(h => !brokerSymbols.includes(h.symbol));
+                    const choice = confirm(
+                        `נמצאו ${existingData.holdings.length} אחזקות קיימות.\n` +
+                        `מתוכן ${manualHoldings.length} אחזקות ידניות (לא מהברוקר).\n\n` +
+                        `כן = עדכן מניות ברוקר, שמור ידניות\n` +
+                        `לא = החלף הכל (מחק גם ידניות)`
+                    );
+                    importMode = choice ? 'smart' : 'replace';
                 }
 
-                // Import each holding (without creating fake transactions)
+                if (importMode === 'replace') {
+                    // Clear all holdings
+                    Storage.saveStocks({ holdings: [], transactions: existingData.transactions || [] });
+                } else {
+                    // Smart merge: remove only broker holdings, keep manual ones
+                    const manualHoldings = existingData.holdings.filter(h => !brokerSymbols.includes(h.symbol));
+                    Storage.saveStocks({ holdings: manualHoldings, transactions: existingData.transactions || [] });
+                }
+
+                // Import broker holdings (will add fresh, not merge)
                 let imported = 0;
                 holdings.forEach(h => {
                     Storage.importStock(h);
