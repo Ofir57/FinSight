@@ -221,12 +221,13 @@
                             <tr>
                                 <th data-i18n="stocks.symbol" style="cursor: pointer;" onclick="setSortBy('symbol')">סימול</th>
                                 <th data-i18n="stocks.companyName" style="cursor: pointer;" onclick="setSortBy('name')">שם</th>
-                                <th>מטבע</th>
                                 <th data-i18n="stocks.quantity" style="cursor: pointer;" onclick="setSortBy('quantity')">כמות</th>
                                 <th style="cursor: pointer;" onclick="setSortBy('avgPrice')">עלות ליח'</th>
                                 <th style="cursor: pointer;" onclick="setSortBy('currentPrice')">מחיר נוכחי</th>
+                                <th>MA150</th>
                                 <th style="cursor: pointer;" onclick="setSortBy('valueILS')">שווי ₪</th>
                                 <th style="cursor: pointer;" onclick="setSortBy('portfolioPercent')">% מהתיק</th>
+                                <th>רווח (מט"ח)</th>
                                 <th style="cursor: pointer;" onclick="setSortBy('profitILS')">רווח ₪</th>
                                 <th style="cursor: pointer;" onclick="setSortBy('profitPercent')">רווח %</th>
                                 <th data-i18n="common.actions">פעולות</th>
@@ -619,7 +620,7 @@
             let totalCost = 0;
 
             if (data.holdings.length === 0) {
-                holdingsTable.innerHTML = `<tr><td colspan="11" style="text-align: center; color: var(--color-text-secondary);">${I18n.t('stocks.noStocks')}</td></tr>`;
+                holdingsTable.innerHTML = `<tr><td colspan="12" style="text-align: center; color: var(--color-text-secondary);">${I18n.t('stocks.noStocks')}</td></tr>`;
             } else {
                 // Get sort criteria
                 const sortBy = document.getElementById('sortBy')?.value || 'valueILS';
@@ -673,16 +674,33 @@
                     totalValue += valueILS;
                     totalCost += costILS;
 
+                    // MA150 from cache (in trading currency)
+                    const ma150 = cached.ma150;
+                    let ma150Display = '<span style="color: var(--color-text-secondary);">-</span>';
+                    if (ma150 !== null && ma150 !== undefined) {
+                        const ma150Position = currentPrice > ma150 ? 'above' : 'below';
+                        const positionIcon = ma150Position === 'above' ? '🟢' : '🔴';
+                        ma150Display = `<span class="${ma150Position === 'above' ? 'profit' : 'loss'}">${positionIcon} ${currencySymbol}${ma150.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>`;
+                    }
+
+                    // Profit in trading currency (calculate from prices)
+                    const profitPerUnit = currentPrice - h.avgPrice;
+                    const profitInCurrency = profitPerUnit * h.quantity;
+                    const isProfitCurrency = profitInCurrency >= 0;
+
                     return `
                         <tr>
                             <td class="stock-symbol">${h.symbol}</td>
                             <td>${h.name || '-'}</td>
-                            <td>${currency}</td>
                             <td>${h.quantity.toLocaleString()}</td>
                             <td>${currencySymbol}${h.avgPrice.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
                             <td>${currencySymbol}${currentPrice.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                            <td>${ma150Display}</td>
                             <td><strong>₪${valueILS.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}</strong></td>
                             <td>${portfolioPercent.toFixed(1)}%</td>
+                            <td class="${isProfitCurrency ? 'profit' : 'loss'}">
+                                ${isProfitCurrency ? '+' : ''}${currencySymbol}${profitInCurrency.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}
+                            </td>
                             <td class="${isProfit ? 'profit' : 'loss'}">
                                 ${isProfit ? '+' : ''}₪${profitILS.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}
                             </td>

@@ -196,6 +196,11 @@ const Storage = {
             existing.avgPrice = ((existing.avgPrice * existing.quantity) + (holding.avgPrice * holding.quantity)) / totalQuantity;
             existing.quantity = totalQuantity;
             existing.currentPrice = holding.currentPrice || existing.currentPrice;
+            // Preserve imported ILS values
+            existing.valueILS = (existing.valueILS || 0) + (holding.valueILS || 0);
+            existing.profitILS = (existing.profitILS || 0) + (holding.profitILS || 0);
+            existing.currency = holding.currency || existing.currency;
+            existing.market = holding.market || existing.market;
         } else {
             holding.id = this.generateId();
             data.holdings.push(holding);
