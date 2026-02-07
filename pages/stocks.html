@@ -204,9 +204,9 @@
                             <select id="sortBy" onchange="loadStocks()" style="padding: 5px 10px; border-radius: 5px; background: var(--color-card-bg); color: var(--color-text); border: 1px solid var(--color-border);">
                                 <option value="symbol">סימול</option>
                                 <option value="name">שם</option>
-                                <option value="value" selected>שווי כולל</option>
+                                <option value="valueILS" selected>שווי ₪</option>
                                 <option value="portfolioPercent">% מהתיק</option>
-                                <option value="profitLoss">רווח ₪</option>
+                                <option value="profitILS">רווח ₪</option>
                                 <option value="profitPercent">רווח %</option>
                                 <option value="quantity">כמות</option>
                             </select>
@@ -221,13 +221,13 @@
                             <tr>
                                 <th data-i18n="stocks.symbol" style="cursor: pointer;" onclick="setSortBy('symbol')">סימול</th>
                                 <th data-i18n="stocks.companyName" style="cursor: pointer;" onclick="setSortBy('name')">שם</th>
+                                <th>מטבע</th>
                                 <th data-i18n="stocks.quantity" style="cursor: pointer;" onclick="setSortBy('quantity')">כמות</th>
                                 <th style="cursor: pointer;" onclick="setSortBy('avgPrice')">עלות ליח'</th>
-                                <th data-i18n="stocks.totalValue" style="cursor: pointer;" onclick="setSortBy('value')">שווי כולל</th>
-                                <th style="cursor: pointer;" onclick="setSortBy('portfolioPercent')">% מהתיק</th>
                                 <th style="cursor: pointer;" onclick="setSortBy('currentPrice')">מחיר נוכחי</th>
-                                <th>MA150</th>
-                                <th style="cursor: pointer;" onclick="setSortBy('profitLoss')">רווח ₪</th>
+                                <th style="cursor: pointer;" onclick="setSortBy('valueILS')">שווי ₪</th>
+                                <th style="cursor: pointer;" onclick="setSortBy('portfolioPercent')">% מהתיק</th>
+                                <th style="cursor: pointer;" onclick="setSortBy('profitILS')">רווח ₪</th>
                                 <th style="cursor: pointer;" onclick="setSortBy('profitPercent')">רווח %</th>
                                 <th data-i18n="common.actions">פעולות</th>
                             </tr>
@@ -622,26 +622,24 @@
                 holdingsTable.innerHTML = `<tr><td colspan="11" style="text-align: center; color: var(--color-text-secondary);">${I18n.t('stocks.noStocks')}</td></tr>`;
             } else {
                 // Get sort criteria
-                const sortBy = document.getElementById('sortBy')?.value || 'value';
+                const sortBy = document.getElementById('sortBy')?.value || 'valueILS';
 
-                // First pass: calculate total value for portfolio percentages
-                let portfolioTotalValue = 0;
+                // First pass: calculate total ILS value for portfolio percentages
+                let portfolioTotalILS = 0;
                 data.holdings.forEach(h => {
-                    const cached = priceCache[h.symbol] || {};
-                    const currentPrice = cached.currentPrice || h.currentPrice || h.avgPrice;
-                    portfolioTotalValue += h.quantity * currentPrice;
+                    portfolioTotalILS += h.valueILS || 0;
                 });
 
                 // Prepare holdings with calculated values for sorting
                 const holdingsWithCalc = data.holdings.map(h => {
                     const cached = priceCache[h.symbol] || {};
-                    const currentPrice = cached.currentPrice || h.currentPrice || h.avgPrice;
-                    const value = h.quantity * currentPrice;
-                    const cost = h.quantity * h.avgPrice;
-                    const profitLoss = value - cost;
-                    const profitPercent = cost > 0 ? (profitLoss / cost) * 100 : 0;
-                    const portfolioPercent = portfolioTotalValue > 0 ? (value / portfolioTotalValue) * 100 : 0;
-                    return { ...h, currentPrice, value, cost, profitLoss, profitPercent, portfolioPercent, cached };
+                    const currentPrice = h.currentPrice || h.avgPrice;
+                    const valueILS = h.valueILS || 0;
+                    const profitILS = h.profitILS || 0;
+                    const costILS = valueILS - profitILS;
+                    const profitPercent = costILS > 0 ? (profitILS / costILS) * 100 : 0;
+                    const portfolioPercent = portfolioTotalILS > 0 ? (valueILS / portfolioTotalILS) * 100 : 0;
+                    return { ...h, currentPrice, valueILS, profitILS, costILS, profitPercent, portfolioPercent, cached };
                 });
 
                 // Sort holdings
@@ -653,11 +651,11 @@
                         case 'quantity': aVal = a.quantity; bVal = b.quantity; break;
                         case 'avgPrice': aVal = a.avgPrice; bVal = b.avgPrice; break;
                         case 'currentPrice': aVal = a.currentPrice; bVal = b.currentPrice; break;
-                        case 'value': aVal = a.value; bVal = b.value; break;
-                        case 'profitLoss': aVal = a.profitLoss; bVal = b.profitLoss; break;
+                        case 'valueILS': aVal = a.valueILS; bVal = b.valueILS; break;
+                        case 'profitILS': aVal = a.profitILS; bVal = b.profitILS; break;
                         case 'profitPercent': aVal = a.profitPercent; bVal = b.profitPercent; break;
                         case 'portfolioPercent': aVal = a.portfolioPercent; bVal = b.portfolioPercent; break;
-                        default: aVal = a.value; bVal = b.value;
+                        default: aVal = a.valueILS; bVal = b.valueILS;
                     }
                     if (typeof aVal === 'string') {
                         return sortDirection === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
@@ -666,39 +664,27 @@
                 });
 
                 holdingsTable.innerHTML = holdingsWithCalc.map(h => {
-                    const { currentPrice, value, cost, profitLoss, profitPercent, portfolioPercent, cached } = h;
-                    const ma150 = cached.ma150;
-                    const ma150Position = cached.ma150Position;
-                    const ma150PositionPercent = cached.ma150PositionPercent;
+                    const { currentPrice, valueILS, profitILS, costILS, profitPercent, portfolioPercent, cached } = h;
+                    const currency = h.currency || 'USD';
+                    const currencySymbol = { USD: '$', GBP: '£', ILS: '₪', EUR: '€' }[currency] || '$';
 
-                    const isProfit = profitLoss >= 0;
+                    const isProfit = profitILS >= 0;
 
-                    totalValue += value;
-                    totalCost += cost;
-
-                    // MA150 display
-                    let ma150Display = '-';
-                    if (ma150 !== null && ma150 !== undefined) {
-                        ma150Display = `₪${ma150.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
-                        if (ma150Position) {
-                            const icon = ma150Position === 'above' ? '🟢' : '🔴';
-                            const pct = ma150PositionPercent?.toFixed(1) || '0';
-                            ma150Display += `<br><small>${icon} ${ma150PositionPercent >= 0 ? '+' : ''}${pct}%</small>`;
-                        }
-                    }
+                    totalValue += valueILS;
+                    totalCost += costILS;
 
                     return `
                         <tr>
                             <td class="stock-symbol">${h.symbol}</td>
                             <td>${h.name || '-'}</td>
+                            <td>${currency}</td>
                             <td>${h.quantity.toLocaleString()}</td>
-                            <td>₪${h.avgPrice.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
-                            <td><strong>₪${value.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}</strong></td>
+                            <td>${currencySymbol}${h.avgPrice.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                            <td>${currencySymbol}${currentPrice.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                            <td><strong>₪${valueILS.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}</strong></td>
                             <td>${portfolioPercent.toFixed(1)}%</td>
-                            <td>₪${currentPrice.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
-                            <td>${ma150Display}</td>
                             <td class="${isProfit ? 'profit' : 'loss'}">
-                                ${isProfit ? '+' : ''}₪${profitLoss.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}
+                                ${isProfit ? '+' : ''}₪${profitILS.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}
                             </td>
                             <td class="${isProfit ? 'profit' : 'loss'}">
                                 ${isProfit ? '+' : ''}${profitPercent.toFixed(1)}%
@@ -1678,7 +1664,9 @@
 
                 const securityId = row[0];
                 const name = row[1];
+                const avgPriceOriginal = parseFloat(row[2]?.replace(/,/g, ''));
                 const quantity = parseFloat(row[3]?.replace(/,/g, ''));
+                const currentPriceOriginal = parseFloat(row[4]?.replace(/,/g, ''));
                 const valueILS = parseFloat(row[5]?.replace(/,/g, '')) || 0;
                 const profitILS = parseFloat(row[8]?.replace(/,/g, '')) || 0;
 
@@ -1687,19 +1675,16 @@
                 // Extract symbol from name
                 const symbolInfo = extractSymbolFromName(name, securityId);
 
-                // Calculate ILS prices from value and profit
-                const costILS = valueILS - profitILS;
-                const avgPrice = costILS / quantity;
-                const currentPrice = valueILS / quantity;
-
                 holdings.push({
                     symbol: symbolInfo.symbol,
                     name: symbolInfo.displayName,
                     quantity: quantity,
-                    avgPrice: avgPrice,
-                    currentPrice: currentPrice,
-                    currency: 'ILS',
-                    market: symbolInfo.market
+                    avgPrice: avgPriceOriginal,
+                    currentPrice: currentPriceOriginal || avgPriceOriginal,
+                    currency: symbolInfo.currency,
+                    market: symbolInfo.market,
+                    valueILS: valueILS,
+                    profitILS: profitILS
                 });
             }
 
