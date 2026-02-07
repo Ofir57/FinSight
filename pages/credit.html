@@ -243,9 +243,9 @@
                         <thead>
                             <tr>
                                 <th data-i18n="credit.expenseDate">תאריך</th>
-                                <th>כרטיס</th>
                                 <th data-i18n="credit.expenseCategory">קטגוריה</th>
                                 <th data-i18n="credit.expenseDescription">תיאור</th>
+                                <th>מקור</th>
                                 <th data-i18n="credit.expenseAmount">סכום</th>
                                 <th data-i18n="common.actions">פעולות</th>
                             </tr>
@@ -470,13 +470,20 @@
             }
 
             const rows = monthExpenses.map(exp => {
-                const card = data.cards.find(c => c.id === exp.cardId);
+                // Show foreign transaction info
+                let foreignInfo = '';
+                if (exp.originalCurrency && exp.originalCurrency !== '₪' && exp.originalCurrency !== 'ILS') {
+                    const flag = getCurrencyFlag(exp.originalCurrency);
+                    const origAmount = exp.originalAmount || exp.amount;
+                    foreignInfo = `<span title="${exp.originalCurrency}">${flag} ${origAmount.toLocaleString()}</span>`;
+                }
+
                 return `
                     <tr>
                         <td>${I18n.formatDate(exp.date)}</td>
-                        <td>${card ? card.name : '-'}</td>
                         <td>${I18n.t('credit.categories.' + exp.category)}</td>
                         <td>${exp.description}${exp.isRecurring ? ' 🔄' : ''}</td>
+                        <td>${foreignInfo}</td>
                         <td class="negative">${I18n.formatCurrency(exp.amount)}</td>
                         <td>
                             <div class="action-buttons">
@@ -496,6 +503,43 @@
                     <td></td>
                 </tr>
             `);
+        }
+
+        // Helper function to get country flag from currency
+        function getCurrencyFlag(currency) {
+            const flags = {
+                'USD': '🇺🇸', '$': '🇺🇸',
+                'EUR': '🇪🇺', '€': '🇪🇺',
+                'GBP': '🇬🇧', '£': '🇬🇧',
+                'BRL': '🇧🇷', 'R$': '🇧🇷',
+                'JPY': '🇯🇵', '¥': '🇯🇵',
+                'CNY': '🇨🇳',
+                'CHF': '🇨🇭',
+                'AUD': '🇦🇺',
+                'CAD': '🇨🇦',
+                'THB': '🇹🇭',
+                'TRY': '🇹🇷',
+                'PLN': '🇵🇱',
+                'CZK': '🇨🇿',
+                'HUF': '🇭🇺',
+                'SEK': '🇸🇪',
+                'NOK': '🇳🇴',
+                'DKK': '🇩🇰',
+                'MXN': '🇲🇽',
+                'ARS': '🇦🇷',
+                'CLP': '🇨🇱',
+                'COP': '🇨🇴',
+                'PEN': '🇵🇪',
+                'INR': '🇮🇳',
+                'RUB': '🇷🇺',
+                'ZAR': '🇿🇦',
+                'AED': '🇦🇪',
+                'SGD': '🇸🇬',
+                'HKD': '🇭🇰',
+                'NZD': '🇳🇿',
+                'KRW': '🇰🇷'
+            };
+            return flags[currency] || '🌍';
 
             tbody.innerHTML = rows.join('');
 
@@ -800,7 +844,9 @@
                         amount: exp.amount,
                         category: exp.category,
                         description: exp.description,
-                        isRecurring: exp.isRecurring || false
+                        isRecurring: exp.isRecurring || false,
+                        originalAmount: exp.originalAmount,
+                        originalCurrency: exp.originalCurrency
                     });
                     imported++;
                 });
@@ -892,6 +938,8 @@
                 const categoryHeb = row[2]; // C: קטגוריה
                 const cardLastFour = row[3]; // D: 4 ספרות
                 const amountStr = row[5]; // F: סכום חיוב
+                const originalAmountStr = row[7]; // H: סכום עסקה מקורי
+                const originalCurrency = row[8]; // I: מטבע עסקה מקורי
                 const notes = row[10] || ''; // K: הערות
 
                 if (!dateStr || !description || !amountStr) continue;
@@ -905,11 +953,17 @@
                 const amount = parseFloat(amountStr.replace(/,/g, ''));
                 if (isNaN(amount) || amount <= 0) continue;
 
+                // Parse original amount (for foreign transactions)
+                const originalAmount = parseFloat(originalAmountStr?.replace(/,/g, '') || '0');
+
                 // Map category
                 const category = categoryMap[categoryHeb] || 'other';
 
                 // Check if recurring
                 const isRecurring = notes.includes('הוראת קבע');
+
+                // Check if foreign transaction (original currency different from ILS)
+                const isForeign = originalCurrency && originalCurrency !== '₪' && originalCurrency !== 'ILS';
 
                 expenses.push({
                     date,
@@ -917,7 +971,9 @@
                     amount,
                     category,
                     cardLastFour,
-                    isRecurring
+                    isRecurring,
+                    originalAmount: isForeign ? originalAmount : null,
+                    originalCurrency: isForeign ? originalCurrency : null
                 });
             }
 
