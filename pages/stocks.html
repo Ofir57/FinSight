@@ -222,14 +222,14 @@
                                 <th data-i18n="stocks.symbol" style="cursor: pointer;" onclick="setSortBy('symbol')">סימול</th>
                                 <th data-i18n="stocks.companyName" style="cursor: pointer;" onclick="setSortBy('name')">שם</th>
                                 <th data-i18n="stocks.quantity" style="cursor: pointer;" onclick="setSortBy('quantity')">כמות</th>
-                                <th style="cursor: pointer;" onclick="setSortBy('avgPrice')">עלות ליח'</th>
+                                <th style="cursor: pointer;" onclick="setSortBy('avgPrice')">מחיר קנייה</th>
+                                <th>סה"כ רכישה</th>
                                 <th style="cursor: pointer;" onclick="setSortBy('currentPrice')">מחיר נוכחי</th>
                                 <th>MA150</th>
                                 <th style="cursor: pointer;" onclick="setSortBy('valueILS')">שווי ₪</th>
-                                <th style="cursor: pointer;" onclick="setSortBy('portfolioPercent')">% מהתיק</th>
                                 <th>רווח (מט"ח)</th>
                                 <th style="cursor: pointer;" onclick="setSortBy('profitILS')">רווח ₪</th>
-                                <th style="cursor: pointer;" onclick="setSortBy('profitPercent')">רווח %</th>
+                                <th style="cursor: pointer;" onclick="setSortBy('portfolioPercent')">% מהתיק</th>
                                 <th data-i18n="common.actions">פעולות</th>
                             </tr>
                         </thead>
@@ -634,7 +634,9 @@
                 // Prepare holdings with calculated values for sorting
                 const holdingsWithCalc = data.holdings.map(h => {
                     const cached = priceCache[h.symbol] || {};
-                    const currentPrice = h.currentPrice || h.avgPrice;
+                    // Use cached price if available, otherwise use imported currentPrice
+                    const currentPrice = cached.currentPrice || h.currentPrice || h.avgPrice;
+                    // Use imported ILS values from broker file - these are the correct values!
                     const valueILS = h.valueILS || 0;
                     const profitILS = h.profitILS || 0;
                     const costILS = valueILS - profitILS;
@@ -674,6 +676,9 @@
                     totalValue += valueILS;
                     totalCost += costILS;
 
+                    // Total purchase cost in trading currency
+                    const totalPurchase = h.avgPrice * h.quantity;
+
                     // MA150 from cache (in trading currency)
                     const ma150 = cached.ma150;
                     let ma150Display = '<span style="color: var(--color-text-secondary);">-</span>';
@@ -694,19 +699,17 @@
                             <td>${h.name || '-'}</td>
                             <td>${h.quantity.toLocaleString()}</td>
                             <td>${currencySymbol}${h.avgPrice.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                            <td>${currencySymbol}${totalPurchase.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}</td>
                             <td>${currencySymbol}${currentPrice.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
                             <td>${ma150Display}</td>
                             <td><strong>₪${valueILS.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}</strong></td>
-                            <td>${portfolioPercent.toFixed(1)}%</td>
                             <td class="${isProfitCurrency ? 'profit' : 'loss'}">
                                 ${isProfitCurrency ? '+' : ''}${currencySymbol}${profitInCurrency.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}
                             </td>
                             <td class="${isProfit ? 'profit' : 'loss'}">
                                 ${isProfit ? '+' : ''}₪${profitILS.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}
                             </td>
-                            <td class="${isProfit ? 'profit' : 'loss'}">
-                                ${isProfit ? '+' : ''}${profitPercent.toFixed(1)}%
-                            </td>
+                            <td>${portfolioPercent.toFixed(1)}%</td>
                             <td>
                                 <div class="action-buttons">
                                     <button class="btn btn-secondary btn-sm" onclick="openAlertModal('${h.symbol}', ${currentPrice})" title="הוסף התראה">🔔</button>
@@ -1583,12 +1586,14 @@
                     return;
                 }
 
-                // Show confirmation
-                const totalValue = holdings.reduce((sum, h) => sum + (h.quantity * h.currentPrice), 0);
+                // Show confirmation - use valueILS from broker file
+                const totalValue = holdings.reduce((sum, h) => sum + (h.valueILS || 0), 0);
+                const totalProfit = holdings.reduce((sum, h) => sum + (h.profitILS || 0), 0);
                 const confirmed = confirm(
                     `נמצאו ${holdings.length} אחזקות\n` +
-                    `שווי כולל: ₪${totalValue.toLocaleString(undefined, {minimumFractionDigits: 0})}\n\n` +
-                    `רשימת מניות:\n${holdings.map(h => `  ${h.symbol} - ${h.name} (₪${(h.quantity * h.currentPrice).toLocaleString(undefined, {maximumFractionDigits: 0})})`).join('\n')}\n\n` +
+                    `שווי כולל: ₪${totalValue.toLocaleString(undefined, {minimumFractionDigits: 0})}\n` +
+                    `רווח/הפסד: ₪${totalProfit.toLocaleString(undefined, {minimumFractionDigits: 0})}\n\n` +
+                    `רשימת מניות:\n${holdings.map(h => `  ${h.symbol} - ${h.name} (₪${(h.valueILS || 0).toLocaleString(undefined, {maximumFractionDigits: 0})}, רווח: ₪${(h.profitILS || 0).toLocaleString(undefined, {maximumFractionDigits: 0})})`).join('\n')}\n\n` +
                     `לייבא את כל האחזקות?`
                 );
 
