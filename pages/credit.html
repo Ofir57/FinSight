@@ -212,10 +212,11 @@
                             <span>➕</span>
                             <span data-i18n="credit.addExpense">הוסף הוצאה</span>
                         </button>
-                        <button class="btn btn-secondary btn-sm" onclick="importCSV()">
+                        <button class="btn btn-secondary btn-sm" onclick="document.getElementById('excelImportInput').click()">
                             <span>📥</span>
-                            <span>ייבוא CSV</span>
+                            <span>ייבוא Excel</span>
                         </button>
+                        <input type="file" id="excelImportInput" accept=".xlsx,.xls" style="display: none;" onchange="importCreditExcel(event)">
                     </div>
                 </div>
                 <!-- Search and Filter -->
@@ -698,6 +699,181 @@
             if (result.errors && result.errors.length > 0) {
                 console.log('Import errors:', result.errors);
             }
+        }
+
+        // Excel Import for Credit Card Transactions
+        async function importCreditExcel(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            try {
+                const content = await file.text();
+                const expenses = parseCreditExcel(content);
+
+                if (expenses.length === 0) {
+                    App.notify('לא נמצאו עסקאות בקובץ', 'warning');
+                    return;
+                }
+
+                // Calculate total
+                const total = expenses.reduce((sum, e) => sum + e.amount, 0);
+
+                // Show confirmation
+                const confirmed = confirm(
+                    `נמצאו ${expenses.length} עסקאות\n` +
+                    `סה"כ: ₪${total.toLocaleString(undefined, {minimumFractionDigits: 0})}\n\n` +
+                    `דוגמאות:\n${expenses.slice(0, 5).map(e => `  ${e.date} - ${e.description} - ₪${e.amount}`).join('\n')}\n` +
+                    `${expenses.length > 5 ? `  ...ועוד ${expenses.length - 5} עסקאות` : ''}\n\n` +
+                    `לייבא את העסקאות?`
+                );
+
+                if (!confirmed) return;
+
+                // Get or create default card
+                const data = Storage.getCreditCards();
+                let cardId = data.cards[0]?.id;
+
+                if (!cardId) {
+                    // Create default card
+                    const card = Storage.addCreditCard({
+                        name: 'כרטיס אשראי',
+                        lastFour: expenses[0]?.cardLastFour || '0000',
+                        limit: 50000
+                    });
+                    cardId = card.id;
+                }
+
+                // Import expenses
+                let imported = 0;
+                expenses.forEach(exp => {
+                    Storage.addExpense({
+                        cardId,
+                        date: exp.date,
+                        amount: exp.amount,
+                        category: exp.category,
+                        description: exp.description,
+                        isRecurring: exp.isRecurring || false
+                    });
+                    imported++;
+                });
+
+                App.notify(`יובאו ${imported} עסקאות בהצלחה!`, 'success');
+                loadCards();
+                loadExpenses();
+
+            } catch (error) {
+                console.error('Excel import error:', error);
+                App.notify('שגיאה בקריאת הקובץ: ' + error.message, 'error');
+            }
+
+            event.target.value = '';
+        }
+
+        function parseCreditExcel(content) {
+            const expenses = [];
+
+            // Parse XML-based Excel (xlsx)
+            const rowPattern = /<row[^>]*>([\s\S]*?)<\/row>/gi;
+            const cellPattern = /<c[^>]*>(?:<v>([^<]*)<\/v>)?/gi;
+            const valuePattern = /<v>([^<]*)<\/v>/;
+
+            // Find all rows
+            const rows = [];
+            let match;
+            while ((match = rowPattern.exec(content)) !== null) {
+                const rowContent = match[1];
+                const cells = [];
+
+                // Extract cell values
+                let cellMatch;
+                const cp = new RegExp(cellPattern.source, 'gi');
+                while ((cellMatch = cp.exec(rowContent)) !== null) {
+                    const cellContent = cellMatch[0];
+                    const valMatch = cellContent.match(valuePattern);
+                    cells.push(valMatch ? valMatch[1] : '');
+                }
+                rows.push(cells);
+            }
+
+            // Find header row (contains 'תאריך עסקה' or 'שם בית העסק')
+            let headerIdx = -1;
+            for (let i = 0; i < rows.length; i++) {
+                const rowText = rows[i].join(' ');
+                if (rowText.includes('תאריך עסקה') || rowText.includes('שם בית העסק')) {
+                    headerIdx = i;
+                    break;
+                }
+            }
+
+            if (headerIdx === -1) {
+                throw new Error('לא נמצא פורמט מוכר בקובץ');
+            }
+
+            // Category mapping from Hebrew to internal
+            const categoryMap = {
+                'מזון ומסעדות': 'food',
+                'מסעדות, קפה וברים': 'food',
+                'סופרמרקט': 'food',
+                'תחבורה ודלק': 'transport',
+                'דלק, חשמל וגז': 'transport',
+                'קניות': 'shopping',
+                'אופנה והנעלה': 'shopping',
+                'ציוד לבית': 'shopping',
+                'בילויים': 'entertainment',
+                'פנאי, בידור וספורט': 'entertainment',
+                'חשבונות': 'bills',
+                'עירייה וממשלה': 'bills',
+                'שירותי תקשורת': 'bills',
+                'חשמל ומים': 'bills',
+                'בריאות': 'health',
+                'בריאות ויופי': 'health',
+                'חינוך': 'education',
+                'שונות': 'other'
+            };
+
+            // Parse data rows (after header)
+            for (let i = headerIdx + 1; i < rows.length; i++) {
+                const row = rows[i];
+                if (row.length < 6) continue;
+
+                // Skip summary rows
+                if (row[0]?.includes('סך הכל') || row[0]?.includes('₪')) continue;
+
+                const dateStr = row[0]; // A: תאריך עסקה
+                const description = row[1]; // B: שם בית העסק
+                const categoryHeb = row[2]; // C: קטגוריה
+                const cardLastFour = row[3]; // D: 4 ספרות
+                const amountStr = row[5]; // F: סכום חיוב
+                const notes = row[10] || ''; // K: הערות
+
+                if (!dateStr || !description || !amountStr) continue;
+
+                // Parse date (DD-MM-YYYY to YYYY-MM-DD)
+                const dateParts = dateStr.split('-');
+                if (dateParts.length !== 3) continue;
+                const date = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`;
+
+                // Parse amount
+                const amount = parseFloat(amountStr.replace(/,/g, ''));
+                if (isNaN(amount) || amount <= 0) continue;
+
+                // Map category
+                const category = categoryMap[categoryHeb] || 'other';
+
+                // Check if recurring
+                const isRecurring = notes.includes('הוראת קבע');
+
+                expenses.push({
+                    date,
+                    description: description.trim(),
+                    amount,
+                    category,
+                    cardLastFour,
+                    isRecurring
+                });
+            }
+
+            return expenses;
         }
     </script>
 </body>
