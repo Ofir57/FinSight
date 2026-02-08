@@ -217,6 +217,10 @@
                             <span>ייבוא Excel</span>
                         </button>
                         <input type="file" id="excelImportInput" accept=".xlsx,.xls" style="display: none;" onchange="importCreditExcel(event)">
+                        <button class="btn btn-danger btn-sm" onclick="deleteAllExpenses()">
+                            <span>🗑️</span>
+                            <span>מחק הכל</span>
+                        </button>
                     </div>
                 </div>
                 <!-- Search and Filter -->
@@ -805,6 +809,21 @@
                 Storage.deleteExpense(id);
                 loadExpenses();
                 App.notify(I18n.t('common.delete') + ' ✓', 'success');
+            }
+        }
+
+        function deleteAllExpenses() {
+            var data = Storage.getCreditCards();
+            var count = data.expenses.length;
+            if (count === 0) {
+                App.notify('אין הוצאות למחיקה', 'warning');
+                return;
+            }
+            if (confirm('האם למחוק את כל ' + count + ' ההוצאות?')) {
+                data.expenses = [];
+                Storage.saveCreditCards(data);
+                loadExpenses();
+                App.notify('נמחקו ' + count + ' הוצאות', 'success');
             }
         }
 
