@@ -385,20 +385,37 @@
         function initMonthSelector() {
             const select = document.getElementById('monthFilter');
             const now = new Date();
-            const months = [];
+            const monthsSet = new Set();
 
+            // Add last 12 months
             for (let i = 0; i < 12; i++) {
                 const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
                 const value = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
-                const label = I18n.translations[I18n.currentLanguage].months[date.getMonth()] + ' ' + date.getFullYear();
-                months.push({ value, label });
+                monthsSet.add(value);
             }
+
+            // Add months from existing expenses
+            const data = Storage.getCreditCards();
+            data.expenses.forEach(exp => {
+                if (exp.date) {
+                    const month = exp.date.substring(0, 7);
+                    monthsSet.add(month);
+                }
+            });
+
+            // Convert to array and sort descending
+            const months = Array.from(monthsSet).sort((a, b) => b.localeCompare(a)).map(value => {
+                const [year, month] = value.split('-');
+                const date = new Date(parseInt(year), parseInt(month) - 1, 1);
+                const label = I18n.translations[I18n.currentLanguage].months[date.getMonth()] + ' ' + date.getFullYear();
+                return { value, label };
+            });
 
             select.innerHTML = months.map((m, i) =>
                 `<option value="${m.value}" ${i === 0 ? 'selected' : ''}>${m.label}</option>`
             ).join('');
 
-            selectedMonth = months[0].value;
+            selectedMonth = months[0]?.value || '';
         }
 
         function loadCards() {
@@ -503,6 +520,12 @@
                     <td></td>
                 </tr>
             `);
+
+            // Populate table
+            tbody.innerHTML = rows.join('');
+
+            // Update category chart
+            updateCategoryChart(monthExpenses, total);
         }
 
         // Helper function to get country flag from currency
@@ -540,11 +563,6 @@
                 'KRW': '🇰🇷'
             };
             return flags[currency] || '🌍';
-
-            tbody.innerHTML = rows.join('');
-
-            // Update category chart
-            updateCategoryChart(monthExpenses, total);
         }
 
         function updateCategoryChart(expenses, grandTotal) {
@@ -560,6 +578,10 @@
 
             if (categories.length === 0) {
                 breakdownDiv.innerHTML = '<p style="text-align: center; color: var(--color-text-secondary);">אין נתונים</p>';
+                if (Charts.charts.categoryChart) {
+                    Charts.charts.categoryChart.destroy();
+                    Charts.charts.categoryChart = null;
+                }
                 return;
             }
 
@@ -852,6 +874,21 @@
                 });
 
                 App.notify(`יובאו ${imported} עסקאות בהצלחה!`, 'success');
+
+                // Switch to the month of the first imported expense
+                if (expenses.length > 0 && expenses[0].date) {
+                    const importedMonth = expenses[0].date.substring(0, 7); // YYYY-MM
+                    const monthFilter = document.getElementById('monthFilter');
+                    // Add the month if not in the list
+                    let optionExists = Array.from(monthFilter.options).some(opt => opt.value === importedMonth);
+                    if (!optionExists) {
+                        const date = new Date(importedMonth + '-01');
+                        const label = I18n.translations[I18n.currentLanguage].months[date.getMonth()] + ' ' + date.getFullYear();
+                        monthFilter.insertAdjacentHTML('beforeend', `<option value="${importedMonth}">${label}</option>`);
+                    }
+                    monthFilter.value = importedMonth;
+                }
+
                 loadCards();
                 loadExpenses();
 

@@ -361,7 +361,13 @@ const Storage = {
 
     getTotalStocksValue() {
         const data = this.getStocks();
-        return data.holdings.reduce((sum, h) => sum + (h.quantity * (h.currentPrice || h.avgPrice)), 0);
+        return data.holdings.reduce((sum, h) => {
+            // Use valueILS if available (from broker import), otherwise calculate
+            if (h.valueILS && h.valueILS > 0) {
+                return sum + h.valueILS;
+            }
+            return sum + (h.quantity * (h.currentPrice || h.avgPrice));
+        }, 0);
     },
 
     getTotalAssetsValue() {
