@@ -495,12 +495,13 @@
                     // Has foreign currency info
                     var origAmount = exp.originalAmount || exp.amount;
                     var flag = countryCode ? getCountryFlag(countryCode) : getCurrencyFlag(exp.originalCurrency);
-                    var rate = origAmount > 0 ? (exp.amount / origAmount).toFixed(2) : '';
+                    var rate = exp.exchangeRate || (origAmount > 0 ? (exp.amount / origAmount).toFixed(2) : '');
                     var rateText = rate ? ' (' + rate + ')' : '';
                     foreignInfo = '<span title="' + exp.originalCurrency + rateText + '">' + flag + ' ' + origAmount.toLocaleString() + rateText + '</span>';
                 } else if (countryCode && countryCode !== 'IL') {
-                    // No currency info but has foreign country in description
-                    foreignInfo = '<span>' + getCountryFlag(countryCode) + '</span>';
+                    // No currency info but has foreign country in description - check for exchange rate
+                    var rateInfo = exp.exchangeRate ? ' (' + exp.exchangeRate + ')' : '';
+                    foreignInfo = '<span>' + getCountryFlag(countryCode) + rateInfo + '</span>';
                 }
 
                 return `
@@ -935,7 +936,8 @@
                         description: exp.description,
                         isRecurring: exp.isRecurring || false,
                         originalAmount: exp.originalAmount,
-                        originalCurrency: exp.originalCurrency
+                        originalCurrency: exp.originalCurrency,
+                        exchangeRate: exp.exchangeRate
                     });
                     imported++;
                 });
@@ -1046,8 +1048,9 @@
                 const cardLastFour = row[3]; // D: 4 ספרות
                 const amountStr = row[5]; // F: סכום חיוב
                 const originalAmountStr = row[7]; // H: סכום עסקה מקורי
-                const originalCurrency = row[8]; // I: מטבע עסקה מקורי
+                var originalCurrency = row[8]; // I: מטבע עסקה מקורי
                 const notes = row[10] || ''; // K: הערות
+                const exchangeRateStr = row[15] || ''; // P: שער המרה
 
                 if (!dateStr || !description || !amountStr) continue;
 
@@ -1061,7 +1064,20 @@
                 if (isNaN(amount) || amount <= 0) continue;
 
                 // Parse original amount (for foreign transactions)
-                const originalAmount = parseFloat(originalAmountStr?.replace(/,/g, '') || '0');
+                var originalAmount = parseFloat(originalAmountStr?.replace(/,/g, '') || '0');
+
+                // Parse exchange rate from text like "שער המרה מדולר לש"ח 3.1500"
+                var exchangeRate = null;
+                if (exchangeRateStr) {
+                    var rateMatch = exchangeRateStr.match(/(\d+\.?\d*)/);
+                    if (rateMatch) {
+                        exchangeRate = parseFloat(rateMatch[1]);
+                    }
+                    // If no original currency but has exchange rate, it's likely USD
+                    if ((!originalCurrency || originalCurrency === '₪' || originalCurrency === '') && exchangeRate) {
+                        originalCurrency = '$';
+                    }
+                }
 
                 // Map category
                 const category = categoryMap[categoryHeb] || 'other';
@@ -1070,7 +1086,7 @@
                 const isRecurring = notes.includes('הוראת קבע');
 
                 // Check if foreign transaction (original currency different from ILS)
-                const isForeign = originalCurrency && originalCurrency !== '₪' && originalCurrency !== 'ILS';
+                var isForeign = originalCurrency && originalCurrency !== '₪' && originalCurrency !== 'ILS' && originalCurrency !== '';
 
                 expenses.push({
                     date,
@@ -1079,8 +1095,9 @@
                     category,
                     cardLastFour,
                     isRecurring,
-                    originalAmount: isForeign ? originalAmount : null,
-                    originalCurrency: isForeign ? originalCurrency : null
+                    originalAmount: (isForeign || exchangeRate) ? originalAmount : null,
+                    originalCurrency: (isForeign || exchangeRate) ? originalCurrency : null,
+                    exchangeRate: exchangeRate
                 });
             }
 
