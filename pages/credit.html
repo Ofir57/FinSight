@@ -487,6 +487,7 @@
 
             if (monthExpenses.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--color-text-secondary);">${I18n.t('credit.noExpenses')}</td></tr>`;
+                updateCategoryChart([], 0);
                 return;
             }
 
@@ -680,32 +681,33 @@
                 });
             }
 
-            // Build breakdown list
-            const breakdownRows = categories.map(cat => {
-                const amount = categoryTotals[cat];
-                const percentage = ((amount / total) * 100).toFixed(1);
-                const color = Charts.colors.categories[cat] || Charts.colors.categories.other;
-                return `
-                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--color-border);">
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <span style="width: 12px; height: 12px; border-radius: 50%; background: ${color};"></span>
-                            <span>${I18n.t('credit.categories.' + cat)}</span>
-                        </div>
-                        <div style="text-align: left;">
-                            <span style="font-weight: bold;">${percentage}%</span>
-                            <span style="color: var(--color-text-secondary); margin-right: 10px;">${I18n.formatCurrency(amount)}</span>
-                        </div>
-                    </div>
-                `;
+            // Build breakdown table
+            var breakdownHtml = '<table style="width: 100%; border-collapse: collapse;">';
+            breakdownHtml += '<thead><tr style="border-bottom: 2px solid var(--color-border);">';
+            breakdownHtml += '<th style="text-align: right; padding: 8px 5px;">קטגוריה</th>';
+            breakdownHtml += '<th style="text-align: center; padding: 8px 5px; width: 60px;">אחוז</th>';
+            breakdownHtml += '<th style="text-align: left; padding: 8px 5px; width: 100px;">סכום</th>';
+            breakdownHtml += '</tr></thead><tbody>';
+
+            categories.forEach(function(cat) {
+                var amount = categoryTotals[cat];
+                var percentage = ((amount / total) * 100).toFixed(1);
+                var color = Charts.colors.categories[cat] || Charts.colors.categories.other;
+                breakdownHtml += '<tr style="border-bottom: 1px solid var(--color-border);">';
+                breakdownHtml += '<td style="padding: 10px 5px;"><span style="display: inline-block; width: 12px; height: 12px; border-radius: 50%; background: ' + color + '; margin-left: 8px; vertical-align: middle;"></span>' + I18n.t('credit.categories.' + cat) + '</td>';
+                breakdownHtml += '<td style="text-align: center; padding: 10px 5px; font-weight: bold;">' + percentage + '%</td>';
+                breakdownHtml += '<td style="text-align: left; padding: 10px 5px; color: var(--color-negative);">' + I18n.formatCurrency(amount) + '</td>';
+                breakdownHtml += '</tr>';
             });
 
             // Add total row
-            breakdownRows.push(`
-                <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; font-weight: bold; margin-top: 5px;">
-                    <span>סה"כ</span>
-                    <span class="negative">${I18n.formatCurrency(total)}</span>
-                </div>
-            `);
+            breakdownHtml += '<tr style="font-weight: bold; background: var(--color-bg-hover);">';
+            breakdownHtml += '<td style="padding: 12px 5px;">סה"כ</td>';
+            breakdownHtml += '<td style="text-align: center; padding: 12px 5px;">100%</td>';
+            breakdownHtml += '<td style="text-align: left; padding: 12px 5px; color: var(--color-negative);">' + I18n.formatCurrency(total) + '</td>';
+            breakdownHtml += '</tr></tbody></table>';
+
+            var breakdownRows = [breakdownHtml];
 
             breakdownDiv.innerHTML = breakdownRows.join('');
         }
