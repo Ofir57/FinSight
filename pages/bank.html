@@ -100,7 +100,7 @@
             <!-- Total Balance Card -->
             <div class="net-worth-banner" style="border-color: var(--color-bank);">
                 <div class="label" data-i18n="bank.balance">יתרה כוללת</div>
-                <div class="value" id="totalBalance" style="background: linear-gradient(90deg, var(--color-bank), #60a5fa);">₪0</div>
+                <div class="value" id="totalBalance" style="background: linear-gradient(90deg, var(--color-bank), #60a5fa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">₪0</div>
             </div>
 
             <!-- Add Account Button -->
@@ -109,13 +109,9 @@
                     <span>➕</span>
                     <span data-i18n="bank.addAccount">הוסף חשבון</span>
                 </button>
-                <button class="btn btn-secondary" onclick="importExcel()">
+                <button class="btn btn-secondary" onclick="importSmartFile()">
                     <span>📥</span>
-                    <span>ייבוא Excel</span>
-                </button>
-                <button class="btn btn-secondary" onclick="importCSV()">
-                    <span>📥</span>
-                    <span>ייבוא CSV</span>
+                    <span>ייבוא חכם</span>
                 </button>
             </div>
 
@@ -141,6 +137,13 @@
                         <tbody id="accountsTable">
                             <!-- Will be populated by JS -->
                         </tbody>
+                        <tfoot id="accountsFooter" style="display: none;">
+                            <tr style="background: var(--color-bg-secondary); font-weight: bold;">
+                                <td colspan="3" style="text-align: right;">סה"כ יתרות</td>
+                                <td id="totalBalanceFooter">₪0</td>
+                                <td></td>
+                            </tr>
+                        </tfoot>
                     </table>
                 </div>
             </div>
@@ -255,15 +258,21 @@
             const tbody = document.getElementById('accountsTable');
             const totalEl = document.getElementById('totalBalance');
 
+            const footer = document.getElementById('accountsFooter');
+            const footerTotal = document.getElementById('totalBalanceFooter');
+
             if (accounts.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--color-text-secondary);">${I18n.t('bank.noAccounts')}</td></tr>`;
                 totalEl.textContent = I18n.formatCurrency(0);
+                footer.style.display = 'none';
                 document.getElementById('historyCard').style.display = 'none';
                 return;
             }
 
             const total = accounts.reduce((sum, acc) => sum + (acc.balance || 0), 0);
             totalEl.textContent = I18n.formatCurrency(total);
+            footerTotal.textContent = I18n.formatCurrency(total);
+            footer.style.display = 'table-footer-group';
 
             tbody.innerHTML = accounts.map(acc => {
                 // Mask account number - show last 4 digits only
@@ -424,10 +433,18 @@
             return rows;
         }
 
-        async function importExcel() {
+        // Bank account column mappings (multi-language)
+        const bankColumnMappings = {
+            name: ['שם', 'שם חשבון', 'סוג פעילות', 'פעילות', 'תיאור', 'name', 'account name', 'description', 'nome', 'nome da conta', 'descrição', 'activity', 'tipo', 'type'],
+            bank: ['בנק', 'שם בנק', 'bank', 'bank name', 'banco', 'instituição'],
+            accountNumber: ['מספר חשבון', 'חשבון', 'account number', 'account', 'número', 'número da conta', 'conta'],
+            balance: ['יתרה', 'יתרה בש', 'יתרה בשח', 'סכום', 'סכום בש', 'balance', 'amount', 'total', 'value', 'saldo', 'valor', 'montante']
+        };
+
+        async function importSmartFile() {
             const input = document.createElement('input');
             input.type = 'file';
-            input.accept = '.xlsx,.xls,.csv,.html';
+            input.accept = '.xlsx,.xls,.csv,.html,.txt';
 
             input.onchange = async (e) => {
                 const file = e.target.files[0];
@@ -447,7 +464,7 @@
                         const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
                         rows = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
                     } else {
-                        // CSV - use existing parser
+                        // CSV/TXT - use existing parser
                         rows = SmartImport.parseFile(content, file.name);
                     }
 
@@ -457,68 +474,20 @@
                     }
 
                     // Find header row
-                    const headerIdx = SmartImport.findHeaderRow(rows);
+                    const headerIdx = findBankHeaderRow(rows);
                     const headers = rows[headerIdx];
 
-                    // Define bank account column mappings (including Bank Leumi format)
-                    const bankColumnMappings = {
-                        name: ['שם', 'שם חשבון', 'סוג פעילות', 'פעילות', 'name', 'account name', 'nome', 'nome da conta', 'activity'],
-                        bank: ['בנק', 'שם בנק', 'bank', 'bank name', 'banco'],
-                        accountNumber: ['מספר חשבון', 'חשבון', 'account number', 'account', 'número', 'número da conta'],
-                        balance: ['יתרה', 'יתרה בש', 'יתרה בשח', 'סכום', 'balance', 'amount', 'saldo', 'valor']
-                    };
-
                     // Auto-detect columns
-                    const detected = {};
-                    headers.forEach((header, index) => {
-                        if (!header) return;
-                        const headerLower = String(header).toLowerCase().trim();
-                        Object.keys(bankColumnMappings).forEach(field => {
-                            if (detected[field] !== undefined) return;
-                            const matches = bankColumnMappings[field].some(kw =>
-                                headerLower.includes(kw.toLowerCase())
-                            );
-                            if (matches) detected[field] = index;
-                        });
-                    });
+                    const detected = detectBankColumns(headers);
 
-                    // Need at least balance column
+                    // If balance column not found, show manual mapping
                     if (detected.balance === undefined) {
-                        App.notify('לא נמצאה עמודת יתרה/סכום', 'error');
+                        showColumnMappingModal(headers, rows, headerIdx);
                         return;
                     }
 
-                    let imported = 0;
-                    const dataRows = rows.slice(headerIdx + 1);
-
-                    for (const row of dataRows) {
-                        // Skip empty rows and summary rows
-                        const firstCell = String(row[0] || '').trim();
-                        if (!firstCell || firstCell.includes('סה"כ') || firstCell.includes('סהכ')) continue;
-
-                        const balanceVal = row[detected.balance];
-                        const balance = typeof balanceVal === 'number' ? balanceVal :
-                            parseFloat(String(balanceVal || '0').replace(/[^\d.-]/g, ''));
-                        if (isNaN(balance)) continue;
-
-                        const name = detected.name !== undefined ? String(row[detected.name] || 'חשבון מיובא').trim() : 'חשבון מיובא';
-                        const bank = detected.bank !== undefined ? String(row[detected.bank] || 'other') : 'other';
-                        const accountNumber = detected.accountNumber !== undefined ?
-                            String(row[detected.accountNumber] || '').replace(/[^\d]/g, '').slice(-10) : '';
-
-                        // Map bank name to internal key
-                        const bankKey = mapBankName(bank);
-
-                        Storage.addBankAccount({
-                            nameHe: name,
-                            nameEn: name,
-                            bank: bankKey,
-                            accountNumber: accountNumber,
-                            balance: balance,
-                            currency: 'ILS'
-                        });
-                        imported++;
-                    }
+                    // Import the data
+                    const imported = importBankData(rows, headerIdx, detected);
 
                     if (imported > 0) {
                         App.notify(`יובאו ${imported} חשבונות בהצלחה`, 'success');
@@ -528,11 +497,167 @@
                     }
                 } catch (error) {
                     console.error('Import error:', error);
-                    App.notify('שגיאה בייבוא הקובץ', 'error');
+                    App.notify('שגיאה בייבוא הקובץ: ' + error.message, 'error');
                 }
             };
 
             input.click();
+        }
+
+        function findBankHeaderRow(rows) {
+            for (let i = 0; i < Math.min(rows.length, 15); i++) {
+                const row = rows[i];
+                if (!row || row.length < 2) continue;
+
+                const rowText = row.map(c => String(c || '').toLowerCase()).join(' ');
+
+                // Check for balance-related words
+                const hasBalanceWord = bankColumnMappings.balance.some(w => rowText.includes(w.toLowerCase()));
+                const hasNameWord = bankColumnMappings.name.some(w => rowText.includes(w.toLowerCase()));
+
+                if (hasBalanceWord || hasNameWord) {
+                    return i;
+                }
+            }
+            return 0;
+        }
+
+        function detectBankColumns(headers) {
+            const detected = {};
+            headers.forEach((header, index) => {
+                if (!header) return;
+                const headerLower = String(header).toLowerCase().trim();
+                Object.keys(bankColumnMappings).forEach(field => {
+                    if (detected[field] !== undefined) return;
+                    const matches = bankColumnMappings[field].some(kw =>
+                        headerLower.includes(kw.toLowerCase())
+                    );
+                    if (matches) detected[field] = index;
+                });
+            });
+            return detected;
+        }
+
+        function importBankData(rows, headerIdx, detected) {
+            let imported = 0;
+            const dataRows = rows.slice(headerIdx + 1);
+
+            for (const row of dataRows) {
+                // Skip empty rows and summary rows
+                const firstCell = String(row[0] || '').trim();
+                if (!firstCell || firstCell.includes('סה"כ') || firstCell.includes('סהכ') || firstCell.includes('total')) continue;
+
+                const balanceVal = row[detected.balance];
+                const balance = typeof balanceVal === 'number' ? balanceVal :
+                    parseFloat(String(balanceVal || '0').replace(/[^\d.-]/g, ''));
+                if (isNaN(balance)) continue;
+
+                const name = detected.name !== undefined ? String(row[detected.name] || 'חשבון מיובא').trim() : 'חשבון מיובא';
+                const bank = detected.bank !== undefined ? String(row[detected.bank] || 'other') : 'other';
+                const accountNumber = detected.accountNumber !== undefined ?
+                    String(row[detected.accountNumber] || '').replace(/[^\d]/g, '').slice(-10) : '';
+
+                // Map bank name to internal key
+                const bankKey = mapBankName(bank);
+
+                Storage.addBankAccount({
+                    nameHe: name,
+                    nameEn: name,
+                    bank: bankKey,
+                    accountNumber: accountNumber,
+                    balance: balance,
+                    currency: 'ILS'
+                });
+                imported++;
+            }
+            return imported;
+        }
+
+        function showColumnMappingModal(headers, rows, headerIdx) {
+            // Create modal for manual column mapping
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay active';
+            modal.id = 'mappingModal';
+            modal.innerHTML = `
+                <div class="modal" style="max-width: 500px;">
+                    <div class="modal-header">
+                        <h2>בחר עמודות</h2>
+                        <button class="modal-close" onclick="document.getElementById('mappingModal').remove()">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <p>לא הצלחנו לזהות את העמודות אוטומטית. אנא בחר:</p>
+                        <div class="form-group">
+                            <label>עמודת שם/תיאור:</label>
+                            <select id="mapName" class="form-control">
+                                <option value="-1">-- לא נבחר --</option>
+                                ${headers.map((h, i) => `<option value="${i}">${h || 'עמודה ' + (i+1)}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>עמודת יתרה/סכום: *</label>
+                            <select id="mapBalance" class="form-control" required>
+                                <option value="-1">-- בחר עמודה --</option>
+                                ${headers.map((h, i) => `<option value="${i}">${h || 'עמודה ' + (i+1)}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>עמודת בנק:</label>
+                            <select id="mapBank" class="form-control">
+                                <option value="-1">-- לא נבחר --</option>
+                                ${headers.map((h, i) => `<option value="${i}">${h || 'עמודה ' + (i+1)}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>עמודת מספר חשבון:</label>
+                            <select id="mapAccount" class="form-control">
+                                <option value="-1">-- לא נבחר --</option>
+                                ${headers.map((h, i) => `<option value="${i}">${h || 'עמודה ' + (i+1)}</option>`).join('')}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" onclick="document.getElementById('mappingModal').remove()">ביטול</button>
+                        <button class="btn btn-primary" onclick="applyManualMapping()">ייבא</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+
+            // Store data for later use
+            window._importData = { rows, headerIdx };
+        }
+
+        function applyManualMapping() {
+            const balanceIdx = parseInt(document.getElementById('mapBalance').value);
+            if (balanceIdx < 0) {
+                App.notify('יש לבחור עמודת יתרה', 'error');
+                return;
+            }
+
+            const detected = {
+                name: parseInt(document.getElementById('mapName').value),
+                balance: balanceIdx,
+                bank: parseInt(document.getElementById('mapBank').value),
+                accountNumber: parseInt(document.getElementById('mapAccount').value)
+            };
+
+            // Clean up -1 values
+            Object.keys(detected).forEach(k => {
+                if (detected[k] < 0) delete detected[k];
+            });
+
+            const { rows, headerIdx } = window._importData;
+            const imported = importBankData(rows, headerIdx, detected);
+
+            document.getElementById('mappingModal').remove();
+            delete window._importData;
+
+            if (imported > 0) {
+                App.notify(`יובאו ${imported} חשבונות בהצלחה`, 'success');
+                loadAccounts();
+            } else {
+                App.notify('לא נמצאו חשבונות לייבוא', 'error');
+            }
         }
 
         function mapBankName(bankText) {
@@ -550,31 +675,6 @@
             if (bankLower.includes('מסד') || bankLower.includes('massad')) return 'massad';
 
             return 'other';
-        }
-
-        async function importCSV() {
-            const format = CSVImport.showImportHelp('bank');
-            const confirmed = confirm(
-                `${format.title}\n\n` +
-                `עמודות נדרשות:\n${format.columns.join(', ')}\n\n` +
-                `דוגמה:\n${format.example}\n\n` +
-                `להמשיך?`
-            );
-
-            if (!confirmed) return;
-
-            const result = await CSVImport.openFilePicker('bank');
-
-            if (result.success) {
-                App.notify(`יובאו ${result.imported} רשומות בהצלחה`, 'success');
-                loadAccounts();
-            } else {
-                App.notify(result.error || 'שגיאה בייבוא', 'error');
-            }
-
-            if (result.errors && result.errors.length > 0) {
-                console.log('Import errors:', result.errors);
-            }
         }
     </script>
 </body>
