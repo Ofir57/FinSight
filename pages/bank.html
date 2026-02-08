@@ -384,10 +384,41 @@
             }
         }
 
+        function parseHTMLTable(html) {
+            const rows = [];
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+
+            // Find the data table
+            const tables = doc.querySelectorAll('table.dataTable, table');
+
+            for (const table of tables) {
+                const tableRows = table.querySelectorAll('tr');
+                for (const tr of tableRows) {
+                    const cells = tr.querySelectorAll('th, td');
+                    if (cells.length > 0) {
+                        const rowData = [];
+                        cells.forEach(cell => {
+                            // Clean up text - remove extra spaces and special characters
+                            let text = cell.textContent.trim()
+                                .replace(/\s+/g, ' ')
+                                .replace(/[‎‏]/g, ''); // Remove RTL/LTR marks
+                            rowData.push(text);
+                        });
+                        if (rowData.some(cell => cell.length > 0)) {
+                            rows.push(rowData);
+                        }
+                    }
+                }
+            }
+
+            return rows;
+        }
+
         async function importExcel() {
             const input = document.createElement('input');
             input.type = 'file';
-            input.accept = '.xlsx,.xls,.csv';
+            input.accept = '.xlsx,.xls,.csv,.html';
 
             input.onchange = async (e) => {
                 const file = e.target.files[0];
@@ -395,16 +426,19 @@
 
                 try {
                     let rows = [];
+                    const content = await file.text();
 
-                    // Use SheetJS for Excel files
-                    if (file.name.endsWith('.xls') || file.name.endsWith('.xlsx')) {
+                    // Check if it's HTML (bank exports often use .xls for HTML)
+                    if (content.includes('<HTML') || content.includes('<html') || content.includes('<table')) {
+                        rows = parseHTMLTable(content);
+                    } else if (file.name.endsWith('.xls') || file.name.endsWith('.xlsx')) {
+                        // Use SheetJS for real Excel files
                         const data = await file.arrayBuffer();
                         const workbook = XLSX.read(data, { type: 'array' });
                         const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
                         rows = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
                     } else {
                         // CSV - use existing parser
-                        const content = await file.text();
                         rows = SmartImport.parseFile(content, file.name);
                     }
 
@@ -417,12 +451,12 @@
                     const headerIdx = SmartImport.findHeaderRow(rows);
                     const headers = rows[headerIdx];
 
-                    // Define bank account column mappings
+                    // Define bank account column mappings (including Bank Leumi format)
                     const bankColumnMappings = {
-                        name: ['שם', 'שם חשבון', 'name', 'account name', 'nome', 'nome da conta'],
+                        name: ['שם', 'שם חשבון', 'סוג פעילות', 'פעילות', 'name', 'account name', 'nome', 'nome da conta', 'activity'],
                         bank: ['בנק', 'שם בנק', 'bank', 'bank name', 'banco'],
                         accountNumber: ['מספר חשבון', 'חשבון', 'account number', 'account', 'número', 'número da conta'],
-                        balance: ['יתרה', 'סכום', 'balance', 'amount', 'saldo', 'valor']
+                        balance: ['יתרה', 'יתרה בש"ח', 'יתרה בשח', 'סכום', 'balance', 'amount', 'saldo', 'valor']
                     };
 
                     // Auto-detect columns

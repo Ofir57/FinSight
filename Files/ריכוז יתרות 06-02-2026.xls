@@ -1,0 +1,170 @@
+<HTML xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40" dir="RTL"><head><META http-equiv="Content-Type" content="text/html; charset=UTF-8"><style type="text/css">.dirLTRorRTLNum{direction:ltr;background-color:#000} body{background-color:#fff} .text-right{text-align:right} .text-left{text-align:left} .text-center{text-align:center} .ltr{direction:ltr} .rtl{direction:rtl} .lblLastLogin{font-weight:bold;font-family:Arial;font-size:8pt} .PageTitle{font-family:Arial;font-weight:bold;font-size:11pt;color:#000090} .ShowInExcel{display:block!important;visibility:visible!important} .font11Excel{font-size:11px !important} .showPanel{display:none !important;visibility:hidden} .hiddenPanel{display:block;visibility:visible} #PmmModePanel{font-family:Arial !important;font-weight:bold !important;font-size:11pt !important;color:#000090 !important;padding-bottom:20px} #CheckImagesPanel{display:none;visibility:hidden} #ExportCheckImagesPanel{display:block;visibility:visible} .hiddenExcelPanel{display:block;visibility:visible} .printPanel,.HideInExcel{display:none !important;visibility:hidden !important} .notShowInExcel{display:none !important;visibility:hidden !important} .dataTable tr td,.dataTable tr th,.dataTable1 tr td,.thereIsOnlyTodayActivity tr td,.homeDataTable tr td,.homeDataTable tr th,.workFlowTrExcel,#dtObligoValue tr th,#dtObligoValue tr td,#dtObligoValueTwo tr th,#dtObligoValueTwo tr td,#ctlActivityTable tr td,#ctlOtherActivityTable tr td,#ctlActivityTable tr th,#ctlOtherActivityTable tr th,#ctlRegularTransactions tr td{border:.5pt solid gray !important} #printArea{text-align:right;color:#333;font-family:Arial,Helvetica,sans-serif;font-size:8pt} .dataTable tr th,table.dataTable tr.header td,table.homeDataTable tr.header td,.dataTable1 tr td,tr.header,.homeDataTable tr th{font-weight:bold !important;background-color:#9cf} table.dataTable tr.footer td,table.homeDataTable tr.footer td,table.filter tr td,table.SummaryBox tr td,table.smallfilter tr td,.workFlowEndMassageExcel,.workFlowLableExcel,.boldInExcel{font-weight:bold !important} .tbl-obligo tr td,.dataTable1 tr td,.dataTable tr td,.thereIsOnlyTodayActivity tr td,.homeDataTable tr td,.SummaryBox tr td,table.smallfilter tr td,.sectionHeader,.workFlowTrExcel,.workFlowExcelTableMessage,.straightenToRightExcel{text-align:right} .Summary_lable2{text-align:right} .vanishInExcel{display:none !important} .tbl-obligo tr td,.dataTable1 tr td,.dataTable tr td,.TodayActivityTableSecond tr td,.thereIsOnlyTodayActivity tr td,.homeDataTable tr td,.workFlowEndMassageExcel,.workFlowTrExcel,.nowrapExcel{white-space:nowrap} .workFlowEndMassageExcel{height:40pt;vertical-align:top} .rightAndNowrapExcel{text-align:right !important;white-space:nowrap} .RightA{text-align:right!important;direction:rtl !important} .emptyLineForExcel{display:block !important} #accountTd,#TransactionTypeTd,#FronDateTd,#ToDateTd{text-align:right} #pagingTr,#accountTitleTr,#btnDisplay{display:none;visibility:hidden} #ddlAccounts_m_ddl,#dtFromDate,#dtToDate,#dtToDate_textBox,#dtFromDate_textBox{text-align:right !important} #displayBalancesLegalMessageExcel{display:block !important} #pnlBalanceTable tr td{text-align:right !important;white-space:nowrap} .dirRtl{direction:rtl !important} .alignRightOrLeft{text-align:right !important} .DirectionRTL{direction:rtl} #ctlSaving tr td{direction:rtl !important} #pnlMasterDataGrid div table tr td{font-weight:bold} #pnlMasterDataGrid div table tr td.gridGroup table tr.item td,#pnlMasterDataGrid div table tr td.gridGroup table tr.alternatingItem td{font-weight:normal !important} .totalLineExtendedSummary{border:.5pt solid gray !important;font-weight:bold !important;background-color:#9cf} .rightNowrapLtr td{text-align:right;white-space:nowrap;direction:rtl !important} #lblRenewalCDTd{direction:rtl !important} #ctlPaidOrUnPaidChecks homeDataTableWide tr th,#ctlPaidOrUnPaidChecks homeDataTableWide tr.header td a{font-weight:bold !important;background-color:#9cf} #ctlPeriodicBalancesTableAssets1 tr.item td,#ctlPeriodicBalancesTableAssets1 tr.alternatingItem td,#ctlPeriodicBalancesTableAssets2 tr.item td,#ctlPeriodicBalancesTableAssets2 tr.alternatingItem td,#ctlPeriodicBalancesTableDebit1 tr.item td,#ctlPeriodicBalancesTableDebit1 tr.alternatingItem td,#ctlPeriodicBalancesTableDebit2 tr.item td,#ctlPeriodicBalancesTableDebit2 tr.alternatingItem td{font-weight:normal !important} #ctlPeriodicBalancesTableAssets1 tr td.boldInExcel,#ctlPeriodicBalancesTableDebit1 tr td.boldInExcel,#ctlPeriodicBalancesTableAssets2 tr td.boldInExcel,#ctlPeriodicBalancesTableDebit2 tr td.boldInExcel{font-weight:bold !important} #TR_Paging,#TR_printAll,#TR_ErrorMessege{display:none} Table.filterNoDirection{text-align:right;margin-bottom:15px;width:auto !important} Table.filterNoDirection TH{font-weight:normal;text-align:right} Table.filterNoDirection td{font-family:Arial,Helvetica,sans-serif;color:#505d65;text-align:right;font-weight:bold;vertical-align:middle;direction:rtl;white-space:nowrap} .detailsTr{padding-top:1px} Table.SummaryBoxNoDirection{margin-bottom:27px;width:auto !important;color:#000;white-space:nowrap} .DirectionExportRTL{direction:rtl} Table.SummaryBoxNoDirection td{white-space:nowrap} .Summary_lable{font-weight:bold;font-size:small;color:#000;text-align:right;direction:rtl;white-space:nowrap;padding-top:4px} .number_column{direction:ltr;white-space:nowrap;mso-number-format:"\#\,\#\#0\.00_ \;\[Red\]\\-\#\,\#\#0\.00\\ "} .number_ColumnForFooterInExcel{white-space:nowrap;mso-number-format:"\#\,\#\#0\.00_ \;\[Red\]\\-\#\,\#\#0\.00\\ ";font-weight:bold !important} .text_column{white-space:nowrap;mso-number-format:"\@";} .date_column{white-space:nowrap;mso-number-format:"Short Date";} .monthYear_column{white-space:nowrap;mso-number-format:"MM/yyyy";} .straightToBottom{vertical-align:bottom !important;} .original_width{white-space:nowrap;} .ExtendedActivityColume2,.ExtendedActivityColume3,.ExtendedActivityColume4,.ExtendedActivityColume5,.ExtendedActivityColume6,.ExtendedActivityColumnDate{direction:rtl;} .ExtendedActivityColume6,.ExtendedActivityColumnDate{mso-number-format:"Short Date";} H2.TableTitleBlue{font-size:10pt;display:inline;color:#203ca9 !important;} H2.TableTitle{font-size:8pt;display:inline;} .MainPageColumn5{direction:ltr;white-space:nowrap;mso-number-format:Standard;} .MainPageColumn1{direction:ltr;white-space:nowrap;mso-number-format:Standard;} .MainPageDirColumn1{direction:rtl;white-space:nowrap;mso-number-format:Standard;} .ltrExcel{direction:ltr !important;} .RedColor{color:#9E0000 !important;} .RedcolorBalance{color:#9E0000 !important;direction:ltr;} .cardTitle{font-weight:bold;font-size:small!important;color:#000;direction:rtl;} .MakeBoldTitleBlue{padding:0px !important;} .xSmallFontSize{vertical-align:middle !important;font-size:xx-small !important;} .padding-right30{padding-right:30px;} .gridExpanderUniqeClass{display:none;} .alignRightExcel{text-align:right !important;direction:rtl !important;} .TitleBoldInExcel{font-weight:bold !important;font-size:8pt;} .boldInExcel .balancePos{direction:ltr;color:#0078DA;font-size:20px;font-weight:bold;} .boldInExcel .balanceNeg{direction:ltr;color:#9E0000;font-size:20px;font-weight:bold;} .boldInExcel1{font-weight:bold;} #spnBalanceTotalDebitVal{color:#9e0000;} #spnBalanceTotalCreditVal{color:#0078da;} .balance_num_col{text-align:left;direction:rtl;padding-bottom:2px;} .balance_num_col .lblCurrentBalanceVal{direction:ltr;display:inline-block;margin-right:14px;} .balance_num_col .lblCurrentBalance{font:bold 14px arial;color:#505D65;display:inline-block;} .LoanSummaryBoxFontSize tr td,.LoanSummaryBoxFontSize h2{font-size:10px !important} .HideInHebrew{display:none;visibility:hidden;} .exlAccAlign{text-align:right;} .divAcc{direction:rtl;text-align:right;} .pageCreditLines .WorkSpaceBox table a{float:right;} .FontAriel{font-family:Arial;font-size:8pt;} .boldExport{font-weight:bold;} .workFlowStepWrapper{display:none !important;visibility:hidden !important;} #angularHeader,#angularFooter{display:none;} .gen_cont_bg{padding:0px !important;} [title~=Partial]{display:none;}
+</style></head><body><div class="Container"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td><div id=container1></div></td></tr><tr><td bgcolor="#FFFFFF" height="3"></td></tr><tr><td align=right class="lblLastLogin" nowrap>תאריך שמירה/הדפסה: 06/02/26</td></tr><tr><td colspan="4" align=right class="PageTitle" nowrap><h1>בנק לאומי - ריכוז יתרות</h1></td></tr></table><br><form method="post" action="DisplayBalances.aspx" id="ctl00">
+<div class="aspNetHidden">
+
+</div>
+<div id="printArea" align="right" class="pageDisplayBalances"><span><span class="no-wrap">                                                                                
+                                                                                    </span></span><input name="AjaxSaveAS" type="hidden" id="AjaxSaveAS" /><span><span class="no-wrap">
+                                                                                    </span></span><span><span class="no-wrap">
+</span></span><div id="ExportDataFilterPanel" class="hiddenPanel">
+	<span><span class="no-wrap">	
+	</span></span><table id="ExportDataFilterBox" class="SummaryBoxNoDirection" border="0" cellspacing="0" cellpadding="0">
+		<tr>
+			<TD><span><span class="no-wrap">
+				</span></span><span><span class="no-wrap">מספר לקוח:</span></span><span><span class="no-wrap">					
+				</span></span><span><span class="no-wrap">806-326081/73</span></span><span><span class="no-wrap">										
+			</span></span></TD>
+		</tr>
+	</table>
+	<span><span class="no-wrap">
+</span></span>
+</div><span><span class="no-wrap">
+ <div class="DirLeft">
+	</span></span><span><span class="no-wrap">
+ </div>
+</span></span><span><span class="no-wrap">
+                                                                                    </span></span><span><span class="no-wrap">
+                                                                                    </span></span><span><span class="no-wrap">
+                                                                                    </span></span><span><span class="no-wrap">
+                                                                                    </span></span><span><span class="no-wrap">
+                                                                                    </span></span><span><span class="no-wrap">
+                                                                                    </span></span><span><span class="no-wrap">
+<TABLE class="WorkSpaceBox"  cellSpacing="0" cellPadding="0">
+	<TR>
+		<TD>
+			<TABLE class=gridGroup cellSpacing=0 cellPadding=0 align=right>
+				<TR class=vanishInExcel>
+					<TD class="sectionHeader" colSpan=2>
+						<H2 class="Hidden"></span></span><span><span class="no-wrap">ריכוז יתרות ללקוח, בחלוקה לפעילויות</span></span><span><span class="no-wrap"></H2></TD></TR>
+				<TR>
+					<TD colSpan=2>
+						</span></span><div id="pnlBalanceTable">
+	<table width="100%" class="dataTable" border="0" cellpadding="0" cellspacing="0" dir="rtl" summary="טבלת ריכוז יתרות לחשבון806-326081/73">
+		<tr class="header">
+			<th width="34%"><span><span class="no-wrap">סוג פעילות</span></span></th>
+			<th width="32%"><span><span class="no-wrap">נכון לתאריך</span></span></th>
+			<th width="34%"><span><span class="no-wrap">יתרה בש&quot;ח</span></span></th>
+		</tr>
+		<tr class="alternatingItem">
+			<td nowrap="nowrap" width="34%"><span><span class="no-wrap"><a role="presentation""/eBanking/SO/SPA.aspx#/ts/BusinessAccountTrx" >עובר ושב</a></span></span></td>
+			<td width="32%"><span><span class="no-wrap">04/02/26</span></span></td>
+			<td class="AlignBalanceColumn" width="34%"><span><span class="no-wrap">329,564.19</span></span></td>
+		</tr>
+		<tr class="item">
+			<td nowrap="nowrap" width="34%"><span><span class="no-wrap"><a role="presentation""/eBanking/Accounts/ExtendedSummary.aspx?DisplayType=2" >מטבע חוץ </a></span></span></td>
+			<td width="32%"><span><span class="no-wrap">04/02/26</span></span></td>
+			<td class="AlignBalanceColumn" width="34%"><span><span class="no-wrap">93.19</span></span></td>
+		</tr>
+		<tr class="alternatingItem">
+			<td nowrap="nowrap" width="34%"><span><span class="no-wrap"><a role="presentation""/eBanking/Accounts/Pre_Trade.aspx?IDX=6" > ניירות ערך</a></span></span></td>
+			<td width="32%"><span><span class="no-wrap">04/02/26</span></span></td>
+			<td class="AlignBalanceColumn" width="34%"><span><span class="no-wrap">295,010.00</span></span></td>
+		</tr>
+		<tr class="item">
+			<td nowrap="nowrap" width="34%"><span><span class="no-wrap"><a role="presentation""/eBanking/SO/SPA.aspx#/ts/CardsWorld" >כ.א. חוץ בנקאיים</a></span></span></td>
+			<td width="32%"><span><span class="no-wrap">05/02/26</span></span></td>
+			<td class="AlignBalanceColumn" width="34%" style="Color:#9E0000;"><span><span class="no-wrap">‎-6,419.19</span></span></td>
+		</tr>
+		<tr class="footer" role="presentation">
+			<td width="34%"><span><span class="no-wrap">סה&quot;כ</span></span></td>
+			<td width="16%"><span><span class="no-wrap">&nbsp;</span></span></td>
+			<td class="AlignBalanceColumn" width="34%"><span><span class="no-wrap">618,248.19</span></span></td>
+		</tr>
+	</table>
+
+</div><span><span class="no-wrap">
+					</TD>
+				</TR>
+				<TR>
+					<TD colSpan=2>
+						</span></span><div id="pnlTodayBalance">
+
+</div><span><span class="no-wrap">
+					</TD>
+				</TR>
+				<TR id=displayBalancesLegalMessageExcelTemporaryClosed style="DISPLAY: none">
+					<TD colSpan=2>
+						</span></span><span><span class="no-wrap">פירוט הפעולות להיום אינו סופי ועשוי להשתנות / לא להתבצע. יתכן שתהיינה פעולות נוספות שלא מופיעות בשלב זה</span></span><span><span class="no-wrap">
+					</TD>
+				</TR>
+				<TR class="vanishInExcel dirLTRorRTL">
+					<TD class="alignRightExcel"  colSpan=2>
+						</span></span><span><span class="no-wrap">
+						</span></span><span><span class="no-wrap">
+					</TD>
+				</TR>
+				<TR class="rightNowrapLtr dirLTRorRTL" dir="rtl" colSpan=2>
+					<TD class="alignRightExcel" style="padding-bottom: 5px;">
+					</span></span><span><span class="no-wrap">*</span></span><span><span class="no-wrap">
+					</span></span><span><span class="no-wrap">* שערוך תיק ניירות הערך אינו סופי. לצפייה בנתוני זמן אמת עבור לאתר <a role="presentation""/eBanking/Accounts/Pre_Trade.aspx?IDX=6">לאומי טרייד </a>ולחץ על כפתור "הצג זמן אמת"</span></span><span><span class="no-wrap">
+					</TD>
+				</TR>
+				<TR class="vanishInExcel dirLTRorRTL" >
+					<TD class="alignRightExcel"  colSpan=2>
+						</span></span><span><span class="no-wrap">
+						</span></span><span><span class="no-wrap">
+					</TD>
+				</TR>
+			
+				<TR>
+                    <td style="padding-top:15px;" colspan="2"> 
+                        </span></span><span id="MortgageTitle" class="sectionHeader colWidth110"></span><span><span class="no-wrap">
+                        </span></span><span><span class="no-wrap">  
+					</td>
+                 </TR>
+				<TR>
+					<TD colSpan=2>
+						</span></span><span><span class="no-wrap">
+					</TD>
+				</TR>
+				<TR>
+				    <td style="padding-top:15px;" colspan="2">
+					 </span></span><span id="MortgageCorpTitle" class="sectionHeader"></span><span><span class="no-wrap">
+                     </span></span><span><span class="no-wrap">
+					</td>
+				</TR>
+				<TR>
+					<TD colSpan=2>
+						</span></span><span><span class="no-wrap">
+					</TD>
+				</TR>
+				<TR>
+					<TD colSpan=2>
+						</span></span><span><span class="no-wrap">
+					</TD>
+				</TR>
+				<TR>
+					<TD colSpan=2>
+						</span></span><span id="lblCreditMortgageMsg"></span><span><span class="no-wrap">
+					</TD>
+				</TR>
+				<TR>
+					<TD colSpan=2>
+						</span></span><span id="lblForeignMortgageMsg"></span><span><span class="no-wrap">
+					</TD>
+				</TR>
+			</TABLE>
+		</TD>
+	</TR>
+	<TR>
+		<TD style="text-align:right">
+			</span></span><span><span class="no-wrap">
+		</TD>
+	</TR>
+	<TR class="vanishInExcel notShownInEnglish">
+		<TD class=workFlowStepPaddingTop_17 style="text-align:right">
+			</span></span><span><span class="no-wrap">
+			</span></span><span><span class="no-wrap">
+		</TD>
+	</TR>
+</TABLE>
+
+</span></span><input name="hidSaveAsChoice" type="hidden" id="hidSaveAsChoice" value="EXCEL" /><span><span class="no-wrap"><!img style="display:none;"  id='logoForSave' src="https://cache.bankleumi.co.il/eBanking/Themes/PremiumTopTabMenu/Images/premium_logo.png" border='0' Class='saveVisible' /></span></span><span><span class="no-wrap">
+                                                                                    </span></span><span><span class="no-wrap">
+                                                                                    </span></span><span><span class="no-wrap">
+                                                                                </span></span></div>
+<div class="aspNetHidden">
+
+	<input type="hidden" name="__VIEWSTATEGENERATOR" id="__VIEWSTATEGENERATOR" value="C21772F6" />
+	
+</div></form></div></body></html>

@@ -1,0 +1,281 @@
+
+        <?xml version="1.0"?>
+        <?mso-application progid="Excel.Sheet"?>
+        <Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+        xmlns:o="urn:schemas-microsoft-com:office:office"
+        xmlns:x="urn:schemas-microsoft-com:office:excel"
+        xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
+        xmlns:html="http://www.w3.org/TR/REC-html40">
+         <ExcelWorkbook xmlns="urn:schemas-microsoft-com:office:excel">
+          <ProtectStructure>False</ProtectStructure>
+          <ProtectWindows>False</ProtectWindows>
+         </ExcelWorkbook>
+          
+            <Styles>
+                <Style ss:ID="Default" ss:Name="Normal">
+                <Alignment ss:Horizontal="Center" ss:Vertical="Bottom" ss:WrapText="1"/>
+                <Font ss:FontName="Arial" x:Family="Swiss" ss:Size="9" ss:Color="#000000"/>
+                <Borders/>
+                </Style>
+                    <Style ss:ID="titleTbl">
+                        <Alignment ss:Horizontal="Right" ss:Vertical="Bottom" ss:WrapText="0"/>
+                        <Font ss:FontName="Arial" x:Family="Swiss" ss:Size="12" ss:Color="#000155" ss:Bold="1"/>
+                    </Style>
+                    <Style ss:ID="titleTblCenter">
+                    <Alignment ss:Horizontal="Center" ss:Vertical="Bottom" ss:WrapText="1"/>
+                    <Font ss:FontName="Arial" x:Family="Swiss" ss:Size="12" ss:Color="#000155" ss:Bold="1"/>
+                </Style>
+                    <Style ss:ID="noDataTbl">
+                    <Alignment ss:Horizontal="Right" ss:Vertical="Bottom" ss:WrapText="1"/>
+                    <Font ss:FontName="Arial" x:Family="Swiss" ss:Size="11" ss:Color="#000155" ss:Bold="1"/>
+                </Style>
+                    <Style ss:ID="titleTblNoWrap">
+                    <Alignment ss:Horizontal="Right" ss:Vertical="Bottom" ss:WrapText="0"/>
+                    <Font ss:FontName="Arial" x:Family="Swiss" ss:Size="12" ss:Color="#000155" ss:Bold="1"/>
+                </Style>
+                <Style ss:ID="subTitleRightNoWrap">
+                <Alignment ss:Horizontal="Right" ss:Vertical="Center" ss:WrapText="0"/>
+                <Font ss:FontName="Arial" x:Family="Swiss" ss:Size="11" ss:Color="#000000"/>
+               </Style>
+               <Style ss:ID="subTitleRightNoWrapBold">
+                        <Alignment ss:Horizontal="Right" ss:Vertical="Bottom" ss:WrapText="1"/>
+                        <Font ss:FontName="Arial" x:Family="Swiss" ss:Size="11" ss:Color="#000155" ss:Bold="1"/>
+                    </Style>
+                    <Style ss:ID="subTitleRight">
+                    <Alignment ss:Horizontal="Right" ss:Vertical="Bottom" ss:WrapText="0"/>
+                    <Font ss:FontName="Arial" x:Family="Swiss" ss:Size="11" ss:Color="#000000"/>
+                   </Style>
+                   <Style ss:ID="subTitleLeft">
+                        <Alignment ss:Horizontal="Left" ss:Vertical="Bottom" ss:WrapText="0"/>
+                        <Font ss:FontName="Arial" x:Family="Swiss" ss:Size="11" ss:Color="#000000"/>
+                    </Style>
+                    <Style ss:ID="subTitleRightBold">
+                        <Alignment ss:Horizontal="Right" ss:Vertical="Center" ss:WrapText="0"/>
+                        <Font ss:FontName="Arial" x:Family="Swiss" ss:Size="11" ss:Color="#000000" ss:Bold="1"/>
+                    </Style>                 
+                    <Style ss:ID="subTitleLeftBold">
+                        <Alignment ss:Horizontal="Left" ss:Vertical="Center" ss:WrapText="0"/>
+                        <Font ss:FontName="Arial" x:Family="Swiss" ss:Size="11" ss:Color="#000000" ss:Bold="1"/>
+                    </Style>
+                    <Style ss:ID="titleRight">
+                        <Alignment ss:Horizontal="Right" ss:Vertical="Center" ss:WrapText="0"/>
+                        <Font ss:FontName="Arial" x:Family="Swiss" ss:Size="11" ss:Color="#FFFFFF"/>
+                        <Interior ss:Color="#000155" ss:Pattern="Solid"/>
+                    </Style>
+                    <Style ss:ID="titleCenter">
+                        <Alignment ss:Horizontal="Center" ss:Vertical="Center" ss:WrapText="0"/>
+                        <Font ss:FontName="Arial" x:Family="Swiss" ss:Size="11" ss:Color="#FFFFFF"/>
+                        <Interior ss:Color="#000155" ss:Pattern="Solid"/>
+                    </Style>
+                    <Style ss:ID="txtLeft">
+                        <Alignment ss:Horizontal="Left" ss:Vertical="Bottom" />
+                        <Borders>
+                       <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#000000"/>
+                       <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#000000"/>
+                       <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#000000"/>
+                       <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#000000"/>
+                   </Borders>
+                    </Style>
+                    <Style ss:ID="txtRight">
+                        <Alignment ss:Horizontal="Right" ss:Vertical="Bottom" />
+                        <Borders>
+                       <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#000000"/>
+                       <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#000000"/>
+                       <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#000000"/>
+                       <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#000000"/>
+                   </Borders>
+                    </Style>
+                    <Style ss:ID="subTitleLeftBorder">
+                    <Alignment ss:Horizontal="Left" ss:Vertical="Center" ss:WrapText="0"/>
+                    <Font ss:FontName="Arial" x:Family="Swiss" ss:Size="11" ss:Color="#000000" ss:Bold="1"/>
+                    <Borders>
+                       <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#000000"/>
+                       <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#000000"/>
+                       <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#000000"/>
+                       <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#000000"/>
+                   </Borders>
+                  </Style>
+                  <Style ss:ID="subTitleRightBorder">
+                  <Alignment ss:Horizontal="Right" ss:Vertical="Center" ss:WrapText="0"/>
+                  <Font ss:FontName="Arial" x:Family="Swiss" ss:Size="11" ss:Color="#000000" ss:Bold="1"/>
+                  <Borders>
+                     <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#000000"/>
+                     <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#000000"/>
+                     <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#000000"/>
+                     <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#000000"/>
+                 </Borders>
+                </Style>
+                    <Style ss:ID="numberBlack">
+                        <Alignment ss:Horizontal="Center" ss:Vertical="Bottom" ss:WrapText="0"/>
+                        <Font ss:FontName="Arial" x:Family="Swiss" ss:Size="9" ss:Color="#00000"/>
+                        <NumberFormat ss:Format="#,###;@"/>
+                        <Borders>
+                            <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#000000"/>
+                            <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#000000"/>
+                            <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#000000"/>
+                        </Borders>
+                    </Style>
+                    <Style ss:ID="numberFloatBlack">
+                    <Alignment ss:Horizontal="Center" ss:Vertical="Bottom" ss:WrapText="0"/>
+                    <Font ss:FontName="Arial" x:Family="Swiss" ss:Size="9" ss:Color="#00000"/>
+                    <NumberFormat ss:Format="#,###.00??????"/>
+                    <Borders>
+                        <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#000000"/>
+                        <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#000000"/>
+                        <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#000000"/>
+                    </Borders>
+                </Style>
+                    <Style ss:ID="numberZeroBlack">
+                    <Alignment ss:Horizontal="Center" ss:Vertical="Bottom" ss:WrapText="0"/>
+                    <Font ss:FontName="Arial" x:Family="Swiss" ss:Size="9" ss:Color="#00000"/>
+                    <NumberFormat ss:Format="Standard"/>
+                    <Borders>
+                        <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#000000"/>
+                        <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#000000"/>
+                        <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#000000"/>
+                    </Borders>
+                </Style>
+                <Style ss:ID="numberZeroFloatBlack">
+                <Alignment ss:Horizontal="Center" ss:Vertical="Bottom" ss:WrapText="0"/>
+                <Font ss:FontName="Arial" x:Family="Swiss" ss:Size="9" ss:Color="#00000"/>
+                <NumberFormat ss:Format="0.00??????"/>
+                <Borders>
+                    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#000000"/>
+                    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#000000"/>
+                    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#000000"/>
+                </Borders>
+            </Style>
+                    <Style ss:ID="stringBlack">
+                        <Alignment ss:Horizontal="Center" ss:Vertical="Bottom" ss:WrapText="0"/>
+                        <Font ss:FontName="Arial" x:Family="Swiss" ss:Size="9" ss:Color="#00000"/>
+                        <Borders>
+                            <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#000000"/>
+                            <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#000000"/>
+                            <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#000000"/>
+                            <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#000000"/>
+                        </Borders>
+                    </Style>
+                    <Style ss:ID="numberNegative">
+                        <Alignment ss:Horizontal="Center" ss:Vertical="Bottom" ss:WrapText="1"/>
+                        <Font ss:FontName="Arial" x:Family="Swiss" ss:Size="9" ss:Color="#D62161"/>
+                        <NumberFormat ss:Format="Standard"/>
+                        <Borders>
+                            <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#000000"/>
+                            <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#000000"/>
+                            <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#000000"/>
+                            <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#000000"/>
+                        </Borders>
+                    </Style>
+                    <Style ss:ID="numberPositive">
+                        <Alignment ss:Horizontal="Center" ss:Vertical="Bottom" ss:WrapText="1"/>
+                        <Font ss:FontName="Arial" x:Family="Swiss" ss:Size="9" ss:Color="#008000"/>
+                        <NumberFormat ss:Format="Standard"/>
+                        <Borders>
+                            <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#000000"/>
+                            <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#000000"/>
+                            <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#000000"/>
+                            <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#000000"/>
+                        </Borders>
+                    </Style>
+                    <Style ss:ID="numberNegativePercent">
+                       <Alignment ss:Horizontal="Center" ss:Vertical="Bottom" ss:WrapText="1"/>
+                        <Font ss:FontName="Arial" x:Family="Swiss" ss:Size="9" ss:Color="#D62161"/>
+                        <NumberFormat ss:Format="Percent"/>
+                        <Borders>
+                            <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#000000"/>
+                            <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#000000"/>
+                            <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#000000"/>
+                            <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#000000"/>
+                        </Borders>
+                    </Style>
+                    <Style ss:ID="numberPositivePercent">
+                        <Alignment ss:Horizontal="Center" ss:Vertical="Bottom" ss:WrapText="1"/>
+                        <Font ss:FontName="Arial" x:Family="Swiss" ss:Size="9" ss:Color="#008000"/>
+                        <NumberFormat ss:Format="Percent"/>
+                        <Borders>
+                            <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#000000"/>
+                            <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#000000"/>
+                            <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#000000"/>
+                            <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#000000"/>
+                        </Borders>
+                    </Style>
+                    <Style ss:ID="numberZeroPercent">
+                    <Alignment ss:Horizontal="Center" ss:Vertical="Bottom" ss:WrapText="0"/>
+                    <Font ss:FontName="Arial" x:Family="Swiss" ss:Size="9" ss:Color="#000000"/>
+                    <NumberFormat ss:Format="Percent"/>
+                    <Borders>
+                        <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#000000"/>
+                        <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#000000"/>
+                        <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#000000"/>
+                        <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#000000"/>
+                    </Borders>
+                </Style>
+                    <Style ss:ID="dateTime">
+                     <NumberFormat ss:Format="General Date"/>
+                     <Borders>
+                        <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#000000"/>
+                        <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#000000"/>
+                        <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#000000"/>
+                        <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#000000"/>
+                    </Borders>
+                   </Style>
+           </Styles>
+        
+         <Worksheet ss:Name="Sheet1" ss:RightToLeft="1">
+          <Table x:FullColumns="1" x:FullRows="1" ss:DefaultColumnWidth="0" ss:DefaultRowHeight="0"><Column ss:Width="200"/><Column ss:Width="200"/><Column ss:Width="200"/><Column ss:Width="200"/><Column ss:Width="200"/><Column ss:Width="200"/><Column ss:Width="200"/><Column ss:Width="200"/><Column ss:Width="200"/><Column ss:Width="200"/><Column ss:Width="200"/><Column ss:Width="200"/><Row ss:AutoFitHeight="0" ss:Height="15">
+            <Cell ss:StyleID="titleTbl"><Data  ss:Type="String">מבט אישי - האחזקות שלי</Data></Cell></Row><Row ss:AutoFitHeight="0" ss:Height="15">
+       <Cell ss:StyleID="subTitleRightBold"><Data ss:Type="String">תאריך:</Data></Cell>
+       <Cell ss:StyleID="subTitleRight"><Data ss:Type="String">06.02.26</Data></Cell>
+       <Cell ss:StyleID="subTitleRightBold"><Data  ss:Type="String">תיק:</Data></Cell>
+       <Cell ss:StyleID="subTitleRight"><Data  ss:Type="String">806-326081/83</Data></Cell>
+       </Row><Row ss:AutoFitHeight="0" ss:Height="15">
+            <Cell ss:StyleID="subTitleRightBold"><Data  ss:Type="String">מס' ניירות:</Data></Cell>
+            <Cell ss:StyleID="subTitleRight"><Data  ss:Type="String">17</Data></Cell>
+            <Cell ss:StyleID="subTitleRightBold"><Data  ss:Type="String">שווי תיק עדכני ב₪</Data></Cell>
+             <Cell ss:StyleID="subTitleRight"><Data  ss:Type="String">297,348.73</Data></Cell>
+            <Cell ss:StyleID="subTitleRightBold"><Data  ss:Type="String">% שינוי יומי</Data></Cell>
+            <Cell ss:StyleID="subTitleRight"><Data  ss:Type="String">1.72%</Data></Cell>
+            <Cell ss:StyleID="subTitleRightBold"><Data  ss:Type="String">שינוי יומי ב₪</Data></Cell>
+            <Cell ss:StyleID="subTitleRight"><Data  ss:Type="String">5,042.13</Data></Cell>
+            <Cell ss:StyleID="subTitleRightBold"><Data  ss:Type="String">שינוי מקניה ב₪</Data></Cell>
+            <Cell ss:StyleID="subTitleRight"><Data  ss:Type="String">-131,251.33</Data></Cell>
+            <Cell ss:StyleID="subTitleRightBold"><Data  ss:Type="String">תקרת קניה ב₪</Data></Cell>
+            <Cell ss:StyleID="subTitleRight"><Data  ss:Type="String">347,253.23</Data></Cell>
+            </Row><Row ss:AutoFitHeight="0" ss:Height="15">
+                                
+                                
+                                
+                                </Row><Row ss:AutoFitHeight="0" ss:Height="15"><Cell ss:StyleID="titleCenter">
+                                <Data ss:Type="String">מספר נייר</Data>
+                            </Cell><Cell ss:StyleID="titleRight">
+                                <Data ss:Type="String">שם הנייר</Data>
+                            </Cell><Cell ss:StyleID="titleCenter">
+                                <Data ss:Type="String">שער קניה ממוצע</Data>
+                            </Cell><Cell ss:StyleID="titleCenter">
+                                <Data ss:Type="String">כמות אחזקה</Data>
+                            </Cell><Cell ss:StyleID="titleCenter">
+                                <Data ss:Type="String">שער אחרון</Data>
+                            </Cell><Cell ss:StyleID="titleCenter">
+                                <Data ss:Type="String">שווי אחזקה ב ₪</Data>
+                            </Cell><Cell ss:StyleID="titleCenter">
+                                <Data ss:Type="String">% שינוי יומי</Data>
+                            </Cell><Cell ss:StyleID="titleCenter">
+                                <Data ss:Type="String">רווח ב-%</Data>
+                            </Cell><Cell ss:StyleID="titleCenter">
+                                <Data ss:Type="String">רווח ב ₪</Data>
+                            </Cell><Cell ss:StyleID="titleCenter">
+                                <Data ss:Type="String">%  מהתיק</Data>
+                            </Cell><Cell ss:StyleID="titleCenter">
+                                <Data ss:Type="String">שער בסיס</Data>
+                            </Cell><Cell ss:StyleID="titleCenter">
+                                <Data ss:Type="String">מס התיק</Data>
+                            </Cell></Row><Row ss:AutoFitHeight="0" ss:Height="15"><Cell ss:StyleID="stringBlack"> <Data ss:Type="String">70263099</Data></Cell><Cell ss:StyleID="stringBlack"> <Data ss:Type="String">gamestop corp</Data></Cell><Cell ss:StyleID="numberFloatBlack"><Data ss:Type="Number">2.98</Data></Cell><Cell ss:StyleID="numberFloatBlack"><Data ss:Type="Number">10.00</Data></Cell><Cell ss:StyleID="numberFloatBlack"><Data ss:Type="Number">4.11</Data></Cell><Cell ss:StyleID="numberFloatBlack"><Data ss:Type="Number">128.44</Data></Cell><Cell ss:StyleID="numberBlack"><Data ss:Type="Number"></Data></Cell><Cell ss:StyleID="numberPositivePercent"><Data ss:Type="Number">0.38060000000000005</Data></Cell><Cell ss:StyleID="numberPositive"><Data ss:Type="Number">35.41</Data></Cell><Cell ss:StyleID="numberZeroPercent"><Data ss:Type="Number">0.0004</Data></Cell><Cell ss:StyleID="numberFloatBlack"><Data ss:Type="Number">4.11</Data></Cell><Cell ss:StyleID="stringBlack"> <Data ss:Type="String">806-326081/83</Data></Cell></Row><Row ss:AutoFitHeight="0" ss:Height="15"><Cell ss:StyleID="stringBlack"> <Data ss:Type="String">5106810</Data></Cell><Cell ss:StyleID="stringBlack"> <Data ss:Type="String">אילים נבחרת מניות LARGE & MID CAP ישראל</Data></Cell><Cell ss:StyleID="numberFloatBlack"><Data ss:Type="Number">494.41</Data></Cell><Cell ss:StyleID="numberFloatBlack"><Data ss:Type="Number">10242.00</Data></Cell><Cell ss:StyleID="numberFloatBlack"><Data ss:Type="Number">511.21</Data></Cell><Cell ss:StyleID="numberFloatBlack"><Data ss:Type="Number">52358.13</Data></Cell><Cell ss:StyleID="numberNegativePercent"><Data ss:Type="Number">-0.012199999999999999</Data></Cell><Cell ss:StyleID="numberPositivePercent"><Data ss:Type="Number">0.034</Data></Cell><Cell ss:StyleID="numberPositive"><Data ss:Type="Number">1720.66</Data></Cell><Cell ss:StyleID="numberZeroPercent"><Data ss:Type="Number">0.1761</Data></Cell><Cell ss:StyleID="numberFloatBlack"><Data ss:Type="Number">511.21</Data></Cell><Cell ss:StyleID="stringBlack"> <Data ss:Type="String">806-326081/83</Data></Cell></Row><Row ss:AutoFitHeight="0" ss:Height="15"><Cell ss:StyleID="stringBlack"> <Data ss:Type="String">70939913</Data></Cell><Cell ss:StyleID="stringBlack"> <Data ss:Type="String">(ARK חדשנות) ARKK</Data></Cell><Cell ss:StyleID="numberFloatBlack"><Data ss:Type="Number">129.99</Data></Cell><Cell ss:StyleID="numberFloatBlack"><Data ss:Type="Number">30.00</Data></Cell><Cell ss:StyleID="numberFloatBlack"><Data ss:Type="Number">70.12</Data></Cell><Cell ss:StyleID="numberFloatBlack"><Data ss:Type="Number">6573.75</Data></Cell><Cell ss:StyleID="numberPositivePercent"><Data ss:Type="Number">0.0571</Data></Cell><Cell ss:StyleID="numberNegativePercent"><Data ss:Type="Number">-0.4606</Data></Cell><Cell ss:StyleID="numberNegative"><Data ss:Type="Number">-5612.81</Data></Cell><Cell ss:StyleID="numberZeroPercent"><Data ss:Type="Number">0.022099999999999998</Data></Cell><Cell ss:StyleID="numberFloatBlack"><Data ss:Type="Number">66.33</Data></Cell><Cell ss:StyleID="stringBlack"> <Data ss:Type="String">806-326081/83</Data></Cell></Row><Row ss:AutoFitHeight="0" ss:Height="15"><Cell ss:StyleID="stringBlack"> <Data ss:Type="String">70939905</Data></Cell><Cell ss:StyleID="stringBlack"> <Data ss:Type="String">(ARK טכנולוגיה אוטונומית ורובוטיקס) ARKQ</Data></Cell><Cell ss:StyleID="numberFloatBlack"><Data ss:Type="Number">122.60</Data></Cell><Cell ss:StyleID="numberFloatBlack"><Data ss:Type="Number">82.00</Data></Cell><Cell ss:StyleID="numberFloatBlack"><Data ss:Type="Number">122.54</Data></Cell><Cell ss:StyleID="numberFloatBlack"><Data ss:Type="Number">31400.88</Data></Cell><Cell ss:StyleID="numberPositivePercent"><Data ss:Type="Number">0.0593</Data></Cell><Cell ss:StyleID="numberNegativePercent"><Data ss:Type="Number">-0.0005</Data></Cell><Cell ss:StyleID="numberNegative"><Data ss:Type="Number">-15.37</Data></Cell><Cell ss:StyleID="numberZeroPercent"><Data ss:Type="Number">0.1056</Data></Cell><Cell ss:StyleID="numberFloatBlack"><Data ss:Type="Number">115.68</Data></Cell><Cell ss:StyleID="stringBlack"> <Data ss:Type="String">806-326081/83</Data></Cell></Row><Row ss:AutoFitHeight="0" ss:Height="15"><Cell ss:StyleID="stringBlack"> <Data ss:Type="String">70204714</Data></Cell><Cell ss:StyleID="stringBlack"> <Data ss:Type="String">(אדוונסד מיקרו דיווייסז) AMD</Data></Cell><Cell ss:StyleID="numberFloatBlack"><Data ss:Type="Number">224.00</Data></Cell><Cell ss:StyleID="numberFloatBlack"><Data ss:Type="Number">24.00</Data></Cell><Cell ss:StyleID="numberFloatBlack"><Data ss:Type="Number">206.71</Data></Cell><Cell ss:StyleID="numberFloatBlack"><Data ss:Type="Number">15503.25</Data></Cell><Cell ss:StyleID="numberPositivePercent"><Data ss:Type="Number">0.0738</Data></Cell><Cell ss:StyleID="numberNegativePercent"><Data ss:Type="Number">-0.07719999999999999</Data></Cell><Cell ss:StyleID="numberNegative"><Data ss:Type="Number">-1296.75</Data></Cell><Cell ss:StyleID="numberZeroPercent"><Data ss:Type="Number">0.0521</Data></Cell><Cell ss:StyleID="numberFloatBlack"><Data ss:Type="Number">192.50</Data></Cell><Cell ss:StyleID="stringBlack"> <Data ss:Type="String">806-326081/83</Data></Cell></Row><Row ss:AutoFitHeight="0" ss:Height="15"><Cell ss:StyleID="stringBlack"> <Data ss:Type="String">70449889</Data></Cell><Cell ss:StyleID="stringBlack"> <Data ss:Type="String">(או'שיירס ענקיות אינטרנט בינלאומיות) OGIG</Data></Cell><Cell ss:StyleID="numberFloatBlack"><Data ss:Type="Number">62.98</Data></Cell><Cell ss:StyleID="numberFloatBlack"><Data ss:Type="Number">80.00</Data></Cell><Cell ss:StyleID="numberFloatBlack"><Data ss:Type="Number">43.58</Data></Cell><Cell ss:StyleID="numberFloatBlack"><Data ss:Type="Number">10895.00</Data></Cell><Cell ss:StyleID="numberPositivePercent"><Data ss:Type="Number">0.0098</Data></Cell><Cell ss:StyleID="numberNegativePercent"><Data ss:Type="Number">-0.308</Data></Cell><Cell ss:StyleID="numberNegative"><Data ss:Type="Number">-4850.00</Data></Cell><Cell ss:StyleID="numberZeroPercent"><Data ss:Type="Number">0.0366</Data></Cell><Cell ss:StyleID="numberFloatBlack"><Data ss:Type="Number">43.15</Data></Cell><Cell ss:StyleID="stringBlack"> <Data ss:Type="String">806-326081/83</Data></Cell></Row><Row ss:AutoFitHeight="0" ss:Height="15"><Cell ss:StyleID="stringBlack"> <Data ss:Type="String">70136051</Data></Cell><Cell ss:StyleID="stringBlack"> <Data ss:Type="String">(אוסטין טכנולוג'י) OST</Data></Cell><Cell ss:StyleID="numberFloatBlack"><Data ss:Type="Number">147.20</Data></Cell><Cell ss:StyleID="numberFloatBlack"><Data ss:Type="Number">59.00</Data></Cell><Cell ss:StyleID="numberFloatBlack"><Data ss:Type="Number">1.70</Data></Cell><Cell ss:StyleID="numberFloatBlack"><Data ss:Type="Number">313.44</Data></Cell><Cell ss:StyleID="numberZeroPercent"><Data ss:Type="Number">0</Data></Cell><Cell ss:StyleID="numberNegativePercent"><Data ss:Type="Number">-0.9884999999999999</Data></Cell><Cell ss:StyleID="numberNegative"><Data ss:Type="Number">-26827.19</Data></Cell><Cell ss:StyleID="numberZeroPercent"><Data ss:Type="Number">0.0011</Data></Cell><Cell ss:StyleID="numberFloatBlack"><Data ss:Type="Number">1.70</Data></Cell><Cell ss:StyleID="stringBlack"> <Data ss:Type="String">806-326081/83</Data></Cell></Row><Row ss:AutoFitHeight="0" ss:Height="15"><Cell ss:StyleID="stringBlack"> <Data ss:Type="String">70445044</Data></Cell><Cell ss:StyleID="stringBlack"> <Data ss:Type="String">(אינווסקו QQQ) QQQ</Data></Cell><Cell ss:StyleID="numberFloatBlack"><Data ss:Type="Number">620.00</Data></Cell><Cell ss:StyleID="numberFloatBlack"><Data ss:Type="Number">24.00</Data></Cell><Cell ss:StyleID="numberFloatBlack"><Data ss:Type="Number">608.31</Data></Cell><Cell ss:StyleID="numberFloatBlack"><Data ss:Type="Number">45623.25</Data></Cell><Cell ss:StyleID="numberPositivePercent"><Data ss:Type="Number">0.0189</Data></Cell><Cell ss:StyleID="numberNegativePercent"><Data ss:Type="Number">-0.0189</Data></Cell><Cell ss:StyleID="numberNegative"><Data ss:Type="Number">-876.75</Data></Cell><Cell ss:StyleID="numberZeroPercent"><Data ss:Type="Number">0.1534</Data></Cell><Cell ss:StyleID="numberFloatBlack"><Data ss:Type="Number">597.03</Data></Cell><Cell ss:StyleID="stringBlack"> <Data ss:Type="String">806-326081/83</Data></Cell></Row><Row ss:AutoFitHeight="0" ss:Height="15"><Cell ss:StyleID="stringBlack"> <Data ss:Type="String">70428248</Data></Cell><Cell ss:StyleID="stringBlack"> <Data ss:Type="String">(אמאזון.קום) AMZN</Data></Cell><Cell ss:StyleID="numberFloatBlack"><Data ss:Type="Number">243.30</Data></Cell><Cell ss:StyleID="numberFloatBlack"><Data ss:Type="Number">29.00</Data></Cell><Cell ss:StyleID="numberFloatBlack"><Data ss:Type="Number">207.35</Data></Cell><Cell ss:StyleID="numberFloatBlack"><Data ss:Type="Number">18791.09</Data></Cell><Cell ss:StyleID="numberNegativePercent"><Data ss:Type="Number">-0.0689</Data></Cell><Cell ss:StyleID="numberNegativePercent"><Data ss:Type="Number">-0.1478</Data></Cell><Cell ss:StyleID="numberNegative"><Data ss:Type="Number">-3257.97</Data></Cell><Cell ss:StyleID="numberZeroPercent"><Data ss:Type="Number">0.0632</Data></Cell><Cell ss:StyleID="numberFloatBlack"><Data ss:Type="Number">222.69</Data></Cell><Cell ss:StyleID="stringBlack"> <Data ss:Type="String">806-326081/83</Data></Cell></Row><Row ss:AutoFitHeight="0" ss:Height="15"><Cell ss:StyleID="stringBlack"> <Data ss:Type="String">70128905</Data></Cell><Cell ss:StyleID="stringBlack"> <Data ss:Type="String">(גיים-סטופ) GME</Data></Cell><Cell ss:StyleID="numberFloatBlack"><Data ss:Type="Number">92.98</Data></Cell><Cell ss:StyleID="numberFloatBlack"><Data ss:Type="Number">104.00</Data></Cell><Cell ss:StyleID="numberFloatBlack"><Data ss:Type="Number">24.84</Data></Cell><Cell ss:StyleID="numberFloatBlack"><Data ss:Type="Number">8073.00</Data></Cell><Cell ss:StyleID="numberPositivePercent"><Data ss:Type="Number">0.0060999999999999995</Data></Cell><Cell ss:StyleID="numberNegativePercent"><Data ss:Type="Number">-0.7329000000000001</Data></Cell><Cell ss:StyleID="numberNegative"><Data ss:Type="Number">-22146.06</Data></Cell><Cell ss:StyleID="numberZeroPercent"><Data ss:Type="Number">0.0271</Data></Cell><Cell ss:StyleID="numberFloatBlack"><Data ss:Type="Number">24.69</Data></Cell><Cell ss:StyleID="stringBlack"> <Data ss:Type="String">806-326081/83</Data></Cell></Row><Row ss:AutoFitHeight="0" ss:Height="15"><Cell ss:StyleID="stringBlack"> <Data ss:Type="String">70105588</Data></Cell><Cell ss:StyleID="stringBlack"> <Data ss:Type="String">(טאבולה) TBLA</Data></Cell><Cell ss:StyleID="numberFloatBlack"><Data ss:Type="Number">12.26</Data></Cell><Cell ss:StyleID="numberFloatBlack"><Data ss:Type="Number">1200.00</Data></Cell><Cell ss:StyleID="numberFloatBlack"><Data ss:Type="Number">3.59</Data></Cell><Cell ss:StyleID="numberFloatBlack"><Data ss:Type="Number">13462.50</Data></Cell><Cell ss:StyleID="numberNegativePercent"><Data ss:Type="Number">-0.011000000000000001</Data></Cell><Cell ss:StyleID="numberNegativePercent"><Data ss:Type="Number">-0.7071</Data></Cell><Cell ss:StyleID="numberNegative"><Data ss:Type="Number">-32506.25</Data></Cell><Cell ss:StyleID="numberZeroPercent"><Data ss:Type="Number">0.0453</Data></Cell><Cell ss:StyleID="numberFloatBlack"><Data ss:Type="Number">3.63</Data></Cell><Cell ss:StyleID="stringBlack"> <Data ss:Type="String">806-326081/83</Data></Cell></Row><Row ss:AutoFitHeight="0" ss:Height="15"><Cell ss:StyleID="stringBlack"> <Data ss:Type="String">70449392</Data></Cell><Cell ss:StyleID="stringBlack"> <Data ss:Type="String">(טייוואן סמיקונדקטור) TSM</Data></Cell><Cell ss:StyleID="numberFloatBlack"><Data ss:Type="Number">332.00</Data></Cell><Cell ss:StyleID="numberFloatBlack"><Data ss:Type="Number">15.00</Data></Cell><Cell ss:StyleID="numberFloatBlack"><Data ss:Type="Number">347.16</Data></Cell><Cell ss:StyleID="numberFloatBlack"><Data ss:Type="Number">16273.13</Data></Cell><Cell ss:StyleID="numberPositivePercent"><Data ss:Type="Number">0.049699999999999994</Data></Cell><Cell ss:StyleID="numberPositivePercent"><Data ss:Type="Number">0.045700000000000005</Data></Cell><Cell ss:StyleID="numberPositive"><Data ss:Type="Number">710.63</Data></Cell><Cell ss:StyleID="numberZeroPercent"><Data ss:Type="Number">0.0547</Data></Cell><Cell ss:StyleID="numberFloatBlack"><Data ss:Type="Number">330.73</Data></Cell><Cell ss:StyleID="stringBlack"> <Data ss:Type="String">806-326081/83</Data></Cell></Row><Row ss:AutoFitHeight="0" ss:Height="15"><Cell ss:StyleID="stringBlack"> <Data ss:Type="String">70838933</Data></Cell><Cell ss:StyleID="stringBlack"> <Data ss:Type="String">(טילריי) TLRY</Data></Cell><Cell ss:StyleID="numberFloatBlack"><Data ss:Type="Number">170.20</Data></Cell><Cell ss:StyleID="numberFloatBlack"><Data ss:Type="Number">8.00</Data></Cell><Cell ss:StyleID="numberFloatBlack"><Data ss:Type="Number">7.56</Data></Cell><Cell ss:StyleID="numberFloatBlack"><Data ss:Type="Number">189.00</Data></Cell><Cell ss:StyleID="numberPositivePercent"><Data ss:Type="Number">0.0723</Data></Cell><Cell ss:StyleID="numberNegativePercent"><Data ss:Type="Number">-0.9556</Data></Cell><Cell ss:StyleID="numberNegative"><Data ss:Type="Number">-4066.01</Data></Cell><Cell ss:StyleID="numberZeroPercent"><Data ss:Type="Number">0.0006</Data></Cell><Cell ss:StyleID="numberFloatBlack"><Data ss:Type="Number">7.05</Data></Cell><Cell ss:StyleID="stringBlack"> <Data ss:Type="String">806-326081/83</Data></Cell></Row><Row ss:AutoFitHeight="0" ss:Height="15"><Cell ss:StyleID="stringBlack"> <Data ss:Type="String">70126684</Data></Cell><Cell ss:StyleID="stringBlack"> <Data ss:Type="String">(סאנדיסק) SNDK</Data></Cell><Cell ss:StyleID="numberFloatBlack"><Data ss:Type="Number">477.50</Data></Cell><Cell ss:StyleID="numberFloatBlack"><Data ss:Type="Number">6.00</Data></Cell><Cell ss:StyleID="numberFloatBlack"><Data ss:Type="Number">603.26</Data></Cell><Cell ss:StyleID="numberFloatBlack"><Data ss:Type="Number">11311.13</Data></Cell><Cell ss:StyleID="numberPositivePercent"><Data ss:Type="Number">0.047</Data></Cell><Cell ss:StyleID="numberPositivePercent"><Data ss:Type="Number">0.2634</Data></Cell><Cell ss:StyleID="numberPositive"><Data ss:Type="Number">2358.00</Data></Cell><Cell ss:StyleID="numberZeroPercent"><Data ss:Type="Number">0.038</Data></Cell><Cell ss:StyleID="numberFloatBlack"><Data ss:Type="Number">576.20</Data></Cell><Cell ss:StyleID="stringBlack"> <Data ss:Type="String">806-326081/83</Data></Cell></Row><Row ss:AutoFitHeight="0" ss:Height="15"><Cell ss:StyleID="stringBlack"> <Data ss:Type="String">70421995</Data></Cell><Cell ss:StyleID="stringBlack"> <Data ss:Type="String">(ספיידר S&P 500) SPY</Data></Cell><Cell ss:StyleID="numberFloatBlack"><Data ss:Type="Number">687.70</Data></Cell><Cell ss:StyleID="numberFloatBlack"><Data ss:Type="Number">25.00</Data></Cell><Cell ss:StyleID="numberFloatBlack"><Data ss:Type="Number">689.21</Data></Cell><Cell ss:StyleID="numberFloatBlack"><Data ss:Type="Number">53844.53</Data></Cell><Cell ss:StyleID="numberPositivePercent"><Data ss:Type="Number">0.0171</Data></Cell><Cell ss:StyleID="numberPositivePercent"><Data ss:Type="Number">0.0022</Data></Cell><Cell ss:StyleID="numberPositive"><Data ss:Type="Number">117.97</Data></Cell><Cell ss:StyleID="numberZeroPercent"><Data ss:Type="Number">0.18109999999999998</Data></Cell><Cell ss:StyleID="numberFloatBlack"><Data ss:Type="Number">677.62</Data></Cell><Cell ss:StyleID="stringBlack"> <Data ss:Type="String">806-326081/83</Data></Cell></Row><Row ss:AutoFitHeight="0" ss:Height="15"><Cell ss:StyleID="stringBlack"> <Data ss:Type="String">70209028</Data></Cell><Cell ss:StyleID="stringBlack"> <Data ss:Type="String">(ספיידר מגזר האנרגיה) XLE</Data></Cell><Cell ss:StyleID="numberFloatBlack"><Data ss:Type="Number">48.50</Data></Cell><Cell ss:StyleID="numberFloatBlack"><Data ss:Type="Number">62.00</Data></Cell><Cell ss:StyleID="numberFloatBlack"><Data ss:Type="Number">53.27</Data></Cell><Cell ss:StyleID="numberFloatBlack"><Data ss:Type="Number">10321.06</Data></Cell><Cell ss:StyleID="numberPositivePercent"><Data ss:Type="Number">0.0202</Data></Cell><Cell ss:StyleID="numberPositivePercent"><Data ss:Type="Number">0.0984</Data></Cell><Cell ss:StyleID="numberPositive"><Data ss:Type="Number">924.19</Data></Cell><Cell ss:StyleID="numberZeroPercent"><Data ss:Type="Number">0.0347</Data></Cell><Cell ss:StyleID="numberFloatBlack"><Data ss:Type="Number">52.21</Data></Cell><Cell ss:StyleID="stringBlack"> <Data ss:Type="String">806-326081/83</Data></Cell></Row><Row ss:AutoFitHeight="0" ss:Height="15"><Cell ss:StyleID="stringBlack"> <Data ss:Type="String">70835426</Data></Cell><Cell ss:StyleID="stringBlack"> <Data ss:Type="String">(ASTON MARTIN) AML LN</Data></Cell><Cell ss:StyleID="numberFloatBlack"><Data ss:Type="Number">10.01</Data></Cell><Cell ss:StyleID="numberFloatBlack"><Data ss:Type="Number">894.00</Data></Cell><Cell ss:StyleID="numberZeroFloatBlack"><Data ss:Type="Number">0.60</Data></Cell><Cell ss:StyleID="numberFloatBlack"><Data ss:Type="Number">2287.16</Data></Cell><Cell ss:StyleID="numberBlack"><Data ss:Type="Number"></Data></Cell><Cell ss:StyleID="numberNegativePercent"><Data ss:Type="Number">-0.9397</Data></Cell><Cell ss:StyleID="numberNegative"><Data ss:Type="Number">-35663.02</Data></Cell><Cell ss:StyleID="numberZeroPercent"><Data ss:Type="Number">0.0077</Data></Cell><Cell ss:StyleID="numberZeroFloatBlack"><Data ss:Type="Number">0.60</Data></Cell><Cell ss:StyleID="stringBlack"> <Data ss:Type="String">806-326081/83</Data></Cell></Row></Table>
+          <WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel">
+           <ZeroHeight/>
+           <Selected/>
+           <DisplayRightToLeft/>
+           <AutoFit />
+          </WorksheetOptions>
+         </Worksheet>
+        </Workbook>
+        
