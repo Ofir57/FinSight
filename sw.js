@@ -1,4 +1,4 @@
-const CACHE_NAME = 'finzilla-v49';
+const CACHE_NAME = 'finzilla-v50';
 const ASSETS_TO_CACHE = [
     './',
     './index.html',
@@ -42,7 +42,8 @@ const ASSETS_TO_CACHE = [
     './pages/settings.html',
     './data/sample-data.js',
     './data/market-funds.js',
-    'https://cdn.jsdelivr.net/npm/chart.js'
+    'https://cdn.jsdelivr.net/npm/chart.js',
+    'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js'
 ];
 
 // Install event - cache assets
