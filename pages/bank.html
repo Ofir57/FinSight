@@ -389,23 +389,32 @@
             const parser = new DOMParser();
             const doc = parser.parseFromString(html, 'text/html');
 
-            // Find the data table
-            const tables = doc.querySelectorAll('table.dataTable, table');
+            // Prefer dataTable class, fallback to any table
+            let tables = doc.querySelectorAll('table.dataTable');
+            if (tables.length === 0) {
+                tables = doc.querySelectorAll('table');
+            }
+
+            const seenRows = new Set();
 
             for (const table of tables) {
                 const tableRows = table.querySelectorAll('tr');
                 for (const tr of tableRows) {
                     const cells = tr.querySelectorAll('th, td');
-                    if (cells.length > 0) {
+                    if (cells.length >= 2 && cells.length <= 10) {
                         const rowData = [];
                         cells.forEach(cell => {
                             // Clean up text - remove extra spaces and special characters
                             let text = cell.textContent.trim()
                                 .replace(/\s+/g, ' ')
-                                .replace(/[‎‏]/g, ''); // Remove RTL/LTR marks
+                                .replace(/[‎‏\u200e\u200f]/g, ''); // Remove RTL/LTR marks
                             rowData.push(text);
                         });
-                        if (rowData.some(cell => cell.length > 0)) {
+
+                        // Skip empty or duplicate rows
+                        const rowKey = rowData.join('|');
+                        if (rowData.some(cell => cell.length > 0) && !seenRows.has(rowKey)) {
+                            seenRows.add(rowKey);
                             rows.push(rowData);
                         }
                     }
@@ -456,7 +465,7 @@
                         name: ['שם', 'שם חשבון', 'סוג פעילות', 'פעילות', 'name', 'account name', 'nome', 'nome da conta', 'activity'],
                         bank: ['בנק', 'שם בנק', 'bank', 'bank name', 'banco'],
                         accountNumber: ['מספר חשבון', 'חשבון', 'account number', 'account', 'número', 'número da conta'],
-                        balance: ['יתרה', 'יתרה בש"ח', 'יתרה בשח', 'סכום', 'balance', 'amount', 'saldo', 'valor']
+                        balance: ['יתרה', 'יתרה בש', 'יתרה בשח', 'סכום', 'balance', 'amount', 'saldo', 'valor']
                     };
 
                     // Auto-detect columns
@@ -483,12 +492,16 @@
                     const dataRows = rows.slice(headerIdx + 1);
 
                     for (const row of dataRows) {
+                        // Skip empty rows and summary rows
+                        const firstCell = String(row[0] || '').trim();
+                        if (!firstCell || firstCell.includes('סה"כ') || firstCell.includes('סהכ')) continue;
+
                         const balanceVal = row[detected.balance];
                         const balance = typeof balanceVal === 'number' ? balanceVal :
                             parseFloat(String(balanceVal || '0').replace(/[^\d.-]/g, ''));
-                        if (isNaN(balance) || balance === 0) continue;
+                        if (isNaN(balance)) continue;
 
-                        const name = detected.name !== undefined ? String(row[detected.name] || 'חשבון מיובא') : 'חשבון מיובא';
+                        const name = detected.name !== undefined ? String(row[detected.name] || 'חשבון מיובא').trim() : 'חשבון מיובא';
                         const bank = detected.bank !== undefined ? String(row[detected.bank] || 'other') : 'other';
                         const accountNumber = detected.accountNumber !== undefined ?
                             String(row[detected.accountNumber] || '').replace(/[^\d]/g, '').slice(-10) : '';
