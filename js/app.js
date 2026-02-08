@@ -32,7 +32,12 @@ const App = {
     async registerServiceWorker() {
         if ('serviceWorker' in navigator) {
             try {
-                const registration = await navigator.serviceWorker.register('/sw.js');
+                // Detect base path for GitHub Pages compatibility
+                const basePath = window.location.pathname.includes('/pages/')
+                    ? window.location.pathname.split('/pages/')[0]
+                    : window.location.pathname.replace(/\/[^/]*$/, '');
+                const swPath = basePath + '/sw.js';
+                const registration = await navigator.serviceWorker.register(swPath, { scope: basePath + '/' });
                 console.log('ServiceWorker registered:', registration.scope);
             } catch (error) {
                 console.log('ServiceWorker registration failed:', error);
