@@ -857,9 +857,24 @@
                     cardId = card.id;
                 }
 
-                // Import expenses
+                // Import expenses (skip duplicates)
                 let imported = 0;
+                let skipped = 0;
+                const existingExpenses = Storage.getCreditCards().expenses;
+
                 expenses.forEach(exp => {
+                    // Check if expense already exists (same date, description, and amount)
+                    const isDuplicate = existingExpenses.some(existing =>
+                        existing.date === exp.date &&
+                        existing.description === exp.description &&
+                        existing.amount === exp.amount
+                    );
+
+                    if (isDuplicate) {
+                        skipped++;
+                        return;
+                    }
+
                     Storage.addExpense({
                         cardId,
                         date: exp.date,
@@ -873,7 +888,10 @@
                     imported++;
                 });
 
-                App.notify(`יובאו ${imported} עסקאות בהצלחה!`, 'success');
+                const msg = skipped > 0
+                    ? `יובאו ${imported} עסקאות (${skipped} כפולות דולגו)`
+                    : `יובאו ${imported} עסקאות בהצלחה!`;
+                App.notify(msg, 'success');
 
                 // Switch to the month of the first imported expense
                 if (expenses.length > 0 && expenses[0].date) {
