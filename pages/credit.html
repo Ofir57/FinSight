@@ -489,15 +489,18 @@
             const rows = monthExpenses.map(exp => {
                 // Show foreign transaction info
                 let foreignInfo = '';
+                var countryCode = getCountryFromDescription(exp.description);
+
                 if (exp.originalCurrency && exp.originalCurrency !== '₪' && exp.originalCurrency !== 'ILS') {
-                    const origAmount = exp.originalAmount || exp.amount;
-                    // Detect country from description suffix
-                    const countryCode = getCountryFromDescription(exp.description);
-                    const flag = countryCode ? getCountryFlag(countryCode) : getCurrencyFlag(exp.originalCurrency);
-                    // Calculate exchange rate
-                    const rate = origAmount > 0 ? (exp.amount / origAmount).toFixed(2) : '';
-                    const rateText = rate ? ` (${rate})` : '';
-                    foreignInfo = `<span title="${exp.originalCurrency}${rateText}">${flag} ${origAmount.toLocaleString()}${rateText}</span>`;
+                    // Has foreign currency info
+                    var origAmount = exp.originalAmount || exp.amount;
+                    var flag = countryCode ? getCountryFlag(countryCode) : getCurrencyFlag(exp.originalCurrency);
+                    var rate = origAmount > 0 ? (exp.amount / origAmount).toFixed(2) : '';
+                    var rateText = rate ? ' (' + rate + ')' : '';
+                    foreignInfo = '<span title="' + exp.originalCurrency + rateText + '">' + flag + ' ' + origAmount.toLocaleString() + rateText + '</span>';
+                } else if (countryCode && countryCode !== 'IL') {
+                    // No currency info but has foreign country in description
+                    foreignInfo = '<span>' + getCountryFlag(countryCode) + '</span>';
                 }
 
                 return `
