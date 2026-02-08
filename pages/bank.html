@@ -109,6 +109,10 @@
                     <span>➕</span>
                     <span data-i18n="bank.addAccount">הוסף חשבון</span>
                 </button>
+                <button class="btn btn-secondary" onclick="importExcel()">
+                    <span>📥</span>
+                    <span>ייבוא Excel</span>
+                </button>
                 <button class="btn btn-secondary" onclick="importCSV()">
                     <span>📥</span>
                     <span>ייבוא CSV</span>
@@ -192,8 +196,8 @@
                     </div>
 
                     <div class="form-group">
-                        <label data-i18n="bank.accountNumber">מספר חשבון (4 ספרות אחרונות)</label>
-                        <input type="text" class="form-control" id="accountNumber" maxlength="4" pattern="[0-9]{4}">
+                        <label data-i18n="bank.accountNumber">מספר חשבון</label>
+                        <input type="text" class="form-control" id="accountNumber" maxlength="10" pattern="[0-9]{1,10}">
                     </div>
 
                     <div class="form-group">
@@ -236,6 +240,7 @@
     <script src="../js/i18n.js"></script>
     <script src="../js/charts.js"></script>
     <script src="../js/csv-import.js"></script>
+    <script src="../js/smart-import.js"></script>
     <script src="../js/app.js"></script>
     <script>
         // Page specific code
@@ -259,11 +264,15 @@
             const total = accounts.reduce((sum, acc) => sum + (acc.balance || 0), 0);
             totalEl.textContent = I18n.formatCurrency(total);
 
-            tbody.innerHTML = accounts.map(acc => `
+            tbody.innerHTML = accounts.map(acc => {
+                // Mask account number - show last 4 digits only
+                const accNum = acc.accountNumber || '';
+                const maskedNum = accNum.length > 4 ? '****' + accNum.slice(-4) : accNum;
+                return `
                 <tr>
                     <td>${I18n.currentLanguage === 'he' ? acc.nameHe || acc.nameEn : acc.nameEn || acc.nameHe}</td>
                     <td>${I18n.t('bank.banks.' + acc.bank) || acc.bank}</td>
-                    <td>****${acc.accountNumber}</td>
+                    <td>${maskedNum}</td>
                     <td>${I18n.formatCurrency(acc.balance)}</td>
                     <td>
                         <div class="action-buttons">
@@ -273,7 +282,8 @@
                         </div>
                     </td>
                 </tr>
-            `).join('');
+            `;
+            }).join('');
 
             // Show history chart with combined history
             document.getElementById('historyCard').style.display = 'block';
@@ -371,6 +381,113 @@
                 loadAccounts();
                 App.notify(I18n.t('common.delete') + ' ✓', 'success');
             }
+        }
+
+        async function importExcel() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.xlsx,.xls,.csv';
+
+            input.onchange = async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                try {
+                    const content = await file.text();
+                    const rows = SmartImport.parseFile(content, file.name);
+
+                    if (rows.length < 2) {
+                        App.notify('הקובץ ריק או לא תקין', 'error');
+                        return;
+                    }
+
+                    // Find header row
+                    const headerIdx = SmartImport.findHeaderRow(rows);
+                    const headers = rows[headerIdx];
+
+                    // Define bank account column mappings
+                    const bankColumnMappings = {
+                        name: ['שם', 'שם חשבון', 'name', 'account name', 'nome', 'nome da conta'],
+                        bank: ['בנק', 'שם בנק', 'bank', 'bank name', 'banco'],
+                        accountNumber: ['מספר חשבון', 'חשבון', 'account number', 'account', 'número', 'número da conta'],
+                        balance: ['יתרה', 'סכום', 'balance', 'amount', 'saldo', 'valor']
+                    };
+
+                    // Auto-detect columns
+                    const detected = {};
+                    headers.forEach((header, index) => {
+                        const headerLower = header.toLowerCase().trim();
+                        Object.keys(bankColumnMappings).forEach(field => {
+                            if (detected[field] !== undefined) return;
+                            const matches = bankColumnMappings[field].some(kw =>
+                                headerLower.includes(kw.toLowerCase())
+                            );
+                            if (matches) detected[field] = index;
+                        });
+                    });
+
+                    // Need at least balance column
+                    if (detected.balance === undefined) {
+                        App.notify('לא נמצאה עמודת יתרה/סכום', 'error');
+                        return;
+                    }
+
+                    let imported = 0;
+                    const dataRows = rows.slice(headerIdx + 1);
+
+                    for (const row of dataRows) {
+                        const balance = parseFloat((row[detected.balance] || '0').replace(/[^\d.-]/g, ''));
+                        if (isNaN(balance) || balance === 0) continue;
+
+                        const name = detected.name !== undefined ? row[detected.name] : 'חשבון מיובא';
+                        const bank = detected.bank !== undefined ? row[detected.bank] : 'other';
+                        const accountNumber = detected.accountNumber !== undefined ?
+                            (row[detected.accountNumber] || '').replace(/[^\d]/g, '').slice(-10) : '';
+
+                        // Map bank name to internal key
+                        const bankKey = mapBankName(bank);
+
+                        Storage.addBankAccount({
+                            nameHe: name,
+                            nameEn: name,
+                            bank: bankKey,
+                            accountNumber: accountNumber,
+                            balance: balance,
+                            currency: 'ILS'
+                        });
+                        imported++;
+                    }
+
+                    if (imported > 0) {
+                        App.notify(`יובאו ${imported} חשבונות בהצלחה`, 'success');
+                        loadAccounts();
+                    } else {
+                        App.notify('לא נמצאו חשבונות לייבוא', 'error');
+                    }
+                } catch (error) {
+                    console.error('Import error:', error);
+                    App.notify('שגיאה בייבוא הקובץ', 'error');
+                }
+            };
+
+            input.click();
+        }
+
+        function mapBankName(bankText) {
+            if (!bankText) return 'other';
+            const bankLower = bankText.toLowerCase();
+
+            if (bankLower.includes('לאומי') || bankLower.includes('leumi')) return 'leumi';
+            if (bankLower.includes('פועלים') || bankLower.includes('hapoalim')) return 'hapoalim';
+            if (bankLower.includes('דיסקונט') || bankLower.includes('discount')) return 'discount';
+            if (bankLower.includes('מזרחי') || bankLower.includes('mizrahi')) return 'mizrahi';
+            if (bankLower.includes('בינלאומי') || bankLower.includes('international')) return 'international';
+            if (bankLower.includes('מרכנתיל') || bankLower.includes('mercantile')) return 'mercantile';
+            if (bankLower.includes('אוצר') || bankLower.includes('otsar')) return 'otsar';
+            if (bankLower.includes('יהב') || bankLower.includes('yahav')) return 'yahav';
+            if (bankLower.includes('מסד') || bankLower.includes('massad')) return 'massad';
+
+            return 'other';
         }
 
         async function importCSV() {

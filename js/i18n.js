@@ -330,6 +330,169 @@ const I18n = {
             },
             // Months
             months: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+        },
+        pt: {
+            // Navigation
+            nav: {
+                dashboard: 'Painel',
+                bankAccounts: 'Contas Bancárias',
+                creditCards: 'Cartões de Crédito',
+                stocks: 'Ações',
+                fundsAndPension: 'Fundos e Previdência',
+                trainingFunds: 'Fundos de Capacitação',
+                pension: 'Previdência',
+                gemel: 'Fundos de Investimento',
+                assets: 'Ativos',
+                settings: 'Configurações'
+            },
+            // Dashboard
+            dashboard: {
+                title: 'Gerenciador Financeiro Pessoal',
+                subtitle: 'Visão geral dos seus ativos',
+                netWorth: 'Patrimônio Líquido',
+                totalAssets: 'Total de Ativos',
+                bankBalance: 'Saldo Bancário',
+                creditExpenses: 'Despesas de Crédito',
+                stocksValue: 'Valor das Ações',
+                fundsValue: 'Valor dos Fundos',
+                assetsValue: 'Valor dos Ativos',
+                assetDistribution: 'Distribuição de Ativos',
+                monthlyExpenses: 'Despesas Mensais',
+                recentTransactions: 'Transações Recentes'
+            },
+            // Bank
+            bank: {
+                title: 'Contas Bancárias',
+                addAccount: 'Adicionar Conta',
+                accountName: 'Nome da Conta',
+                bankName: 'Nome do Banco',
+                accountNumber: 'Número da Conta',
+                balance: 'Saldo',
+                currency: 'Moeda',
+                updateBalance: 'Atualizar Saldo',
+                balanceHistory: 'Histórico de Saldo',
+                noAccounts: 'Nenhuma conta bancária',
+                banks: {
+                    leumi: 'Banco Leumi',
+                    hapoalim: 'Banco Hapoalim',
+                    discount: 'Banco Discount',
+                    mizrahi: 'Mizrahi Tefahot',
+                    international: 'First International',
+                    mercantile: 'Banco Mercantile',
+                    otsar: 'Otsar Hahayal',
+                    yahav: 'Banco Yahav',
+                    massad: 'Banco Massad',
+                    other: 'Outro'
+                }
+            },
+            // Credit
+            credit: {
+                title: 'Cartões de Crédito',
+                addCard: 'Adicionar Cartão',
+                addExpense: 'Adicionar Despesa',
+                cardName: 'Nome do Cartão',
+                lastFour: 'Últimos 4 Dígitos',
+                creditLimit: 'Limite de Crédito',
+                monthlyTotal: 'Total Mensal',
+                expenseDate: 'Data',
+                expenseAmount: 'Valor',
+                expenseCategory: 'Categoria',
+                expenseDescription: 'Descrição',
+                recurring: 'Recorrente',
+                noCards: 'Nenhum cartão de crédito',
+                noExpenses: 'Nenhuma despesa',
+                categories: {
+                    food: 'Alimentação e Restaurantes',
+                    transport: 'Transporte e Combustível',
+                    shopping: 'Compras',
+                    entertainment: 'Entretenimento',
+                    bills: 'Contas',
+                    health: 'Saúde',
+                    education: 'Educação',
+                    other: 'Outro'
+                }
+            },
+            // Stocks
+            stocks: {
+                title: 'Carteira de Ações',
+                addStock: 'Adicionar Ação',
+                symbol: 'Símbolo',
+                companyName: 'Nome da Empresa',
+                quantity: 'Quantidade',
+                avgPrice: 'Preço Médio',
+                currentPrice: 'Preço Atual',
+                totalValue: 'Valor Total',
+                profitLoss: 'Lucro/Prejuízo',
+                updatePrice: 'Atualizar Preço',
+                sell: 'Vender',
+                transactions: 'Histórico de Transações',
+                buy: 'Comprar',
+                portfolioDistribution: 'Distribuição da Carteira',
+                noStocks: 'Nenhuma ação na carteira'
+            },
+            // Funds
+            funds: {
+                title: 'Meus Fundos',
+                addFund: 'Adicionar Fundo',
+                fundName: 'Nome do Fundo',
+                fundType: 'Tipo de Fundo',
+                currentValue: 'Valor Atual',
+                monthlyDeposit: 'Depósito Mensal',
+                types: {
+                    training: 'Fundo de Capacitação',
+                    pension: 'Previdência',
+                    gemel: 'Fundo de Investimento'
+                },
+                noFunds: 'Nenhum fundo selecionado'
+            },
+            // Assets
+            assets: {
+                title: 'Outros Ativos',
+                addAsset: 'Adicionar Ativo',
+                assetName: 'Nome do Ativo',
+                assetType: 'Tipo de Ativo',
+                estimatedValue: 'Valor Estimado',
+                purchaseDate: 'Data da Compra',
+                purchasePrice: 'Preço de Compra',
+                types: {
+                    car: 'Carro',
+                    property: 'Imóvel',
+                    savings: 'Poupança',
+                    jewelry: 'Joias',
+                    electronics: 'Eletrônicos',
+                    other: 'Outro'
+                },
+                noAssets: 'Nenhum ativo'
+            },
+            // Common
+            common: {
+                save: 'Salvar',
+                cancel: 'Cancelar',
+                delete: 'Excluir',
+                edit: 'Editar',
+                add: 'Adicionar',
+                update: 'Atualizar',
+                close: 'Fechar',
+                confirm: 'Confirmar',
+                yes: 'Sim',
+                no: 'Não',
+                loading: 'Carregando...',
+                noData: 'Sem dados',
+                total: 'Total',
+                currency: 'R$',
+                currencyCode: 'BRL',
+                date: 'Data',
+                amount: 'Valor',
+                name: 'Nome',
+                type: 'Tipo',
+                actions: 'Ações',
+                export: 'Exportar Dados',
+                import: 'Importar Dados',
+                backup: 'Backup',
+                confirmDelete: 'Tem certeza que deseja excluir?'
+            },
+            // Months
+            months: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro']
         }
     },
 
@@ -358,10 +521,18 @@ const I18n = {
     },
 
     /**
-     * Toggle between Hebrew and English
+     * Available languages
+     */
+    languages: ['he', 'en', 'pt'],
+    languageNames: { he: 'עברית', en: 'English', pt: 'Português' },
+
+    /**
+     * Toggle between languages (Hebrew -> English -> Portuguese -> Hebrew)
      */
     toggleLanguage() {
-        this.currentLanguage = this.currentLanguage === 'he' ? 'en' : 'he';
+        var currentIdx = this.languages.indexOf(this.currentLanguage);
+        var nextIdx = (currentIdx + 1) % this.languages.length;
+        this.currentLanguage = this.languages[nextIdx];
         Storage.saveSettings({ ...Storage.getSettings(), language: this.currentLanguage });
         this.updatePageDirection();
         this.translatePage();
@@ -369,10 +540,10 @@ const I18n = {
 
     /**
      * Set specific language
-     * @param {string} lang - 'he' or 'en'
+     * @param {string} lang - 'he', 'en', or 'pt'
      */
     setLanguage(lang) {
-        if (lang === 'he' || lang === 'en') {
+        if (this.languages.includes(lang)) {
             this.currentLanguage = lang;
             Storage.saveSettings({ ...Storage.getSettings(), language: lang });
             this.updatePageDirection();
@@ -386,7 +557,7 @@ const I18n = {
     updatePageDirection() {
         document.documentElement.lang = this.currentLanguage;
         document.documentElement.dir = this.currentLanguage === 'he' ? 'rtl' : 'ltr';
-        document.body.classList.toggle('ltr', this.currentLanguage === 'en');
+        document.body.classList.toggle('ltr', this.currentLanguage !== 'he');
     },
 
     /**
@@ -405,15 +576,26 @@ const I18n = {
             const key = el.getAttribute('data-i18n-title');
             el.title = this.t(key);
         });
-        // Update language toggle buttons
+        // Update language toggle buttons - show NEXT language in cycle
+        var currentIdx = this.languages.indexOf(this.currentLanguage);
+        var nextIdx = (currentIdx + 1) % this.languages.length;
+        var nextLang = this.languageNames[this.languages[nextIdx]];
         const langBtn = document.querySelector('.lang-toggle');
         if (langBtn) {
-            langBtn.textContent = this.currentLanguage === 'he' ? 'English' : 'עברית';
+            langBtn.textContent = nextLang;
         }
         const langBtnHeader = document.querySelector('.lang-toggle-header');
         if (langBtnHeader) {
-            langBtnHeader.textContent = this.currentLanguage === 'he' ? '🌐 English' : '🌐 עברית';
+            langBtnHeader.textContent = '🌐 ' + nextLang;
         }
+    },
+
+    /**
+     * Get locale code for Intl formatting
+     */
+    getLocale() {
+        const locales = { he: 'he-IL', en: 'en-US', pt: 'pt-BR' };
+        return locales[this.currentLanguage] || 'en-US';
     },
 
     /**
@@ -423,7 +605,7 @@ const I18n = {
      * @returns {string} Formatted currency string
      */
     formatCurrency(amount, currency = 'ILS') {
-        const formatter = new Intl.NumberFormat(this.currentLanguage === 'he' ? 'he-IL' : 'en-US', {
+        const formatter = new Intl.NumberFormat(this.getLocale(), {
             style: 'currency',
             currency: currency,
             minimumFractionDigits: 0,
@@ -438,7 +620,7 @@ const I18n = {
      * @returns {string} Formatted number
      */
     formatNumber(num) {
-        return new Intl.NumberFormat(this.currentLanguage === 'he' ? 'he-IL' : 'en-US').format(num);
+        return new Intl.NumberFormat(this.getLocale()).format(num);
     },
 
     /**
@@ -448,7 +630,7 @@ const I18n = {
      */
     formatDate(date) {
         const d = new Date(date);
-        return new Intl.DateTimeFormat(this.currentLanguage === 'he' ? 'he-IL' : 'en-US').format(d);
+        return new Intl.DateTimeFormat(this.getLocale()).format(d);
     },
 
     /**
