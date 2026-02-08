@@ -428,7 +428,8 @@
                     // Auto-detect columns
                     const detected = {};
                     headers.forEach((header, index) => {
-                        const headerLower = header.toLowerCase().trim();
+                        if (!header) return;
+                        const headerLower = String(header).toLowerCase().trim();
                         Object.keys(bankColumnMappings).forEach(field => {
                             if (detected[field] !== undefined) return;
                             const matches = bankColumnMappings[field].some(kw =>
@@ -448,13 +449,15 @@
                     const dataRows = rows.slice(headerIdx + 1);
 
                     for (const row of dataRows) {
-                        const balance = parseFloat((row[detected.balance] || '0').replace(/[^\d.-]/g, ''));
+                        const balanceVal = row[detected.balance];
+                        const balance = typeof balanceVal === 'number' ? balanceVal :
+                            parseFloat(String(balanceVal || '0').replace(/[^\d.-]/g, ''));
                         if (isNaN(balance) || balance === 0) continue;
 
-                        const name = detected.name !== undefined ? row[detected.name] : 'חשבון מיובא';
-                        const bank = detected.bank !== undefined ? row[detected.bank] : 'other';
+                        const name = detected.name !== undefined ? String(row[detected.name] || 'חשבון מיובא') : 'חשבון מיובא';
+                        const bank = detected.bank !== undefined ? String(row[detected.bank] || 'other') : 'other';
                         const accountNumber = detected.accountNumber !== undefined ?
-                            (row[detected.accountNumber] || '').replace(/[^\d]/g, '').slice(-10) : '';
+                            String(row[detected.accountNumber] || '').replace(/[^\d]/g, '').slice(-10) : '';
 
                         // Map bank name to internal key
                         const bankKey = mapBankName(bank);
