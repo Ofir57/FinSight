@@ -1,4 +1,4 @@
-const CACHE_NAME = 'finzilla-v46';
+const CACHE_NAME = 'finzilla-v47';
 const ASSETS_TO_CACHE = [
     './',
     './index.html',
@@ -8,6 +8,7 @@ const ASSETS_TO_CACHE = [
     './js/i18n.js',
     './js/charts.js',
     './js/csv-import.js',
+    './js/smart-import.js',
     './js/alerts.js',
     './js/goals.js',
     './js/reports.js',
