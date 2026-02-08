@@ -490,9 +490,14 @@
                 // Show foreign transaction info
                 let foreignInfo = '';
                 if (exp.originalCurrency && exp.originalCurrency !== '₪' && exp.originalCurrency !== 'ILS') {
-                    const flag = getCurrencyFlag(exp.originalCurrency);
                     const origAmount = exp.originalAmount || exp.amount;
-                    foreignInfo = `<span title="${exp.originalCurrency}">${flag} ${origAmount.toLocaleString()}</span>`;
+                    // Detect country from description suffix
+                    const countryCode = getCountryFromDescription(exp.description);
+                    const flag = countryCode ? getCountryFlag(countryCode) : getCurrencyFlag(exp.originalCurrency);
+                    // Calculate exchange rate
+                    const rate = origAmount > 0 ? (exp.amount / origAmount).toFixed(2) : '';
+                    const rateText = rate ? ` (${rate})` : '';
+                    foreignInfo = `<span title="${exp.originalCurrency}${rateText}">${flag} ${origAmount.toLocaleString()}${rateText}</span>`;
                 }
 
                 return `
@@ -526,6 +531,63 @@
 
             // Update category chart
             updateCategoryChart(monthExpenses, total);
+        }
+
+        // Helper function to get country code from description suffix
+        function getCountryFromDescription(description) {
+            if (!description) return null;
+            const desc = description.toUpperCase().trim();
+            // Check for country code at end of description
+            const countryPatterns = [
+                { pattern: / BR$/, code: 'BR' },
+                { pattern: / US$/, code: 'US' },
+                { pattern: / UK$/, code: 'GB' },
+                { pattern: / GB$/, code: 'GB' },
+                { pattern: / DE$/, code: 'DE' },
+                { pattern: / FR$/, code: 'FR' },
+                { pattern: / IT$/, code: 'IT' },
+                { pattern: / ES$/, code: 'ES' },
+                { pattern: / PT$/, code: 'PT' },
+                { pattern: / NL$/, code: 'NL' },
+                { pattern: / JP$/, code: 'JP' },
+                { pattern: / CN$/, code: 'CN' },
+                { pattern: / AU$/, code: 'AU' },
+                { pattern: / CA$/, code: 'CA' },
+                { pattern: / MX$/, code: 'MX' },
+                { pattern: / TH$/, code: 'TH' },
+                { pattern: / TR$/, code: 'TR' },
+                { pattern: / PL$/, code: 'PL' },
+                { pattern: / IN$/, code: 'IN' },
+                { pattern: / RU$/, code: 'RU' },
+                { pattern: / ZA$/, code: 'ZA' },
+                { pattern: / AE$/, code: 'AE' },
+                { pattern: / SG$/, code: 'SG' },
+                { pattern: / HK$/, code: 'HK' },
+                { pattern: / NZ$/, code: 'NZ' },
+                { pattern: / KR$/, code: 'KR' },
+                { pattern: / AR$/, code: 'AR' },
+                { pattern: / CL$/, code: 'CL' },
+                { pattern: / CO$/, code: 'CO' },
+                { pattern: / PE$/, code: 'PE' },
+            ];
+            for (const { pattern, code } of countryPatterns) {
+                if (pattern.test(desc)) return code;
+            }
+            return null;
+        }
+
+        // Helper function to get flag from country code
+        function getCountryFlag(countryCode) {
+            const flags = {
+                'BR': '🇧🇷', 'US': '🇺🇸', 'GB': '🇬🇧', 'DE': '🇩🇪', 'FR': '🇫🇷',
+                'IT': '🇮🇹', 'ES': '🇪🇸', 'PT': '🇵🇹', 'NL': '🇳🇱', 'JP': '🇯🇵',
+                'CN': '🇨🇳', 'AU': '🇦🇺', 'CA': '🇨🇦', 'MX': '🇲🇽', 'TH': '🇹🇭',
+                'TR': '🇹🇷', 'PL': '🇵🇱', 'IN': '🇮🇳', 'RU': '🇷🇺', 'ZA': '🇿🇦',
+                'AE': '🇦🇪', 'SG': '🇸🇬', 'HK': '🇭🇰', 'NZ': '🇳🇿', 'KR': '🇰🇷',
+                'AR': '🇦🇷', 'CL': '🇨🇱', 'CO': '🇨🇴', 'PE': '🇵🇪', 'CH': '🇨🇭',
+                'SE': '🇸🇪', 'NO': '🇳🇴', 'DK': '🇩🇰', 'CZ': '🇨🇿', 'HU': '🇭🇺'
+            };
+            return flags[countryCode] || '🌍';
         }
 
         // Helper function to get country flag from currency
