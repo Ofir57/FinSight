@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Finance Dashboard - קופות גמל להשקעה</title>
+    <title>FinSight - קופות גמל להשקעה</title>
     <style>
         * {
             margin: 0;
@@ -349,6 +349,35 @@
                 font-size: 0.85rem;
             }
         }
+
+        .lang-switcher {
+            display: inline-flex;
+            gap: 4px;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 10px;
+            padding: 4px;
+        }
+        .lang-btn {
+            padding: 6px 14px;
+            border: none;
+            border-radius: 8px;
+            background: transparent;
+            color: rgba(255, 255, 255, 0.45);
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            letter-spacing: 0.5px;
+        }
+        .lang-btn:hover {
+            color: rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.06);
+        }
+        .lang-btn.active {
+            background: linear-gradient(135deg, #10b981, #3b82f6);
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+        }
     </style>
 </head>
 <body>
@@ -364,6 +393,11 @@
                 <a href="pension.html" data-he="קרנות פנסיה" data-en="Pension Funds">קרנות פנסיה</a>
                 <a href="gemel.html" class="active" data-he="קופות גמל" data-en="Provident Funds">קופות גמל</a>
                 <a href="my-funds.html" data-he="💎 הקרנות שלי" data-en="💎 My Funds">💎 הקרנות שלי</a>
+            </div>
+            <div class="lang-switcher" style="margin-top: 12px; display: inline-flex;">
+                <button class="lang-btn active" data-lang="he" onclick="setLang('he')">HE</button>
+                <button class="lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
+                <button class="lang-btn" data-lang="pt" onclick="setLang('pt')">PT</button>
             </div>
         </header>
 
@@ -779,6 +813,24 @@
 
             document.querySelectorAll('[data-he][data-en]').forEach(el => {
                 el.textContent = el.getAttribute(`data-${currentLang}`);
+            });
+        }
+
+        function setLang(lang) {
+            try {
+                const settings = JSON.parse(localStorage.getItem('finance_settings') || '{}');
+                settings.language = lang;
+                localStorage.setItem('finance_settings', JSON.stringify(settings));
+            } catch(e) {}
+            currentLang = lang;
+            document.body.classList.toggle('ltr', lang !== 'he');
+            document.documentElement.lang = lang;
+            document.documentElement.dir = lang === 'he' ? 'rtl' : 'ltr';
+            document.querySelectorAll('[data-he][data-en]').forEach(el => {
+                el.textContent = el.getAttribute('data-' + (lang === 'pt' ? 'en' : lang));
+            });
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.getAttribute('data-lang') === lang);
             });
         }
 

@@ -21,7 +21,7 @@ const I18n = {
             },
             // Dashboard
             dashboard: {
-                title: 'ניהול פיננסי אישי',
+                title: 'FinSight',
                 subtitle: 'סקירה כללית של הנכסים שלך',
                 netWorth: 'שווי נקי',
                 totalAssets: 'סה״כ נכסים',
@@ -184,7 +184,7 @@ const I18n = {
             },
             // Dashboard
             dashboard: {
-                title: 'Personal Finance Manager',
+                title: 'FinSight',
                 subtitle: 'Overview of your assets',
                 netWorth: 'Net Worth',
                 totalAssets: 'Total Assets',
@@ -347,7 +347,7 @@ const I18n = {
             },
             // Dashboard
             dashboard: {
-                title: 'Gerenciador Financeiro Pessoal',
+                title: 'FinSight',
                 subtitle: 'Visão geral dos seus ativos',
                 netWorth: 'Patrimônio Líquido',
                 totalAssets: 'Total de Ativos',
@@ -576,18 +576,11 @@ const I18n = {
             const key = el.getAttribute('data-i18n-title');
             el.title = this.t(key);
         });
-        // Update language toggle buttons - show NEXT language in cycle
-        var currentIdx = this.languages.indexOf(this.currentLanguage);
-        var nextIdx = (currentIdx + 1) % this.languages.length;
-        var nextLang = this.languageNames[this.languages[nextIdx]];
-        const langBtn = document.querySelector('.lang-toggle');
-        if (langBtn) {
-            langBtn.textContent = nextLang;
-        }
-        const langBtnHeader = document.querySelector('.lang-toggle-header');
-        if (langBtnHeader) {
-            langBtnHeader.textContent = '🌐 ' + nextLang;
-        }
+        // Update language switcher buttons - highlight active language
+        document.querySelectorAll('.lang-btn').forEach(btn => {
+            const lang = btn.getAttribute('data-lang');
+            btn.classList.toggle('active', lang === this.currentLanguage);
+        });
     },
 
     /**

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>מחשבון פנסיה - ניהול פיננסי</title>
+    <title>מחשבון פנסיה - FinSight</title>
     <link rel="stylesheet" href="../css/app.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -202,8 +202,15 @@
         <!-- Sidebar Navigation -->
         <aside class="sidebar">
             <div class="sidebar-header">
-                <span class="logo">💰</span>
-                <h1 data-i18n="dashboard.title">ניהול פיננסי אישי</h1>
+                <div class="brand">
+                    <span class="brand-icon">📊</span>
+                    <span class="brand-name">Fin<span class="brand-highlight">Sight</span></span>
+                </div>
+                <div class="lang-switcher">
+                    <button class="lang-btn active" data-lang="he" onclick="I18n.setLanguage('he')">HE</button>
+                    <button class="lang-btn" data-lang="en" onclick="I18n.setLanguage('en')">EN</button>
+                    <button class="lang-btn" data-lang="pt" onclick="I18n.setLanguage('pt')">PT</button>
+                </div>
             </div>
 
             <nav>
@@ -259,7 +266,6 @@
             </nav>
 
             <div class="sidebar-footer">
-                <button class="lang-toggle" onclick="toggleLanguage()">English</button>
             </div>
         </aside>
 
@@ -442,10 +448,7 @@
                 el.textContent = el.getAttribute(`data-${currentLang}`);
             });
 
-            const langBtn = document.querySelector('.lang-toggle');
-            if (langBtn) {
-                langBtn.textContent = currentLang === 'he' ? 'English' : 'עברית';
-            }
+            // Language switcher buttons are now in sidebar-header
         }
 
         function formatCurrency(amount) {

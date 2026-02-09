@@ -116,16 +116,71 @@ body.ltr .main-content {
     border-bottom: 1px solid var(--color-border);
 }
 
-.sidebar-header .logo {
-    font-size: 2rem;
+.sidebar-header {
+    flex-direction: column;
+    align-items: stretch;
 }
 
-.sidebar-header h1 {
-    font-size: 1.2rem;
-    background: linear-gradient(90deg, var(--color-dashboard), #3a7bd5);
+/* ===== FinSight Brand ===== */
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    justify-content: center;
+}
+
+.brand-icon {
+    font-size: 2rem;
+    line-height: 1;
+}
+
+.brand-name {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -0.5px;
+}
+
+.brand-highlight {
+    background: linear-gradient(135deg, #10b981, #3b82f6);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+}
+
+/* ===== Language Switcher ===== */
+.lang-switcher {
+    display: flex;
+    gap: 4px;
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 10px;
+    padding: 4px;
+    margin-top: 10px;
+}
+
+.lang-btn {
+    flex: 1;
+    padding: 7px 0;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.45);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    letter-spacing: 0.5px;
+}
+
+.lang-btn:hover {
+    color: rgba(255, 255, 255, 0.8);
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.lang-btn.active {
+    background: linear-gradient(135deg, #10b981, #3b82f6);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
 }
 
 .nav-menu {
@@ -524,41 +579,9 @@ select.form-control {
     gap: var(--spacing-lg);
 }
 
-/* ===== Language Toggle ===== */
-.lang-toggle {
-    background: var(--color-bg-card);
-    border: 1px solid var(--color-border);
-    color: var(--color-text-primary);
-    padding: var(--spacing-xs) var(--spacing-md);
-    border-radius: var(--radius-xl);
-    cursor: pointer;
-    font-size: 0.9rem;
-    transition: all var(--transition-fast);
-}
-
-.lang-toggle:hover {
-    background: rgba(255, 255, 255, 0.1);
-}
-
-.lang-toggle-header {
-    display: block;
-    width: 100%;
-    margin-top: 12px;
-    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-    border: none;
-    color: white;
-    padding: 10px 16px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 0.95rem;
-    font-weight: 500;
-    transition: all 0.3s ease;
-}
-
-.lang-toggle-header:hover {
-    background: linear-gradient(135deg, #2563eb, #7c3aed);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+/* Legacy lang-toggle (kept for nav-links pages) */
+.lang-toggle, .lang-toggle-header {
+    display: none;
 }
 
 /* ===== Empty State ===== */
@@ -615,25 +638,23 @@ select.form-control {
     z-index: 101;
     box-shadow: 0 4px 20px rgba(16, 185, 129, 0.4);
 
-/* Mobile Language Toggle */
-.mobile-lang-toggle {
+/* Mobile Language Switcher */
+.mobile-lang-switcher {
     display: none;
     position: fixed;
     bottom: var(--spacing-lg);
     right: var(--spacing-lg);
-    background: #3b82f6;
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 48px;
-    height: 48px;
-    font-size: 1.3rem;
-    cursor: pointer;
+    background: rgba(26, 26, 46, 0.95);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 4px;
     z-index: 101;
-    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    gap: 3px;
 }
 
-body.ltr .mobile-lang-toggle {
+body.ltr .mobile-lang-switcher {
     right: auto;
     left: var(--spacing-lg);
 }
@@ -686,7 +707,7 @@ body.ltr .mobile-lang-toggle {
         justify-content: center;
     }
 
-    .mobile-lang-toggle {
+    .mobile-lang-switcher {
         display: flex;
         align-items: center;
         justify-content: center;

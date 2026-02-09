@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#8b5cf6">
     <link rel="manifest" href="../manifest.json">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📈</text></svg>">
-    <title>תיק מניות - ניהול פיננסי</title>
+    <title>תיק מניות - FinSight</title>
     <link rel="stylesheet" href="../css/app.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Firebase SDK -->
@@ -114,8 +114,15 @@
         <!-- Sidebar Navigation -->
         <aside class="sidebar">
             <div class="sidebar-header">
-                <span class="logo">💰</span>
-                <h1 data-i18n="dashboard.title">ניהול פיננסי אישי</h1>
+                <div class="brand">
+                    <span class="brand-icon">📊</span>
+                    <span class="brand-name">Fin<span class="brand-highlight">Sight</span></span>
+                </div>
+                <div class="lang-switcher">
+                    <button class="lang-btn active" data-lang="he" onclick="I18n.setLanguage('he')">HE</button>
+                    <button class="lang-btn" data-lang="en" onclick="I18n.setLanguage('en')">EN</button>
+                    <button class="lang-btn" data-lang="pt" onclick="I18n.setLanguage('pt')">PT</button>
+                </div>
             </div>
 
             <nav>
@@ -165,7 +172,6 @@
             </nav>
 
             <div class="sidebar-footer">
-                <button class="lang-toggle" onclick="I18n.toggleLanguage()">English</button>
             </div>
         </aside>
 
