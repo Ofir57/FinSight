@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#8b5cf6">
+    <link rel="manifest" href="../manifest.json">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💎</text></svg>">
+    <title>הקרנות שלי - ניהול פיננסי</title>
+    <link rel="stylesheet" href="../css/app.css">
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .nav-link.active { background: var(--color-funds) !important; }
+        .page-header h1 { color: var(--color-funds); }
+        .btn-primary { background: var(--color-funds); }
+        .btn-primary:hover { background: #7c3aed; }
+
+        .fund-type-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .fund-type-tab {
+            padding: 10px 20px;
+            border: 2px solid var(--color-border);
+            border-radius: var(--radius-md);
+            background: var(--color-bg-secondary);
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .fund-type-tab:hover {
+            border-color: var(--color-funds);
+        }
+
+        .fund-type-tab.active {
+            background: var(--color-funds);
+            border-color: var(--color-funds);
+            color: white;
+        }
+
+        .fund-type-tab .icon {
+            margin-left: 8px;
+        }
+
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .summary-card {
+            background: var(--color-bg-secondary);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            border: 1px solid var(--color-border);
+        }
+
+        .summary-card .label {
+            font-size: 0.85rem;
+            color: var(--color-text-secondary);
+            margin-bottom: 5px;
+        }
+
+        .summary-card .value {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .summary-card.pension .value { color: #f59e0b; }
+        .summary-card.training .value { color: #10b981; }
+        .summary-card.gemel .value { color: #3b82f6; }
+        .summary-card.savings .value { color: #ec4899; }
+        .summary-card.total .value { color: var(--color-funds); }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <span class="logo">💰</span>
+                <h1 data-i18n="dashboard.title">ניהול פיננסי אישי</h1>
+            </div>
+
+            <nav>
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a href="../index.html" class="nav-link" data-category="dashboard">
+                            <span class="icon">🏠</span>
+                            <span data-i18n="nav.dashboard">דאשבורד</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="bank.html" class="nav-link" data-category="bank">
+                            <span class="icon">🏦</span>
+                            <span data-i18n="nav.bankAccounts">חשבונות בנק</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="credit.html" class="nav-link" data-category="credit">
+                            <span class="icon">💳</span>
+                            <span data-i18n="nav.creditCards">כרטיסי אשראי</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="stocks.html" class="nav-link" data-category="stocks">
+                            <span class="icon">📈</span>
+                            <span data-i18n="nav.stocks">מניות</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="my-funds.html" class="nav-link active" data-category="funds">
+                            <span class="icon">💎</span>
+                            <span>הקרנות שלי</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="assets.html" class="nav-link" data-category="assets">
+                            <span class="icon">🏠</span>
+                            <span data-i18n="nav.assets">נכסים</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button class="lang-toggle" onclick="I18n.toggleLanguage()">English</button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="page-header">
+                <h1>
+                    <span>💎</span>
+                    <span>הקרנות שלי</span>
+                </h1>
+            </header>
+
+            <!-- Summary Cards -->
+            <div class="summary-cards">
+                <div class="summary-card pension">
+                    <div class="label">🏛️ פנסיה</div>
+                    <div class="value" id="pensionTotal">₪0</div>
+                </div>
+                <div class="summary-card training">
+                    <div class="label">🎓 קרן השתלמות</div>
+                    <div class="value" id="trainingTotal">₪0</div>
+                </div>
+                <div class="summary-card gemel">
+                    <div class="label">💼 קופת גמל</div>
+                    <div class="value" id="gemelTotal">₪0</div>
+                </div>
+                <div class="summary-card savings">
+                    <div class="label">🐷 קרן חיסכון</div>
+                    <div class="value" id="savingsTotal">₪0</div>
+                </div>
+                <div class="summary-card total">
+                    <div class="label">💎 סה"כ קרנות</div>
+                    <div class="value" id="allFundsTotal">₪0</div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+                <button class="btn btn-primary" onclick="openAddModal()">
+                    <span>➕</span>
+                    <span>הוסף קרן</span>
+                </button>
+                <button class="btn btn-secondary" onclick="importSmartFile()">
+                    <span>📥</span>
+                    <span>ייבוא חכם</span>
+                </button>
+            </div>
+
+            <!-- Fund Type Tabs -->
+            <div class="fund-type-tabs">
+                <button class="fund-type-tab active" data-type="all" onclick="filterByType('all')">
+                    <span class="icon">📊</span>הכל
+                </button>
+                <button class="fund-type-tab" data-type="pension" onclick="filterByType('pension')">
+                    <span class="icon">🏛️</span>פנסיה
+                </button>
+                <button class="fund-type-tab" data-type="training" onclick="filterByType('training')">
+                    <span class="icon">🎓</span>קרן השתלמות
+                </button>
+                <button class="fund-type-tab" data-type="gemel" onclick="filterByType('gemel')">
+                    <span class="icon">💼</span>קופת גמל
+                </button>
+                <button class="fund-type-tab" data-type="savings" onclick="filterByType('savings')">
+                    <span class="icon">🐷</span>קרן חיסכון
+                </button>
+            </div>
+
+            <!-- Funds List -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <span class="icon">📋</span>
+                        <span>רשימת קרנות</span>
+                    </h2>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>שם הקרן</th>
+                                <th>סוג</th>
+                                <th>חברה מנהלת</th>
+                                <th>שווי נוכחי</th>
+                                <th>הפקדה חודשית</th>
+                                <th>עדכון אחרון</th>
+                                <th>פעולות</th>
+                            </tr>
+                        </thead>
+                        <tbody id="fundsTable">
+                            <!-- Will be populated by JS -->
+                        </tbody>
+                        <tfoot id="fundsFooter" style="display: none;">
+                            <tr style="background: var(--color-bg-secondary); font-weight: bold;">
+                                <td colspan="3" style="text-align: right;">סה"כ</td>
+                                <td id="totalValueFooter">₪0</td>
+                                <td id="totalDepositFooter">₪0</td>
+                                <td colspan="2"></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Distribution Chart -->
+            <div class="card" id="chartCard" style="display: none;">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <span class="icon">📊</span>
+                        <span>התפלגות קרנות</span>
+                    </h2>
+                </div>
+                <div class="chart-container" style="max-width: 400px; margin: 0 auto;">
+                    <canvas id="fundsChart"></canvas>
+                </div>
+            </div>
+        </main>
+
+        <!-- Mobile Menu Toggle -->
+        <button class="mobile-menu-toggle">☰</button>
+    </div>
+
+    <!-- Add/Edit Fund Modal -->
+    <div class="modal-overlay" id="fundModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 id="modalTitle">הוסף קרן</h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="fundForm">
+                    <input type="hidden" id="fundId">
+
+                    <div class="form-group">
+                        <label>סוג קרן *</label>
+                        <select class="form-control" id="fundType" required>
+                            <option value="pension">🏛️ פנסיה</option>
+                            <option value="training">🎓 קרן השתלמות</option>
+                            <option value="gemel">💼 קופת גמל</option>
+                            <option value="savings">🐷 קרן חיסכון</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>שם הקרן *</label>
+                        <input type="text" class="form-control" id="fundName" required placeholder="לדוגמה: מיטב דש פנסיה">
+                    </div>
+
+                    <div class="form-group">
+                        <label>חברה מנהלת</label>
+                        <select class="form-control" id="fundCompany">
+                            <option value="">-- בחר --</option>
+                            <option value="meitav">מיטב דש</option>
+                            <option value="altshuler">אלטשולר שחם</option>
+                            <option value="harel">הראל</option>
+                            <option value="migdal">מגדל</option>
+                            <option value="menora">מנורה מבטחים</option>
+                            <option value="phoenix">הפניקס</option>
+                            <option value="clal">כלל</option>
+                            <option value="psagot">פסגות</option>
+                            <option value="analyst">אנליסט</option>
+                            <option value="yelin">ילין לפידות</option>
+                            <option value="more">מור</option>
+                            <option value="other">אחר</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>שווי נוכחי (₪) *</label>
+                        <input type="number" class="form-control" id="fundValue" step="0.01" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>הפקדה חודשית (₪)</label>
+                        <input type="number" class="form-control" id="monthlyDeposit" step="0.01" value="0">
+                    </div>
+
+                    <div class="form-group">
+                        <label>מספר חשבון/פוליסה</label>
+                        <input type="text" class="form-control" id="accountNumber" maxlength="20">
+                    </div>
+
+                    <div class="form-group">
+                        <label>הערות</label>
+                        <textarea class="form-control" id="fundNotes" rows="2"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal()">ביטול</button>
+                <button class="btn btn-primary" onclick="saveFund()">שמור</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Update Value Modal -->
+    <div class="modal-overlay" id="updateValueModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>עדכן שווי</h2>
+                <button class="modal-close" onclick="closeUpdateModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="updateValueForm">
+                    <input type="hidden" id="updateFundId">
+                    <div class="form-group">
+                        <label>שווי חדש (₪)</label>
+                        <input type="number" class="form-control" id="newValue" step="0.01" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeUpdateModal()">ביטול</button>
+                <button class="btn btn-primary" onclick="updateValue()">עדכן</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/storage.js"></script>
+    <script src="../js/i18n.js"></script>
+    <script src="../js/smart-import.js"></script>
+    <script src="../js/app.js"></script>
+    <script>
+        const FUNDS_KEY = 'finance_my_funds';
+        let currentFilter = 'all';
+        let fundsChart = null;
+
+        const fundTypeNames = {
+            pension: '🏛️ פנסיה',
+            training: '🎓 קרן השתלמות',
+            gemel: '💼 קופת גמל',
+            savings: '🐷 קרן חיסכון'
+        };
+
+        const companyNames = {
+            meitav: 'מיטב דש',
+            altshuler: 'אלטשולר שחם',
+            harel: 'הראל',
+            migdal: 'מגדל',
+            menora: 'מנורה מבטחים',
+            phoenix: 'הפניקס',
+            clal: 'כלל',
+            psagot: 'פסגות',
+            analyst: 'אנליסט',
+            yelin: 'ילין לפידות',
+            more: 'מור',
+            other: 'אחר'
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            App.currentPage = 'funds';
+            loadFunds();
+        });
+
+        function getFunds() {
+            const data = localStorage.getItem(FUNDS_KEY);
+            return data ? JSON.parse(data) : [];
+        }
+
+        function saveFunds(funds) {
+            localStorage.setItem(FUNDS_KEY, JSON.stringify(funds));
+        }
+
+        function loadFunds() {
+            const funds = getFunds();
+            const tbody = document.getElementById('fundsTable');
+            const footer = document.getElementById('fundsFooter');
+
+            // Update summary cards
+            const totals = { pension: 0, training: 0, gemel: 0, savings: 0 };
+            funds.forEach(f => {
+                if (totals[f.type] !== undefined) {
+                    totals[f.type] += f.value || 0;
+                }
+            });
+
+            document.getElementById('pensionTotal').textContent = I18n.formatCurrency(totals.pension);
+            document.getElementById('trainingTotal').textContent = I18n.formatCurrency(totals.training);
+            document.getElementById('gemelTotal').textContent = I18n.formatCurrency(totals.gemel);
+            document.getElementById('savingsTotal').textContent = I18n.formatCurrency(totals.savings);
+
+            const grandTotal = Object.values(totals).reduce((a, b) => a + b, 0);
+            document.getElementById('allFundsTotal').textContent = I18n.formatCurrency(grandTotal);
+
+            // Filter funds
+            const filteredFunds = currentFilter === 'all' ? funds : funds.filter(f => f.type === currentFilter);
+
+            if (filteredFunds.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--color-text-secondary);">אין קרנות להצגה</td></tr>`;
+                footer.style.display = 'none';
+                document.getElementById('chartCard').style.display = 'none';
+                return;
+            }
+
+            const totalValue = filteredFunds.reduce((sum, f) => sum + (f.value || 0), 0);
+            const totalDeposit = filteredFunds.reduce((sum, f) => sum + (f.monthlyDeposit || 0), 0);
+
+            tbody.innerHTML = filteredFunds.map(fund => `
+                <tr>
+                    <td><strong>${fund.name}</strong></td>
+                    <td>${fundTypeNames[fund.type] || fund.type}</td>
+                    <td>${companyNames[fund.company] || fund.company || '-'}</td>
+                    <td>${I18n.formatCurrency(fund.value)}</td>
+                    <td>${fund.monthlyDeposit ? I18n.formatCurrency(fund.monthlyDeposit) : '-'}</td>
+                    <td>${fund.updatedAt ? new Date(fund.updatedAt).toLocaleDateString('he-IL') : '-'}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn btn-secondary btn-sm" onclick="openUpdateValueModal('${fund.id}', ${fund.value})" title="עדכן שווי">💰</button>
+                            <button class="btn btn-secondary btn-sm" onclick="editFund('${fund.id}')" title="ערוך">✏️</button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteFund('${fund.id}')" title="מחק">🗑️</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+
+            document.getElementById('totalValueFooter').textContent = I18n.formatCurrency(totalValue);
+            document.getElementById('totalDepositFooter').textContent = I18n.formatCurrency(totalDeposit);
+            footer.style.display = 'table-footer-group';
+
+            // Update chart
+            updateChart(totals);
+        }
+
+        function updateChart(totals) {
+            const chartCard = document.getElementById('chartCard');
+            const hasData = Object.values(totals).some(v => v > 0);
+
+            if (!hasData) {
+                chartCard.style.display = 'none';
+                return;
+            }
+
+            chartCard.style.display = 'block';
+            const ctx = document.getElementById('fundsChart').getContext('2d');
+
+            if (fundsChart) {
+                fundsChart.destroy();
+            }
+
+            fundsChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['פנסיה', 'קרן השתלמות', 'קופת גמל', 'קרן חיסכון'],
+                    datasets: [{
+                        data: [totals.pension, totals.training, totals.gemel, totals.savings],
+                        backgroundColor: ['#f59e0b', '#10b981', '#3b82f6', '#ec4899'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { color: '#fff' }
+                        }
+                    }
+                }
+            });
+        }
+
+        function filterByType(type) {
+            currentFilter = type;
+            document.querySelectorAll('.fund-type-tab').forEach(tab => {
+                tab.classList.toggle('active', tab.dataset.type === type);
+            });
+            loadFunds();
+        }
+
+        function openAddModal() {
+            document.getElementById('modalTitle').textContent = 'הוסף קרן';
+            document.getElementById('fundForm').reset();
+            document.getElementById('fundId').value = '';
+            document.getElementById('fundModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('fundModal').classList.remove('active');
+        }
+
+        function editFund(id) {
+            const funds = getFunds();
+            const fund = funds.find(f => f.id === id);
+            if (!fund) return;
+
+            document.getElementById('modalTitle').textContent = 'ערוך קרן';
+            document.getElementById('fundId').value = fund.id;
+            document.getElementById('fundType').value = fund.type;
+            document.getElementById('fundName').value = fund.name;
+            document.getElementById('fundCompany').value = fund.company || '';
+            document.getElementById('fundValue').value = fund.value;
+            document.getElementById('monthlyDeposit').value = fund.monthlyDeposit || 0;
+            document.getElementById('accountNumber').value = fund.accountNumber || '';
+            document.getElementById('fundNotes').value = fund.notes || '';
+            document.getElementById('fundModal').classList.add('active');
+        }
+
+        function saveFund() {
+            const id = document.getElementById('fundId').value;
+            const type = document.getElementById('fundType').value;
+            const name = document.getElementById('fundName').value.trim();
+            const company = document.getElementById('fundCompany').value;
+            const value = parseFloat(document.getElementById('fundValue').value) || 0;
+            const monthlyDeposit = parseFloat(document.getElementById('monthlyDeposit').value) || 0;
+            const accountNumber = document.getElementById('accountNumber').value.trim();
+            const notes = document.getElementById('fundNotes').value.trim();
+
+            if (!name || !value) {
+                App.notify('יש למלא שם קרן ושווי', 'error');
+                return;
+            }
+
+            const funds = getFunds();
+            const now = new Date().toISOString();
+
+            if (id) {
+                // Update existing
+                const idx = funds.findIndex(f => f.id === id);
+                if (idx !== -1) {
+                    funds[idx] = { ...funds[idx], type, name, company, value, monthlyDeposit, accountNumber, notes, updatedAt: now };
+                }
+            } else {
+                // Add new
+                funds.push({
+                    id: 'fund_' + Date.now(),
+                    type,
+                    name,
+                    company,
+                    value,
+                    monthlyDeposit,
+                    accountNumber,
+                    notes,
+                    createdAt: now,
+                    updatedAt: now
+                });
+            }
+
+            saveFunds(funds);
+            closeModal();
+            loadFunds();
+            App.notify('הקרן נשמרה בהצלחה', 'success');
+        }
+
+        function openUpdateValueModal(id, currentValue) {
+            document.getElementById('updateFundId').value = id;
+            document.getElementById('newValue').value = currentValue;
+            document.getElementById('updateValueModal').classList.add('active');
+        }
+
+        function closeUpdateModal() {
+            document.getElementById('updateValueModal').classList.remove('active');
+        }
+
+        function updateValue() {
+            const id = document.getElementById('updateFundId').value;
+            const newValue = parseFloat(document.getElementById('newValue').value);
+
+            if (isNaN(newValue)) {
+                App.notify('יש להזין שווי תקין', 'error');
+                return;
+            }
+
+            const funds = getFunds();
+            const idx = funds.findIndex(f => f.id === id);
+            if (idx !== -1) {
+                funds[idx].value = newValue;
+                funds[idx].updatedAt = new Date().toISOString();
+                saveFunds(funds);
+            }
+
+            closeUpdateModal();
+            loadFunds();
+            App.notify('השווי עודכן בהצלחה', 'success');
+        }
+
+        function deleteFund(id) {
+            if (!confirm('האם למחוק את הקרן?')) return;
+
+            const funds = getFunds().filter(f => f.id !== id);
+            saveFunds(funds);
+            loadFunds();
+            App.notify('הקרן נמחקה', 'success');
+        }
+
+        // Smart Import
+        const fundColumnMappings = {
+            name: ['שם', 'שם קרן', 'קרן', 'תיאור', 'name', 'fund name', 'description'],
+            type: ['סוג', 'סוג קרן', 'type', 'fund type', 'tipo'],
+            company: ['חברה', 'חברה מנהלת', 'מנהל', 'company', 'manager'],
+            value: ['שווי', 'יתרה', 'סכום', 'ערך', 'value', 'balance', 'amount', 'total'],
+            monthlyDeposit: ['הפקדה', 'הפקדה חודשית', 'deposit', 'monthly']
+        };
+
+        async function importSmartFile() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.xlsx,.xls,.csv,.html,.txt';
+
+            input.onchange = async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                try {
+                    let rows = [];
+                    const content = await file.text();
+
+                    if (content.includes('<HTML') || content.includes('<html') || content.includes('<table')) {
+                        rows = parseHTMLTable(content);
+                    } else if (file.name.endsWith('.xls') || file.name.endsWith('.xlsx')) {
+                        const data = await file.arrayBuffer();
+                        const workbook = XLSX.read(data, { type: 'array' });
+                        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                        rows = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
+                    } else {
+                        rows = SmartImport.parseFile(content, file.name);
+                    }
+
+                    if (rows.length < 2) {
+                        App.notify('הקובץ ריק או לא תקין', 'error');
+                        return;
+                    }
+
+                    const headerIdx = findHeaderRow(rows);
+                    const headers = rows[headerIdx];
+                    const detected = detectColumns(headers);
+
+                    if (detected.value === undefined) {
+                        showMappingModal(headers, rows, headerIdx);
+                        return;
+                    }
+
+                    const imported = importFundData(rows, headerIdx, detected);
+
+                    if (imported > 0) {
+                        App.notify(`יובאו ${imported} קרנות בהצלחה`, 'success');
+                        loadFunds();
+                    } else {
+                        App.notify('לא נמצאו קרנות לייבוא', 'error');
+                    }
+                } catch (error) {
+                    console.error('Import error:', error);
+                    App.notify('שגיאה בייבוא: ' + error.message, 'error');
+                }
+            };
+
+            input.click();
+        }
+
+        function parseHTMLTable(html) {
+            const rows = [];
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            let tables = doc.querySelectorAll('table.dataTable');
+            if (tables.length === 0) tables = doc.querySelectorAll('table');
+
+            const seenRows = new Set();
+            for (const table of tables) {
+                for (const tr of table.querySelectorAll('tr')) {
+                    const cells = tr.querySelectorAll('th, td');
+                    if (cells.length >= 2 && cells.length <= 15) {
+                        const rowData = [];
+                        cells.forEach(cell => {
+                            rowData.push(cell.textContent.trim().replace(/\s+/g, ' ').replace(/[‎‏\u200e\u200f]/g, ''));
+                        });
+                        const rowKey = rowData.join('|');
+                        if (rowData.some(c => c.length > 0) && !seenRows.has(rowKey)) {
+                            seenRows.add(rowKey);
+                            rows.push(rowData);
+                        }
+                    }
+                }
+            }
+            return rows;
+        }
+
+        function findHeaderRow(rows) {
+            for (let i = 0; i < Math.min(rows.length, 15); i++) {
+                const row = rows[i];
+                if (!row || row.length < 2) continue;
+                const rowText = row.map(c => String(c || '').toLowerCase()).join(' ');
+                if (fundColumnMappings.value.some(w => rowText.includes(w.toLowerCase())) ||
+                    fundColumnMappings.name.some(w => rowText.includes(w.toLowerCase()))) {
+                    return i;
+                }
+            }
+            return 0;
+        }
+
+        function detectColumns(headers) {
+            const detected = {};
+            headers.forEach((header, index) => {
+                if (!header) return;
+                const headerLower = String(header).toLowerCase().trim();
+                Object.keys(fundColumnMappings).forEach(field => {
+                    if (detected[field] !== undefined) return;
+                    if (fundColumnMappings[field].some(kw => headerLower.includes(kw.toLowerCase()))) {
+                        detected[field] = index;
+                    }
+                });
+            });
+            return detected;
+        }
+
+        function mapFundType(typeText) {
+            if (!typeText) return 'savings';
+            const t = typeText.toLowerCase();
+            if (t.includes('פנסיה') || t.includes('pension')) return 'pension';
+            if (t.includes('השתלמות') || t.includes('training')) return 'training';
+            if (t.includes('גמל') || t.includes('gemel') || t.includes('provident')) return 'gemel';
+            return 'savings';
+        }
+
+        function importFundData(rows, headerIdx, detected) {
+            let imported = 0;
+            const dataRows = rows.slice(headerIdx + 1);
+            const funds = getFunds();
+            const now = new Date().toISOString();
+
+            for (const row of dataRows) {
+                const firstCell = String(row[0] || '').trim();
+                if (!firstCell || firstCell.includes('סה"כ') || firstCell.includes('total')) continue;
+
+                const valueVal = row[detected.value];
+                const value = typeof valueVal === 'number' ? valueVal :
+                    parseFloat(String(valueVal || '0').replace(/[^\d.-]/g, ''));
+                if (isNaN(value) || value === 0) continue;
+
+                const name = detected.name !== undefined ? String(row[detected.name] || 'קרן מיובאת').trim() : 'קרן מיובאת';
+                const type = detected.type !== undefined ? mapFundType(String(row[detected.type])) : 'savings';
+                const company = detected.company !== undefined ? String(row[detected.company] || '') : '';
+                const monthlyDeposit = detected.monthlyDeposit !== undefined ?
+                    parseFloat(String(row[detected.monthlyDeposit] || '0').replace(/[^\d.-]/g, '')) || 0 : 0;
+
+                funds.push({
+                    id: 'fund_' + Date.now() + '_' + imported,
+                    type,
+                    name,
+                    company,
+                    value,
+                    monthlyDeposit,
+                    createdAt: now,
+                    updatedAt: now
+                });
+                imported++;
+            }
+
+            if (imported > 0) saveFunds(funds);
+            return imported;
+        }
+
+        function showMappingModal(headers, rows, headerIdx) {
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay active';
+            modal.id = 'mappingModal';
+            modal.innerHTML = `
+                <div class="modal" style="max-width: 500px;">
+                    <div class="modal-header">
+                        <h2>בחר עמודות</h2>
+                        <button class="modal-close" onclick="document.getElementById('mappingModal').remove()">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <p>אנא בחר את העמודות המתאימות:</p>
+                        <div class="form-group">
+                            <label>עמודת שם:</label>
+                            <select id="mapName" class="form-control">
+                                <option value="-1">-- לא נבחר --</option>
+                                ${headers.map((h, i) => `<option value="${i}">${h || 'עמודה ' + (i+1)}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>עמודת שווי: *</label>
+                            <select id="mapValue" class="form-control" required>
+                                <option value="-1">-- בחר --</option>
+                                ${headers.map((h, i) => `<option value="${i}">${h || 'עמודה ' + (i+1)}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>עמודת סוג:</label>
+                            <select id="mapType" class="form-control">
+                                <option value="-1">-- לא נבחר --</option>
+                                ${headers.map((h, i) => `<option value="${i}">${h || 'עמודה ' + (i+1)}</option>`).join('')}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" onclick="document.getElementById('mappingModal').remove()">ביטול</button>
+                        <button class="btn btn-primary" onclick="applyMapping()">ייבא</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            window._importData = { rows, headerIdx };
+        }
+
+        function applyMapping() {
+            const valueIdx = parseInt(document.getElementById('mapValue').value);
+            if (valueIdx < 0) {
+                App.notify('יש לבחור עמודת שווי', 'error');
+                return;
+            }
+
+            const detected = {
+                name: parseInt(document.getElementById('mapName').value),
+                value: valueIdx,
+                type: parseInt(document.getElementById('mapType').value)
+            };
+
+            Object.keys(detected).forEach(k => { if (detected[k] < 0) delete detected[k]; });
+
+            const { rows, headerIdx } = window._importData;
+            const imported = importFundData(rows, headerIdx, detected);
+
+            document.getElementById('mappingModal').remove();
+            delete window._importData;
+
+            if (imported > 0) {
+                App.notify(`יובאו ${imported} קרנות בהצלחה`, 'success');
+                loadFunds();
+            } else {
+                App.notify('לא נמצאו קרנות לייבוא', 'error');
+            }
+        }
+    </script>
+</body>
+</html>

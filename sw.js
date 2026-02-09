@@ -1,4 +1,4 @@
-const CACHE_NAME = 'finzilla-v54';
+const CACHE_NAME = 'finzilla-v55';
 const ASSETS_TO_CACHE = [
     './',
     './index.html',
@@ -37,6 +37,7 @@ const ASSETS_TO_CACHE = [
     './data/mygemel-funds.js',
     './pages/assets.html',
     './pages/goals.html',
+    './pages/my-funds.html',
     './pages/pension-calc.html',
     './pages/reports.html',
     './pages/settings.html',
