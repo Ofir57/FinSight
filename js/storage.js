@@ -10,7 +10,10 @@ const Storage = {
         MY_FUNDS: 'finance_my_funds',
         SETTINGS: 'finance_settings',
         STOCK_ALERTS: 'finance_stock_alerts',
-        TV_CUSTOM_SYMBOLS: 'finance_tv_custom_symbols'
+        TV_CUSTOM_SYMBOLS: 'finance_tv_custom_symbols',
+        NOTIFICATIONS: 'finance_notifications',
+        DASHBOARD_WIDGETS: 'finance_dashboard_widgets',
+        IMPORT_TEMPLATES: 'finance_import_templates'
     },
 
     /**
@@ -324,6 +327,33 @@ const Storage = {
         this.set(this.KEYS.TV_CUSTOM_SYMBOLS, symbols);
     },
 
+    // Notifications
+    getNotifications() {
+        return this.get(this.KEYS.NOTIFICATIONS) || { enabled: true, history: [] };
+    },
+
+    saveNotifications(data) {
+        this.set(this.KEYS.NOTIFICATIONS, data);
+    },
+
+    // Dashboard Widgets
+    getDashboardWidgets() {
+        return this.get(this.KEYS.DASHBOARD_WIDGETS) || {};
+    },
+
+    saveDashboardWidgets(widgets) {
+        this.set(this.KEYS.DASHBOARD_WIDGETS, widgets);
+    },
+
+    // Import Templates
+    getImportTemplates() {
+        return this.get(this.KEYS.IMPORT_TEMPLATES) || [];
+    },
+
+    saveImportTemplates(templates) {
+        this.set(this.KEYS.IMPORT_TEMPLATES, templates);
+    },
+
     // Settings
     getSettings() {
         return this.get(this.KEYS.SETTINGS) || { language: 'he', currency: 'ILS' };
@@ -342,6 +372,11 @@ const Storage = {
             assets: this.getAssets(),
             myFunds: this.getMyFunds(),
             settings: this.getSettings(),
+            stockAlerts: this.get(this.KEYS.STOCK_ALERTS),
+            tvCustomSymbols: this.getTVCustomSymbols(),
+            notifications: this.getNotifications(),
+            dashboardWidgets: this.getDashboardWidgets(),
+            importTemplates: this.getImportTemplates(),
             exportDate: new Date().toISOString()
         };
     },
@@ -353,6 +388,11 @@ const Storage = {
         if (data.assets) this.saveAssets(data.assets);
         if (data.myFunds) this.saveMyFunds(data.myFunds);
         if (data.settings) this.saveSettings(data.settings);
+        if (data.stockAlerts) this.set(this.KEYS.STOCK_ALERTS, data.stockAlerts);
+        if (data.tvCustomSymbols) this.saveTVCustomSymbols(data.tvCustomSymbols);
+        if (data.notifications) this.saveNotifications(data.notifications);
+        if (data.dashboardWidgets) this.saveDashboardWidgets(data.dashboardWidgets);
+        if (data.importTemplates) this.saveImportTemplates(data.importTemplates);
     },
 
     // Summary calculations

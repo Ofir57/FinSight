@@ -127,6 +127,9 @@ const Auth = {
                 settings: Storage.getSettings(),
                 stockAlerts: Storage.get(Storage.KEYS.STOCK_ALERTS),
                 tvCustomSymbols: Storage.getTVCustomSymbols(),
+                notifications: Storage.getNotifications(),
+                dashboardWidgets: Storage.getDashboardWidgets(),
+                importTemplates: Storage.getImportTemplates(),
                 lastUpdated: firebase.firestore.FieldValue.serverTimestamp(),
                 lastUpdatedBy: this.currentUser.email
             };
@@ -181,6 +184,9 @@ const Auth = {
                     if (data.settings) Storage.saveSettings(data.settings);
                     if (data.stockAlerts) Storage.set(Storage.KEYS.STOCK_ALERTS, data.stockAlerts);
                     if (data.tvCustomSymbols) Storage.saveTVCustomSymbols(data.tvCustomSymbols);
+                    if (data.notifications) Storage.saveNotifications(data.notifications);
+                    if (data.dashboardWidgets) Storage.saveDashboardWidgets(data.dashboardWidgets);
+                    if (data.importTemplates) Storage.saveImportTemplates(data.importTemplates);
 
                     localStorage.setItem('finance_last_update', new Date().toISOString());
                     console.log('Data synced from cloud');

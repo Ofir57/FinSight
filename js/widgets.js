@@ -22,9 +22,9 @@ const WidgetManager = {
      */
     getConfig() {
         try {
-            const saved = localStorage.getItem(this.STORAGE_KEY);
+            const saved = Storage.get(Storage.KEYS.DASHBOARD_WIDGETS);
             if (saved) {
-                return JSON.parse(saved);
+                return saved;
             }
         } catch (e) {
             console.error('Error loading widget config:', e);
@@ -52,7 +52,7 @@ const WidgetManager = {
      */
     saveConfig(config) {
         try {
-            localStorage.setItem(this.STORAGE_KEY, JSON.stringify(config));
+            Storage.set(Storage.KEYS.DASHBOARD_WIDGETS, config);
         } catch (e) {
             console.error('Error saving widget config:', e);
         }

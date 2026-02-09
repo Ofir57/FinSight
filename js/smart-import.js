@@ -409,7 +409,7 @@ const SmartImport = {
             filePattern: filePattern,
             createdAt: new Date().toISOString()
         };
-        localStorage.setItem(this.TEMPLATES_KEY, JSON.stringify(templates));
+        Storage.set(Storage.KEYS.IMPORT_TEMPLATES, templates);
     },
 
     /**
@@ -417,7 +417,7 @@ const SmartImport = {
      */
     getTemplates: function() {
         try {
-            return JSON.parse(localStorage.getItem(this.TEMPLATES_KEY) || '{}');
+            return Storage.get(Storage.KEYS.IMPORT_TEMPLATES) || {};
         } catch (e) {
             return {};
         }
@@ -429,7 +429,7 @@ const SmartImport = {
     deleteTemplate: function(name) {
         var templates = this.getTemplates();
         delete templates[name];
-        localStorage.setItem(this.TEMPLATES_KEY, JSON.stringify(templates));
+        Storage.set(Storage.KEYS.IMPORT_TEMPLATES, templates);
     },
 
     /**

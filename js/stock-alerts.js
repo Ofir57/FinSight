@@ -35,15 +35,14 @@ const StockAlerts = {
      */
     getConfig() {
         try {
-            const data = localStorage.getItem(this.STORAGE_KEY);
+            const data = Storage.get(Storage.KEYS.STOCK_ALERTS);
             if (data) {
-                const parsed = JSON.parse(data);
                 // Merge with defaults to ensure all properties exist
                 return {
                     ...this.DEFAULT_CONFIG,
-                    ...parsed,
-                    settings: { ...this.DEFAULT_CONFIG.settings, ...parsed.settings },
-                    cache: { ...this.DEFAULT_CONFIG.cache, ...parsed.cache }
+                    ...data,
+                    settings: { ...this.DEFAULT_CONFIG.settings, ...data.settings },
+                    cache: { ...this.DEFAULT_CONFIG.cache, ...data.cache }
                 };
             }
         } catch (error) {
@@ -58,7 +57,7 @@ const StockAlerts = {
      */
     saveConfig(config) {
         try {
-            localStorage.setItem(this.STORAGE_KEY, JSON.stringify(config));
+            Storage.set(Storage.KEYS.STOCK_ALERTS, config);
         } catch (error) {
             console.error('Error saving stock alerts config:', error);
         }

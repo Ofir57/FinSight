@@ -57,9 +57,9 @@ const Notifications = {
      */
     getSettings() {
         try {
-            const data = localStorage.getItem(this.STORAGE_KEY);
+            const data = Storage.get(Storage.KEYS.NOTIFICATIONS);
             if (data) {
-                return { ...this.DEFAULT_SETTINGS, ...JSON.parse(data) };
+                return { ...this.DEFAULT_SETTINGS, ...data };
             }
         } catch (error) {
             console.error('Error getting notification settings:', error);
@@ -73,7 +73,7 @@ const Notifications = {
     updateSettings(updates) {
         const settings = this.getSettings();
         const newSettings = { ...settings, ...updates };
-        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(newSettings));
+        Storage.set(Storage.KEYS.NOTIFICATIONS, newSettings);
         return newSettings;
     },
 
