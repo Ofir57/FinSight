@@ -87,8 +87,23 @@
                 <a href="training.html" data-he="קרנות השתלמות" data-en="Training Funds">קרנות השתלמות</a>
                 <a href="pension.html" class="active" data-he="קרנות פנסיה" data-en="Pension Funds">קרנות פנסיה</a>
                 <a href="gemel.html" data-he="קופות גמל" data-en="Provident Funds">קופות גמל</a>
+                <a href="my-funds.html" data-he="💎 הקרנות שלי" data-en="💎 My Funds">💎 הקרנות שלי</a>
             </div>
         </header>
+
+        <!-- My Pension Funds Section -->
+        <div class="my-funds-section" id="myFundsSection" style="margin-bottom: 30px;">
+            <div class="table-container" style="border: 2px solid #ff6b6b;">
+                <h2 class="section-title" style="color: #ff6b6b;">
+                    <span class="icon">🏛️</span>
+                    <span>הפנסיה שלי</span>
+                    <button onclick="openAddPensionModal()" style="margin-right: auto; background: #ff6b6b; color: #1a1a2e; border: none; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 0.9rem;">➕ הוסף</button>
+                </h2>
+                <div id="myPensionFunds">
+                    <p style="text-align: center; color: #8892b0; padding: 20px;">טוען...</p>
+                </div>
+            </div>
+        </div>
 
         <div class="stats-row">
             <div class="stat-card">
@@ -376,6 +391,188 @@
         loadLanguage();
         updateDataDate();
         initTables();
+        loadMyPensionFunds();
+
+        // ===== MY PENSION FUNDS =====
+        const FUNDS_KEY = 'finance_my_funds';
+
+        function getMyFunds() {
+            try {
+                return JSON.parse(localStorage.getItem(FUNDS_KEY) || '[]');
+            } catch { return []; }
+        }
+
+        function saveMyFunds(funds) {
+            localStorage.setItem(FUNDS_KEY, JSON.stringify(funds));
+        }
+
+        function loadMyPensionFunds() {
+            const funds = getMyFunds().filter(f => f.type === 'pension');
+            const container = document.getElementById('myPensionFunds');
+
+            if (funds.length === 0) {
+                container.innerHTML = `
+                    <p style="text-align: center; color: #8892b0; padding: 30px;">
+                        אין לך קרנות פנסיה. לחץ על "הוסף" להוספת קרן פנסיה.<br>
+                        <a href="my-funds.html" style="color: #ff6b6b;">או עבור לדף הקרנות שלי</a>
+                    </p>`;
+                return;
+            }
+
+            // Get market data for comparison
+            const marketFunds = getFundsData();
+            const avgMonth = marketFunds.reduce((s, f) => s + (f.month || 0), 0) / marketFunds.length;
+            const avgYear1 = marketFunds.reduce((s, f) => s + (f.year1 || 0), 0) / marketFunds.length;
+            const avgYear3 = marketFunds.reduce((s, f) => s + (f.year3 || 0), 0) / marketFunds.length;
+            const avgYear5 = marketFunds.reduce((s, f) => s + (f.year5 || 0), 0) / marketFunds.length;
+
+            container.innerHTML = `
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr>
+                            <th style="padding: 12px; text-align: right; border-bottom: 1px solid rgba(255,255,255,0.1); color: #ff6b6b;">קרן</th>
+                            <th style="padding: 12px; text-align: right; border-bottom: 1px solid rgba(255,255,255,0.1); color: #ff6b6b;">שווי נוכחי</th>
+                            <th style="padding: 12px; text-align: right; border-bottom: 1px solid rgba(255,255,255,0.1); color: #ff6b6b;">איזון אקטוארי</th>
+                            <th style="padding: 12px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); color: #ff6b6b;">חודש</th>
+                            <th style="padding: 12px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); color: #ff6b6b;">שנה</th>
+                            <th style="padding: 12px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); color: #ff6b6b;">3 שנים</th>
+                            <th style="padding: 12px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); color: #ff6b6b;">5 שנים</th>
+                            <th style="padding: 12px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); color: #ff6b6b;">פעולות</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${funds.map(fund => {
+                            const returns = calculateReturns(fund);
+                            const formatVal = (val, avg) => {
+                                if (val === null) return '<span style="color: #8892b0;">-</span>';
+                                const num = parseFloat(val);
+                                const color = num >= avg ? '#00ff88' : '#ff4757';
+                                return `<span style="color: ${color}; font-weight: 600;">${num >= 0 ? '+' : ''}${val}%</span>`;
+                            };
+                            const actuarial = fund.actuarialBalance
+                                ? `₪${fund.actuarialBalance.toLocaleString()}`
+                                : '<span style="color: #8892b0;">-</span>';
+                            return `
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                <td style="padding: 12px;"><strong>${fund.name}</strong><br><small style="color: #8892b0;">${fund.company || ''}</small></td>
+                                <td style="padding: 12px; font-weight: bold; color: #feca57;">₪${fund.value.toLocaleString()}</td>
+                                <td style="padding: 12px;">${actuarial}</td>
+                                <td style="padding: 12px; text-align: center;">${formatVal(returns.month, avgMonth)}</td>
+                                <td style="padding: 12px; text-align: center;">${formatVal(returns.year1, avgYear1)}</td>
+                                <td style="padding: 12px; text-align: center;">${formatVal(returns.year3, avgYear3)}</td>
+                                <td style="padding: 12px; text-align: center;">${formatVal(returns.year5, avgYear5)}</td>
+                                <td style="padding: 12px; text-align: center;">
+                                    <button onclick="editPension('${fund.id}')" style="background: rgba(255,255,255,0.1); border: none; color: #fff; padding: 5px 10px; border-radius: 5px; cursor: pointer; margin: 2px;">✏️</button>
+                                    <button onclick="updatePensionValue('${fund.id}', ${fund.value})" style="background: rgba(255,255,255,0.1); border: none; color: #fff; padding: 5px 10px; border-radius: 5px; cursor: pointer; margin: 2px;">💰</button>
+                                </td>
+                            </tr>`;
+                        }).join('')}
+                    </tbody>
+                    <tfoot>
+                        <tr style="background: rgba(255, 107, 107, 0.1);">
+                            <td style="padding: 12px; font-weight: bold;">סה"כ</td>
+                            <td style="padding: 12px; font-weight: bold; color: #feca57;">₪${funds.reduce((s, f) => s + (f.value || 0), 0).toLocaleString()}</td>
+                            <td colspan="6"></td>
+                        </tr>
+                        <tr style="background: rgba(255,255,255,0.02);">
+                            <td style="padding: 12px; color: #8892b0;">ממוצע שוק</td>
+                            <td style="padding: 12px; color: #8892b0;">-</td>
+                            <td style="padding: 12px; color: #8892b0;">-</td>
+                            <td style="padding: 12px; text-align: center; color: #8892b0;">${avgMonth.toFixed(2)}%</td>
+                            <td style="padding: 12px; text-align: center; color: #8892b0;">${avgYear1.toFixed(2)}%</td>
+                            <td style="padding: 12px; text-align: center; color: #8892b0;">${avgYear3.toFixed(2)}%</td>
+                            <td style="padding: 12px; text-align: center; color: #8892b0;">${avgYear5.toFixed(2)}%</td>
+                            <td></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            `;
+        }
+
+        function calculateReturns(fund) {
+            const history = fund.history || [];
+            if (history.length < 2) return { month: null, year1: null, year3: null, year5: null };
+
+            const now = new Date();
+            const currentValue = fund.value;
+
+            const getValueAtDate = (targetDate) => {
+                const sorted = [...history].sort((a, b) => new Date(a.date) - new Date(b.date));
+                let closest = sorted[0];
+                for (const h of sorted) {
+                    if (new Date(h.date) <= targetDate) closest = h;
+                }
+                return closest?.value;
+            };
+
+            const monthAgo = new Date(now); monthAgo.setMonth(monthAgo.getMonth() - 1);
+            const year1Ago = new Date(now); year1Ago.setFullYear(year1Ago.getFullYear() - 1);
+            const year3Ago = new Date(now); year3Ago.setFullYear(year3Ago.getFullYear() - 3);
+            const year5Ago = new Date(now); year5Ago.setFullYear(year5Ago.getFullYear() - 5);
+
+            const calcReturn = (oldValue) => {
+                if (!oldValue || oldValue === 0) return null;
+                return ((currentValue - oldValue) / oldValue * 100).toFixed(2);
+            };
+
+            return {
+                month: calcReturn(getValueAtDate(monthAgo)),
+                year1: calcReturn(getValueAtDate(year1Ago)),
+                year3: calcReturn(getValueAtDate(year3Ago)),
+                year5: calcReturn(getValueAtDate(year5Ago))
+            };
+        }
+
+        function openAddPensionModal() {
+            const name = prompt('שם קרן הפנסיה:');
+            if (!name) return;
+            const value = parseFloat(prompt('שווי נוכחי (₪):'));
+            if (isNaN(value)) { alert('יש להזין מספר תקין'); return; }
+            const actuarial = parseFloat(prompt('איזון אקטוארי (₪) - אופציונלי:')) || null;
+            const company = prompt('חברה מנהלת (אופציונלי):') || '';
+
+            const funds = getMyFunds();
+            const now = new Date().toISOString();
+            const today = now.split('T')[0];
+
+            funds.push({
+                id: 'fund_' + Date.now(),
+                type: 'pension',
+                name,
+                company,
+                value,
+                actuarialBalance: actuarial,
+                history: [{ date: today, value }],
+                createdAt: now,
+                updatedAt: now
+            });
+
+            saveMyFunds(funds);
+            loadMyPensionFunds();
+        }
+
+        function editPension(id) {
+            window.location.href = 'my-funds.html';
+        }
+
+        function updatePensionValue(id, currentValue) {
+            const newValue = parseFloat(prompt('שווי חדש (₪):', currentValue));
+            if (isNaN(newValue)) return;
+
+            const funds = getMyFunds();
+            const idx = funds.findIndex(f => f.id === id);
+            if (idx !== -1) {
+                const now = new Date().toISOString();
+                const today = now.split('T')[0];
+                let history = funds[idx].history || [];
+                history = [...history, { date: today, value: newValue }];
+                funds[idx].value = newValue;
+                funds[idx].history = history;
+                funds[idx].updatedAt = now;
+                saveMyFunds(funds);
+                loadMyPensionFunds();
+            }
+        }
     </script>
 </body>
 </html>
