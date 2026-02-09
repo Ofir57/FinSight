@@ -9,7 +9,8 @@ const Storage = {
         ASSETS: 'finance_assets',
         MY_FUNDS: 'finance_my_funds',
         SETTINGS: 'finance_settings',
-        STOCK_ALERTS: 'finance_stock_alerts'
+        STOCK_ALERTS: 'finance_stock_alerts',
+        TV_CUSTOM_SYMBOLS: 'finance_tv_custom_symbols'
     },
 
     /**
@@ -312,6 +313,15 @@ const Storage = {
     deleteMyFund(id) {
         const funds = this.getMyFunds().filter(f => f.id !== id);
         this.saveMyFunds(funds);
+    },
+
+    // TradingView Custom Symbols
+    getTVCustomSymbols() {
+        return this.get(this.KEYS.TV_CUSTOM_SYMBOLS) || [];
+    },
+
+    saveTVCustomSymbols(symbols) {
+        this.set(this.KEYS.TV_CUSTOM_SYMBOLS, symbols);
     },
 
     // Settings

@@ -371,6 +371,41 @@
                 </div>
             </div>
 
+            <!-- TradingView Chart -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <span class="icon">📺</span>
+                        <span>גרף מתקדם - TradingView</span>
+                    </h2>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <select id="tvChartSelect" class="form-control" style="width: auto; min-width: 180px;" onchange="updateTVChart()">
+                            <option value="NASDAQ:AAPL">AAPL - Apple</option>
+                            <option value="NASDAQ:MSFT">MSFT - Microsoft</option>
+                            <option value="NASDAQ:GOOGL">GOOGL - Alphabet</option>
+                            <option value="NASDAQ:AMZN">AMZN - Amazon</option>
+                            <option value="NASDAQ:NVDA">NVDA - NVIDIA</option>
+                            <option value="NASDAQ:TSLA">TSLA - Tesla</option>
+                            <option value="NASDAQ:META">META - Meta</option>
+                            <option value="NYSE:BRK.B">BRK.B - Berkshire</option>
+                            <option value="TLV:TA125.TA">TA-125 - ת״א 125</option>
+                            <option value="TLV:TA35.TA">TA-35 - ת״א 35</option>
+                        </select>
+                        <input type="text" id="tvCustomSymbol" class="form-control" placeholder="הקלד סימול..." style="width: 150px;" onkeydown="if(event.key==='Enter'){addCustomTVSymbol(); event.preventDefault();}">
+                        <button class="btn btn-sm btn-secondary" onclick="addCustomTVSymbol()" title="הוסף מניה">➕</button>
+                        <button class="btn btn-sm btn-secondary" onclick="removeSelectedTVSymbol()" title="הסר מניה שנבחרה" style="color: #ff4757;">🗑️</button>
+                    </div>
+                </div>
+                <div id="tvChartContainer" style="height: 500px; padding: 0 20px 20px;">
+                    <!-- TradingView Widget BEGIN -->
+                    <div class="tradingview-widget-container" id="tvWidget" style="height:100%;width:100%">
+                        <div class="tradingview-widget-container__widget" style="height:calc(100% - 32px);width:100%"></div>
+                        <div class="tradingview-widget-copyright"><a href="https://www.tradingview.com/" rel="noopener nofollow" target="_blank"><span class="blue-text">Charts</span></a><span class="trademark"> by TradingView</span></div>
+                    </div>
+                    <!-- TradingView Widget END -->
+                </div>
+            </div>
+
             <!-- Transaction History -->
             <div class="card">
                 <div class="card-header">
@@ -1881,7 +1916,202 @@
         // Update dropdown when page loads
         document.addEventListener('DOMContentLoaded', () => {
             populateMA150ChartDropdown();
+            populateTVChartDropdown();
+            loadTVChart('NASDAQ:AAPL');
         });
+
+        // ===== TRADINGVIEW CHART =====
+        function loadTVChart(symbol) {
+            const container = document.getElementById('tvWidget');
+            // Clear existing widget
+            container.innerHTML = `
+                <div class="tradingview-widget-container__widget" style="height:calc(100% - 32px);width:100%"></div>
+                <div class="tradingview-widget-copyright"><a href="https://www.tradingview.com/" rel="noopener nofollow" target="_blank"><span class="blue-text">Charts</span></a><span class="trademark"> by TradingView</span></div>
+            `;
+
+            const script = document.createElement('script');
+            script.type = 'text/javascript';
+            script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js';
+            script.async = true;
+            script.textContent = JSON.stringify({
+                "symbol": symbol,
+                "allow_symbol_change": true,
+                "calendar": false,
+                "details": false,
+                "hide_side_toolbar": true,
+                "hide_top_toolbar": false,
+                "hide_legend": false,
+                "hide_volume": false,
+                "hotlist": false,
+                "interval": "D",
+                "locale": "en",
+                "save_image": true,
+                "style": "1",
+                "theme": "dark",
+                "timezone": "Etc/UTC",
+                "backgroundColor": "#0F0F0F",
+                "gridColor": "rgba(242, 242, 242, 0.06)",
+                "watchlist": [],
+                "withdateranges": false,
+                "compareSymbols": [],
+                "studies": [],
+                "autosize": true
+            });
+
+            container.appendChild(script);
+        }
+
+        function updateTVChart() {
+            const select = document.getElementById('tvChartSelect');
+            if (select.value) {
+                loadTVChart(select.value);
+            }
+        }
+
+        // Saved custom symbols via Storage (synced with Firebase)
+        function getSavedTVSymbols() {
+            return Storage.getTVCustomSymbols();
+        }
+
+        function saveTVSymbol(tvSymbol, label) {
+            const saved = getSavedTVSymbols();
+            if (!saved.some(s => s.tvSymbol === tvSymbol)) {
+                saved.push({ tvSymbol, label });
+                Storage.saveTVCustomSymbols(saved);
+            }
+        }
+
+        function removeTVSymbol(tvSymbol) {
+            const saved = getSavedTVSymbols().filter(s => s.tvSymbol !== tvSymbol);
+            Storage.saveTVCustomSymbols(saved);
+            rebuildTVDropdown();
+        }
+
+        function addCustomTVSymbol() {
+            const input = document.getElementById('tvCustomSymbol');
+            const symbol = input.value.trim().toUpperCase();
+            if (!symbol) return;
+
+            // Build TradingView symbol
+            let tvSymbol = symbol;
+            if (!symbol.includes(':')) {
+                if (symbol.endsWith('.TA')) {
+                    tvSymbol = 'TLV:' + symbol;
+                } else {
+                    tvSymbol = 'NASDAQ:' + symbol;
+                }
+            }
+
+            // Save to localStorage and rebuild dropdown
+            saveTVSymbol(tvSymbol, symbol);
+            rebuildTVDropdown();
+
+            const select = document.getElementById('tvChartSelect');
+            select.value = tvSymbol;
+            loadTVChart(tvSymbol);
+            input.value = '';
+        }
+
+        function rebuildTVDropdown() {
+            const select = document.getElementById('tvChartSelect');
+            const currentVal = select.value;
+            select.innerHTML = '';
+
+            // Default popular stocks
+            const defaults = [
+                { value: 'NASDAQ:AAPL', label: 'AAPL - Apple' },
+                { value: 'NASDAQ:MSFT', label: 'MSFT - Microsoft' },
+                { value: 'NASDAQ:GOOGL', label: 'GOOGL - Alphabet' },
+                { value: 'NASDAQ:AMZN', label: 'AMZN - Amazon' },
+                { value: 'NASDAQ:NVDA', label: 'NVDA - NVIDIA' },
+                { value: 'NASDAQ:TSLA', label: 'TSLA - Tesla' },
+                { value: 'NASDAQ:META', label: 'META - Meta' },
+                { value: 'NYSE:BRK.B', label: 'BRK.B - Berkshire' },
+                { value: 'TLV:TA125.TA', label: 'TA-125 - ת״א 125' },
+                { value: 'TLV:TA35.TA', label: 'TA-35 - ת״א 35' }
+            ];
+            defaults.forEach(d => {
+                const opt = document.createElement('option');
+                opt.value = d.value;
+                opt.textContent = d.label;
+                select.appendChild(opt);
+            });
+
+            const existingValues = new Set(defaults.map(d => d.value));
+
+            // User's saved custom symbols
+            const saved = getSavedTVSymbols();
+            if (saved.length > 0) {
+                const sep = document.createElement('option');
+                sep.disabled = true;
+                sep.textContent = '── מניות שהוספתי ──';
+                select.appendChild(sep);
+
+                saved.forEach(s => {
+                    if (!existingValues.has(s.tvSymbol)) {
+                        const opt = document.createElement('option');
+                        opt.value = s.tvSymbol;
+                        opt.textContent = s.label + ' ✕';
+                        select.appendChild(opt);
+                        existingValues.add(s.tvSymbol);
+                    }
+                });
+            }
+
+            // Portfolio stocks
+            const data = Storage.getStocks();
+            if (data.holdings && data.holdings.length > 0) {
+                const sep2 = document.createElement('option');
+                sep2.disabled = true;
+                sep2.textContent = '── התיק שלי ──';
+                select.appendChild(sep2);
+
+                data.holdings.forEach(stock => {
+                    const symbol = stock.symbol || '';
+                    let tvSymbol = '';
+                    if (stock.market === 'TASE' || symbol.endsWith('.TA')) {
+                        tvSymbol = 'TLV:' + symbol.replace('.TA', '') + '.TA';
+                    } else if (stock.market === 'LSE' || stock.currency === 'GBP') {
+                        tvSymbol = 'LSE:' + symbol;
+                    } else {
+                        tvSymbol = 'NASDAQ:' + symbol;
+                    }
+
+                    if (!existingValues.has(tvSymbol)) {
+                        const opt = document.createElement('option');
+                        opt.value = tvSymbol;
+                        opt.textContent = `${symbol} - ${stock.name || stock.displayName || symbol}`;
+                        select.appendChild(opt);
+                        existingValues.add(tvSymbol);
+                    }
+                });
+            }
+
+            // Restore selection
+            if (currentVal && Array.from(select.options).some(o => o.value === currentVal)) {
+                select.value = currentVal;
+            }
+        }
+
+        function removeSelectedTVSymbol() {
+            const select = document.getElementById('tvChartSelect');
+            const tvSymbol = select.value;
+            const saved = getSavedTVSymbols();
+            if (saved.some(s => s.tvSymbol === tvSymbol)) {
+                removeTVSymbol(tvSymbol);
+                // Load first available
+                if (select.options.length > 0) {
+                    select.selectedIndex = 0;
+                    loadTVChart(select.value);
+                }
+            } else {
+                alert('אפשר למחוק רק מניות שהוספת ידנית');
+            }
+        }
+
+        function populateTVChartDropdown() {
+            rebuildTVDropdown();
+        }
     </script>
 </body>
 </html>

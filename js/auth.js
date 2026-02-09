@@ -126,6 +126,7 @@ const Auth = {
                 myFunds: Storage.getMyFunds(),
                 settings: Storage.getSettings(),
                 stockAlerts: Storage.get(Storage.KEYS.STOCK_ALERTS),
+                tvCustomSymbols: Storage.getTVCustomSymbols(),
                 lastUpdated: firebase.firestore.FieldValue.serverTimestamp(),
                 lastUpdatedBy: this.currentUser.email
             };
@@ -179,6 +180,7 @@ const Auth = {
                     if (data.myFunds) Storage.saveMyFunds(data.myFunds);
                     if (data.settings) Storage.saveSettings(data.settings);
                     if (data.stockAlerts) Storage.set(Storage.KEYS.STOCK_ALERTS, data.stockAlerts);
+                    if (data.tvCustomSymbols) Storage.saveTVCustomSymbols(data.tvCustomSymbols);
 
                     localStorage.setItem('finance_last_update', new Date().toISOString());
                     console.log('Data synced from cloud');
@@ -187,6 +189,7 @@ const Auth = {
                     // Refresh current page
                     if (typeof loadStocks === 'function') loadStocks();
                     if (typeof loadWatchlist === 'function') loadWatchlist();
+                    if (typeof rebuildTVDropdown === 'function') rebuildTVDropdown();
 
                     return true;
                 } else {
