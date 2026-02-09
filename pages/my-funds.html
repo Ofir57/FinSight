@@ -212,10 +212,11 @@
                             <tr>
                                 <th>שם הקרן</th>
                                 <th>סוג</th>
-                                <th>חברה מנהלת</th>
                                 <th>שווי נוכחי</th>
-                                <th>הפקדה חודשית</th>
-                                <th>עדכון אחרון</th>
+                                <th>חודש</th>
+                                <th>שנה</th>
+                                <th>3 שנים</th>
+                                <th>5 שנים</th>
                                 <th>פעולות</th>
                             </tr>
                         </thead>
@@ -224,10 +225,9 @@
                         </tbody>
                         <tfoot id="fundsFooter" style="display: none;">
                             <tr style="background: var(--color-bg-secondary); font-weight: bold;">
-                                <td colspan="3" style="text-align: right;">סה"כ</td>
+                                <td colspan="2" style="text-align: right;">סה"כ</td>
                                 <td id="totalValueFooter">₪0</td>
-                                <td id="totalDepositFooter">₪0</td>
-                                <td colspan="2"></td>
+                                <td colspan="5"></td>
                             </tr>
                         </tfoot>
                     </table>
@@ -312,11 +312,22 @@
                         <input type="text" class="form-control" id="accountNumber" maxlength="20">
                     </div>
 
+                    <div class="form-group" id="actuarialGroup" style="display: none;">
+                        <label>איזון אקטוארי (₪) - לפנסיה בלבד</label>
+                        <input type="number" class="form-control" id="actuarialBalance" step="0.01">
+                    </div>
+
                     <div class="form-group">
                         <label>הערות</label>
                         <textarea class="form-control" id="fundNotes" rows="2"></textarea>
                     </div>
                 </form>
+                <script>
+                    document.getElementById('fundType').addEventListener('change', function() {
+                        document.getElementById('actuarialGroup').style.display =
+                            this.value === 'pension' ? 'block' : 'none';
+                    });
+                </script>
             </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" onclick="closeModal()">ביטול</button>
@@ -427,14 +438,28 @@
             const totalValue = filteredFunds.reduce((sum, f) => sum + (f.value || 0), 0);
             const totalDeposit = filteredFunds.reduce((sum, f) => sum + (f.monthlyDeposit || 0), 0);
 
-            tbody.innerHTML = filteredFunds.map(fund => `
+            tbody.innerHTML = filteredFunds.map(fund => {
+                const returns = calculateReturns(fund);
+                const formatReturn = (val) => {
+                    if (val === null) return '<span style="color: var(--color-text-secondary);">-</span>';
+                    const num = parseFloat(val);
+                    const color = num >= 0 ? '#10b981' : '#ef4444';
+                    return `<span style="color: ${color}; font-weight: 600;">${num >= 0 ? '+' : ''}${val}%</span>`;
+                };
+                const actuarialInfo = fund.type === 'pension' && fund.actuarialBalance
+                    ? `<br><small style="color: var(--color-text-secondary);">איזון: ${I18n.formatCurrency(fund.actuarialBalance)}</small>` : '';
+                return `
                 <tr>
-                    <td><strong>${fund.name}</strong></td>
+                    <td>
+                        <strong>${fund.name}</strong>
+                        <br><small style="color: var(--color-text-secondary);">${companyNames[fund.company] || fund.company || ''}</small>
+                    </td>
                     <td>${fundTypeNames[fund.type] || fund.type}</td>
-                    <td>${companyNames[fund.company] || fund.company || '-'}</td>
-                    <td>${I18n.formatCurrency(fund.value)}</td>
-                    <td>${fund.monthlyDeposit ? I18n.formatCurrency(fund.monthlyDeposit) : '-'}</td>
-                    <td>${fund.updatedAt ? new Date(fund.updatedAt).toLocaleDateString('he-IL') : '-'}</td>
+                    <td>${I18n.formatCurrency(fund.value)}${actuarialInfo}</td>
+                    <td>${formatReturn(returns.month)}</td>
+                    <td>${formatReturn(returns.year1)}</td>
+                    <td>${formatReturn(returns.year3)}</td>
+                    <td>${formatReturn(returns.year5)}</td>
                     <td>
                         <div class="action-buttons">
                             <button class="btn btn-secondary btn-sm" onclick="openUpdateValueModal('${fund.id}', ${fund.value})" title="עדכן שווי">💰</button>
@@ -443,10 +468,10 @@
                         </div>
                     </td>
                 </tr>
-            `).join('');
+            `;
+            }).join('');
 
             document.getElementById('totalValueFooter').textContent = I18n.formatCurrency(totalValue);
-            document.getElementById('totalDepositFooter').textContent = I18n.formatCurrency(totalDeposit);
             footer.style.display = 'table-footer-group';
 
             // Update chart
@@ -518,11 +543,13 @@
             document.getElementById('modalTitle').textContent = 'ערוך קרן';
             document.getElementById('fundId').value = fund.id;
             document.getElementById('fundType').value = fund.type;
+            document.getElementById('fundType').dispatchEvent(new Event('change'));
             document.getElementById('fundName').value = fund.name;
             document.getElementById('fundCompany').value = fund.company || '';
             document.getElementById('fundValue').value = fund.value;
             document.getElementById('monthlyDeposit').value = fund.monthlyDeposit || 0;
             document.getElementById('accountNumber').value = fund.accountNumber || '';
+            document.getElementById('actuarialBalance').value = fund.actuarialBalance || '';
             document.getElementById('fundNotes').value = fund.notes || '';
             document.getElementById('fundModal').classList.add('active');
         }
@@ -535,6 +562,7 @@
             const value = parseFloat(document.getElementById('fundValue').value) || 0;
             const monthlyDeposit = parseFloat(document.getElementById('monthlyDeposit').value) || 0;
             const accountNumber = document.getElementById('accountNumber').value.trim();
+            const actuarialBalance = parseFloat(document.getElementById('actuarialBalance').value) || null;
             const notes = document.getElementById('fundNotes').value.trim();
 
             if (!name || !value) {
@@ -544,15 +572,22 @@
 
             const funds = getFunds();
             const now = new Date().toISOString();
+            const today = now.split('T')[0];
 
             if (id) {
                 // Update existing
                 const idx = funds.findIndex(f => f.id === id);
                 if (idx !== -1) {
-                    funds[idx] = { ...funds[idx], type, name, company, value, monthlyDeposit, accountNumber, notes, updatedAt: now };
+                    const oldFund = funds[idx];
+                    // Add to history if value changed
+                    let history = oldFund.history || [];
+                    if (oldFund.value !== value) {
+                        history = [...history, { date: today, value: value }];
+                    }
+                    funds[idx] = { ...oldFund, type, name, company, value, monthlyDeposit, accountNumber, actuarialBalance, notes, history, updatedAt: now };
                 }
             } else {
-                // Add new
+                // Add new with initial history
                 funds.push({
                     id: 'fund_' + Date.now(),
                     type,
@@ -561,7 +596,9 @@
                     value,
                     monthlyDeposit,
                     accountNumber,
+                    actuarialBalance,
                     notes,
+                    history: [{ date: today, value: value }],
                     createdAt: now,
                     updatedAt: now
                 });
@@ -595,14 +632,61 @@
             const funds = getFunds();
             const idx = funds.findIndex(f => f.id === id);
             if (idx !== -1) {
+                const now = new Date().toISOString();
+                const today = now.split('T')[0];
+                // Add to history
+                let history = funds[idx].history || [];
+                history = [...history, { date: today, value: newValue }];
                 funds[idx].value = newValue;
-                funds[idx].updatedAt = new Date().toISOString();
+                funds[idx].history = history;
+                funds[idx].updatedAt = now;
                 saveFunds(funds);
             }
 
             closeUpdateModal();
             loadFunds();
             App.notify('השווי עודכן בהצלחה', 'success');
+        }
+
+        // Calculate returns based on history
+        function calculateReturns(fund) {
+            const history = fund.history || [];
+            if (history.length < 2) return { month: null, year1: null, year3: null, year5: null };
+
+            const now = new Date();
+            const currentValue = fund.value;
+
+            const getValueAtDate = (targetDate) => {
+                const sorted = [...history].sort((a, b) => new Date(a.date) - new Date(b.date));
+                let closest = sorted[0];
+                for (const h of sorted) {
+                    if (new Date(h.date) <= targetDate) {
+                        closest = h;
+                    }
+                }
+                return closest?.value;
+            };
+
+            const monthAgo = new Date(now);
+            monthAgo.setMonth(monthAgo.getMonth() - 1);
+            const year1Ago = new Date(now);
+            year1Ago.setFullYear(year1Ago.getFullYear() - 1);
+            const year3Ago = new Date(now);
+            year3Ago.setFullYear(year3Ago.getFullYear() - 3);
+            const year5Ago = new Date(now);
+            year5Ago.setFullYear(year5Ago.getFullYear() - 5);
+
+            const calcReturn = (oldValue) => {
+                if (!oldValue || oldValue === 0) return null;
+                return ((currentValue - oldValue) / oldValue * 100).toFixed(2);
+            };
+
+            return {
+                month: calcReturn(getValueAtDate(monthAgo)),
+                year1: calcReturn(getValueAtDate(year1Ago)),
+                year3: calcReturn(getValueAtDate(year3Ago)),
+                year5: calcReturn(getValueAtDate(year5Ago))
+            };
         }
 
         function deleteFund(id) {
