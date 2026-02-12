@@ -107,12 +107,72 @@
         thead .col-dynamic {
             background: rgba(16, 185, 129, 0.2) !important;
         }
+        /* Collapsible sidebar */
+        .sidebar-toggle {
+            position: fixed;
+            top: 15px;
+            right: 270px;
+            z-index: 101;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: 2px solid var(--color-border);
+            background: var(--color-bg-card);
+            color: var(--color-text);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        body.ltr .sidebar-toggle {
+            right: auto;
+            left: 270px;
+        }
+        .sidebar-toggle:hover {
+            background: var(--color-stocks);
+            color: #fff;
+            transform: scale(1.1);
+        }
+        .sidebar-toggle .toggle-icon {
+            transition: transform 0.3s ease;
+        }
+        /* Collapsed state */
+        body.sidebar-collapsed .sidebar {
+            transform: translateX(100%);
+        }
+        body.ltr.sidebar-collapsed .sidebar {
+            transform: translateX(-100%);
+        }
+        body.sidebar-collapsed .main-content {
+            margin-right: 0;
+        }
+        body.ltr.sidebar-collapsed .main-content {
+            margin-left: 0;
+        }
+        body.sidebar-collapsed .sidebar-toggle {
+            right: 10px;
+        }
+        body.ltr.sidebar-collapsed .sidebar-toggle {
+            right: auto;
+            left: 10px;
+        }
+        body.sidebar-collapsed .sidebar-toggle .toggle-icon {
+            transform: rotate(180deg);
+        }
     </style>
 </head>
 <body>
+    <!-- Sidebar Toggle Button -->
+    <button class="sidebar-toggle" onclick="toggleSidebar()" title="פתח/סגור תפריט">
+        <span class="toggle-icon">💰</span>
+    </button>
+
     <div class="app-container">
         <!-- Sidebar Navigation -->
-        <aside class="sidebar">
+        <aside class="sidebar" id="mainSidebar">
             <div class="sidebar-header">
                 <div class="brand">
                     <span class="brand-icon">📊</span>
@@ -220,6 +280,10 @@
                     <span>📂</span>
                     <span>ייבוא מברוקר (XLS)</span>
                 </button>
+                <button class="btn btn-secondary" onclick="exportHoldingsToExcel()">
+                    <span>📊</span>
+                    <span>ייצוא Excel</span>
+                </button>
                 <input type="file" id="brokerFileInput" accept=".xls,.xlsx,.xml" style="display: none;" onchange="handleBrokerFile(event)">
                 <label class="auto-refresh-toggle" style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
                     <input type="checkbox" id="autoRefreshToggle" onchange="toggleAutoRefresh()" checked>
@@ -244,6 +308,7 @@
                                 <option value="portfolioPercent">% מהתיק</option>
                                 <option value="profitILS">רווח ₪</option>
                                 <option value="profitPercent">רווח %</option>
+                                <option value="dailyChange">שינוי יומי</option>
                                 <option value="quantity">כמות</option>
                             </select>
                             <button onclick="toggleSortDirection()" id="sortDirBtn" class="btn btn-sm btn-secondary" style="padding: 5px 8px;">⬇️</button>
@@ -258,13 +323,16 @@
                                 <th class="col-static" data-i18n="stocks.symbol" style="cursor: pointer;" onclick="setSortBy('symbol')">סימול</th>
                                 <th class="col-static" data-i18n="stocks.companyName" style="cursor: pointer;" onclick="setSortBy('name')">שם</th>
                                 <th class="col-static" data-i18n="stocks.quantity" style="cursor: pointer;" onclick="setSortBy('quantity')">כמות</th>
-                                <th class="col-static" style="cursor: pointer;" onclick="setSortBy('avgPrice')">מחיר קנייה</th>
+                                <th class="col-static" style="cursor: pointer;" onclick="setSortBy('avgPrice')">מחיר רכישה</th>
                                 <th class="col-static">עלות רכישה ₪</th>
                                 <th class="col-dynamic" style="cursor: pointer;" onclick="setSortBy('currentPrice')">מחיר נוכחי</th>
+                                <th class="col-dynamic" style="cursor: pointer;" onclick="setSortBy('dailyChange')">שינוי יומי</th>
                                 <th class="col-dynamic">MA150</th>
-                                <th class="col-dynamic" style="cursor: pointer;" onclick="setSortBy('valueILS')">שווי ₪</th>
+                                <th class="col-dynamic">טרנד</th>
+                                <th class="col-dynamic" style="cursor: pointer;" onclick="setSortBy('valueILS')">שווי נוכחי ₪</th>
                                 <th class="col-dynamic">רווח (מט"ח)</th>
                                 <th class="col-dynamic" style="cursor: pointer;" onclick="setSortBy('profitILS')">רווח ₪</th>
+                                <th class="col-dynamic" style="cursor: pointer;" onclick="setSortBy('profitPercent')">שינוי %</th>
                                 <th class="col-dynamic" style="cursor: pointer;" onclick="setSortBy('portfolioPercent')">% מהתיק</th>
                                 <th class="col-dynamic" data-i18n="common.actions">פעולות</th>
                             </tr>
@@ -631,6 +699,7 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="../js/storage.js"></script>
     <script src="../js/i18n.js"></script>
     <script src="../js/charts.js"></script>
@@ -643,6 +712,17 @@
     <script src="../js/firebase-config.js"></script>
     <script src="../js/auth.js"></script>
     <script>
+        // Sidebar toggle
+        function toggleSidebar() {
+            document.body.classList.toggle('sidebar-collapsed');
+            const isCollapsed = document.body.classList.contains('sidebar-collapsed');
+            localStorage.setItem('stocks_sidebar_collapsed', isCollapsed ? '1' : '0');
+        }
+        // Restore sidebar state
+        if (localStorage.getItem('stocks_sidebar_collapsed') === '1') {
+            document.body.classList.add('sidebar-collapsed');
+        }
+
         // State
         let refreshInterval = null;
         let priceCache = {};
@@ -706,7 +786,7 @@
             let totalProfitCurrency = { USD: 0, GBP: 0, EUR: 0, ILS: 0 };
 
             if (data.holdings.length === 0) {
-                holdingsTable.innerHTML = `<tr><td colspan="12" style="text-align: center; color: var(--color-text-secondary);">${I18n.t('stocks.noStocks')}</td></tr>`;
+                holdingsTable.innerHTML = `<tr><td colspan="15" style="text-align: center; color: var(--color-text-secondary);">${I18n.t('stocks.noStocks')}</td></tr>`;
             } else {
                 // Get sort criteria
                 const sortBy = document.getElementById('sortBy')?.value || 'valueILS';
@@ -760,6 +840,7 @@
                         case 'quantity': aVal = a.quantity; bVal = b.quantity; break;
                         case 'avgPrice': aVal = a.avgPrice; bVal = b.avgPrice; break;
                         case 'currentPrice': aVal = a.currentPrice; bVal = b.currentPrice; break;
+                        case 'dailyChange': aVal = (a.cached.priceChangePercent || 0); bVal = (b.cached.priceChangePercent || 0); break;
                         case 'valueILS': aVal = a.valueILS; bVal = b.valueILS; break;
                         case 'profitILS': aVal = a.profitILS; bVal = b.profitILS; break;
                         case 'profitPercent': aVal = a.profitPercent; bVal = b.profitPercent; break;
@@ -788,13 +869,39 @@
                         totalProfitCurrency[currency] = (totalProfitCurrency[currency] || 0) + profitInCurrency;
                     }
 
-                    // MA150 from cache (in trading currency)
+                    // Daily change from cache
+                    const dailyChangePercent = cached.priceChangePercent;
+                    let dailyChangeDisplay = '<span style="color: var(--color-text-secondary);">-</span>';
+                    if (dailyChangePercent !== null && dailyChangePercent !== undefined) {
+                        const isDailyPositive = dailyChangePercent >= 0;
+                        dailyChangeDisplay = `<span class="${isDailyPositive ? 'profit' : 'loss'}">${isDailyPositive ? '+' : ''}${dailyChangePercent.toFixed(2)}%</span>`;
+                    }
+
+                    // MA150 from cache - show distance in %
                     const ma150 = cached.ma150;
+                    const ma150PositionPercent = cached.ma150PositionPercent;
                     let ma150Display = '<span style="color: var(--color-text-secondary);">-</span>';
                     if (ma150 !== null && ma150 !== undefined) {
-                        const ma150Position = currentPrice > ma150 ? 'above' : 'below';
-                        const positionIcon = ma150Position === 'above' ? '🟢' : '🔴';
-                        ma150Display = `<span class="${ma150Position === 'above' ? 'profit' : 'loss'}">${positionIcon} ${currencySymbol}${ma150.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>`;
+                        const isAbove = currentPrice > ma150;
+                        const positionIcon = isAbove ? '🟢' : '🔴';
+                        const distPercent = ma150PositionPercent !== null && ma150PositionPercent !== undefined ? ma150PositionPercent.toFixed(1) : '0';
+                        ma150Display = `<span class="${isAbove ? 'profit' : 'loss'}">${positionIcon} ${isAbove ? '+' : ''}${distPercent}%</span>`;
+                    }
+
+                    // Trend indicator based on MA150 position and daily momentum
+                    let trendDisplay = '<span style="color: var(--color-text-secondary);">-</span>';
+                    if (ma150 !== null && ma150 !== undefined) {
+                        const isAboveMA = currentPrice > ma150;
+                        const dailyUp = dailyChangePercent !== null && dailyChangePercent !== undefined && dailyChangePercent >= 0;
+                        if (isAboveMA && dailyUp) {
+                            trendDisplay = '<span class="profit" title="Bullish">📈 Bullish</span>';
+                        } else if (!isAboveMA && !dailyUp) {
+                            trendDisplay = '<span class="loss" title="Bearish">📉 Bearish</span>';
+                        } else if (isAboveMA && !dailyUp) {
+                            trendDisplay = '<span style="color: #f59e0b;" title="Caution - above MA but declining">⚠️ Caution</span>';
+                        } else {
+                            trendDisplay = '<span style="color: #3b82f6;" title="Recovery - below MA but rising">🔄 Recovery</span>';
+                        }
                     }
 
                     // Profit in currency - only show for non-ILS stocks
@@ -811,12 +918,15 @@
                             <td class="col-static">${currencySymbol}${h.avgPrice.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
                             <td class="col-static">₪${costILS.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}</td>
                             <td class="col-dynamic">${currencySymbol}${currentPrice.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                            <td class="col-dynamic">${dailyChangeDisplay}</td>
                             <td class="col-dynamic">${ma150Display}</td>
+                            <td class="col-dynamic">${trendDisplay}</td>
                             <td class="col-dynamic"><strong>₪${valueILS.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}</strong></td>
                             <td class="col-dynamic">${profitCurrencyDisplay}</td>
                             <td class="col-dynamic ${isProfit ? 'profit' : 'loss'}">
                                 ${isProfit ? '+' : ''}₪${profitILS.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}
                             </td>
+                            <td class="col-dynamic"><span class="${isProfit ? 'profit' : 'loss'}">${isProfit ? '+' : ''}${profitPercent.toFixed(1)}%</span></td>
                             <td class="col-dynamic">${portfolioPercent.toFixed(1)}%</td>
                             <td class="col-dynamic">
                                 <div class="action-buttons">
@@ -848,16 +958,18 @@
 
                 // Add totals row
                 const isTotalProfit = totalProfitILS >= 0;
+                const totalReturnPercent = totalCostILS > 0 ? ((totalProfitILS / totalCostILS) * 100).toFixed(1) : '0.0';
                 rows.push(`
                     <tr style="font-weight: bold; border-top: 2px solid var(--color-border);">
                         <td class="col-static" colspan="4" style="text-align: left;">סה"כ</td>
                         <td class="col-static">₪${totalCostILS.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}</td>
-                        <td class="col-dynamic" colspan="2"></td>
+                        <td class="col-dynamic" colspan="4"></td>
                         <td class="col-dynamic"><strong>₪${totalValueILS.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}</strong></td>
                         <td class="col-dynamic">${profitCurrencyTotal}</td>
                         <td class="col-dynamic ${isTotalProfit ? 'profit' : 'loss'}">
                             ${isTotalProfit ? '+' : ''}₪${totalProfitILS.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}
                         </td>
+                        <td class="col-dynamic"><span class="${isTotalProfit ? 'profit' : 'loss'}">${isTotalProfit ? '+' : ''}${totalReturnPercent}%</span></td>
                         <td class="col-dynamic">100%</td>
                         <td class="col-dynamic"></td>
                     </tr>
@@ -1412,6 +1524,76 @@
                 loadStocks();
                 App.notify(I18n.t('common.delete') + ' ✓', 'success');
             }
+        }
+
+        function exportHoldingsToExcel() {
+            const data = Storage.getStocks();
+            if (data.holdings.length === 0) {
+                App.notify('אין אחזקות לייצוא', 'error');
+                return;
+            }
+
+            const rows = data.holdings.map(h => {
+                const cached = priceCache[h.symbol] || {};
+                const currency = h.currency || 'USD';
+                const rate = currencyRates[currency] || 1;
+                const currentPrice = cached.currentPrice || h.currentPrice || h.avgPrice;
+
+                let valueILS, profitILS;
+                if (h.valueILS && h.valueILS > 0) {
+                    valueILS = h.valueILS;
+                    profitILS = h.profitILS || 0;
+                } else {
+                    const valueInCurrency = currentPrice * h.quantity;
+                    valueILS = valueInCurrency * rate;
+                    profitILS = (currentPrice - h.avgPrice) * h.quantity * rate;
+                }
+                const costILS = valueILS - profitILS;
+                const profitPercent = costILS > 0 ? (profitILS / costILS) * 100 : 0;
+                const dailyChange = cached.priceChangePercent || 0;
+                const ma150 = cached.ma150;
+                const ma150Dist = cached.ma150PositionPercent;
+
+                let trend = '-';
+                if (ma150 !== null && ma150 !== undefined) {
+                    const aboveMA = currentPrice > ma150;
+                    const dailyUp = dailyChange >= 0;
+                    if (aboveMA && dailyUp) trend = 'Bullish';
+                    else if (!aboveMA && !dailyUp) trend = 'Bearish';
+                    else if (aboveMA && !dailyUp) trend = 'Caution';
+                    else trend = 'Recovery';
+                }
+
+                return {
+                    'סימול': h.symbol,
+                    'שם': h.name || '-',
+                    'כמות': h.quantity,
+                    'מטבע': currency,
+                    'מחיר רכישה': h.avgPrice,
+                    'עלות רכישה ₪': Math.round(costILS),
+                    'מחיר נוכחי': currentPrice,
+                    'שינוי יומי %': Number(dailyChange.toFixed(2)),
+                    'MA150 מרחק %': ma150Dist !== null && ma150Dist !== undefined ? Number(ma150Dist.toFixed(1)) : '-',
+                    'טרנד': trend,
+                    'שווי נוכחי ₪': Math.round(valueILS),
+                    'רווח ₪': Math.round(profitILS),
+                    'שינוי %': Number(profitPercent.toFixed(1))
+                };
+            });
+
+            const ws = XLSX.utils.json_to_sheet(rows);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Holdings');
+
+            // Auto-size columns
+            const colWidths = Object.keys(rows[0]).map(key => ({
+                wch: Math.max(key.length + 2, ...rows.map(r => String(r[key]).length + 2))
+            }));
+            ws['!cols'] = colWidths;
+
+            const dateStr = new Date().toISOString().split('T')[0];
+            XLSX.writeFile(wb, `FinSight_Holdings_${dateStr}.xlsx`);
+            App.notify('קובץ Excel יוצא בהצלחה ✓', 'success');
         }
 
         async function importCSV() {
