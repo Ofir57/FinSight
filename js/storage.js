@@ -285,7 +285,7 @@ const Storage = {
         this.saveAssets(assets);
     },
 
-    // My Funds (Training, Pension, Gemel)
+    // My Accounts (Training, Pension, Gemel, Savings Policy)
     getMyFunds() {
         return this.get(this.KEYS.MY_FUNDS) || [];
     },

@@ -350,34 +350,6 @@
             }
         }
 
-        .lang-switcher {
-            display: inline-flex;
-            gap: 4px;
-            background: rgba(255, 255, 255, 0.06);
-            border-radius: 10px;
-            padding: 4px;
-        }
-        .lang-btn {
-            padding: 6px 14px;
-            border: none;
-            border-radius: 8px;
-            background: transparent;
-            color: rgba(255, 255, 255, 0.45);
-            font-size: 0.85rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.25s ease;
-            letter-spacing: 0.5px;
-        }
-        .lang-btn:hover {
-            color: rgba(255, 255, 255, 0.8);
-            background: rgba(255, 255, 255, 0.06);
-        }
-        .lang-btn.active {
-            background: linear-gradient(135deg, #10b981, #3b82f6);
-            color: #fff;
-            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
-        }
     </style>
 </head>
 <body>
@@ -392,12 +364,7 @@
                 <a href="training.html" data-he="קרנות השתלמות" data-en="Training Funds">קרנות השתלמות</a>
                 <a href="pension.html" data-he="קרנות פנסיה" data-en="Pension Funds">קרנות פנסיה</a>
                 <a href="gemel.html" class="active" data-he="קופות גמל" data-en="Provident Funds">קופות גמל</a>
-                <a href="my-funds.html" data-he="💎 הקרנות שלי" data-en="💎 My Funds">💎 הקרנות שלי</a>
-            </div>
-            <div class="lang-switcher" style="margin-top: 12px; display: inline-flex;">
-                <button class="lang-btn active" data-lang="he" onclick="setLang('he')">HE</button>
-                <button class="lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
-                <button class="lang-btn" data-lang="pt" onclick="setLang('pt')">PT</button>
+                <a href="my-funds.html" data-he="💎 הקופות שלי" data-en="💎 My Accounts">💎 הקופות שלי</a>
             </div>
         </header>
 
@@ -407,7 +374,7 @@
                 <h2 class="section-title" style="color: #a855f7;">
                     <span class="icon">💰</span>
                     <span>קופות הגמל שלי</span>
-                    <button onclick="openAddGemelModal()" style="margin-right: auto; background: #a855f7; color: #1a1a2e; border: none; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 0.9rem;">➕ הוסף</button>
+                    <button onclick="openAddGemelModal()" style="margin-right: auto; background: #a855f7; color: #fff; border: none; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 0.9rem; font-weight: 600;">➕ הוסף</button>
                 </h2>
                 <div id="myGemelFunds">
                     <p style="text-align: center; color: #8892b0; padding: 20px;">טוען...</p>
@@ -816,23 +783,6 @@
             });
         }
 
-        function setLang(lang) {
-            try {
-                const settings = JSON.parse(localStorage.getItem('finance_settings') || '{}');
-                settings.language = lang;
-                localStorage.setItem('finance_settings', JSON.stringify(settings));
-            } catch(e) {}
-            currentLang = lang;
-            document.body.classList.toggle('ltr', lang !== 'he');
-            document.documentElement.lang = lang;
-            document.documentElement.dir = lang === 'he' ? 'rtl' : 'ltr';
-            document.querySelectorAll('[data-he][data-en]').forEach(el => {
-                el.textContent = el.getAttribute('data-' + (lang === 'pt' ? 'en' : lang));
-            });
-            document.querySelectorAll('.lang-btn').forEach(btn => {
-                btn.classList.toggle('active', btn.getAttribute('data-lang') === lang);
-            });
-        }
 
         function getRankClass(rank) {
             if (rank === 1) return 'rank-1';
@@ -921,7 +871,7 @@
             const container = document.getElementById('myGemelFunds');
 
             if (funds.length === 0) {
-                container.innerHTML = `<p style="text-align: center; color: #8892b0; padding: 30px;">אין לך קופות גמל. לחץ על "הוסף" להוספת קופה.<br><a href="my-funds.html" style="color: #a855f7;">או עבור לדף הקרנות שלי</a></p>`;
+                container.innerHTML = `<p style="text-align: center; color: #8892b0; padding: 30px;">אין לך קופות גמל. לחץ על "הוסף" להוספת קופה.<br><a href="my-funds.html" style="color: #a855f7;">או עבור לדף הקופות שלי</a></p>`;
                 return;
             }
 

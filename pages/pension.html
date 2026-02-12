@@ -74,34 +74,6 @@
         @media (max-width: 1200px) { .tables-grid { grid-template-columns: 1fr; } }
         @media (max-width: 768px) { header h1 { font-size: 1.8rem; } th, td { padding: 10px 8px; font-size: 0.85rem; } }
 
-        .lang-switcher {
-            display: inline-flex;
-            gap: 4px;
-            background: rgba(255, 255, 255, 0.06);
-            border-radius: 10px;
-            padding: 4px;
-        }
-        .lang-btn {
-            padding: 6px 14px;
-            border: none;
-            border-radius: 8px;
-            background: transparent;
-            color: rgba(255, 255, 255, 0.45);
-            font-size: 0.85rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.25s ease;
-            letter-spacing: 0.5px;
-        }
-        .lang-btn:hover {
-            color: rgba(255, 255, 255, 0.8);
-            background: rgba(255, 255, 255, 0.06);
-        }
-        .lang-btn.active {
-            background: linear-gradient(135deg, #10b981, #3b82f6);
-            color: #fff;
-            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
-        }
     </style>
 </head>
 <body>
@@ -116,12 +88,7 @@
                 <a href="training.html" data-he="קרנות השתלמות" data-en="Training Funds">קרנות השתלמות</a>
                 <a href="pension.html" class="active" data-he="קרנות פנסיה" data-en="Pension Funds">קרנות פנסיה</a>
                 <a href="gemel.html" data-he="קופות גמל" data-en="Provident Funds">קופות גמל</a>
-                <a href="my-funds.html" data-he="💎 הקרנות שלי" data-en="💎 My Funds">💎 הקרנות שלי</a>
-            </div>
-            <div class="lang-switcher" style="margin-top: 12px; display: inline-flex;">
-                <button class="lang-btn active" data-lang="he" onclick="setLang('he')">HE</button>
-                <button class="lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
-                <button class="lang-btn" data-lang="pt" onclick="setLang('pt')">PT</button>
+                <a href="my-funds.html" data-he="💎 הקופות שלי" data-en="💎 My Accounts">💎 הקופות שלי</a>
             </div>
         </header>
 
@@ -131,7 +98,7 @@
                 <h2 class="section-title" style="color: #ff6b6b;">
                     <span class="icon">🏛️</span>
                     <span>הפנסיה שלי</span>
-                    <button onclick="openAddPensionModal()" style="margin-right: auto; background: #ff6b6b; color: #1a1a2e; border: none; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 0.9rem;">➕ הוסף</button>
+                    <button onclick="openAddPensionModal()" style="margin-right: auto; background: #ff6b6b; color: #fff; border: none; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 0.9rem; font-weight: 600;">➕ הוסף</button>
                 </h2>
                 <div id="myPensionFunds">
                     <p style="text-align: center; color: #8892b0; padding: 20px;">טוען...</p>
@@ -385,23 +352,6 @@
             });
         }
 
-        function setLang(lang) {
-            try {
-                const settings = JSON.parse(localStorage.getItem('finance_settings') || '{}');
-                settings.language = lang;
-                localStorage.setItem('finance_settings', JSON.stringify(settings));
-            } catch(e) {}
-            currentLang = lang;
-            document.body.classList.toggle('ltr', lang !== 'he');
-            document.documentElement.lang = lang;
-            document.documentElement.dir = lang === 'he' ? 'rtl' : 'ltr';
-            document.querySelectorAll('[data-he][data-en]').forEach(el => {
-                el.textContent = el.getAttribute('data-' + (lang === 'pt' ? 'en' : lang));
-            });
-            document.querySelectorAll('.lang-btn').forEach(btn => {
-                btn.classList.toggle('active', btn.getAttribute('data-lang') === lang);
-            });
-        }
 
         function getRankClass(rank) {
             if (rank === 1) return 'rank-1';
@@ -466,7 +416,7 @@
                 container.innerHTML = `
                     <p style="text-align: center; color: #8892b0; padding: 30px;">
                         אין לך קרנות פנסיה. לחץ על "הוסף" להוספת קרן פנסיה.<br>
-                        <a href="my-funds.html" style="color: #ff6b6b;">או עבור לדף הקרנות שלי</a>
+                        <a href="my-funds.html" style="color: #ff6b6b;">או עבור לדף הקופות שלי</a>
                     </p>`;
                 return;
             }

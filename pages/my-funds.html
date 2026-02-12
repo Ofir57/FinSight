@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#8b5cf6">
     <link rel="manifest" href="../manifest.json">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💎</text></svg>">
-    <title>הקרנות שלי - FinSight</title>
+    <title>הקופות שלי - FinSight</title>
     <link rel="stylesheet" href="../css/app.css">
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -88,11 +88,6 @@
                     <span class="brand-icon">📊</span>
                     <span class="brand-name">Fin<span class="brand-highlight">Sight</span></span>
                 </div>
-                <div class="lang-switcher">
-                    <button class="lang-btn active" data-lang="he" onclick="I18n.setLanguage('he')">HE</button>
-                    <button class="lang-btn" data-lang="en" onclick="I18n.setLanguage('en')">EN</button>
-                    <button class="lang-btn" data-lang="pt" onclick="I18n.setLanguage('pt')">PT</button>
-                </div>
             </div>
 
             <nav>
@@ -124,7 +119,7 @@
                     <li class="nav-item">
                         <a href="my-funds.html" class="nav-link active" data-category="funds">
                             <span class="icon">💎</span>
-                            <span>הקרנות שלי</span>
+                            <span>הקופות שלי</span>
                         </a>
                     </li>
                     <li class="nav-item">
@@ -145,7 +140,7 @@
             <header class="page-header">
                 <h1>
                     <span>💎</span>
-                    <span>הקרנות שלי</span>
+                    <span>הקופות שלי</span>
                 </h1>
             </header>
 
@@ -164,7 +159,7 @@
                     <div class="value" id="gemelTotal">₪0</div>
                 </div>
                 <div class="summary-card savings">
-                    <div class="label">🐷 קרן חיסכון</div>
+                    <div class="label">🐷 פוליסת חיסכון</div>
                     <div class="value" id="savingsTotal">₪0</div>
                 </div>
                 <div class="summary-card total">
@@ -200,7 +195,7 @@
                     <span class="icon">💼</span>קופת גמל
                 </button>
                 <button class="fund-type-tab" data-type="savings" onclick="filterByType('savings')">
-                    <span class="icon">🐷</span>קרן חיסכון
+                    <span class="icon">🐷</span>פוליסת חיסכון
                 </button>
             </div>
 
@@ -275,7 +270,7 @@
                             <option value="pension">🏛️ פנסיה</option>
                             <option value="training">🎓 קרן השתלמות</option>
                             <option value="gemel">💼 קופת גמל</option>
-                            <option value="savings">🐷 קרן חיסכון</option>
+                            <option value="savings">🐷 פוליסת חיסכון</option>
                         </select>
                     </div>
 
@@ -378,7 +373,7 @@
             pension: '🏛️ פנסיה',
             training: '🎓 קרן השתלמות',
             gemel: '💼 קופת גמל',
-            savings: '🐷 קרן חיסכון'
+            savings: '🐷 פוליסת חיסכון'
         };
 
         const companyNames = {
@@ -503,7 +498,7 @@
             fundsChart = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
-                    labels: ['פנסיה', 'קרן השתלמות', 'קופת גמל', 'קרן חיסכון'],
+                    labels: ['פנסיה', 'קרן השתלמות', 'קופת גמל', 'פוליסת חיסכון'],
                     datasets: [{
                         data: [totals.pension, totals.training, totals.gemel, totals.savings],
                         backgroundColor: ['#f59e0b', '#10b981', '#3b82f6', '#ec4899'],

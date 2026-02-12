@@ -106,18 +106,19 @@ const I18n = {
             },
             // Funds
             funds: {
-                title: 'הקרנות שלי',
-                addFund: 'הוסף קרן',
-                fundName: 'שם הקרן',
-                fundType: 'סוג קרן',
+                title: 'הקופות שלי',
+                addFund: 'הוסף קופה',
+                fundName: 'שם הקופה',
+                fundType: 'סוג קופה',
                 currentValue: 'שווי נוכחי',
                 monthlyDeposit: 'הפקדה חודשית',
                 types: {
                     training: 'קרן השתלמות',
                     pension: 'פנסיה',
-                    gemel: 'קופת גמל'
+                    gemel: 'קופת גמל',
+                    savings: 'פוליסת חיסכון'
                 },
-                noFunds: 'לא נבחרו קרנות'
+                noFunds: 'לא נבחרו קופות'
             },
             // Assets
             assets: {
@@ -269,18 +270,19 @@ const I18n = {
             },
             // Funds
             funds: {
-                title: 'My Funds',
-                addFund: 'Add Fund',
-                fundName: 'Fund Name',
-                fundType: 'Fund Type',
+                title: 'My Accounts',
+                addFund: 'Add Account',
+                fundName: 'Account Name',
+                fundType: 'Account Type',
                 currentValue: 'Current Value',
                 monthlyDeposit: 'Monthly Deposit',
                 types: {
                     training: 'Training Fund',
                     pension: 'Pension',
-                    gemel: 'Provident Fund'
+                    gemel: 'Provident Fund',
+                    savings: 'Savings Policy'
                 },
-                noFunds: 'No funds selected'
+                noFunds: 'No accounts selected'
             },
             // Assets
             assets: {
@@ -432,18 +434,19 @@ const I18n = {
             },
             // Funds
             funds: {
-                title: 'Meus Fundos',
-                addFund: 'Adicionar Fundo',
-                fundName: 'Nome do Fundo',
-                fundType: 'Tipo de Fundo',
+                title: 'Minhas Contas',
+                addFund: 'Adicionar Conta',
+                fundName: 'Nome da Conta',
+                fundType: 'Tipo de Conta',
                 currentValue: 'Valor Atual',
                 monthlyDeposit: 'Depósito Mensal',
                 types: {
                     training: 'Fundo de Capacitação',
                     pension: 'Previdência',
-                    gemel: 'Fundo de Investimento'
+                    gemel: 'Fundo de Investimento',
+                    savings: 'Apólice de Poupança'
                 },
-                noFunds: 'Nenhum fundo selecionado'
+                noFunds: 'Nenhuma conta selecionada'
             },
             // Assets
             assets: {
