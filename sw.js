@@ -1,7 +1,8 @@
-const CACHE_NAME = 'finsight-v3';
+const CACHE_NAME = 'finsight-v4';
 const ASSETS_TO_CACHE = [
     './',
     './index.html',
+    './img/logo.png',
     './css/app.css',
     './js/app.js',
     './js/storage.js',

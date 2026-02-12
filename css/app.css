@@ -130,8 +130,10 @@ body.ltr .main-content {
 }
 
 .brand-icon {
-    font-size: 2rem;
-    line-height: 1;
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    object-fit: contain;
 }
 
 .brand-name {
