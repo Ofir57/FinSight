@@ -69,7 +69,7 @@ body.ltr {
 }
 
 .sidebar {
-    width: 260px;
+    width: 230px;
     background: rgba(0, 0, 0, 0.2);
     backdrop-filter: blur(10px);
     border-left: 1px solid var(--color-border);
@@ -96,14 +96,14 @@ body.ltr .sidebar-header {
 
 .main-content {
     flex: 1;
-    margin-right: 260px;
+    margin-right: 230px;
     padding: var(--spacing-xl);
     max-width: 1400px;
 }
 
 body.ltr .main-content {
     margin-right: 0;
-    margin-left: 260px;
+    margin-left: 230px;
 }
 
 /* ===== Sidebar ===== */
@@ -242,6 +242,47 @@ body.ltr .nav-submenu {
 .nav-submenu .nav-link {
     font-size: 0.9rem;
     padding: var(--spacing-xs) var(--spacing-md);
+}
+
+/* ===== Logo Hero ===== */
+.logo-hero {
+    text-align: center;
+    margin-bottom: var(--spacing-lg);
+}
+
+.logo-hero-img {
+    width: 120px;
+    height: 120px;
+    object-fit: contain;
+    border-radius: 16px;
+}
+
+/* ===== Auth Buttons ===== */
+.auth-buttons {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.btn-auth {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    background: var(--color-bg-card);
+    color: var(--color-text-primary);
+    cursor: pointer;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+}
+
+.btn-auth:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--color-dashboard);
 }
 
 /* ===== Page Header ===== */

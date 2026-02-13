@@ -24,11 +24,6 @@
                     <img src="./img/logo.png" class="brand-icon" alt="FinSight">
                     <span class="brand-name">Fin<span class="brand-highlight">Sight</span></span>
                 </div>
-                <div class="lang-switcher">
-                    <button class="lang-btn active" data-lang="he" onclick="I18n.setLanguage('he')">HE</button>
-                    <button class="lang-btn" data-lang="en" onclick="I18n.setLanguage('en')">EN</button>
-                    <button class="lang-btn" data-lang="pt" onclick="I18n.setLanguage('pt')">PT</button>
-                </div>
             </div>
 
             <!-- Auth Section -->
@@ -44,12 +39,20 @@
                         .sync-status.syncing { background: rgba(59, 130, 246, 0.2); color: #3b82f6; }
                     </style>
                 </div>
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    <button id="authBtn" class="btn btn-primary btn-sm" style="flex: 1;">
-                        🔐 התחבר עם Google
+                <div id="authButtons" class="auth-buttons">
+                    <button class="btn btn-auth" onclick="Auth.signInWithGoogle()">
+                        <span>G</span> Google
                     </button>
-                    <span id="syncStatus" class="sync-status local">💾 מקומי</span>
+                    <button class="btn btn-auth" onclick="Auth.showEmailLogin()">
+                        <span>📧</span> אימייל
+                    </button>
                 </div>
+                <div id="authLogout" style="display: none;">
+                    <button id="authBtn" class="btn btn-secondary btn-sm" style="width: 100%;" onclick="Auth.signOut()">
+                        התנתק
+                    </button>
+                </div>
+                <span id="syncStatus" class="sync-status local">💾 מקומי</span>
             </div>
 
             <nav>

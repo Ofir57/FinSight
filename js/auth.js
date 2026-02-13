@@ -46,6 +46,106 @@ const Auth = {
     },
 
     /**
+     * Sign in with Email/Password
+     */
+    async signInWithEmail(email, password) {
+        try {
+            const result = await firebaseAuth.signInWithEmailAndPassword(email, password);
+            App.notify(`ברוך הבא, ${result.user.email}!`, 'success');
+            this.closeEmailModal();
+            return result.user;
+        } catch (error) {
+            console.error('Email sign in error:', error);
+            if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+                App.notify('אימייל או סיסמה שגויים', 'error');
+            } else if (error.code === 'auth/invalid-email') {
+                App.notify('כתובת אימייל לא תקינה', 'error');
+            } else {
+                App.notify('שגיאה בהתחברות: ' + error.message, 'error');
+            }
+            return null;
+        }
+    },
+
+    /**
+     * Register with Email/Password
+     */
+    async registerWithEmail(email, password) {
+        try {
+            const result = await firebaseAuth.createUserWithEmailAndPassword(email, password);
+            App.notify(`נרשמת בהצלחה! ברוך הבא`, 'success');
+            this.closeEmailModal();
+            return result.user;
+        } catch (error) {
+            console.error('Email register error:', error);
+            if (error.code === 'auth/email-already-in-use') {
+                App.notify('אימייל זה כבר רשום, נסה להתחבר', 'error');
+            } else if (error.code === 'auth/weak-password') {
+                App.notify('הסיסמה חלשה מדי (מינימום 6 תווים)', 'error');
+            } else if (error.code === 'auth/invalid-email') {
+                App.notify('כתובת אימייל לא תקינה', 'error');
+            } else {
+                App.notify('שגיאה בהרשמה: ' + error.message, 'error');
+            }
+            return null;
+        }
+    },
+
+    /**
+     * Show email login modal
+     */
+    showEmailLogin() {
+        let modal = document.getElementById('emailAuthModal');
+        if (modal) {
+            modal.style.display = 'flex';
+            return;
+        }
+
+        modal = document.createElement('div');
+        modal.id = 'emailAuthModal';
+        modal.className = 'modal-overlay active';
+        modal.innerHTML = `
+            <div class="modal" style="max-width: 400px;">
+                <div class="modal-header">
+                    <h2>📧 התחברות עם אימייל</h2>
+                    <button class="modal-close" onclick="Auth.closeEmailModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>אימייל</label>
+                        <input type="email" id="emailAuthInput" class="form-control" placeholder="email@example.com" dir="ltr">
+                    </div>
+                    <div class="form-group">
+                        <label>סיסמה</label>
+                        <input type="password" id="emailAuthPassword" class="form-control" placeholder="סיסמה (מינימום 6 תווים)" dir="ltr">
+                    </div>
+                    <div class="auth-buttons" style="margin-top: 15px;">
+                        <button class="btn btn-primary" style="flex: 1;" onclick="Auth.signInWithEmail(document.getElementById('emailAuthInput').value, document.getElementById('emailAuthPassword').value)">
+                            התחבר
+                        </button>
+                        <button class="btn btn-secondary" style="flex: 1;" onclick="Auth.registerWithEmail(document.getElementById('emailAuthInput').value, document.getElementById('emailAuthPassword').value)">
+                            הרשמה
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) this.closeEmailModal();
+        });
+        document.getElementById('emailAuthInput').focus();
+    },
+
+    /**
+     * Close email login modal
+     */
+    closeEmailModal() {
+        const modal = document.getElementById('emailAuthModal');
+        if (modal) modal.style.display = 'none';
+    },
+
+    /**
      * Sign out
      */
     async signOut() {
@@ -62,17 +162,17 @@ const Auth = {
      * Update UI based on auth state
      */
     updateUI() {
-        const authBtn = document.getElementById('authBtn');
+        const authButtons = document.getElementById('authButtons');
+        const authLogout = document.getElementById('authLogout');
         const userInfo = document.getElementById('userInfo');
         const syncStatus = document.getElementById('syncStatus');
 
-        if (!authBtn) return;
+        if (!authButtons && !authLogout) return;
 
         if (this.currentUser) {
-            // User is signed in
-            authBtn.innerHTML = `<span>התנתק</span>`;
-            authBtn.onclick = () => this.signOut();
-            authBtn.className = 'btn btn-secondary';
+            // User is signed in - hide login buttons, show logout
+            if (authButtons) authButtons.style.display = 'none';
+            if (authLogout) authLogout.style.display = 'block';
 
             if (userInfo) {
                 const photo = this.currentUser.photoURL || '';
@@ -91,10 +191,9 @@ const Auth = {
                 syncStatus.className = 'sync-status synced';
             }
         } else {
-            // User is signed out
-            authBtn.innerHTML = `<span>🔐 התחבר עם Google</span>`;
-            authBtn.onclick = () => this.signInWithGoogle();
-            authBtn.className = 'btn btn-primary';
+            // User is signed out - show login buttons, hide logout
+            if (authButtons) authButtons.style.display = 'flex';
+            if (authLogout) authLogout.style.display = 'none';
 
             if (userInfo) {
                 userInfo.style.display = 'none';
