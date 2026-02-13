@@ -251,8 +251,8 @@ body.ltr .nav-submenu {
 }
 
 .logo-hero-img {
-    width: 80px;
-    height: 80px;
+    width: 160px;
+    height: auto;
     object-fit: contain;
     border-radius: 12px;
 }
