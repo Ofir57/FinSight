@@ -47,6 +47,13 @@ const ImageImport = {
                 return;
             }
 
+            // Try smart extraction for card-layout financial screenshots
+            const smartData = this.extractFinancialCard(text, dataType);
+            if (smartData) {
+                this.showSmartPreviewModal(smartData, dataType);
+                return;
+            }
+
             const rows = this.parseOCRText(text);
             if (rows.length < 1) {
                 App.notify('לא נמצאו שורות נתונים בתמונה', 'error');
@@ -59,6 +66,229 @@ const ImageImport = {
             console.error('OCR error:', error);
             App.notify('שגיאה בזיהוי טקסט: ' + error.message, 'error');
         }
+    },
+
+    /**
+     * Try to extract structured data from card-layout financial screenshots
+     * (e.g. Menora, Harel, Migdal pension/fund summary pages)
+     */
+    extractFinancialCard(text, dataType) {
+        // Extract all numbers that look like monetary values (with commas)
+        const amounts = [];
+        const amountPattern = /[\d,]+\.\d{2}/g;
+        let m;
+        while ((m = amountPattern.exec(text)) !== null) {
+            const val = parseFloat(m[0].replace(/,/g, ''));
+            if (val > 100) amounts.push(val);
+        }
+
+        if (amounts.length === 0) return null;
+
+        // Detect fund/company name from known Israeli providers
+        const providers = [
+            { key: 'menora', patterns: ['מנורה', 'menora'] },
+            { key: 'harel', patterns: ['הראל', 'harel'] },
+            { key: 'migdal', patterns: ['מגדל', 'migdal'] },
+            { key: 'phoenix', patterns: ['פניקס', 'הפניקס', 'phoenix'] },
+            { key: 'clal', patterns: ['כלל', 'clal'] },
+            { key: 'meitav', patterns: ['מיטב', 'meitav'] },
+            { key: 'altshuler', patterns: ['אלטשולר', 'altshuler'] },
+            { key: 'psagot', patterns: ['פסגות', 'psagot'] },
+            { key: 'analyst', patterns: ['אנליסט', 'analyst'] },
+            { key: 'yelin', patterns: ['ילין', 'yelin'] },
+            { key: 'more', patterns: ['מור', 'more'] }
+        ];
+
+        const textLower = text.toLowerCase();
+        let company = 'other';
+        for (const p of providers) {
+            if (p.patterns.some(pat => textLower.includes(pat))) {
+                company = p.key;
+                break;
+            }
+        }
+
+        // Detect fund type
+        let type = 'gemel';
+        if (/פנסי[הת]/.test(text)) type = 'pension';
+        else if (/השתלמות/.test(text)) type = 'training';
+        else if (/גמל/.test(text)) type = 'gemel';
+        else if (/חיסכון/.test(text)) type = 'savings';
+
+        // Detect fund number
+        let fundNumber = '';
+        const fundNumMatch = text.match(/מספר קופה\s*:?\s*(\d+)/);
+        if (fundNumMatch) fundNumber = fundNumMatch[1];
+
+        // Detect investment track
+        let track = '';
+        const trackMatch = text.match(/(?:מסלול|המסלול שלי)[^\n]*?[\n\r]+([^\n\r]+)/);
+        if (trackMatch) track = trackMatch[1].trim();
+        if (!track) {
+            // Try to find S&P or common track names
+            const spMatch = text.match(/(?:מניות|אגח|אג"ח|S&P|מדד)[^,\n]*/);
+            if (spMatch) track = spMatch[0].trim();
+        }
+
+        // Build fund name
+        const companyName = providers.find(p => p.key === company);
+        const typeNames = { pension: 'פנסיה', training: 'קרן השתלמות', gemel: 'קופת גמל', savings: 'פוליסת חיסכון' };
+        let fundName = (companyName ? companyName.patterns[0] : '') + ' ' + (typeNames[type] || '');
+        // Check for "מקיפה" or "כללית" etc.
+        if (text.includes('מקיפה')) fundName += ' מקיפה';
+        else if (text.includes('כללית')) fundName += ' כללית';
+        fundName = fundName.trim();
+
+        // The largest amount is likely the total balance
+        const balance = Math.max(...amounts);
+
+        // Try to find expected pension (קצבה צפויה)
+        let expectedPension = null;
+        const pensionMatch = text.match(/קצבה\s*(?:צפויה)?[^\d]*?([\d,]+\.\d{2})/);
+        if (pensionMatch) {
+            expectedPension = parseFloat(pensionMatch[1].replace(/,/g, ''));
+        }
+
+        return {
+            name: fundName,
+            company: company,
+            type: type,
+            value: balance,
+            fundNumber: fundNumber,
+            track: track,
+            expectedPension: expectedPension,
+            allAmounts: amounts
+        };
+    },
+
+    /**
+     * Show preview modal for smart-extracted card data
+     */
+    showSmartPreviewModal(data, dataType) {
+        const typeNames = { pension: 'פנסיה', training: 'קרן השתלמות', gemel: 'קופת גמל', savings: 'פוליסת חיסכון' };
+
+        let fieldsHTML = `
+            <div class="form-group">
+                <label>שם הקרן</label>
+                <input type="text" class="form-control" id="smartName" value="${data.name}">
+            </div>
+            <div class="form-group">
+                <label>סוג</label>
+                <select class="form-control" id="smartType">
+                    <option value="pension" ${data.type === 'pension' ? 'selected' : ''}>🏛️ פנסיה</option>
+                    <option value="training" ${data.type === 'training' ? 'selected' : ''}>🎓 קרן השתלמות</option>
+                    <option value="gemel" ${data.type === 'gemel' ? 'selected' : ''}>💼 קופת גמל</option>
+                    <option value="savings" ${data.type === 'savings' ? 'selected' : ''}>🐷 פוליסת חיסכון</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>חברה</label>
+                <select class="form-control" id="smartCompany">
+                    <option value="menora" ${data.company === 'menora' ? 'selected' : ''}>מנורה מבטחים</option>
+                    <option value="harel" ${data.company === 'harel' ? 'selected' : ''}>הראל</option>
+                    <option value="migdal" ${data.company === 'migdal' ? 'selected' : ''}>מגדל</option>
+                    <option value="phoenix" ${data.company === 'phoenix' ? 'selected' : ''}>הפניקס</option>
+                    <option value="clal" ${data.company === 'clal' ? 'selected' : ''}>כלל</option>
+                    <option value="meitav" ${data.company === 'meitav' ? 'selected' : ''}>מיטב דש</option>
+                    <option value="altshuler" ${data.company === 'altshuler' ? 'selected' : ''}>אלטשולר שחם</option>
+                    <option value="psagot" ${data.company === 'psagot' ? 'selected' : ''}>פסגות</option>
+                    <option value="analyst" ${data.company === 'analyst' ? 'selected' : ''}>אנליסט</option>
+                    <option value="yelin" ${data.company === 'yelin' ? 'selected' : ''}>ילין לפידות</option>
+                    <option value="more" ${data.company === 'more' ? 'selected' : ''}>מור</option>
+                    <option value="other" ${data.company === 'other' ? 'selected' : ''}>אחר</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>שווי צבירה (₪)</label>
+                <input type="number" class="form-control" id="smartValue" value="${data.value}" step="0.01">
+            </div>
+            <div class="form-group">
+                <label>מספר קופה</label>
+                <input type="text" class="form-control" id="smartFundNumber" value="${data.fundNumber}">
+            </div>`;
+
+        if (data.track) {
+            fieldsHTML += `
+            <div class="form-group">
+                <label>מסלול השקעה</label>
+                <input type="text" class="form-control" id="smartTrack" value="${data.track}" readonly style="opacity: 0.7;">
+            </div>`;
+        }
+
+        if (data.expectedPension) {
+            fieldsHTML += `
+            <div class="form-group">
+                <label>קצבה צפויה (₪)</label>
+                <input type="number" class="form-control" id="smartPension" value="${data.expectedPension}" step="0.01">
+            </div>`;
+        }
+
+        const modal = document.createElement('div');
+        modal.className = 'modal-overlay active';
+        modal.id = 'ocrPreviewModal';
+        modal.innerHTML = `
+            <div class="modal" style="max-width: 500px;">
+                <div class="modal-header">
+                    <h2>נתונים שזוהו מהתמונה</h2>
+                    <button class="modal-close" onclick="document.getElementById('ocrPreviewModal').remove()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p style="margin-bottom: 15px; color: var(--color-text-secondary); font-size: 0.9rem;">
+                        זוהו נתוני ${typeNames[data.type] || 'קרן'} — ניתן לערוך לפני ייבוא.
+                    </p>
+                    ${fieldsHTML}
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" onclick="document.getElementById('ocrPreviewModal').remove()">ביטול</button>
+                    <button class="btn btn-primary" onclick="ImageImport.confirmSmartImport('${dataType}')">ייבא</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    },
+
+    /**
+     * Confirm import from smart-extracted card data
+     */
+    confirmSmartImport(dataType) {
+        const name = document.getElementById('smartName').value.trim();
+        const type = document.getElementById('smartType').value;
+        const company = document.getElementById('smartCompany').value;
+        const value = parseFloat(document.getElementById('smartValue').value) || 0;
+        const fundNumber = document.getElementById('smartFundNumber').value.trim();
+        const pensionEl = document.getElementById('smartPension');
+        const expectedPension = pensionEl ? parseFloat(pensionEl.value) || null : null;
+
+        if (!name || !value) {
+            App.notify('יש למלא שם ושווי', 'error');
+            return;
+        }
+
+        document.getElementById('ocrPreviewModal').remove();
+
+        const now = new Date().toISOString();
+        const today = now.split('T')[0];
+        const FUNDS_KEY = 'finance_my_funds';
+
+        const funds = JSON.parse(localStorage.getItem(FUNDS_KEY) || '[]');
+        funds.push({
+            id: 'fund_' + Date.now(),
+            type: type,
+            name: name,
+            company: company,
+            value: value,
+            monthlyDeposit: 0,
+            accountNumber: fundNumber,
+            actuarialBalance: expectedPension,
+            notes: '',
+            history: [{ date: today, value: value }],
+            createdAt: now,
+            updatedAt: now
+        });
+        localStorage.setItem(FUNDS_KEY, JSON.stringify(funds));
+
+        if (typeof loadFunds === 'function') loadFunds();
+        App.notify('הקרן יובאה בהצלחה', 'success');
     },
 
     /**
@@ -413,13 +643,18 @@ const ImageImport = {
     },
 
     importFunds(rows) {
+        const FUNDS_KEY = 'finance_my_funds';
         const headers = rows[0];
         const nameCol = this.detectColumn(headers, ['שם', 'קרן', 'name', 'fund']);
         const typeCol = this.detectColumn(headers, ['סוג', 'type', 'מסלול']);
         const valCol = this.detectColumn(headers, ['שווי', 'יתרה', 'סכום', 'value', 'balance', 'amount']);
         const numCol = this.detectColumn(headers, ['מספר', 'number']);
 
+        const funds = JSON.parse(localStorage.getItem(FUNDS_KEY) || '[]');
+        const now = new Date().toISOString();
+        const today = now.split('T')[0];
         let imported = 0;
+
         for (let i = 1; i < rows.length; i++) {
             const row = rows[i];
             const first = (row[0] || '').trim();
@@ -432,21 +667,26 @@ const ImageImport = {
             const type = typeCol >= 0 ? this.mapFundType(row[typeCol]) : 'gemel';
             const fundNumber = numCol >= 0 ? (row[numCol] || '').trim() : '';
 
-            // Use Storage to add fund (my-funds uses a generic fund storage)
-            const funds = JSON.parse(localStorage.getItem('finsight_my_funds') || '[]');
             funds.push({
-                id: Date.now().toString(36) + Math.random().toString(36).substr(2, 5),
-                name: name,
+                id: 'fund_' + Date.now() + '_' + i,
                 type: type,
+                name: name,
+                company: 'other',
                 value: value,
-                fundNumber: fundNumber,
-                addedAt: new Date().toISOString()
+                monthlyDeposit: 0,
+                accountNumber: fundNumber,
+                notes: '',
+                history: [{ date: today, value: value }],
+                createdAt: now,
+                updatedAt: now
             });
-            localStorage.setItem('finsight_my_funds', JSON.stringify(funds));
             imported++;
         }
 
-        if (imported > 0 && typeof loadFunds === 'function') loadFunds();
+        if (imported > 0) {
+            localStorage.setItem(FUNDS_KEY, JSON.stringify(funds));
+            if (typeof loadFunds === 'function') loadFunds();
+        }
         return imported;
     },
 
