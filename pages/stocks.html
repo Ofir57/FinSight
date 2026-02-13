@@ -1912,8 +1912,25 @@
             if (!file) return;
 
             try {
-                const text = await file.text();
-                const holdings = parseBrokerXLS(text);
+                // Try reading as XLSX first (for FinSight exports and real xlsx)
+                let holdings = [];
+                const arrayBuffer = await file.arrayBuffer();
+                try {
+                    const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+                    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+                    // Check if it's a FinSight export (has "סימול" header)
+                    if (rows.length > 0 && rows[0].some(c => String(c || '').includes('סימול'))) {
+                        holdings = parseFinSightExport(rows);
+                    }
+                } catch(e) { /* not a valid xlsx, try XML below */ }
+
+                // Fallback: try XML-based XLS (Israeli brokers)
+                if (holdings.length === 0) {
+                    const text = new TextDecoder().decode(arrayBuffer);
+                    holdings = parseBrokerXLS(text);
+                }
 
                 if (holdings.length === 0) {
                     App.notify('לא נמצאו אחזקות בקובץ', 'error');
@@ -1977,6 +1994,45 @@
 
             // Reset file input
             event.target.value = '';
+        }
+
+        function parseFinSightExport(rows) {
+            const headers = rows[0].map(h => String(h || '').trim());
+            const symIdx = headers.findIndex(h => h.includes('סימול'));
+            const nameIdx = headers.findIndex(h => h === 'שם');
+            const qtyIdx = headers.findIndex(h => h.includes('כמות'));
+            const currIdx = headers.findIndex(h => h.includes('מטבע'));
+            const buyPriceIdx = headers.findIndex(h => h.includes('מחיר רכישה'));
+            const costIdx = headers.findIndex(h => h.includes('עלות רכישה'));
+            const curPriceIdx = headers.findIndex(h => h.includes('מחיר נוכחי'));
+            const valueIdx = headers.findIndex(h => h.includes('שווי נוכחי'));
+            const profitIdx = headers.findIndex(h => h.includes('רווח'));
+
+            if (symIdx === -1 || qtyIdx === -1) return [];
+
+            const holdings = [];
+            for (let i = 1; i < rows.length; i++) {
+                const row = rows[i];
+                if (!row || !row[symIdx]) continue;
+
+                const symbol = String(row[symIdx]).trim();
+                const name = nameIdx >= 0 ? String(row[nameIdx] || symbol).trim() : symbol;
+                const quantity = parseFloat(String(row[qtyIdx] || '0').replace(/,/g, ''));
+                const currency = currIdx >= 0 ? String(row[currIdx] || 'ILS').trim() : 'ILS';
+                const avgPrice = buyPriceIdx >= 0 ? parseFloat(String(row[buyPriceIdx] || '0').replace(/,/g, '')) : 0;
+                const currentPrice = curPriceIdx >= 0 ? parseFloat(String(row[curPriceIdx] || '0').replace(/,/g, '')) : avgPrice;
+                const valueILS = valueIdx >= 0 ? parseFloat(String(row[valueIdx] || '0').replace(/,/g, '')) : 0;
+                const profitILS = profitIdx >= 0 ? parseFloat(String(row[profitIdx] || '0').replace(/,/g, '')) : 0;
+
+                if (!symbol || isNaN(quantity) || quantity <= 0) continue;
+
+                const market = currency === 'ILS' ? 'IL' : 'US';
+                holdings.push({
+                    symbol, name, quantity, avgPrice, currentPrice,
+                    currency, market, valueILS, profitILS
+                });
+            }
+            return holdings;
         }
 
         function parseBrokerXLS(content) {
