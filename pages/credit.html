@@ -9,6 +9,7 @@
     <title>כרטיסי אשראי - FinSight</title>
     <link rel="stylesheet" href="../css/app.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     <style>
         .nav-link.active { background: var(--color-credit) !important; }
         .page-header h1 { color: var(--color-credit); }
@@ -159,6 +160,9 @@
 
         <!-- Main Content -->
         <main class="main-content">
+            <div class="logo-hero">
+                <img src="../img/logo.png" alt="FinSight" class="logo-hero-img">
+            </div>
             <header class="page-header">
                 <h1>
                     <span>💳</span>
@@ -216,6 +220,10 @@
                         <button class="btn btn-secondary btn-sm" onclick="document.getElementById('smartImportInput').click()">
                             <span>📥</span>
                             <span>ייבוא חכם</span>
+                        </button>
+                        <button class="btn btn-secondary btn-sm" onclick="ImageImport.openImagePicker('credit')">
+                            <span>📷</span>
+                            <span>ייבוא מתמונה</span>
                         </button>
                         <input type="file" id="smartImportInput" accept=".xlsx,.xls,.csv" style="display: none;" onchange="smartImportFile(event)">
                         <button class="btn btn-danger btn-sm" onclick="deleteAllExpenses()">
@@ -375,6 +383,7 @@
     <script src="../js/charts.js"></script>
     <script src="../js/csv-import.js"></script>
     <script src="../js/smart-import.js"></script>
+    <script src="../js/image-import.js"></script>
     <script src="../js/alerts.js"></script>
     <script src="../js/tags.js"></script>
     <script src="../js/app.js"></script>

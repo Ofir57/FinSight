@@ -9,6 +9,7 @@
     <title>חשבונות בנק - FinSight</title>
     <link rel="stylesheet" href="../css/app.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     <style>
         .nav-link.active { background: var(--color-bank) !important; }
         .page-header h1 { color: var(--color-bank); }
@@ -91,6 +92,9 @@
 
         <!-- Main Content -->
         <main class="main-content">
+            <div class="logo-hero">
+                <img src="../img/logo.png" alt="FinSight" class="logo-hero-img">
+            </div>
             <header class="page-header">
                 <h1>
                     <span>🏦</span>
@@ -113,6 +117,10 @@
                 <button class="btn btn-secondary" onclick="importSmartFile()">
                     <span>📥</span>
                     <span>ייבוא חכם</span>
+                </button>
+                <button class="btn btn-secondary" onclick="ImageImport.openImagePicker('bank')">
+                    <span>📷</span>
+                    <span>ייבוא מתמונה</span>
                 </button>
             </div>
 
@@ -246,6 +254,7 @@
     <script src="../js/charts.js"></script>
     <script src="../js/csv-import.js"></script>
     <script src="../js/smart-import.js"></script>
+    <script src="../js/image-import.js"></script>
     <script src="../js/app.js"></script>
     <script>
         // Page specific code

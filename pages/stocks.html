@@ -9,6 +9,7 @@
     <title>תיק מניות - FinSight</title>
     <link rel="stylesheet" href="../css/app.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
@@ -232,6 +233,9 @@
 
         <!-- Main Content -->
         <main class="main-content">
+            <div class="logo-hero">
+                <img src="../img/logo.png" alt="FinSight" class="logo-hero-img">
+            </div>
             <header class="page-header">
                 <h1>
                     <span>📈</span>
@@ -283,6 +287,10 @@
                 <button class="btn btn-secondary" onclick="exportHoldingsToExcel()">
                     <span>📊</span>
                     <span>ייצוא Excel</span>
+                </button>
+                <button class="btn btn-secondary" onclick="ImageImport.openImagePicker('stocks')">
+                    <span>📷</span>
+                    <span>ייבוא מתמונה</span>
                 </button>
                 <input type="file" id="brokerFileInput" accept=".xls,.xlsx,.xml" style="display: none;" onchange="handleBrokerFile(event)">
                 <label class="auto-refresh-toggle" style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
@@ -704,6 +712,7 @@
     <script src="../js/i18n.js"></script>
     <script src="../js/charts.js"></script>
     <script src="../js/csv-import.js"></script>
+    <script src="../js/image-import.js"></script>
     <script src="../js/stock-api.js"></script>
     <script src="../js/stock-alerts.js"></script>
     <script src="../js/notifications.js"></script>
