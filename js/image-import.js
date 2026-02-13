@@ -47,6 +47,8 @@ const ImageImport = {
                 return;
             }
 
+            console.log('OCR raw text:', text);
+
             // Try smart extraction for card-layout financial screenshots
             const smartData = this.extractFinancialCard(text, dataType);
             if (smartData) {
@@ -73,20 +75,55 @@ const ImageImport = {
      * (e.g. Menora, Harel, Migdal pension/fund summary pages)
      */
     extractFinancialCard(text, dataType) {
-        // Extract all numbers that look like monetary values (with commas)
+        console.log('Trying smart extraction on:', text);
+
+        // Check if this looks like a financial card (not a table)
+        // Look for known Israeli financial keywords
+        const financialKeywords = ['צברתי', 'צבירה', 'בקופה', 'קצבה', 'מסלול', 'קופה',
+            'פנסי', 'השתלמות', 'גמל', 'חיסכון', 'מבטחים', 'ביטוח'];
+        const hasFinancialContext = financialKeywords.some(kw => text.includes(kw));
+        if (!hasFinancialContext) return null;
+
+        // Extract ALL numbers from text — handle various OCR formats:
+        // 719,539.54 | 719.539,54 | 719539.54 | 10,423.29 | ₪719,539
         const amounts = [];
-        const amountPattern = /[\d,]+\.\d{2}/g;
-        let m;
-        while ((m = amountPattern.exec(text)) !== null) {
-            const val = parseFloat(m[0].replace(/,/g, ''));
-            if (val > 100) amounts.push(val);
-        }
+
+        // Pattern 1: numbers with commas and decimal (719,539.54)
+        const p1 = text.match(/[\d][,\d]*\d\.\d{1,2}/g) || [];
+        p1.forEach(s => {
+            const val = parseFloat(s.replace(/,/g, ''));
+            if (!isNaN(val) && val > 50) amounts.push(val);
+        });
+
+        // Pattern 2: numbers with dots as thousands separator and comma decimal (719.539,54)
+        const p2 = text.match(/[\d][.\d]*\d,\d{1,2}/g) || [];
+        p2.forEach(s => {
+            const val = parseFloat(s.replace(/\./g, '').replace(',', '.'));
+            if (!isNaN(val) && val > 50) amounts.push(val);
+        });
+
+        // Pattern 3: plain large numbers without decimals (719539 or 719,539)
+        const p3 = text.match(/(?:₪\s*)?(\d{1,3}(?:[,]\d{3})+)(?!\.\d)/g) || [];
+        p3.forEach(s => {
+            const val = parseFloat(s.replace(/[₪\s,]/g, ''));
+            if (!isNaN(val) && val > 50) amounts.push(val);
+        });
+
+        // Pattern 4: numbers right after ₪ symbol
+        const p4 = text.match(/₪\s*([\d,.]+)/g) || [];
+        p4.forEach(s => {
+            const numStr = s.replace(/₪\s*/, '');
+            const val = parseFloat(numStr.replace(/,/g, ''));
+            if (!isNaN(val) && val > 50 && !amounts.includes(val)) amounts.push(val);
+        });
+
+        console.log('Extracted amounts:', amounts);
 
         if (amounts.length === 0) return null;
 
         // Detect fund/company name from known Israeli providers
         const providers = [
-            { key: 'menora', patterns: ['מנורה', 'menora'] },
+            { key: 'menora', patterns: ['מנורה', 'מנורא', 'menora'] },
             { key: 'harel', patterns: ['הראל', 'harel'] },
             { key: 'migdal', patterns: ['מגדל', 'migdal'] },
             { key: 'phoenix', patterns: ['פניקס', 'הפניקס', 'phoenix'] },
@@ -96,13 +133,12 @@ const ImageImport = {
             { key: 'psagot', patterns: ['פסגות', 'psagot'] },
             { key: 'analyst', patterns: ['אנליסט', 'analyst'] },
             { key: 'yelin', patterns: ['ילין', 'yelin'] },
-            { key: 'more', patterns: ['מור', 'more'] }
+            { key: 'more', patterns: ['מור בית'] }
         ];
 
-        const textLower = text.toLowerCase();
         let company = 'other';
         for (const p of providers) {
-            if (p.patterns.some(pat => textLower.includes(pat))) {
+            if (p.patterns.some(pat => text.includes(pat))) {
                 company = p.key;
                 break;
             }
@@ -110,31 +146,40 @@ const ImageImport = {
 
         // Detect fund type
         let type = 'gemel';
-        if (/פנסי[הת]/.test(text)) type = 'pension';
+        if (/פנסי/.test(text)) type = 'pension';
         else if (/השתלמות/.test(text)) type = 'training';
         else if (/גמל/.test(text)) type = 'gemel';
         else if (/חיסכון/.test(text)) type = 'savings';
 
-        // Detect fund number
+        // Detect fund number — flexible patterns
         let fundNumber = '';
-        const fundNumMatch = text.match(/מספר קופה\s*:?\s*(\d+)/);
-        if (fundNumMatch) fundNumber = fundNumMatch[1];
+        const fundNumPatterns = [
+            /מספר\s*קופה\s*:?\s*(\d+)/,
+            /קופה\s*:?\s*(\d+)/,
+            /מס[פ']?\s*:?\s*(\d{2,6})/
+        ];
+        for (const pat of fundNumPatterns) {
+            const fm = text.match(pat);
+            if (fm) { fundNumber = fm[1]; break; }
+        }
 
         // Detect investment track
         let track = '';
-        const trackMatch = text.match(/(?:מסלול|המסלול שלי)[^\n]*?[\n\r]+([^\n\r]+)/);
-        if (trackMatch) track = trackMatch[1].trim();
-        if (!track) {
-            // Try to find S&P or common track names
-            const spMatch = text.match(/(?:מניות|אגח|אג"ח|S&P|מדד)[^,\n]*/);
-            if (spMatch) track = spMatch[0].trim();
+        const trackPatterns = [
+            /(?:המסלול שלי|מסלול השקעה)[:\s]*([^\n]+)/,
+            /(?:מסלול)[:\s]*([^\n]+)/,
+            /(מניות[^,\n]*(?:S&P|מדד)[^\n]*)/,
+            /(S&P\s*\d*[^\n]*)/
+        ];
+        for (const pat of trackPatterns) {
+            const tm = text.match(pat);
+            if (tm) { track = tm[1].trim(); break; }
         }
 
         // Build fund name
-        const companyName = providers.find(p => p.key === company);
+        const providerObj = providers.find(p => p.key === company);
         const typeNames = { pension: 'פנסיה', training: 'קרן השתלמות', gemel: 'קופת גמל', savings: 'פוליסת חיסכון' };
-        let fundName = (companyName ? companyName.patterns[0] : '') + ' ' + (typeNames[type] || '');
-        // Check for "מקיפה" or "כללית" etc.
+        let fundName = (providerObj ? providerObj.patterns[0] : '') + ' ' + (typeNames[type] || '');
         if (text.includes('מקיפה')) fundName += ' מקיפה';
         else if (text.includes('כללית')) fundName += ' כללית';
         fundName = fundName.trim();
@@ -144,10 +189,22 @@ const ImageImport = {
 
         // Try to find expected pension (קצבה צפויה)
         let expectedPension = null;
-        const pensionMatch = text.match(/קצבה\s*(?:צפויה)?[^\d]*?([\d,]+\.\d{2})/);
-        if (pensionMatch) {
-            expectedPension = parseFloat(pensionMatch[1].replace(/,/g, ''));
+        const pensionPatterns = [
+            /קצבה[^\d₪]*([\d][,\d]*\.?\d*)/,
+            /קצבה\s*צפויה[^\d₪]*([\d][,\d]*\.?\d*)/
+        ];
+        for (const pat of pensionPatterns) {
+            const pm = text.match(pat);
+            if (pm) {
+                const val = parseFloat(pm[1].replace(/,/g, ''));
+                if (!isNaN(val) && val < balance) {
+                    expectedPension = val;
+                    break;
+                }
+            }
         }
+
+        console.log('Smart extraction result:', { fundName, company, type, balance, fundNumber, track, expectedPension });
 
         return {
             name: fundName,
