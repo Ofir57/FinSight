@@ -11,3 +11,6 @@ Thumbs.db
 # Logs
 *.log
 .claude/
+
+# Dependencies
+node_modules/
