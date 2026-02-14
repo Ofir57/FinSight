@@ -11,8 +11,6 @@
     <style>
         .nav-link.active { background: #00d2ff !important; color: #1a1a2e !important; }
         .page-header h1 { color: #00d2ff; }
-        .btn-primary { background: #00d2ff; color: #1a1a2e; }
-        .btn-primary:hover { background: #00b8e6; }
 
         .product-tabs {
             display: flex;
@@ -33,9 +31,7 @@
             font-size: 0.95rem;
         }
 
-        .product-tab:hover {
-            border-color: #00d2ff;
-        }
+        .product-tab:hover { border-color: #00d2ff; }
 
         .product-tab.active {
             background: #00d2ff;
@@ -43,6 +39,44 @@
             color: #1a1a2e;
         }
 
+        /* Source toggle */
+        .source-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .source-tab {
+            padding: 8px 16px;
+            border: 1px solid var(--color-border);
+            border-radius: 20px;
+            background: transparent;
+            color: var(--color-text-secondary);
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.85rem;
+        }
+
+        .source-tab:hover { border-color: #00d2ff; color: #00d2ff; }
+
+        .source-tab.active {
+            background: rgba(0, 210, 255, 0.15);
+            border-color: #00d2ff;
+            color: #00d2ff;
+        }
+
+        .source-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            font-size: 0.85rem;
+            color: var(--color-text-secondary);
+        }
+
+        .source-info a { color: #00d2ff; text-decoration: none; }
+
+        /* My products */
         .my-products-section {
             background: var(--color-bg-card);
             border: 1px solid rgba(0, 210, 255, 0.3);
@@ -70,109 +104,174 @@
             border: 1px solid var(--color-border);
         }
 
-        .my-product-card .name {
-            font-weight: 600;
+        .my-product-card .name { font-weight: 600; }
+        .my-product-card .company { font-size: 0.85rem; color: var(--color-text-secondary); }
+        .my-product-card .value { font-weight: 700; color: #00d2ff; font-size: 1.1rem; }
+
+        .my-products-empty { text-align: center; color: var(--color-text-secondary); padding: 20px; }
+        .my-products-link { display: inline-block; margin-top: 10px; color: #00d2ff; text-decoration: none; font-size: 0.9rem; }
+        .my-products-link:hover { text-decoration: underline; }
+
+        /* Stats row */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
         }
 
-        .my-product-card .company {
-            font-size: 0.85rem;
-            color: var(--color-text-secondary);
-        }
-
-        .my-product-card .value {
-            font-weight: 700;
-            color: #00d2ff;
-            font-size: 1.1rem;
-        }
-
-        .my-products-empty {
-            text-align: center;
-            color: var(--color-text-secondary);
+        .stat-card {
+            background: var(--color-bg-card);
+            border-radius: 12px;
             padding: 20px;
-        }
-
-        .my-products-link {
-            display: inline-block;
-            margin-top: 10px;
-            color: #00d2ff;
-            text-decoration: none;
-            font-size: 0.9rem;
-        }
-
-        .my-products-link:hover {
-            text-decoration: underline;
-        }
-
-        .source-tabs {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 15px;
-        }
-
-        .source-tab {
-            padding: 8px 16px;
-            border: 1px solid var(--color-border);
-            border-radius: 20px;
-            background: transparent;
-            color: var(--color-text-secondary);
-            cursor: pointer;
-            transition: all 0.3s;
-            font-size: 0.85rem;
-        }
-
-        .source-tab:hover {
-            border-color: #00d2ff;
-            color: #00d2ff;
-        }
-
-        .source-tab.active {
-            background: rgba(0, 210, 255, 0.15);
-            border-color: #00d2ff;
-            color: #00d2ff;
-        }
-
-        .market-table table {
-            width: 100%;
-        }
-
-        .market-table th {
-            cursor: pointer;
-            user-select: none;
-            white-space: nowrap;
-        }
-
-        .market-table th:hover {
-            color: #00d2ff;
-        }
-
-        .market-table th .sort-arrow {
-            margin-right: 4px;
-            font-size: 0.7rem;
-        }
-
-        .market-table td {
-            white-space: nowrap;
-        }
-
-        .source-info {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-            font-size: 0.85rem;
-            color: var(--color-text-secondary);
-        }
-
-        .source-info a {
-            color: #00d2ff;
-            text-decoration: none;
-        }
-
-        .no-data-msg {
             text-align: center;
-            color: var(--color-text-secondary);
-            padding: 40px 20px;
+            border: 1px solid var(--color-border);
         }
+
+        .stat-card h3 { color: var(--color-text-secondary); font-size: 0.9rem; margin-bottom: 10px; }
+
+        .stat-card .value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            background: linear-gradient(90deg, #00d2ff, #3a7bd5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Winners / Analysis */
+        .analysis-section {
+            background: linear-gradient(135deg, rgba(0, 210, 255, 0.1) 0%, rgba(58, 123, 213, 0.1) 100%);
+            border: 2px solid #00d2ff;
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+
+        .analysis-title {
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #00d2ff;
+        }
+
+        .winners-grid { display: flex; flex-direction: column; gap: 15px; }
+
+        .winner-card {
+            background: rgba(0, 210, 255, 0.15);
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .winner-card.second { background: rgba(192, 192, 192, 0.1); }
+        .winner-card.third { background: rgba(205, 127, 50, 0.1); }
+
+        .winner-badge {
+            background: linear-gradient(135deg, #ffd700, #ffaa00);
+            color: #1a1a2e;
+            padding: 8px 16px;
+            border-radius: 25px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .winner-badge.silver { background: linear-gradient(135deg, #c0c0c0, #a8a8a8); }
+        .winner-badge.bronze { background: linear-gradient(135deg, #cd7f32, #b87333); }
+
+        .winner-info { flex: 1; min-width: 200px; }
+        .winner-name { font-size: 1.3rem; font-weight: bold; color: #fff; margin-bottom: 5px; }
+        .winner-company { color: var(--color-text-secondary); font-size: 0.95rem; }
+
+        .winner-stats { display: flex; gap: 15px; flex-wrap: wrap; }
+
+        .winner-stat {
+            text-align: center;
+            padding: 10px 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+        }
+
+        .winner-stat-value { font-size: 1.2rem; font-weight: bold; color: #00ff88; }
+        .winner-stat-label { font-size: 0.75rem; color: var(--color-text-secondary); margin-top: 3px; }
+
+        .analysis-note {
+            margin-top: 15px;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: var(--color-text-secondary);
+            border-right: 3px solid #00d2ff;
+        }
+
+        /* 4 tables grid */
+        .tables-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .table-block {
+            background: var(--color-bg-card);
+            border-radius: 16px;
+            padding: 20px;
+            overflow-x: auto;
+            border: 1px solid var(--color-border);
+        }
+
+        .table-block .section-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .table-block .section-title .icon { font-size: 1.5rem; }
+        .table-block .sort-indicator { font-size: 0.9rem; color: #00d2ff; margin-right: auto; }
+
+        .table-block table { width: 100%; border-collapse: collapse; }
+
+        .table-block th, .table-block td {
+            padding: 12px 10px;
+            text-align: right;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .table-block th {
+            background: rgba(0, 210, 255, 0.1);
+            color: #00d2ff;
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
+
+        .table-block th.sorted { background: rgba(0, 210, 255, 0.25); }
+        .table-block tr:hover { background: rgba(255, 255, 255, 0.05); }
+
+        .rank { width: 40px; text-align: center; }
+        .rank-1 { color: #ffd700; font-weight: bold; }
+        .rank-2 { color: #c0c0c0; font-weight: bold; }
+        .rank-3 { color: #cd7f32; font-weight: bold; }
+
+        .positive { color: #00ff88; }
+        .negative { color: #ff4757; }
+        .performance { font-weight: 600; font-size: 1.05rem; }
+
+        .fund-name { font-weight: 500; }
+        .company-cell { color: var(--color-text-secondary); font-size: 0.85rem; }
+
+        /* Full table with search */
+        .full-table-section { margin-bottom: 25px; }
 
         .search-box {
             width: 100%;
@@ -185,13 +284,47 @@
             margin-bottom: 15px;
         }
 
-        .search-box::placeholder {
-            color: var(--color-text-secondary);
+        .search-box::placeholder { color: var(--color-text-secondary); }
+        .search-box:focus { outline: none; border-color: #00d2ff; }
+
+        .full-table { overflow-x: auto; }
+
+        .full-table table { width: 100%; border-collapse: collapse; }
+
+        .full-table th {
+            cursor: pointer;
+            user-select: none;
+            white-space: nowrap;
+            padding: 12px 10px;
+            background: rgba(0, 210, 255, 0.1);
+            color: #00d2ff;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-align: right;
+            border-bottom: 1px solid var(--color-border);
         }
 
-        .search-box:focus {
-            outline: none;
-            border-color: #00d2ff;
+        .full-table th:hover { color: #fff; }
+        .full-table th .sort-arrow { margin-right: 4px; font-size: 0.7rem; }
+
+        .full-table td {
+            padding: 12px 10px;
+            white-space: nowrap;
+            text-align: right;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .full-table tr:hover { background: rgba(255, 255, 255, 0.05); }
+
+        .no-data-msg { text-align: center; color: var(--color-text-secondary); padding: 40px 20px; }
+
+        @media (max-width: 1200px) {
+            .tables-grid { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 768px) {
+            .table-block th, .table-block td { padding: 8px 6px; font-size: 0.8rem; }
+            .stat-card .value { font-size: 1.4rem; }
         }
     </style>
 </head>
@@ -277,10 +410,21 @@
 
             <!-- Product Type Tabs -->
             <div class="product-tabs">
-                <button class="product-tab active" onclick="switchTab('training')">🎓 קרן השתלמות</button>
-                <button class="product-tab" onclick="switchTab('pension')">🏛️ פנסיה</button>
-                <button class="product-tab" onclick="switchTab('gemel')">💼 קופת גמל</button>
-                <button class="product-tab" onclick="switchTab('savings')">🐷 פוליסת חיסכון</button>
+                <button class="product-tab active" data-tab="training" onclick="switchTab('training', this)">🎓 קרן השתלמות</button>
+                <button class="product-tab" data-tab="pension" onclick="switchTab('pension', this)">🏛️ פנסיה</button>
+                <button class="product-tab" data-tab="gemel" onclick="switchTab('gemel', this)">💼 קופת גמל</button>
+                <button class="product-tab" data-tab="savings" onclick="switchTab('savings', this)">🐷 פוליסת חיסכון</button>
+            </div>
+
+            <!-- Source Toggle -->
+            <div class="source-tabs">
+                <button class="source-tab active" onclick="switchSource('themarker', this)">TheMarker / אלטשולר</button>
+                <button class="source-tab" onclick="switchSource('igemel', this)">iGemel-Net</button>
+            </div>
+
+            <div class="source-info">
+                <span id="sourceLabel">מקור: TheMarker SuperMarker</span>
+                <a id="sourceLink" href="#" target="_blank">לאתר המקור</a>
             </div>
 
             <!-- My Products Section -->
@@ -293,52 +437,12 @@
                 <a href="my-funds.html" class="my-products-link">ניהול המוצרים שלי &larr;</a>
             </div>
 
-            <!-- Market Data -->
-            <div class="card">
-                <div class="card-header">
-                    <h2 class="card-title">
-                        <span class="icon">📊</span>
-                        <span id="marketTitle">נתוני שוק - קרן השתלמות</span>
-                    </h2>
-                </div>
+            <!-- Dynamic content container -->
+            <div id="dynamicContent"></div>
 
-                <!-- Source Toggle -->
-                <div style="padding: 0 20px;">
-                    <div class="source-tabs">
-                        <button class="source-tab active" onclick="switchSource('themarker')">TheMarker / אלטשולר</button>
-                        <button class="source-tab" onclick="switchSource('igemel')">iGemel-Net</button>
-                    </div>
-
-                    <div class="source-info">
-                        <span id="sourceLabel">מקור: TheMarker SuperMarker</span>
-                        <a id="sourceLink" href="#" target="_blank">לאתר המקור</a>
-                    </div>
-
-                    <input type="text" class="search-box" id="searchBox" placeholder="חיפוש קרן..." oninput="filterTable()">
-                </div>
-
-                <!-- Market Table -->
-                <div class="table-container market-table" style="max-height: 600px; overflow-y: auto;">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th onclick="sortTable('name')">#<span class="sort-arrow"></span> שם הקרן</th>
-                                <th onclick="sortTable('company')">חברה <span class="sort-arrow"></span></th>
-                                <th onclick="sortTable('month')">חודש <span class="sort-arrow"></span></th>
-                                <th onclick="sortTable('year1')">שנה <span class="sort-arrow"></span></th>
-                                <th onclick="sortTable('year3')">3 שנים <span class="sort-arrow"></span></th>
-                                <th onclick="sortTable('year5')">5 שנים <span class="sort-arrow"></span></th>
-                                <th onclick="sortTable('fee')">דמי ניהול <span class="sort-arrow"></span></th>
-                            </tr>
-                        </thead>
-                        <tbody id="marketTableBody">
-                        </tbody>
-                    </table>
-                </div>
-
-                <div id="noDataMsg" class="no-data-msg" style="display: none;">
-                    <p>אין נתוני שוק זמינים לסוג מוצר זה</p>
-                </div>
+            <!-- No data message -->
+            <div id="noDataMsg" class="no-data-msg" style="display: none;">
+                <p>אין נתוני שוק זמינים לסוג מוצר זה</p>
             </div>
         </main>
     </div>
@@ -349,11 +453,10 @@
     <script src="../js/i18n.js"></script>
     <script src="../js/app.js"></script>
     <script>
-        // State
         let currentTab = 'training';
         let currentSource = 'themarker';
-        let sortCol = 'year1';
-        let sortDir = -1; // -1 desc, 1 asc
+        let fullSortCol = 'year5';
+        let fullSortDir = -1;
 
         const tabLabels = {
             training: 'קרן השתלמות',
@@ -362,99 +465,78 @@
             savings: 'פוליסת חיסכון'
         };
 
-        const typeMapping = {
-            training: 'training',
-            pension: 'pension',
-            gemel: 'gemel',
-            savings: 'savings'
-        };
-
-        function switchTab(tab) {
+        function switchTab(tab, btn) {
             currentTab = tab;
-            // Update tab buttons
-            document.querySelectorAll('.product-tab').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-
-            // Update titles
+            document.querySelectorAll('.product-tab').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
             document.getElementById('myProductsTitle').textContent = 'המוצרים שלי - ' + tabLabels[tab];
-            document.getElementById('marketTitle').textContent = 'נתוני שוק - ' + tabLabels[tab];
-
-            // Clear search
-            document.getElementById('searchBox').value = '';
-
-            // Reset sort
-            sortCol = 'year1';
-            sortDir = -1;
-
-            renderMyProducts();
-            renderMarketTable();
+            fullSortCol = 'year5';
+            fullSortDir = -1;
+            renderAll();
         }
 
-        function switchSource(source) {
+        function switchSource(source, btn) {
             currentSource = source;
-            document.querySelectorAll('.source-tab').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-            renderMarketTable();
+            document.querySelectorAll('.source-tab').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderAll();
+        }
+
+        function getMarketData() {
+            if (currentTab === 'savings') return [];
+            if (currentSource === 'themarker') return MarketFunds.getData(currentTab) || [];
+            return MyGemelFunds.getData(currentTab) || [];
+        }
+
+        function renderAll() {
+            updateSourceInfo();
+            renderMyProducts();
+            renderAnalysis();
+        }
+
+        function updateSourceInfo() {
+            if (currentSource === 'themarker') {
+                document.getElementById('sourceLabel').textContent = 'מקור: TheMarker SuperMarker | עדכון: ' + (MarketFunds.getLastUpdate() || '');
+                document.getElementById('sourceLink').href = MarketFunds.getSourceUrl(currentTab) || '#';
+            } else {
+                document.getElementById('sourceLabel').textContent = 'מקור: iGemel-Net | עדכון: ' + (MyGemelFunds.getLastUpdate() || '');
+                document.getElementById('sourceLink').href = (MyGemelFunds.meta.sourceUrls[currentTab]) || '#';
+            }
         }
 
         // ========= My Products =========
         function renderMyProducts() {
             const container = document.getElementById('myProductsList');
             let funds = [];
-            try {
-                funds = JSON.parse(localStorage.getItem('finance_my_funds') || '[]');
-            } catch (e) { }
-
+            try { funds = JSON.parse(localStorage.getItem('finance_my_funds') || '[]'); } catch (e) { }
             const filtered = funds.filter(f => f.type === currentTab);
-
             if (filtered.length === 0) {
-                container.innerHTML = '<div class="my-products-empty">לא הוספת עדיין מוצרים מסוג זה.<br>ניתן להוסיף דרך <a href="my-funds.html" style="color:#00d2ff;">המוצרים שלי</a></div>';
+                container.innerHTML = '<div class="my-products-empty">לא הוספת עדיין מוצרים מסוג זה. <a href="my-funds.html" style="color:#00d2ff;">הוסף דרך המוצרים שלי</a></div>';
                 return;
             }
-
             container.innerHTML = filtered.map(f => {
                 const val = f.value ? '₪' + Number(f.value).toLocaleString() : '';
-                return `<div class="my-product-card">
-                    <div>
-                        <div class="name">${f.name || ''}</div>
-                        <div class="company">${f.company || ''}</div>
-                    </div>
-                    <div class="value">${val}</div>
-                </div>`;
+                return `<div class="my-product-card"><div><div class="name">${f.name || ''}</div><div class="company">${f.company || ''}</div></div><div class="value">${val}</div></div>`;
             }).join('');
         }
 
-        // ========= Market Table =========
-        function getMarketData() {
-            if (currentTab === 'savings') return [];
-
-            if (currentSource === 'themarker') {
-                return MarketFunds.getData(currentTab) || [];
-            } else {
-                return MyGemelFunds.getData(currentTab) || [];
-            }
+        // ========= Analysis Rendering =========
+        function fmtPct(v, primary) {
+            if (v === null || v === undefined) return '<span style="color: var(--color-text-secondary);">-</span>';
+            const cls = v >= 0 ? 'positive' : 'negative';
+            const bold = primary ? ' performance' : '';
+            return `<span class="${cls}${bold}">${v.toFixed(2)}%</span>`;
         }
 
-        function renderMarketTable() {
-            const data = getMarketData();
-            const tbody = document.getElementById('marketTableBody');
-            const noData = document.getElementById('noDataMsg');
-            const tableContainer = document.querySelector('.market-table');
+        function rankClass(r) { return r <= 3 ? 'rank-' + r : ''; }
 
-            // Update source info
-            if (currentSource === 'themarker') {
-                document.getElementById('sourceLabel').textContent = 'מקור: TheMarker SuperMarker | עדכון: ' + (MarketFunds.getLastUpdate() || '');
-                const url = MarketFunds.getSourceUrl(currentTab);
-                document.getElementById('sourceLink').href = url || '#';
-            } else {
-                document.getElementById('sourceLabel').textContent = 'מקור: iGemel-Net | עדכון: ' + (MyGemelFunds.getLastUpdate() || '');
-                const url = MyGemelFunds.meta.sourceUrls[currentTab] || '#';
-                document.getElementById('sourceLink').href = url;
-            }
+        function renderAnalysis() {
+            const data = getMarketData();
+            const container = document.getElementById('dynamicContent');
+            const noData = document.getElementById('noDataMsg');
 
             if (data.length === 0) {
-                tbody.innerHTML = '';
-                tableContainer.style.display = 'none';
+                container.innerHTML = '';
                 noData.style.display = 'block';
                 if (currentTab === 'savings') {
                     noData.innerHTML = '<p>🐷 אין נתוני שוק זמינים עבור פוליסות חיסכון.<br>ניתן לנהל את הפוליסות שלך דרך <a href="my-funds.html" style="color:#00d2ff;">המוצרים שלי</a></p>';
@@ -464,84 +546,165 @@
                 return;
             }
 
-            tableContainer.style.display = '';
             noData.style.display = 'none';
 
-            // Sort
+            // Stats
+            const maxMonth = Math.max(...data.map(f => f.month || 0));
+            const maxYear1 = Math.max(...data.map(f => f.year1 || 0));
+            const y5Data = data.filter(f => f.year5 != null);
+            const maxYear5 = y5Data.length ? Math.max(...y5Data.map(f => f.year5)) : 0;
+
+            let html = `<div class="stats-row">
+                <div class="stat-card"><h3>סה"כ קרנות</h3><div class="value">${data.length}</div></div>
+                <div class="stat-card"><h3>תשואה חודשית מובילה</h3><div class="value">${maxMonth.toFixed(2)}%</div></div>
+                <div class="stat-card"><h3>תשואה שנתית מובילה</h3><div class="value">${maxYear1.toFixed(2)}%</div></div>
+                <div class="stat-card"><h3>תשואה מובילה 5 שנים</h3><div class="value">${maxYear5.toFixed(2)}%</div></div>
+            </div>`;
+
+            // Winners (top 3 by 5-year)
+            const top3 = [...data].filter(f => f.year5 != null).sort((a, b) => b.year5 - a.year5).slice(0, 3);
+            const icons = ['🥇', '🥈', '🥉'];
+            const places = ['מקום ראשון', 'מקום שני', 'מקום שלישי'];
+            const badges = ['winner-badge', 'winner-badge silver', 'winner-badge bronze'];
+            const cards = ['winner-card', 'winner-card second', 'winner-card third'];
+
+            if (top3.length > 0) {
+                html += `<div class="analysis-section">
+                    <h2 class="analysis-title"><span>🏆</span><span>ניתוח: הקרנות המובילות</span></h2>
+                    <div class="winners-grid">`;
+
+                top3.forEach((f, i) => {
+                    html += `<div class="${cards[i]}">
+                        <div class="${badges[i]}"><span>${icons[i]}</span><span>${places[i]}</span></div>
+                        <div class="winner-info">
+                            <div class="winner-name">${f.nameHe || f.nameEn}</div>
+                            <div class="winner-company">${f.companyHe || f.companyEn}</div>
+                        </div>
+                        <div class="winner-stats">
+                            <div class="winner-stat"><div class="winner-stat-value">${f.year5?.toFixed(2) || '-'}%</div><div class="winner-stat-label">5 שנים</div></div>
+                            <div class="winner-stat"><div class="winner-stat-value">${f.year3?.toFixed(2) || '-'}%</div><div class="winner-stat-label">3 שנים</div></div>
+                            <div class="winner-stat"><div class="winner-stat-value">${f.year1?.toFixed(2) || '-'}%</div><div class="winner-stat-label">שנה</div></div>
+                            <div class="winner-stat"><div class="winner-stat-value">${f.month?.toFixed(2) || '-'}%</div><div class="winner-stat-label">חודש</div></div>
+                        </div>
+                    </div>`;
+                });
+
+                const topCompany = top3[0]?.companyHe || top3[0]?.companyEn || '';
+                const srcName = currentSource === 'themarker' ? 'TheMarker' : 'iGemel-Net';
+                html += `</div>
+                    <div class="analysis-note">הדירוג מבוסס על ביצועים לאורך כל התקופות. מקור: ${srcName}.</div>
+                </div>`;
+            }
+
+            // 4 sorted tables (top 5 each)
+            const sortConfigs = [
+                { key: 'year5', icon: '🏆', label: 'ממוין לפי 5 שנים', cols: ['year5', 'year3', 'year1', 'month'], headers: ['5 שנים ▼', '3 שנים', 'שנה', 'חודש'] },
+                { key: 'year3', icon: '🚀', label: 'ממוין לפי 3 שנים', cols: ['year3', 'year5', 'year1', 'month'], headers: ['3 שנים ▼', '5 שנים', 'שנה', 'חודש'] },
+                { key: 'year1', icon: '📈', label: 'ממוין לפי שנה אחרונה', cols: ['year1', 'year5', 'year3', 'month'], headers: ['שנה ▼', '5 שנים', '3 שנים', 'חודש'] },
+                { key: 'month', icon: '📅', label: 'ממוין לפי חודש אחרון', cols: ['month', 'year5', 'year3', 'year1'], headers: ['חודש ▼', '5 שנים', '3 שנים', 'שנה'] }
+            ];
+
+            html += '<div class="tables-grid">';
+            sortConfigs.forEach(cfg => {
+                const sorted = [...data].filter(f => f[cfg.key] != null).sort((a, b) => b[cfg.key] - a[cfg.key]).slice(0, 5);
+                html += `<div class="table-block">
+                    <h2 class="section-title"><span class="icon">${cfg.icon}</span><span>${cfg.label}</span><span class="sort-indicator">▼</span></h2>
+                    <table><thead><tr>
+                        <th class="rank">#</th><th>שם קרן</th><th>חברה</th>`;
+                cfg.headers.forEach((h, i) => {
+                    html += `<th${i === 0 ? ' class="sorted"' : ''}>${h}</th>`;
+                });
+                html += `</tr></thead><tbody>`;
+                sorted.forEach((f, idx) => {
+                    const r = idx + 1;
+                    html += `<tr>
+                        <td class="rank ${rankClass(r)}">${r}</td>
+                        <td><div class="fund-name">${f.nameHe || f.nameEn}</div></td>
+                        <td class="company-cell">${f.companyHe || f.companyEn}</td>`;
+                    cfg.cols.forEach((col, i) => { html += `<td>${fmtPct(f[col], i === 0)}</td>`; });
+                    html += '</tr>';
+                });
+                html += '</tbody></table></div>';
+            });
+            html += '</div>';
+
+            // Full sortable table with search
+            html += `<div class="full-table-section card">
+                <div class="card-header"><h2 class="card-title"><span class="icon">📋</span><span>כל הקרנות - טבלה מלאה</span></h2></div>
+                <div style="padding: 0 20px;">
+                    <input type="text" class="search-box" id="searchBox" placeholder="חיפוש קרן..." oninput="renderFullTable()">
+                </div>
+                <div class="full-table" style="padding: 0 20px 20px;">
+                    <table>
+                        <thead><tr>
+                            <th onclick="sortFull('name')"># שם הקרן <span class="sort-arrow"></span></th>
+                            <th onclick="sortFull('company')">חברה <span class="sort-arrow"></span></th>
+                            <th onclick="sortFull('month')">חודש <span class="sort-arrow"></span></th>
+                            <th onclick="sortFull('year1')">שנה <span class="sort-arrow"></span></th>
+                            <th onclick="sortFull('year3')">3 שנים <span class="sort-arrow"></span></th>
+                            <th onclick="sortFull('year5')">5 שנים <span class="sort-arrow"></span></th>
+                            <th onclick="sortFull('fee')">דמי ניהול <span class="sort-arrow"></span></th>
+                        </tr></thead>
+                        <tbody id="fullTableBody"></tbody>
+                    </table>
+                </div>
+            </div>`;
+
+            container.innerHTML = html;
+            renderFullTable();
+        }
+
+        // ========= Full Table =========
+        function renderFullTable() {
+            const data = getMarketData();
+            const tbody = document.getElementById('fullTableBody');
+            if (!tbody) return;
+
             const sorted = [...data].sort((a, b) => {
-                let valA, valB;
-                if (sortCol === 'name') {
-                    valA = a.nameHe || '';
-                    valB = b.nameHe || '';
-                    return sortDir * valA.localeCompare(valB, 'he');
-                } else if (sortCol === 'company') {
-                    valA = a.companyHe || '';
-                    valB = b.companyHe || '';
-                    return sortDir * valA.localeCompare(valB, 'he');
-                } else {
-                    valA = a[sortCol] ?? -Infinity;
-                    valB = b[sortCol] ?? -Infinity;
-                    return sortDir * (valA - valB);
-                }
+                if (fullSortCol === 'name') return fullSortDir * (a.nameHe || '').localeCompare(b.nameHe || '', 'he');
+                if (fullSortCol === 'company') return fullSortDir * (a.companyHe || '').localeCompare(b.companyHe || '', 'he');
+                return fullSortDir * ((a[fullSortCol] ?? -Infinity) - (b[fullSortCol] ?? -Infinity));
             });
 
-            // Filter by search
-            const query = document.getElementById('searchBox').value.trim().toLowerCase();
-            const filtered = query ? sorted.filter(f =>
-                (f.nameHe || '').includes(query) ||
-                (f.nameEn || '').toLowerCase().includes(query) ||
-                (f.companyHe || '').includes(query) ||
-                (f.companyEn || '').toLowerCase().includes(query)
+            const q = (document.getElementById('searchBox')?.value || '').trim().toLowerCase();
+            const filtered = q ? sorted.filter(f =>
+                (f.nameHe || '').includes(q) || (f.nameEn || '').toLowerCase().includes(q) ||
+                (f.companyHe || '').includes(q) || (f.companyEn || '').toLowerCase().includes(q)
             ) : sorted;
 
             tbody.innerHTML = filtered.map((f, i) => {
-                const fmtPct = (v) => {
-                    if (v === null || v === undefined) return '-';
-                    const cls = v >= 0 ? 'color: var(--color-positive)' : 'color: var(--color-negative)';
-                    return `<span style="${cls}">${v.toFixed(2)}%</span>`;
-                };
-                const fmtFee = (v) => v !== null && v !== undefined ? v.toFixed(2) + '%' : '-';
-
+                const fee = f.fee != null ? f.fee.toFixed(2) + '%' : '-';
                 return `<tr>
                     <td>${i + 1}. ${f.nameHe || f.nameEn || ''}</td>
-                    <td>${f.companyHe || f.companyEn || ''}</td>
+                    <td class="company-cell">${f.companyHe || f.companyEn || ''}</td>
                     <td>${fmtPct(f.month)}</td>
                     <td>${fmtPct(f.year1)}</td>
                     <td>${fmtPct(f.year3)}</td>
                     <td>${fmtPct(f.year5)}</td>
-                    <td>${fmtFee(f.fee)}</td>
+                    <td>${fee}</td>
                 </tr>`;
             }).join('');
 
-            // Update sort arrows
-            document.querySelectorAll('.market-table th .sort-arrow').forEach(el => el.textContent = '');
-            const headers = document.querySelectorAll('.market-table th');
+            // Sort arrows
+            document.querySelectorAll('.full-table th .sort-arrow').forEach(el => el.textContent = '');
+            const ths = document.querySelectorAll('.full-table th');
             const colMap = ['name', 'company', 'month', 'year1', 'year3', 'year5', 'fee'];
             colMap.forEach((col, idx) => {
-                if (col === sortCol) {
-                    const arrow = headers[idx]?.querySelector('.sort-arrow');
-                    if (arrow) arrow.textContent = sortDir === -1 ? ' ▼' : ' ▲';
+                if (col === fullSortCol) {
+                    const arrow = ths[idx]?.querySelector('.sort-arrow');
+                    if (arrow) arrow.textContent = fullSortDir === -1 ? ' ▼' : ' ▲';
                 }
             });
         }
 
-        function sortTable(col) {
-            if (sortCol === col) {
-                sortDir *= -1;
-            } else {
-                sortCol = col;
-                sortDir = -1;
-            }
-            renderMarketTable();
-        }
-
-        function filterTable() {
-            renderMarketTable();
+        function sortFull(col) {
+            if (fullSortCol === col) fullSortDir *= -1;
+            else { fullSortCol = col; fullSortDir = -1; }
+            renderFullTable();
         }
 
         // ========= Init =========
-        renderMyProducts();
-        renderMarketTable();
+        renderAll();
     </script>
 </body>
 </html>
