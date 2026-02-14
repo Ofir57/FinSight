@@ -318,6 +318,238 @@
 
         .no-data-msg { text-align: center; color: var(--color-text-secondary); padding: 40px 20px; }
 
+        /* Import button */
+        .import-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid #10b981;
+            border-radius: 8px;
+            color: #10b981;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .import-btn:hover {
+            background: #10b981;
+            color: #fff;
+        }
+
+        /* Import Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--color-bg-card);
+            border-radius: 16px;
+            max-width: 850px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            border: 1px solid var(--color-border);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 25px;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .modal-header h2 {
+            font-size: 1.2rem;
+            color: #10b981;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--color-text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 5px;
+            line-height: 1;
+        }
+
+        .modal-close:hover { color: #ff4757; }
+
+        .modal-body { padding: 25px; }
+
+        .import-source-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .import-src-tab {
+            padding: 8px 16px;
+            border: 1px solid var(--color-border);
+            border-radius: 20px;
+            background: transparent;
+            color: var(--color-text-secondary);
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.3s;
+        }
+
+        .import-src-tab:hover { border-color: #10b981; color: #10b981; }
+
+        .import-src-tab.active {
+            background: rgba(16, 185, 129, 0.15);
+            border-color: #10b981;
+            color: #10b981;
+        }
+
+        .import-source-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid #10b981;
+            border-radius: 8px;
+            color: #10b981;
+            text-decoration: none;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        .import-source-link:hover { background: #10b981; color: #fff; }
+
+        .import-instructions {
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .import-instructions h4 { margin-bottom: 8px; color: #10b981; font-size: 0.9rem; }
+
+        .import-instructions ol {
+            margin: 0;
+            padding-right: 20px;
+        }
+
+        .import-instructions li {
+            margin-bottom: 5px;
+            color: var(--color-text-secondary);
+            font-size: 0.85rem;
+        }
+
+        .import-paste-area {
+            width: 100%;
+            min-height: 160px;
+            padding: 15px;
+            background: var(--color-bg-main);
+            border: 2px dashed var(--color-border);
+            border-radius: 12px;
+            color: #fff;
+            font-family: monospace;
+            font-size: 0.85rem;
+            resize: vertical;
+            transition: border-color 0.3s;
+        }
+
+        .import-paste-area:focus { outline: none; border-color: #10b981; }
+        .import-paste-area::placeholder { color: var(--color-text-secondary); }
+
+        .import-preview { margin-top: 15px; }
+
+        .import-preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .import-preview-count {
+            background: #10b981;
+            color: #fff;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+
+        .import-preview table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        .import-preview th, .import-preview td {
+            padding: 8px 10px;
+            text-align: right;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .import-preview th {
+            background: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+            font-size: 0.8rem;
+        }
+
+        .import-preview tr:hover { background: rgba(255,255,255,0.05); }
+
+        .import-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .import-success {
+            display: none;
+            padding: 12px;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid #10b981;
+            border-radius: 10px;
+            color: #10b981;
+            margin-top: 12px;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .import-success.active { display: flex; }
+
+        .update-status-bar {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            padding: 12px 16px;
+            background: var(--color-bg-card);
+            border: 1px solid var(--color-border);
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 0.85rem;
+            color: var(--color-text-secondary);
+            flex-wrap: wrap;
+        }
+
+        .update-status-bar .status-label { font-weight: 500; }
+        .update-status-bar .status-ok { color: #10b981; }
+        .update-status-bar .status-warn { color: #f59e0b; }
+        .update-status-bar .status-old { color: #ff4757; }
+
         @media (max-width: 1200px) {
             .tables-grid { grid-template-columns: 1fr; }
         }
@@ -427,6 +659,14 @@
                 <a id="sourceLink" href="#" target="_blank">לאתר המקור</a>
             </div>
 
+            <!-- Import & Status Bar -->
+            <div style="display: flex; gap: 15px; align-items: center; margin-bottom: 20px; flex-wrap: wrap;">
+                <button class="import-btn" onclick="openImportModal()" style="padding: 12px 24px; font-size: 1rem; font-weight: 600;">
+                    📥 ייבוא נתונים
+                </button>
+                <div class="update-status-bar" id="updateStatusBar" style="margin-bottom: 0; flex: 1;"></div>
+            </div>
+
             <!-- My Products Section -->
             <div class="my-products-section">
                 <h3>
@@ -445,6 +685,80 @@
                 <p>אין נתוני שוק זמינים לסוג מוצר זה</p>
             </div>
         </main>
+
+        <!-- Import Modal -->
+        <div class="modal-overlay" id="importModal">
+            <div class="modal">
+                <div class="modal-header">
+                    <h2><span>📥</span> <span>ייבוא נתוני </span><span id="importTypeLabel">קרן השתלמות</span></h2>
+                    <button class="modal-close" onclick="closeImportModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="import-source-tabs">
+                        <button class="import-src-tab active" onclick="switchImportSource('themarker', this)">TheMarker / אלטשולר</button>
+                        <button class="import-src-tab" onclick="switchImportSource('igemel', this)">iGemel-Net</button>
+                    </div>
+
+                    <a id="importSourceLink" href="#" target="_blank" class="import-source-link">
+                        <span>🔗</span>
+                        <span id="importSourceName">פתח את TheMarker</span>
+                        <span>↗</span>
+                    </a>
+
+                    <div class="import-instructions">
+                        <h4>📋 הוראות:</h4>
+                        <ol>
+                            <li>לחץ על הקישור למעלה לפתיחת אתר המקור</li>
+                            <li>סמן את כל הטבלה (Ctrl+A על הטבלה)</li>
+                            <li>העתק (Ctrl+C)</li>
+                            <li>הדבק כאן למטה (Ctrl+V)</li>
+                        </ol>
+                    </div>
+
+                    <textarea class="import-paste-area" id="importPasteArea"
+                        placeholder="הדבק כאן את הנתונים מהאתר..."
+                        oninput="parseImportData()"></textarea>
+
+                    <div class="import-preview" id="importPreview" style="display: none;">
+                        <div class="import-preview-header">
+                            <h4>👁️ תצוגה מקדימה</h4>
+                            <span class="import-preview-count" id="importCount">0 קרנות</span>
+                        </div>
+                        <div style="overflow-x: auto; max-height: 300px;">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>שם קרן</th>
+                                        <th>חברה</th>
+                                        <th>חודש</th>
+                                        <th>שנה</th>
+                                        <th>3 שנים</th>
+                                        <th>5 שנים</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="importPreviewBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="import-actions">
+                        <button class="btn btn-primary" onclick="saveImportData()" style="background: #10b981;">
+                            <span>💾</span>
+                            <span>שמור נתונים</span>
+                        </button>
+                        <button class="btn btn-secondary" onclick="clearImportData()">
+                            <span>🗑️</span>
+                            <span>נקה</span>
+                        </button>
+                    </div>
+
+                    <div class="import-success" id="importSuccess">
+                        <span>✅</span>
+                        <span>הנתונים נשמרו בהצלחה!</span>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="../data/market-funds.js"></script>
@@ -703,8 +1017,226 @@
             renderFullTable();
         }
 
+        // ========= Update Status =========
+        function updateStatusBar() {
+            const bar = document.getElementById('updateStatusBar');
+            const tmUpdate = MarketFunds.getLastUpdate();
+            const igUpdate = MyGemelFunds.getLastUpdate();
+            const tmNeeds = MarketFunds.needsUpdate();
+            const igNeeds = MyGemelFunds.needsUpdate();
+
+            const tmClass = !tmUpdate ? 'status-old' : tmNeeds ? 'status-warn' : 'status-ok';
+            const igClass = !igUpdate ? 'status-old' : igNeeds ? 'status-warn' : 'status-ok';
+
+            bar.innerHTML = `
+                <span class="status-label">TheMarker:</span>
+                <span class="${tmClass}">${tmUpdate || 'לא עודכן'}</span>
+                <span style="color: var(--color-border);">|</span>
+                <span class="status-label">iGemel-Net:</span>
+                <span class="${igClass}">${igUpdate || 'לא עודכן'}</span>
+            `;
+        }
+
+        // ========= Import Modal =========
+        let importSource = 'themarker';
+        let importParsedData = [];
+
+        const theMarkerUrls = {
+            training: 'https://www.supermarker.themarker.com/Gemel/CompareHishtalmutFunds.aspx',
+            pension: 'https://www.supermarker.themarker.com/pension/ComparePensionFunds.aspx',
+            gemel: 'https://www.supermarker.themarker.com/Gemel/CompareGemelFunds.aspx'
+        };
+
+        const iGemelUrls = {
+            training: 'https://www.igemel-net.co.il/%D7%A7%D7%A8%D7%A0%D7%95%D7%AA-%D7%94%D7%A9%D7%AA%D7%9C%D7%9E%D7%95%D7%AA/',
+            pension: 'https://www.igemel-net.co.il/%D7%A7%D7%A8%D7%A0%D7%95%D7%AA-%D7%A4%D7%A0%D7%A1%D7%99%D7%94/',
+            gemel: 'https://www.igemel-net.co.il/%D7%92%D7%9E%D7%9C-%D7%9C%D7%94%D7%A9%D7%A7%D7%A2%D7%94/'
+        };
+
+        function openImportModal() {
+            document.getElementById('importTypeLabel').textContent = tabLabels[currentTab];
+            importSource = 'themarker';
+            importParsedData = [];
+            document.getElementById('importPasteArea').value = '';
+            document.getElementById('importPreview').style.display = 'none';
+            document.getElementById('importSuccess').classList.remove('active');
+
+            // Reset source tabs
+            document.querySelectorAll('.import-src-tab').forEach(b => b.classList.remove('active'));
+            document.querySelector('.import-src-tab').classList.add('active');
+
+            updateImportSourceLink();
+            document.getElementById('importModal').classList.add('active');
+        }
+
+        function closeImportModal() {
+            document.getElementById('importModal').classList.remove('active');
+        }
+
+        function switchImportSource(source, btn) {
+            importSource = source;
+            document.querySelectorAll('.import-src-tab').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            updateImportSourceLink();
+            // Clear existing data when switching source
+            document.getElementById('importPasteArea').value = '';
+            document.getElementById('importPreview').style.display = 'none';
+            document.getElementById('importSuccess').classList.remove('active');
+            importParsedData = [];
+        }
+
+        function updateImportSourceLink() {
+            const link = document.getElementById('importSourceLink');
+            const nameEl = document.getElementById('importSourceName');
+
+            if (currentTab === 'savings') {
+                link.style.display = 'none';
+                return;
+            }
+
+            link.style.display = 'inline-flex';
+            if (importSource === 'themarker') {
+                link.href = theMarkerUrls[currentTab] || '#';
+                nameEl.textContent = 'פתח את TheMarker - ' + tabLabels[currentTab];
+            } else {
+                link.href = iGemelUrls[currentTab] || '#';
+                nameEl.textContent = 'פתח את iGemel-Net - ' + tabLabels[currentTab];
+            }
+        }
+
+        function parseImportData() {
+            const text = document.getElementById('importPasteArea').value;
+
+            if (!text.trim()) {
+                document.getElementById('importPreview').style.display = 'none';
+                importParsedData = [];
+                return;
+            }
+
+            const funds = parseTableData(text);
+            importParsedData = funds;
+
+            const tbody = document.getElementById('importPreviewBody');
+            tbody.innerHTML = funds.map(fund => `
+                <tr>
+                    <td>${fund.nameHe}</td>
+                    <td>${fund.companyHe}</td>
+                    <td>${fmtImportPct(fund.month)}</td>
+                    <td>${fmtImportPct(fund.year1)}</td>
+                    <td>${fmtImportPct(fund.year3)}</td>
+                    <td>${fmtImportPct(fund.year5)}</td>
+                </tr>
+            `).join('');
+
+            document.getElementById('importCount').textContent = `${funds.length} קרנות`;
+            document.getElementById('importPreview').style.display = 'block';
+            document.getElementById('importSuccess').classList.remove('active');
+        }
+
+        function fmtImportPct(v) {
+            if (v === null || v === undefined) return '-';
+            const style = v >= 0 ? 'color: var(--color-positive)' : 'color: var(--color-negative)';
+            return `<span style="${style}">${v.toFixed(2)}%</span>`;
+        }
+
+        function parseTableData(text) {
+            const lines = text.trim().split('\n');
+            const funds = [];
+
+            // Skip header lines
+            let startIndex = 0;
+            for (let i = 0; i < Math.min(3, lines.length); i++) {
+                if (lines[i].includes('שם') || lines[i].includes('תשואה') ||
+                    lines[i].includes('חברה') || lines[i].includes('Name')) {
+                    startIndex = i + 1;
+                }
+            }
+
+            for (let i = startIndex; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (!line) continue;
+
+                const parts = line.split(/\t+|\s{2,}/).filter(p => p.trim());
+
+                if (parts.length >= 4) {
+                    const fund = {
+                        nameHe: parts[0]?.trim() || '',
+                        nameEn: parts[0]?.trim() || '',
+                        companyHe: extractCompany(parts),
+                        companyEn: extractCompany(parts),
+                        month: parsePercent(findPercentValue(parts, 0)),
+                        year1: parsePercent(findPercentValue(parts, 1)),
+                        year3: parsePercent(findPercentValue(parts, 2)),
+                        year5: parsePercent(findPercentValue(parts, 3)),
+                        fee: null,
+                        assets: null
+                    };
+
+                    if (fund.nameHe && (fund.month !== null || fund.year1 !== null)) {
+                        funds.push(fund);
+                    }
+                }
+            }
+
+            return funds;
+        }
+
+        function extractCompany(parts) {
+            if (parts.length >= 2) {
+                const company = parts[1].trim();
+                if (!company.includes('%') && !company.match(/^[\d.-]+$/)) {
+                    return company;
+                }
+            }
+            return 'לא ידוע';
+        }
+
+        function findPercentValue(parts, index) {
+            const percentValues = parts.filter(p =>
+                p.includes('%') || p.match(/^-?[\d.]+$/)
+            );
+            return percentValues[index] || null;
+        }
+
+        function parsePercent(value) {
+            if (!value) return null;
+            const num = parseFloat(value.replace('%', '').replace(',', '.').trim());
+            return isNaN(num) ? null : num;
+        }
+
+        function saveImportData() {
+            if (importParsedData.length === 0) {
+                alert('אין נתונים לשמירה');
+                return;
+            }
+
+            let success;
+            if (importSource === 'themarker') {
+                success = MarketFunds.updateData(currentTab, importParsedData);
+            } else {
+                success = MyGemelFunds.updateData(currentTab, importParsedData);
+            }
+
+            if (success) {
+                document.getElementById('importSuccess').classList.add('active');
+                updateStatusBar();
+                // Refresh the analysis view with updated data
+                renderAll();
+            } else {
+                alert('שגיאה בשמירת הנתונים');
+            }
+        }
+
+        function clearImportData() {
+            document.getElementById('importPasteArea').value = '';
+            document.getElementById('importPreview').style.display = 'none';
+            document.getElementById('importSuccess').classList.remove('active');
+            importParsedData = [];
+        }
+
         // ========= Init =========
         renderAll();
+        updateStatusBar();
     </script>
 </body>
 </html>
