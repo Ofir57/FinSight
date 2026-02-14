@@ -1,4 +1,4 @@
-const CACHE_NAME = 'finsight-v8';
+const CACHE_NAME = 'finsight-v9';
 const ASSETS_TO_CACHE = [
     './',
     './index.html',
@@ -43,6 +43,7 @@ const ASSETS_TO_CACHE = [
     './pages/pension-calc.html',
     './pages/reports.html',
     './pages/settings.html',
+    './pages/market-products.html',
     './data/sample-data.js',
     './data/market-funds.js',
     'https://cdn.jsdelivr.net/npm/chart.js',

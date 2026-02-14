@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#00d2ff">
+    <link rel="manifest" href="../manifest.json">
+    <link rel="icon" type="image/png" href="../img/logo.png">
+    <title>מוצרים בשוק - FinSight</title>
+    <link rel="stylesheet" href="../css/app.css">
+    <style>
+        .nav-link.active { background: #00d2ff !important; color: #1a1a2e !important; }
+        .page-header h1 { color: #00d2ff; }
+        .btn-primary { background: #00d2ff; color: #1a1a2e; }
+        .btn-primary:hover { background: #00b8e6; }
+
+        .product-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .product-tab {
+            padding: 10px 20px;
+            border: 2px solid var(--color-border);
+            border-radius: var(--radius-md);
+            background: var(--color-bg-secondary);
+            color: var(--color-text-primary);
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .product-tab:hover {
+            border-color: #00d2ff;
+        }
+
+        .product-tab.active {
+            background: #00d2ff;
+            border-color: #00d2ff;
+            color: #1a1a2e;
+        }
+
+        .my-products-section {
+            background: var(--color-bg-card);
+            border: 1px solid rgba(0, 210, 255, 0.3);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .my-products-section h3 {
+            color: #00d2ff;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .my-product-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            background: var(--color-bg-secondary);
+            border-radius: var(--radius-md);
+            margin-bottom: 8px;
+            border: 1px solid var(--color-border);
+        }
+
+        .my-product-card .name {
+            font-weight: 600;
+        }
+
+        .my-product-card .company {
+            font-size: 0.85rem;
+            color: var(--color-text-secondary);
+        }
+
+        .my-product-card .value {
+            font-weight: 700;
+            color: #00d2ff;
+            font-size: 1.1rem;
+        }
+
+        .my-products-empty {
+            text-align: center;
+            color: var(--color-text-secondary);
+            padding: 20px;
+        }
+
+        .my-products-link {
+            display: inline-block;
+            margin-top: 10px;
+            color: #00d2ff;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .my-products-link:hover {
+            text-decoration: underline;
+        }
+
+        .source-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .source-tab {
+            padding: 8px 16px;
+            border: 1px solid var(--color-border);
+            border-radius: 20px;
+            background: transparent;
+            color: var(--color-text-secondary);
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.85rem;
+        }
+
+        .source-tab:hover {
+            border-color: #00d2ff;
+            color: #00d2ff;
+        }
+
+        .source-tab.active {
+            background: rgba(0, 210, 255, 0.15);
+            border-color: #00d2ff;
+            color: #00d2ff;
+        }
+
+        .market-table table {
+            width: 100%;
+        }
+
+        .market-table th {
+            cursor: pointer;
+            user-select: none;
+            white-space: nowrap;
+        }
+
+        .market-table th:hover {
+            color: #00d2ff;
+        }
+
+        .market-table th .sort-arrow {
+            margin-right: 4px;
+            font-size: 0.7rem;
+        }
+
+        .market-table td {
+            white-space: nowrap;
+        }
+
+        .source-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            font-size: 0.85rem;
+            color: var(--color-text-secondary);
+        }
+
+        .source-info a {
+            color: #00d2ff;
+            text-decoration: none;
+        }
+
+        .no-data-msg {
+            text-align: center;
+            color: var(--color-text-secondary);
+            padding: 40px 20px;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 10px 15px;
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            color: var(--color-text-primary);
+            font-size: 0.95rem;
+            margin-bottom: 15px;
+        }
+
+        .search-box::placeholder {
+            color: var(--color-text-secondary);
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: #00d2ff;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="brand">
+                    <img src="../img/logo.png" class="brand-icon" alt="FinSight">
+                    <span class="brand-name">Fin<span class="brand-highlight">Sight</span></span>
+                </div>
+            </div>
+
+            <nav>
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a href="../index.html" class="nav-link" data-category="dashboard">
+                            <span class="icon">🏠</span>
+                            <span data-i18n="nav.dashboard">דאשבורד</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="bank.html" class="nav-link" data-category="bank">
+                            <span class="icon">🏦</span>
+                            <span data-i18n="nav.bankAccounts">חשבונות בנק</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="credit.html" class="nav-link" data-category="credit">
+                            <span class="icon">💳</span>
+                            <span data-i18n="nav.creditCards">כרטיסי אשראי</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="stocks.html" class="nav-link" data-category="stocks">
+                            <span class="icon">📈</span>
+                            <span data-i18n="nav.stocks">מניות</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <span class="nav-link" style="cursor: default;">
+                            <span class="icon">📊</span>
+                            <span>מוצרים פיננסיים</span>
+                        </span>
+                        <ul class="nav-submenu">
+                            <li class="nav-item">
+                                <a href="market-products.html" class="nav-link active" data-category="market-products">
+                                    <span>🏪</span><span>מוצרים בשוק</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="my-funds.html" class="nav-link" data-category="my-products">
+                                    <span>💎</span><span>המוצרים שלי</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a href="assets.html" class="nav-link" data-category="assets">
+                            <span class="icon">🏠</span>
+                            <span data-i18n="nav.assets">נכסים</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <div class="sidebar-footer">
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="logo-hero">
+                <img src="../img/logo.png" alt="FinSight" class="logo-hero-img">
+            </div>
+            <header class="page-header">
+                <h1>
+                    <span>🏪</span>
+                    <span>מוצרים בשוק</span>
+                </h1>
+            </header>
+
+            <!-- Product Type Tabs -->
+            <div class="product-tabs">
+                <button class="product-tab active" onclick="switchTab('training')">🎓 קרן השתלמות</button>
+                <button class="product-tab" onclick="switchTab('pension')">🏛️ פנסיה</button>
+                <button class="product-tab" onclick="switchTab('gemel')">💼 קופת גמל</button>
+                <button class="product-tab" onclick="switchTab('savings')">🐷 פוליסת חיסכון</button>
+            </div>
+
+            <!-- My Products Section -->
+            <div class="my-products-section">
+                <h3>
+                    <span>💎</span>
+                    <span id="myProductsTitle">המוצרים שלי - קרן השתלמות</span>
+                </h3>
+                <div id="myProductsList"></div>
+                <a href="my-funds.html" class="my-products-link">ניהול המוצרים שלי &larr;</a>
+            </div>
+
+            <!-- Market Data -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <span class="icon">📊</span>
+                        <span id="marketTitle">נתוני שוק - קרן השתלמות</span>
+                    </h2>
+                </div>
+
+                <!-- Source Toggle -->
+                <div style="padding: 0 20px;">
+                    <div class="source-tabs">
+                        <button class="source-tab active" onclick="switchSource('themarker')">TheMarker / אלטשולר</button>
+                        <button class="source-tab" onclick="switchSource('igemel')">iGemel-Net</button>
+                    </div>
+
+                    <div class="source-info">
+                        <span id="sourceLabel">מקור: TheMarker SuperMarker</span>
+                        <a id="sourceLink" href="#" target="_blank">לאתר המקור</a>
+                    </div>
+
+                    <input type="text" class="search-box" id="searchBox" placeholder="חיפוש קרן..." oninput="filterTable()">
+                </div>
+
+                <!-- Market Table -->
+                <div class="table-container market-table" style="max-height: 600px; overflow-y: auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th onclick="sortTable('name')">#<span class="sort-arrow"></span> שם הקרן</th>
+                                <th onclick="sortTable('company')">חברה <span class="sort-arrow"></span></th>
+                                <th onclick="sortTable('month')">חודש <span class="sort-arrow"></span></th>
+                                <th onclick="sortTable('year1')">שנה <span class="sort-arrow"></span></th>
+                                <th onclick="sortTable('year3')">3 שנים <span class="sort-arrow"></span></th>
+                                <th onclick="sortTable('year5')">5 שנים <span class="sort-arrow"></span></th>
+                                <th onclick="sortTable('fee')">דמי ניהול <span class="sort-arrow"></span></th>
+                            </tr>
+                        </thead>
+                        <tbody id="marketTableBody">
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="noDataMsg" class="no-data-msg" style="display: none;">
+                    <p>אין נתוני שוק זמינים לסוג מוצר זה</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="../data/market-funds.js"></script>
+    <script src="../data/mygemel-funds.js"></script>
+    <script src="../js/storage.js"></script>
+    <script src="../js/i18n.js"></script>
+    <script src="../js/app.js"></script>
+    <script>
+        // State
+        let currentTab = 'training';
+        let currentSource = 'themarker';
+        let sortCol = 'year1';
+        let sortDir = -1; // -1 desc, 1 asc
+
+        const tabLabels = {
+            training: 'קרן השתלמות',
+            pension: 'פנסיה',
+            gemel: 'קופת גמל',
+            savings: 'פוליסת חיסכון'
+        };
+
+        const typeMapping = {
+            training: 'training',
+            pension: 'pension',
+            gemel: 'gemel',
+            savings: 'savings'
+        };
+
+        function switchTab(tab) {
+            currentTab = tab;
+            // Update tab buttons
+            document.querySelectorAll('.product-tab').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Update titles
+            document.getElementById('myProductsTitle').textContent = 'המוצרים שלי - ' + tabLabels[tab];
+            document.getElementById('marketTitle').textContent = 'נתוני שוק - ' + tabLabels[tab];
+
+            // Clear search
+            document.getElementById('searchBox').value = '';
+
+            // Reset sort
+            sortCol = 'year1';
+            sortDir = -1;
+
+            renderMyProducts();
+            renderMarketTable();
+        }
+
+        function switchSource(source) {
+            currentSource = source;
+            document.querySelectorAll('.source-tab').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            renderMarketTable();
+        }
+
+        // ========= My Products =========
+        function renderMyProducts() {
+            const container = document.getElementById('myProductsList');
+            let funds = [];
+            try {
+                funds = JSON.parse(localStorage.getItem('finance_my_funds') || '[]');
+            } catch (e) { }
+
+            const filtered = funds.filter(f => f.type === currentTab);
+
+            if (filtered.length === 0) {
+                container.innerHTML = '<div class="my-products-empty">לא הוספת עדיין מוצרים מסוג זה.<br>ניתן להוסיף דרך <a href="my-funds.html" style="color:#00d2ff;">המוצרים שלי</a></div>';
+                return;
+            }
+
+            container.innerHTML = filtered.map(f => {
+                const val = f.value ? '₪' + Number(f.value).toLocaleString() : '';
+                return `<div class="my-product-card">
+                    <div>
+                        <div class="name">${f.name || ''}</div>
+                        <div class="company">${f.company || ''}</div>
+                    </div>
+                    <div class="value">${val}</div>
+                </div>`;
+            }).join('');
+        }
+
+        // ========= Market Table =========
+        function getMarketData() {
+            if (currentTab === 'savings') return [];
+
+            if (currentSource === 'themarker') {
+                return MarketFunds.getData(currentTab) || [];
+            } else {
+                return MyGemelFunds.getData(currentTab) || [];
+            }
+        }
+
+        function renderMarketTable() {
+            const data = getMarketData();
+            const tbody = document.getElementById('marketTableBody');
+            const noData = document.getElementById('noDataMsg');
+            const tableContainer = document.querySelector('.market-table');
+
+            // Update source info
+            if (currentSource === 'themarker') {
+                document.getElementById('sourceLabel').textContent = 'מקור: TheMarker SuperMarker | עדכון: ' + (MarketFunds.getLastUpdate() || '');
+                const url = MarketFunds.getSourceUrl(currentTab);
+                document.getElementById('sourceLink').href = url || '#';
+            } else {
+                document.getElementById('sourceLabel').textContent = 'מקור: iGemel-Net | עדכון: ' + (MyGemelFunds.getLastUpdate() || '');
+                const url = MyGemelFunds.meta.sourceUrls[currentTab] || '#';
+                document.getElementById('sourceLink').href = url;
+            }
+
+            if (data.length === 0) {
+                tbody.innerHTML = '';
+                tableContainer.style.display = 'none';
+                noData.style.display = 'block';
+                if (currentTab === 'savings') {
+                    noData.innerHTML = '<p>🐷 אין נתוני שוק זמינים עבור פוליסות חיסכון.<br>ניתן לנהל את הפוליסות שלך דרך <a href="my-funds.html" style="color:#00d2ff;">המוצרים שלי</a></p>';
+                } else {
+                    noData.innerHTML = '<p>אין נתונים זמינים</p>';
+                }
+                return;
+            }
+
+            tableContainer.style.display = '';
+            noData.style.display = 'none';
+
+            // Sort
+            const sorted = [...data].sort((a, b) => {
+                let valA, valB;
+                if (sortCol === 'name') {
+                    valA = a.nameHe || '';
+                    valB = b.nameHe || '';
+                    return sortDir * valA.localeCompare(valB, 'he');
+                } else if (sortCol === 'company') {
+                    valA = a.companyHe || '';
+                    valB = b.companyHe || '';
+                    return sortDir * valA.localeCompare(valB, 'he');
+                } else {
+                    valA = a[sortCol] ?? -Infinity;
+                    valB = b[sortCol] ?? -Infinity;
+                    return sortDir * (valA - valB);
+                }
+            });
+
+            // Filter by search
+            const query = document.getElementById('searchBox').value.trim().toLowerCase();
+            const filtered = query ? sorted.filter(f =>
+                (f.nameHe || '').includes(query) ||
+                (f.nameEn || '').toLowerCase().includes(query) ||
+                (f.companyHe || '').includes(query) ||
+                (f.companyEn || '').toLowerCase().includes(query)
+            ) : sorted;
+
+            tbody.innerHTML = filtered.map((f, i) => {
+                const fmtPct = (v) => {
+                    if (v === null || v === undefined) return '-';
+                    const cls = v >= 0 ? 'color: var(--color-positive)' : 'color: var(--color-negative)';
+                    return `<span style="${cls}">${v.toFixed(2)}%</span>`;
+                };
+                const fmtFee = (v) => v !== null && v !== undefined ? v.toFixed(2) + '%' : '-';
+
+                return `<tr>
+                    <td>${i + 1}. ${f.nameHe || f.nameEn || ''}</td>
+                    <td>${f.companyHe || f.companyEn || ''}</td>
+                    <td>${fmtPct(f.month)}</td>
+                    <td>${fmtPct(f.year1)}</td>
+                    <td>${fmtPct(f.year3)}</td>
+                    <td>${fmtPct(f.year5)}</td>
+                    <td>${fmtFee(f.fee)}</td>
+                </tr>`;
+            }).join('');
+
+            // Update sort arrows
+            document.querySelectorAll('.market-table th .sort-arrow').forEach(el => el.textContent = '');
+            const headers = document.querySelectorAll('.market-table th');
+            const colMap = ['name', 'company', 'month', 'year1', 'year3', 'year5', 'fee'];
+            colMap.forEach((col, idx) => {
+                if (col === sortCol) {
+                    const arrow = headers[idx]?.querySelector('.sort-arrow');
+                    if (arrow) arrow.textContent = sortDir === -1 ? ' ▼' : ' ▲';
+                }
+            });
+        }
+
+        function sortTable(col) {
+            if (sortCol === col) {
+                sortDir *= -1;
+            } else {
+                sortCol = col;
+                sortDir = -1;
+            }
+            renderMarketTable();
+        }
+
+        function filterTable() {
+            renderMarketTable();
+        }
+
+        // ========= Init =========
+        renderMyProducts();
+        renderMarketTable();
+    </script>
+</body>
+</html>
