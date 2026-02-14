@@ -367,6 +367,44 @@
                 </div>
             </div>
 
+            <!-- Security & Privacy -->
+            <div class="settings-section" style="border-color: rgba(16, 185, 129, 0.3);">
+                <h2>🔒 אבטחה ופרטיות</h2>
+
+                <div class="setting-row">
+                    <div class="setting-label" style="max-width: 100%; flex: 1;">
+                        <span style="color: #10b981; font-size: 1.05rem;">איך הנתונים שלך מוגנים</span>
+                    </div>
+                </div>
+
+                <div style="padding: 15px 0; color: var(--color-text-secondary); font-size: 0.9rem; line-height: 1.8;">
+                    <div style="display: flex; align-items: flex-start; gap: 10px; margin-bottom: 12px;">
+                        <span style="font-size: 1.2rem;">💾</span>
+                        <span><strong style="color: var(--color-text-primary);">אחסון מקומי</strong> - הנתונים נשמרים על המכשיר שלך בלבד. אף שרת חיצוני לא מקבל גישה אוטומטית.</span>
+                    </div>
+                    <div style="display: flex; align-items: flex-start; gap: 10px; margin-bottom: 12px;">
+                        <span style="font-size: 1.2rem;">☁️</span>
+                        <span><strong style="color: var(--color-text-primary);">סנכרון ענן (אופציונלי)</strong> - רק אם תתחבר עם Google. הנתונים מוצפנים לפני העלאה לענן ורק אתה יכול לפענח אותם.</span>
+                    </div>
+                    <div style="display: flex; align-items: flex-start; gap: 10px; margin-bottom: 12px;">
+                        <span style="font-size: 1.2rem;">🚫</span>
+                        <span><strong style="color: var(--color-text-primary);">ללא סיסמאות בנק</strong> - האפליקציה לא שומרת סיסמאות, קודי גישה או פרטי התחברות לבנק.</span>
+                    </div>
+                    <div style="display: flex; align-items: flex-start; gap: 10px; margin-bottom: 12px;">
+                        <span style="font-size: 1.2rem;">🔐</span>
+                        <span><strong style="color: var(--color-text-primary);">הצפנת AES-256</strong> - כל הנתונים הרגישים מוצפנים בהצפנה צבאית לפני שליחה לענן.</span>
+                    </div>
+                    <div style="display: flex; align-items: flex-start; gap: 10px; margin-bottom: 12px;">
+                        <span style="font-size: 1.2rem;">⏱️</span>
+                        <span><strong style="color: var(--color-text-primary);">התנתקות אוטומטית</strong> - לאחר 30 דקות ללא פעילות, המערכת מתנתקת אוטומטית.</span>
+                    </div>
+                    <div style="display: flex; align-items: flex-start; gap: 10px;">
+                        <span style="font-size: 1.2rem;">🗑️</span>
+                        <span><strong style="color: var(--color-text-primary);">מחיקה מלאה</strong> - בכל רגע תוכל למחוק את כל הנתונים שלך מהמכשיר ומהענן.</span>
+                    </div>
+                </div>
+            </div>
+
             <!-- Danger Zone -->
             <div class="settings-section danger-zone">
                 <h2>⚠️ אזור סכנה</h2>
@@ -374,9 +412,9 @@
                 <div class="setting-row">
                     <div class="setting-label">
                         <span>מחק את כל הנתונים</span>
-                        <span>פעולה זו לא ניתנת לביטול!</span>
+                        <span>מחיקה מהמכשיר ומהענן - פעולה בלתי הפיכה!</span>
                     </div>
-                    <button class="btn btn-danger" onclick="clearAllData()">
+                    <button class="btn btn-danger" onclick="Auth.deleteAllData()">
                         <span>🗑️</span>
                         <span>מחק הכל</span>
                     </button>

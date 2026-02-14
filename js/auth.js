@@ -218,7 +218,7 @@ const Auth = {
 
         try {
             const userId = this.currentUser.uid;
-            const data = {
+            const sensitiveData = {
                 bankAccounts: Storage.getBankAccounts(),
                 creditCards: Storage.getCreditCards(),
                 stocks: Storage.getStocks(),
@@ -229,13 +229,30 @@ const Auth = {
                 tvCustomSymbols: Storage.getTVCustomSymbols(),
                 notifications: Storage.getNotifications(),
                 dashboardWidgets: Storage.getDashboardWidgets(),
-                importTemplates: Storage.getImportTemplates(),
-                lastUpdated: firebase.firestore.FieldValue.serverTimestamp(),
-                lastUpdatedBy: this.currentUser.email
+                importTemplates: Storage.getImportTemplates()
             };
 
-            await firebaseDb.collection('users').doc(userId).set(data, { merge: true });
-            console.log('Data saved to cloud');
+            // Encrypt sensitive data before uploading
+            let data;
+            if (typeof DataCrypto !== 'undefined') {
+                const encrypted = await DataCrypto.encrypt(sensitiveData, userId);
+                data = {
+                    encryptedData: encrypted,
+                    encrypted: true,
+                    lastUpdated: firebase.firestore.FieldValue.serverTimestamp(),
+                    lastUpdatedBy: this.currentUser.email
+                };
+            } else {
+                data = {
+                    ...sensitiveData,
+                    encrypted: false,
+                    lastUpdated: firebase.firestore.FieldValue.serverTimestamp(),
+                    lastUpdatedBy: this.currentUser.email
+                };
+            }
+
+            await firebaseDb.collection('users').doc(userId).set(data, { merge: false });
+            console.log('Data saved to cloud (encrypted)');
 
             // Update sync status
             const syncStatus = document.getElementById('syncStatus');
@@ -268,13 +285,26 @@ const Auth = {
             const doc = await firebaseDb.collection('users').doc(userId).get();
 
             if (doc.exists) {
-                const data = doc.data();
+                const rawData = doc.data();
                 const localLastUpdate = localStorage.getItem('finance_last_update');
-                const cloudLastUpdate = data.lastUpdated?.toDate?.()?.getTime() || 0;
+                const cloudLastUpdate = rawData.lastUpdated?.toDate?.()?.getTime() || 0;
                 const localTime = localLastUpdate ? new Date(localLastUpdate).getTime() : 0;
 
                 // Check if cloud data is newer or if this is first sync
                 if (cloudLastUpdate > localTime || !localLastUpdate) {
+                    // Decrypt if encrypted
+                    let data;
+                    if (rawData.encrypted && rawData.encryptedData && typeof DataCrypto !== 'undefined') {
+                        data = await DataCrypto.decrypt(rawData.encryptedData, userId);
+                        if (!data) {
+                            console.error('Failed to decrypt cloud data');
+                            App.notify('שגיאה בפענוח הנתונים מהענן', 'error');
+                            return false;
+                        }
+                    } else {
+                        data = rawData;
+                    }
+
                     // Cloud is newer, update local
                     if (data.bankAccounts) Storage.saveBankAccounts(data.bankAccounts);
                     if (data.creditCards) Storage.saveCreditCards(data.creditCards);
@@ -289,7 +319,7 @@ const Auth = {
                     if (data.importTemplates) Storage.saveImportTemplates(data.importTemplates);
 
                     localStorage.setItem('finance_last_update', new Date().toISOString());
-                    console.log('Data synced from cloud');
+                    console.log('Data synced from cloud (decrypted)');
                     App.notify('הנתונים סונכרנו מהענן', 'success');
 
                     // Refresh current page
@@ -333,8 +363,51 @@ const Auth = {
 
         await this.saveToCloud();
         App.notify('הנתונים סונכרנו בהצלחה', 'success');
+    },
+
+    /**
+     * Delete all user data from cloud and local
+     */
+    async deleteAllData() {
+        if (!confirm('האם אתה בטוח? כל הנתונים יימחקו לצמיתות מהמכשיר ומהענן.')) return;
+        if (!confirm('פעולה זו בלתי הפיכה. להמשיך?')) return;
+
+        try {
+            // Delete from Firestore
+            if (this.currentUser) {
+                await firebaseDb.collection('users').doc(this.currentUser.uid).delete();
+            }
+
+            // Delete from localStorage
+            const keysToDelete = Object.keys(localStorage).filter(k => k.startsWith('finance_') || k.startsWith('market_') || k.startsWith('mygemel_'));
+            keysToDelete.forEach(k => localStorage.removeItem(k));
+
+            App.notify('כל הנתונים נמחקו בהצלחה', 'success');
+            setTimeout(() => location.reload(), 1500);
+        } catch (error) {
+            console.error('Delete all data error:', error);
+            App.notify('שגיאה במחיקת הנתונים', 'error');
+        }
     }
 };
+
+// Auto-logout after 30 minutes of inactivity
+let inactivityTimer = null;
+const INACTIVITY_TIMEOUT = 30 * 60 * 1000; // 30 minutes
+
+function resetInactivityTimer() {
+    clearTimeout(inactivityTimer);
+    if (Auth.currentUser) {
+        inactivityTimer = setTimeout(() => {
+            Auth.signOut();
+            App.notify('התנתקת אוטומטית עקב חוסר פעילות', 'info');
+        }, INACTIVITY_TIMEOUT);
+    }
+}
+
+['click', 'keydown', 'scroll', 'touchstart'].forEach(event => {
+    document.addEventListener(event, resetInactivityTimer, { passive: true });
+});
 
 // Auto-save to cloud when data changes (debounced)
 let saveTimeout = null;

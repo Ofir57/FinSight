@@ -1,4 +1,4 @@
-const CACHE_NAME = 'finsight-v12';
+const CACHE_NAME = 'finsight-v13';
 const ASSETS_TO_CACHE = [
     './',
     './index.html',
@@ -23,6 +23,7 @@ const ASSETS_TO_CACHE = [
     './js/data-updates.js',
     './js/image-import.js',
     './js/firebase-config.js',
+    './js/crypto.js',
     './js/auth.js',
     './pages/bank.html',
     './pages/credit.html',
