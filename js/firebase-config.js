@@ -3,12 +3,13 @@
  * Replace with your own Firebase project config
  */
 const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT.appspot.com",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID"
+    apiKey: "AIzaSyDuzJHOMe89YmEFpKlaTgxT40BCNhK6PU0",
+    authDomain: "finzilla-7f1f9.firebaseapp.com",
+    projectId: "finzilla-7f1f9",
+    storageBucket: "finzilla-7f1f9.firebasestorage.app",
+    messagingSenderId: "1027614800253",
+    appId: "1:1027614800253:web:ddfb62426252e0e8ebb414",
+    measurementId: "G-WRNP9L1J21"
 };
 
 // Initialize Firebase
