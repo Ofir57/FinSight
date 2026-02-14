@@ -176,10 +176,11 @@ const Auth = {
 
             if (userInfo) {
                 const photo = this.currentUser.photoURL || '';
-                const name = this.currentUser.displayName || this.currentUser.email;
+                const name = sanitize(this.currentUser.displayName || this.currentUser.email);
+                const safePhoto = photo && /^https:\/\//.test(photo) ? sanitize(photo) : '';
                 userInfo.innerHTML = `
                     <div class="user-profile">
-                        ${photo ? `<img src="${photo}" alt="profile" class="user-avatar">` : ''}
+                        ${safePhoto ? `<img src="${safePhoto}" alt="profile" class="user-avatar">` : ''}
                         <span class="user-name">${name}</span>
                     </div>
                 `;

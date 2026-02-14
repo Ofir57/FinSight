@@ -21,8 +21,10 @@ const ExportManager = {
                 let value = item[col.key];
                 if (value === null || value === undefined) value = '';
                 if (typeof value === 'number') return value;
-                // Escape quotes and wrap in quotes
-                return `"${String(value).replace(/"/g, '""')}"`;
+                // Escape quotes, prevent CSV formula injection
+                let str = String(value).replace(/"/g, '""');
+                if (/^[=+\-@\t\r]/.test(str)) str = "'" + str;
+                return `"${str}"`;
             }).join(',');
         });
 

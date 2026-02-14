@@ -302,6 +302,20 @@ const App = {
     }
 };
 
+/**
+ * Sanitize string to prevent XSS when used in innerHTML
+ */
+function sanitize(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+window.sanitize = sanitize;
+
 // Initialize app when DOM is ready
 document.addEventListener('DOMContentLoaded', () => App.init());
 
