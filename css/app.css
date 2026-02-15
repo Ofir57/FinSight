@@ -39,6 +39,16 @@
     --transition-normal: 0.3s ease;
 }
 
+/* ===== iOS Safe Area ===== */
+@supports (padding: env(safe-area-inset-top)) {
+    body {
+        padding-top: env(safe-area-inset-top);
+        padding-bottom: env(safe-area-inset-bottom);
+        padding-left: env(safe-area-inset-left);
+        padding-right: env(safe-area-inset-right);
+    }
+}
+
 /* ===== Reset & Base ===== */
 * {
     margin: 0;
@@ -667,7 +677,7 @@ select.form-control {
 .mobile-menu-toggle {
     display: none;
     position: fixed;
-    bottom: var(--spacing-lg);
+    bottom: calc(var(--spacing-lg) + env(safe-area-inset-bottom, 0px));
     left: 50%;
     transform: translateX(-50%);
     background: var(--color-dashboard);
