@@ -236,7 +236,24 @@ const I18n = {
                 testNotificationTitle: '🔔 התראת בדיקה',
                 testNotificationBody: 'ההתראות עובדות! תקבל התראות על מניות, תקציב ועוד.',
                 testSent: 'התראת בדיקה נשלחה',
-                testError: 'שגיאה בשליחת התראה'
+                testError: 'שגיאה בשליחת התראה',
+                catIcons: {
+                    shopping: '🛒 קניות',
+                    gifts: '🎁 מתנות',
+                    pets: '🐕 חיות מחמד',
+                    sports: '🏋️ ספורט',
+                    grooming: '💇 טיפוח',
+                    home: '🏠 בית',
+                    kids: '👶 ילדים',
+                    technology: '📱 טכנולוגיה',
+                    music: '🎵 מוזיקה',
+                    books: '📚 ספרים',
+                    travel: '✈️ נסיעות',
+                    alcohol: '🍷 אלכוהול',
+                    coffee: '☕ קפה',
+                    medicine: '💊 תרופות',
+                    repairs: '🔧 תיקונים'
+                }
             },
             // Goals
             goals: {
@@ -271,7 +288,19 @@ const I18n = {
                 deleteGoalConfirm: 'האם למחוק את היעד?',
                 goalDeleted: 'היעד נמחק',
                 enterValidAmount: 'נא להזין סכום תקין',
-                amountAdded: 'נוספו {amount} ליעד'
+                amountAdded: 'נוספו {amount} ליעד',
+                goalIcons: {
+                    home: '🏠 בית',
+                    car: '🚗 רכב',
+                    trip: '✈️ טיול',
+                    wedding: '💍 חתונה',
+                    education: '🎓 לימודים',
+                    technology: '💻 טכנולוגיה',
+                    vacation: '🏖️ חופשה',
+                    baby: '👶 תינוק',
+                    savings: '💰 חיסכון',
+                    goal: '🎯 יעד'
+                }
             },
             // Reports
             reports: {
@@ -389,7 +418,19 @@ const I18n = {
                 importBtn: 'ייבא',
                 selectValueColumn: 'יש לבחור עמודת שווי',
                 importedFund: 'קרן מיובאת',
-                balance: 'איזון'
+                balance: 'איזון',
+                companyMeitav: 'מיטב דש',
+                companyAltshuler: 'אלטשולר שחם',
+                companyHarel: 'הראל',
+                companyMigdal: 'מגדל',
+                companyMenora: 'מנורה מבטחים',
+                companyPhoenix: 'הפניקס',
+                companyClal: 'כלל',
+                companyPsagot: 'פסגות',
+                companyAnalyst: 'אנליסט',
+                companyYelin: 'ילין לפידות',
+                companyMore: 'מור',
+                companyOther: 'אחר'
             },
             // Market Products
             marketProducts: {
@@ -478,7 +519,8 @@ const I18n = {
                 confirmDelete: 'האם אתה בטוח שברצונך למחוק?'
             },
             // Months
-            months: ['ינואר', 'פברואר', 'מרץ', 'אפריל', 'מאי', 'יוני', 'יולי', 'אוגוסט', 'ספטמבר', 'אוקטובר', 'נובמבר', 'דצמבר']
+            months: ['ינואר', 'פברואר', 'מרץ', 'אפריל', 'מאי', 'יוני', 'יולי', 'אוגוסט', 'ספטמבר', 'אוקטובר', 'נובמבר', 'דצמבר'],
+            monthsShort: ['ינו', 'פבר', 'מרץ', 'אפר', 'מאי', 'יונ', 'יול', 'אוג', 'ספט', 'אוק', 'נוב', 'דצמ']
         },
         en: {
             // Navigation
@@ -711,7 +753,24 @@ const I18n = {
                 testNotificationTitle: '🔔 Test Notification',
                 testNotificationBody: 'Notifications are working! You will receive alerts for stocks, budget and more.',
                 testSent: 'Test notification sent',
-                testError: 'Error sending notification'
+                testError: 'Error sending notification',
+                catIcons: {
+                    shopping: '🛒 Shopping',
+                    gifts: '🎁 Gifts',
+                    pets: '🐕 Pets',
+                    sports: '🏋️ Sports',
+                    grooming: '💇 Grooming',
+                    home: '🏠 Home',
+                    kids: '👶 Kids',
+                    technology: '📱 Technology',
+                    music: '🎵 Music',
+                    books: '📚 Books',
+                    travel: '✈️ Travel',
+                    alcohol: '🍷 Alcohol',
+                    coffee: '☕ Coffee',
+                    medicine: '💊 Medicine',
+                    repairs: '🔧 Repairs'
+                }
             },
             // Goals
             goals: {
@@ -746,7 +805,19 @@ const I18n = {
                 deleteGoalConfirm: 'Delete this goal?',
                 goalDeleted: 'Goal deleted',
                 enterValidAmount: 'Please enter a valid amount',
-                amountAdded: '{amount} added to goal'
+                amountAdded: '{amount} added to goal',
+                goalIcons: {
+                    home: '🏠 Home',
+                    car: '🚗 Car',
+                    trip: '✈️ Trip',
+                    wedding: '💍 Wedding',
+                    education: '🎓 Education',
+                    technology: '💻 Technology',
+                    vacation: '🏖️ Vacation',
+                    baby: '👶 Baby',
+                    savings: '💰 Savings',
+                    goal: '🎯 Goal'
+                }
             },
             // Reports
             reports: {
@@ -864,7 +935,19 @@ const I18n = {
                 importBtn: 'Import',
                 selectValueColumn: 'Please select a value column',
                 importedFund: 'Imported fund',
-                balance: 'Balance'
+                balance: 'Balance',
+                companyMeitav: 'Meitav Dash',
+                companyAltshuler: 'Altshuler Shaham',
+                companyHarel: 'Harel',
+                companyMigdal: 'Migdal',
+                companyMenora: 'Menora Mivtachim',
+                companyPhoenix: 'The Phoenix',
+                companyClal: 'Clal',
+                companyPsagot: 'Psagot',
+                companyAnalyst: 'Analyst',
+                companyYelin: 'Yelin Lapidot',
+                companyMore: 'Mor',
+                companyOther: 'Other'
             },
             // Market Products
             marketProducts: {
@@ -953,7 +1036,8 @@ const I18n = {
                 confirmDelete: 'Are you sure you want to delete?'
             },
             // Months
-            months: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+            months: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+            monthsShort: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
         },
         pt: {
             // Navigation

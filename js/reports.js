@@ -582,7 +582,7 @@ const Reports = {
      */
     formatMonthLabel(monthKey) {
         const [year, month] = monthKey.split('-');
-        const monthNames = ['ינו', 'פבר', 'מרץ', 'אפר', 'מאי', 'יונ', 'יול', 'אוג', 'ספט', 'אוק', 'נוב', 'דצמ'];
+        const monthNames = I18n.t('monthsShort');
         return `${monthNames[parseInt(month) - 1]} ${year.slice(2)}`;
     },
 

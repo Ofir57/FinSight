@@ -314,18 +314,18 @@
                         <label data-i18n="myFunds.managingCompany">חברה מנהלת</label>
                         <select class="form-control" id="fundCompany">
                             <option value="" data-i18n="myFunds.selectCompany">-- בחר --</option>
-                            <option value="meitav">מיטב דש</option>
-                            <option value="altshuler">אלטשולר שחם</option>
-                            <option value="harel">הראל</option>
-                            <option value="migdal">מגדל</option>
-                            <option value="menora">מנורה מבטחים</option>
-                            <option value="phoenix">הפניקס</option>
-                            <option value="clal">כלל</option>
-                            <option value="psagot">פסגות</option>
-                            <option value="analyst">אנליסט</option>
-                            <option value="yelin">ילין לפידות</option>
-                            <option value="more">מור</option>
-                            <option value="other">אחר</option>
+                            <option value="meitav" data-i18n="myFunds.companyMeitav">מיטב דש</option>
+                            <option value="altshuler" data-i18n="myFunds.companyAltshuler">אלטשולר שחם</option>
+                            <option value="harel" data-i18n="myFunds.companyHarel">הראל</option>
+                            <option value="migdal" data-i18n="myFunds.companyMigdal">מגדל</option>
+                            <option value="menora" data-i18n="myFunds.companyMenora">מנורה מבטחים</option>
+                            <option value="phoenix" data-i18n="myFunds.companyPhoenix">הפניקס</option>
+                            <option value="clal" data-i18n="myFunds.companyClal">כלל</option>
+                            <option value="psagot" data-i18n="myFunds.companyPsagot">פסגות</option>
+                            <option value="analyst" data-i18n="myFunds.companyAnalyst">אנליסט</option>
+                            <option value="yelin" data-i18n="myFunds.companyYelin">ילין לפידות</option>
+                            <option value="more" data-i18n="myFunds.companyMore">מור</option>
+                            <option value="other" data-i18n="myFunds.companyOther">אחר</option>
                         </select>
                     </div>
 
@@ -410,24 +410,31 @@
             };
         }
 
-        const companyNames = {
-            meitav: 'מיטב דש',
-            altshuler: 'אלטשולר שחם',
-            harel: 'הראל',
-            migdal: 'מגדל',
-            menora: 'מנורה מבטחים',
-            phoenix: 'הפניקס',
-            clal: 'כלל',
-            psagot: 'פסגות',
-            analyst: 'אנליסט',
-            yelin: 'ילין לפידות',
-            more: 'מור',
-            other: 'אחר'
-        };
+        function getCompanyNames() {
+            return {
+                meitav: I18n.t('myFunds.companyMeitav'),
+                altshuler: I18n.t('myFunds.companyAltshuler'),
+                harel: I18n.t('myFunds.companyHarel'),
+                migdal: I18n.t('myFunds.companyMigdal'),
+                menora: I18n.t('myFunds.companyMenora'),
+                phoenix: I18n.t('myFunds.companyPhoenix'),
+                clal: I18n.t('myFunds.companyClal'),
+                psagot: I18n.t('myFunds.companyPsagot'),
+                analyst: I18n.t('myFunds.companyAnalyst'),
+                yelin: I18n.t('myFunds.companyYelin'),
+                more: I18n.t('myFunds.companyMore'),
+                other: I18n.t('myFunds.companyOther')
+            };
+        }
 
         document.addEventListener('DOMContentLoaded', () => {
             App.currentPage = 'funds';
             I18n.init();
+            // Translate fund type select options
+            const fundTypeNames = getFundTypeNames();
+            document.querySelectorAll('#fundType option').forEach(opt => {
+                if (fundTypeNames[opt.value]) opt.textContent = fundTypeNames[opt.value];
+            });
             loadFunds();
         });
 
@@ -489,7 +496,7 @@
                 <tr>
                     <td>
                         <strong>${fund.name}</strong>
-                        <br><small style="color: var(--color-text-secondary);">${companyNames[fund.company] || fund.company || ''}</small>
+                        <br><small style="color: var(--color-text-secondary);">${getCompanyNames()[fund.company] || fund.company || ''}</small>
                     </td>
                     <td>${fundTypeNames[fund.type] || fund.type}</td>
                     <td>${I18n.formatCurrency(fund.value)}${actuarialInfo}</td>

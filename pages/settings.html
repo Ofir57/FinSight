@@ -437,21 +437,21 @@
                     <div class="form-group">
                         <label data-i18n="settings.categoryIcon">אייקון</label>
                         <select class="form-control" id="catIcon">
-                            <option value="🛒">🛒 קניות</option>
-                            <option value="🎁">🎁 מתנות</option>
-                            <option value="🐕">🐕 חיות מחמד</option>
-                            <option value="🏋️">🏋️ ספורט</option>
-                            <option value="💇">💇 טיפוח</option>
-                            <option value="🏠">🏠 בית</option>
-                            <option value="👶">👶 ילדים</option>
-                            <option value="📱">📱 טכנולוגיה</option>
-                            <option value="🎵">🎵 מוזיקה</option>
-                            <option value="📚">📚 ספרים</option>
-                            <option value="✈️">✈️ נסיעות</option>
-                            <option value="🍷">🍷 אלכוהול</option>
-                            <option value="☕">☕ קפה</option>
-                            <option value="💊">💊 תרופות</option>
-                            <option value="🔧">🔧 תיקונים</option>
+                            <option value="🛒" data-i18n="settings.catIcons.shopping">🛒 קניות</option>
+                            <option value="🎁" data-i18n="settings.catIcons.gifts">🎁 מתנות</option>
+                            <option value="🐕" data-i18n="settings.catIcons.pets">🐕 חיות מחמד</option>
+                            <option value="🏋️" data-i18n="settings.catIcons.sports">🏋️ ספורט</option>
+                            <option value="💇" data-i18n="settings.catIcons.grooming">💇 טיפוח</option>
+                            <option value="🏠" data-i18n="settings.catIcons.home">🏠 בית</option>
+                            <option value="👶" data-i18n="settings.catIcons.kids">👶 ילדים</option>
+                            <option value="📱" data-i18n="settings.catIcons.technology">📱 טכנולוגיה</option>
+                            <option value="🎵" data-i18n="settings.catIcons.music">🎵 מוזיקה</option>
+                            <option value="📚" data-i18n="settings.catIcons.books">📚 ספרים</option>
+                            <option value="✈️" data-i18n="settings.catIcons.travel">✈️ נסיעות</option>
+                            <option value="🍷" data-i18n="settings.catIcons.alcohol">🍷 אלכוהול</option>
+                            <option value="☕" data-i18n="settings.catIcons.coffee">☕ קפה</option>
+                            <option value="💊" data-i18n="settings.catIcons.medicine">💊 תרופות</option>
+                            <option value="🔧" data-i18n="settings.catIcons.repairs">🔧 תיקונים</option>
                         </select>
                     </div>
 
@@ -515,7 +515,7 @@
                             <span>₪</span>
                             <input type="number" value="${budget}" step="100"
                                    onchange="saveCategoryBudget('${cat.id}', this.value)"
-                                   placeholder="ללא הגבלה">
+                                   placeholder="${I18n.t('settings.noLimit')}">
                         </div>
                     </div>
                 `;
