@@ -121,17 +121,35 @@
                     <li class="nav-item">
                         <span class="nav-link" style="cursor: default;">
                             <span class="icon">📊</span>
-                            <span>מוצרים פיננסיים</span>
+                            <span data-i18n="nav.financialProducts">מוצרים פיננסיים</span>
                         </span>
                         <ul class="nav-submenu">
-                            <li class="nav-item"><a href="market-products.html" class="nav-link" data-category="market-products"><span>🏪 מוצרים בשוק</span></a></li>
-                            <li class="nav-item"><a href="my-funds.html" class="nav-link active" data-category="my-products"><span>💎 המוצרים שלי</span></a></li>
+                            <li class="nav-item"><a href="market-products.html" class="nav-link" data-category="market-products"><span>🏪 </span><span data-i18n="nav.marketProducts">מוצרים בשוק</span></a></li>
+                            <li class="nav-item"><a href="my-funds.html" class="nav-link active" data-category="my-products"><span>💎 </span><span data-i18n="nav.myProducts">המוצרים שלי</span></a></li>
                         </ul>
                     </li>
                     <li class="nav-item">
                         <a href="assets.html" class="nav-link" data-category="assets">
                             <span class="icon">🏠</span>
                             <span data-i18n="nav.assets">נכסים</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="goals.html" class="nav-link">
+                            <span class="icon">🎯</span>
+                            <span data-i18n="nav.goals">יעדי חיסכון</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="reports.html" class="nav-link">
+                            <span class="icon">📋</span>
+                            <span data-i18n="nav.reports">דוחות</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="settings.html" class="nav-link">
+                            <span class="icon">⚙️</span>
+                            <span data-i18n="nav.settings">הגדרות</span>
                         </a>
                     </li>
                 </ul>
@@ -149,30 +167,30 @@
             <header class="page-header">
                 <h1>
                     <span>💎</span>
-                    <span>הקופות שלי</span>
+                    <span data-i18n="myFunds.title">הקופות שלי</span>
                 </h1>
             </header>
 
             <!-- Summary Cards -->
             <div class="summary-cards">
                 <div class="summary-card pension">
-                    <div class="label">🏛️ פנסיה</div>
+                    <div class="label">🏛️ <span data-i18n="myFunds.pension">פנסיה</span></div>
                     <div class="value" id="pensionTotal">₪0</div>
                 </div>
                 <div class="summary-card training">
-                    <div class="label">🎓 קרן השתלמות</div>
+                    <div class="label">🎓 <span data-i18n="myFunds.trainingFund">קרן השתלמות</span></div>
                     <div class="value" id="trainingTotal">₪0</div>
                 </div>
                 <div class="summary-card gemel">
-                    <div class="label">💼 קופת גמל</div>
+                    <div class="label">💼 <span data-i18n="myFunds.providentFund">קופת גמל</span></div>
                     <div class="value" id="gemelTotal">₪0</div>
                 </div>
                 <div class="summary-card savings">
-                    <div class="label">🐷 פוליסת חיסכון</div>
+                    <div class="label">🐷 <span data-i18n="myFunds.savingsPolicy">פוליסת חיסכון</span></div>
                     <div class="value" id="savingsTotal">₪0</div>
                 </div>
                 <div class="summary-card total">
-                    <div class="label">💎 סה"כ קרנות</div>
+                    <div class="label">💎 <span data-i18n="myFunds.totalFunds">סה"כ קרנות</span></div>
                     <div class="value" id="allFundsTotal">₪0</div>
                 </div>
             </div>
@@ -181,34 +199,34 @@
             <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
                 <button class="btn btn-primary" onclick="openAddModal()">
                     <span>➕</span>
-                    <span>הוסף קרן</span>
+                    <span data-i18n="myFunds.addFund">הוסף קרן</span>
                 </button>
                 <button class="btn btn-secondary" onclick="importSmartFile()">
                     <span>📥</span>
-                    <span>ייבוא חכם</span>
+                    <span data-i18n="myFunds.smartImport">ייבוא חכם</span>
                 </button>
                 <button class="btn btn-secondary" onclick="ImageImport.openImagePicker('funds')">
                     <span>📷</span>
-                    <span>ייבוא מתמונה</span>
+                    <span data-i18n="myFunds.imageImport">ייבוא מתמונה</span>
                 </button>
             </div>
 
             <!-- Fund Type Tabs -->
             <div class="fund-type-tabs">
                 <button class="fund-type-tab active" data-type="all" onclick="filterByType('all')">
-                    <span class="icon">📊</span>הכל
+                    <span class="icon">📊</span><span data-i18n="myFunds.all">הכל</span>
                 </button>
                 <button class="fund-type-tab" data-type="pension" onclick="filterByType('pension')">
-                    <span class="icon">🏛️</span>פנסיה
+                    <span class="icon">🏛️</span><span data-i18n="myFunds.pension">פנסיה</span>
                 </button>
                 <button class="fund-type-tab" data-type="training" onclick="filterByType('training')">
-                    <span class="icon">🎓</span>קרן השתלמות
+                    <span class="icon">🎓</span><span data-i18n="myFunds.trainingFund">קרן השתלמות</span>
                 </button>
                 <button class="fund-type-tab" data-type="gemel" onclick="filterByType('gemel')">
-                    <span class="icon">💼</span>קופת גמל
+                    <span class="icon">💼</span><span data-i18n="myFunds.providentFund">קופת גמל</span>
                 </button>
                 <button class="fund-type-tab" data-type="savings" onclick="filterByType('savings')">
-                    <span class="icon">🐷</span>פוליסת חיסכון
+                    <span class="icon">🐷</span><span data-i18n="myFunds.savingsPolicy">פוליסת חיסכון</span>
                 </button>
             </div>
 
@@ -217,21 +235,21 @@
                 <div class="card-header">
                     <h2 class="card-title">
                         <span class="icon">📋</span>
-                        <span>רשימת קרנות</span>
+                        <span data-i18n="myFunds.fundList">רשימת קרנות</span>
                     </h2>
                 </div>
                 <div class="table-container">
                     <table>
                         <thead>
                             <tr>
-                                <th>שם הקרן</th>
-                                <th>סוג</th>
-                                <th>שווי נוכחי</th>
-                                <th>חודש</th>
-                                <th>שנה</th>
-                                <th>3 שנים</th>
-                                <th>5 שנים</th>
-                                <th>פעולות</th>
+                                <th data-i18n="myFunds.fundName">שם הקרן</th>
+                                <th data-i18n="myFunds.type">סוג</th>
+                                <th data-i18n="myFunds.currentValue">שווי נוכחי</th>
+                                <th data-i18n="myFunds.monthCol">חודש</th>
+                                <th data-i18n="myFunds.yearCol">שנה</th>
+                                <th data-i18n="myFunds.threeYears">3 שנים</th>
+                                <th data-i18n="myFunds.fiveYears">5 שנים</th>
+                                <th data-i18n="myFunds.actions">פעולות</th>
                             </tr>
                         </thead>
                         <tbody id="fundsTable">
@@ -239,7 +257,7 @@
                         </tbody>
                         <tfoot id="fundsFooter" style="display: none;">
                             <tr style="background: var(--color-bg-secondary); font-weight: bold;">
-                                <td colspan="2" style="text-align: right;">סה"כ</td>
+                                <td colspan="2" style="text-align: right;" data-i18n="myFunds.totalRow">סה"כ</td>
                                 <td id="totalValueFooter">₪0</td>
                                 <td colspan="5"></td>
                             </tr>
@@ -253,7 +271,7 @@
                 <div class="card-header">
                     <h2 class="card-title">
                         <span class="icon">📊</span>
-                        <span>התפלגות קרנות</span>
+                        <span data-i18n="myFunds.fundsDistribution">התפלגות קרנות</span>
                     </h2>
                 </div>
                 <div class="chart-container" style="max-width: 400px; margin: 0 auto;">
@@ -270,7 +288,7 @@
     <div class="modal-overlay" id="fundModal">
         <div class="modal">
             <div class="modal-header">
-                <h2 id="modalTitle">הוסף קרן</h2>
+                <h2 id="modalTitle" data-i18n="myFunds.addFund">הוסף קרן</h2>
                 <button class="modal-close" onclick="closeModal()">&times;</button>
             </div>
             <div class="modal-body">
@@ -278,7 +296,7 @@
                     <input type="hidden" id="fundId">
 
                     <div class="form-group">
-                        <label>סוג קרן *</label>
+                        <label data-i18n="myFunds.fundType">סוג קרן *</label>
                         <select class="form-control" id="fundType" required>
                             <option value="pension">🏛️ פנסיה</option>
                             <option value="training">🎓 קרן השתלמות</option>
@@ -288,14 +306,14 @@
                     </div>
 
                     <div class="form-group">
-                        <label>שם הקרן *</label>
-                        <input type="text" class="form-control" id="fundName" required placeholder="לדוגמה: מיטב דש פנסיה">
+                        <label data-i18n="myFunds.fundNameLabel">שם הקרן *</label>
+                        <input type="text" class="form-control" id="fundName" required data-i18n-placeholder="myFunds.fundNamePlaceholder" placeholder="לדוגמה: מיטב דש פנסיה">
                     </div>
 
                     <div class="form-group">
-                        <label>חברה מנהלת</label>
+                        <label data-i18n="myFunds.managingCompany">חברה מנהלת</label>
                         <select class="form-control" id="fundCompany">
-                            <option value="">-- בחר --</option>
+                            <option value="" data-i18n="myFunds.selectCompany">-- בחר --</option>
                             <option value="meitav">מיטב דש</option>
                             <option value="altshuler">אלטשולר שחם</option>
                             <option value="harel">הראל</option>
@@ -312,27 +330,27 @@
                     </div>
 
                     <div class="form-group">
-                        <label>שווי נוכחי (₪) *</label>
+                        <label data-i18n="myFunds.currentValueLabel">שווי נוכחי (₪) *</label>
                         <input type="number" class="form-control" id="fundValue" step="0.01" required>
                     </div>
 
                     <div class="form-group">
-                        <label>הפקדה חודשית (₪)</label>
+                        <label data-i18n="myFunds.monthlyDeposit">הפקדה חודשית (₪)</label>
                         <input type="number" class="form-control" id="monthlyDeposit" step="0.01" value="0">
                     </div>
 
                     <div class="form-group">
-                        <label>מספר חשבון/פוליסה</label>
+                        <label data-i18n="myFunds.accountNumber">מספר חשבון/פוליסה</label>
                         <input type="text" class="form-control" id="accountNumber" maxlength="20">
                     </div>
 
                     <div class="form-group" id="actuarialGroup" style="display: none;">
-                        <label>איזון אקטוארי (₪) - לפנסיה בלבד</label>
+                        <label data-i18n="myFunds.actuarialBalance">איזון אקטוארי (₪) - לפנסיה בלבד</label>
                         <input type="number" class="form-control" id="actuarialBalance" step="0.01">
                     </div>
 
                     <div class="form-group">
-                        <label>הערות</label>
+                        <label data-i18n="myFunds.notes">הערות</label>
                         <textarea class="form-control" id="fundNotes" rows="2"></textarea>
                     </div>
                 </form>
@@ -344,8 +362,8 @@
                 </script>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" onclick="closeModal()">ביטול</button>
-                <button class="btn btn-primary" onclick="saveFund()">שמור</button>
+                <button class="btn btn-secondary" onclick="closeModal()" data-i18n="common.cancel">ביטול</button>
+                <button class="btn btn-primary" onclick="saveFund()" data-i18n="common.save">שמור</button>
             </div>
         </div>
     </div>
@@ -354,21 +372,21 @@
     <div class="modal-overlay" id="updateValueModal">
         <div class="modal">
             <div class="modal-header">
-                <h2>עדכן שווי</h2>
+                <h2 data-i18n="myFunds.updateValue">עדכן שווי</h2>
                 <button class="modal-close" onclick="closeUpdateModal()">&times;</button>
             </div>
             <div class="modal-body">
                 <form id="updateValueForm">
                     <input type="hidden" id="updateFundId">
                     <div class="form-group">
-                        <label>שווי חדש (₪)</label>
+                        <label data-i18n="myFunds.newValue">שווי חדש (₪)</label>
                         <input type="number" class="form-control" id="newValue" step="0.01" required>
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" onclick="closeUpdateModal()">ביטול</button>
-                <button class="btn btn-primary" onclick="updateValue()">עדכן</button>
+                <button class="btn btn-secondary" onclick="closeUpdateModal()" data-i18n="common.cancel">ביטול</button>
+                <button class="btn btn-primary" onclick="updateValue()" data-i18n="common.update">עדכן</button>
             </div>
         </div>
     </div>
@@ -383,12 +401,14 @@
         let currentFilter = 'all';
         let fundsChart = null;
 
-        const fundTypeNames = {
-            pension: '🏛️ פנסיה',
-            training: '🎓 קרן השתלמות',
-            gemel: '💼 קופת גמל',
-            savings: '🐷 פוליסת חיסכון'
-        };
+        function getFundTypeNames() {
+            return {
+                pension: '🏛️ ' + I18n.t('myFunds.pension'),
+                training: '🎓 ' + I18n.t('myFunds.trainingFund'),
+                gemel: '💼 ' + I18n.t('myFunds.providentFund'),
+                savings: '🐷 ' + I18n.t('myFunds.savingsPolicy')
+            };
+        }
 
         const companyNames = {
             meitav: 'מיטב דש',
@@ -407,6 +427,7 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             App.currentPage = 'funds';
+            I18n.init();
             loadFunds();
         });
 
@@ -444,7 +465,7 @@
             const filteredFunds = currentFilter === 'all' ? funds : funds.filter(f => f.type === currentFilter);
 
             if (filteredFunds.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--color-text-secondary);">אין קרנות להצגה</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--color-text-secondary);">${I18n.t('myFunds.noFundsToShow')}</td></tr>`;
                 footer.style.display = 'none';
                 document.getElementById('chartCard').style.display = 'none';
                 return;
@@ -461,8 +482,9 @@
                     const color = num >= 0 ? '#10b981' : '#ef4444';
                     return `<span style="color: ${color}; font-weight: 600;">${num >= 0 ? '+' : ''}${val}%</span>`;
                 };
+                const fundTypeNames = getFundTypeNames();
                 const actuarialInfo = fund.type === 'pension' && fund.actuarialBalance
-                    ? `<br><small style="color: var(--color-text-secondary);">איזון: ${I18n.formatCurrency(fund.actuarialBalance)}</small>` : '';
+                    ? `<br><small style="color: var(--color-text-secondary);">${I18n.t('myFunds.balance')}: ${I18n.formatCurrency(fund.actuarialBalance)}</small>` : '';
                 return `
                 <tr>
                     <td>
@@ -477,9 +499,9 @@
                     <td>${formatReturn(returns.year5)}</td>
                     <td>
                         <div class="action-buttons">
-                            <button class="btn btn-secondary btn-sm" onclick="openUpdateValueModal('${fund.id}', ${fund.value})" title="עדכן שווי">💰</button>
-                            <button class="btn btn-secondary btn-sm" onclick="editFund('${fund.id}')" title="ערוך">✏️</button>
-                            <button class="btn btn-danger btn-sm" onclick="deleteFund('${fund.id}')" title="מחק">🗑️</button>
+                            <button class="btn btn-secondary btn-sm" onclick="openUpdateValueModal('${fund.id}', ${fund.value})" title="${I18n.t('myFunds.updateValue')}">💰</button>
+                            <button class="btn btn-secondary btn-sm" onclick="editFund('${fund.id}')" title="${I18n.t('common.edit')}">✏️</button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteFund('${fund.id}')" title="${I18n.t('common.delete')}">🗑️</button>
                         </div>
                     </td>
                 </tr>
@@ -512,7 +534,7 @@
             fundsChart = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
-                    labels: ['פנסיה', 'קרן השתלמות', 'קופת גמל', 'פוליסת חיסכון'],
+                    labels: [I18n.t('myFunds.pension'), I18n.t('myFunds.trainingFund'), I18n.t('myFunds.providentFund'), I18n.t('myFunds.savingsPolicy')],
                     datasets: [{
                         data: [totals.pension, totals.training, totals.gemel, totals.savings],
                         backgroundColor: ['#f59e0b', '#10b981', '#3b82f6', '#ec4899'],
@@ -540,7 +562,7 @@
         }
 
         function openAddModal() {
-            document.getElementById('modalTitle').textContent = 'הוסף קרן';
+            document.getElementById('modalTitle').textContent = I18n.t('myFunds.addFund');
             document.getElementById('fundForm').reset();
             document.getElementById('fundId').value = '';
             document.getElementById('fundModal').classList.add('active');
@@ -555,7 +577,7 @@
             const fund = funds.find(f => f.id === id);
             if (!fund) return;
 
-            document.getElementById('modalTitle').textContent = 'ערוך קרן';
+            document.getElementById('modalTitle').textContent = I18n.t('myFunds.editFund');
             document.getElementById('fundId').value = fund.id;
             document.getElementById('fundType').value = fund.type;
             document.getElementById('fundType').dispatchEvent(new Event('change'));
@@ -581,7 +603,7 @@
             const notes = document.getElementById('fundNotes').value.trim();
 
             if (!name || !value) {
-                App.notify('יש למלא שם קרן ושווי', 'error');
+                App.notify(I18n.t('myFunds.fillNameAndValue'), 'error');
                 return;
             }
 
@@ -622,7 +644,7 @@
             saveFunds(funds);
             closeModal();
             loadFunds();
-            App.notify('הקרן נשמרה בהצלחה', 'success');
+            App.notify(I18n.t('myFunds.fundSaved'), 'success');
         }
 
         function openUpdateValueModal(id, currentValue) {
@@ -640,7 +662,7 @@
             const newValue = parseFloat(document.getElementById('newValue').value);
 
             if (isNaN(newValue)) {
-                App.notify('יש להזין שווי תקין', 'error');
+                App.notify(I18n.t('myFunds.enterValidValue'), 'error');
                 return;
             }
 
@@ -660,7 +682,7 @@
 
             closeUpdateModal();
             loadFunds();
-            App.notify('השווי עודכן בהצלחה', 'success');
+            App.notify(I18n.t('myFunds.valueUpdated'), 'success');
         }
 
         // Calculate returns based on history
@@ -705,12 +727,12 @@
         }
 
         function deleteFund(id) {
-            if (!confirm('האם למחוק את הקרן?')) return;
+            if (!confirm(I18n.t('myFunds.deleteFundConfirm'))) return;
 
             const funds = getFunds().filter(f => f.id !== id);
             saveFunds(funds);
             loadFunds();
-            App.notify('הקרן נמחקה', 'success');
+            App.notify(I18n.t('myFunds.fundDeleted'), 'success');
         }
 
         // Smart Import
@@ -747,7 +769,7 @@
                     }
 
                     if (rows.length < 2) {
-                        App.notify('הקובץ ריק או לא תקין', 'error');
+                        App.notify(I18n.t('myFunds.fileEmptyOrInvalid'), 'error');
                         return;
                     }
 
@@ -763,14 +785,14 @@
                     const imported = importFundData(rows, headerIdx, detected);
 
                     if (imported > 0) {
-                        App.notify(`יובאו ${imported} קרנות בהצלחה`, 'success');
+                        App.notify(I18n.t('myFunds.importedFunds').replace('{count}', imported), 'success');
                         loadFunds();
                     } else {
-                        App.notify('לא נמצאו קרנות לייבוא', 'error');
+                        App.notify(I18n.t('myFunds.noFundsToImport'), 'error');
                     }
                 } catch (error) {
                     console.error('Import error:', error);
-                    App.notify('שגיאה בייבוא: ' + error.message, 'error');
+                    App.notify(I18n.t('myFunds.importError') + ': ' + error.message, 'error');
                 }
             };
 
@@ -856,7 +878,7 @@
                     parseFloat(String(valueVal || '0').replace(/[^\d.-]/g, ''));
                 if (isNaN(value) || value === 0) continue;
 
-                const name = detected.name !== undefined ? String(row[detected.name] || 'קרן מיובאת').trim() : 'קרן מיובאת';
+                const name = detected.name !== undefined ? String(row[detected.name] || I18n.t('myFunds.importedFund')).trim() : I18n.t('myFunds.importedFund');
                 const type = detected.type !== undefined ? mapFundType(String(row[detected.type])) : 'savings';
                 const company = detected.company !== undefined ? String(row[detected.company] || '') : '';
                 const monthlyDeposit = detected.monthlyDeposit !== undefined ?
@@ -886,36 +908,36 @@
             modal.innerHTML = `
                 <div class="modal" style="max-width: 500px;">
                     <div class="modal-header">
-                        <h2>בחר עמודות</h2>
+                        <h2>${I18n.t('myFunds.selectColumns')}</h2>
                         <button class="modal-close" onclick="document.getElementById('mappingModal').remove()">&times;</button>
                     </div>
                     <div class="modal-body">
-                        <p>אנא בחר את העמודות המתאימות:</p>
+                        <p>${I18n.t('myFunds.selectColumnsDesc')}</p>
                         <div class="form-group">
-                            <label>עמודת שם:</label>
+                            <label>${I18n.t('myFunds.nameColumn')}</label>
                             <select id="mapName" class="form-control">
-                                <option value="-1">-- לא נבחר --</option>
-                                ${headers.map((h, i) => `<option value="${i}">${h || 'עמודה ' + (i+1)}</option>`).join('')}
+                                <option value="-1">${I18n.t('myFunds.notSelected')}</option>
+                                ${headers.map((h, i) => `<option value="${i}">${h || I18n.t('myFunds.column') + ' ' + (i+1)}</option>`).join('')}
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>עמודת שווי: *</label>
+                            <label>${I18n.t('myFunds.valueColumn')}</label>
                             <select id="mapValue" class="form-control" required>
-                                <option value="-1">-- בחר --</option>
-                                ${headers.map((h, i) => `<option value="${i}">${h || 'עמודה ' + (i+1)}</option>`).join('')}
+                                <option value="-1">${I18n.t('myFunds.selectOption')}</option>
+                                ${headers.map((h, i) => `<option value="${i}">${h || I18n.t('myFunds.column') + ' ' + (i+1)}</option>`).join('')}
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>עמודת סוג:</label>
+                            <label>${I18n.t('myFunds.typeColumn')}</label>
                             <select id="mapType" class="form-control">
-                                <option value="-1">-- לא נבחר --</option>
-                                ${headers.map((h, i) => `<option value="${i}">${h || 'עמודה ' + (i+1)}</option>`).join('')}
+                                <option value="-1">${I18n.t('myFunds.notSelected')}</option>
+                                ${headers.map((h, i) => `<option value="${i}">${h || I18n.t('myFunds.column') + ' ' + (i+1)}</option>`).join('')}
                             </select>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button class="btn btn-secondary" onclick="document.getElementById('mappingModal').remove()">ביטול</button>
-                        <button class="btn btn-primary" onclick="applyMapping()">ייבא</button>
+                        <button class="btn btn-secondary" onclick="document.getElementById('mappingModal').remove()">${I18n.t('common.cancel')}</button>
+                        <button class="btn btn-primary" onclick="applyMapping()">${I18n.t('myFunds.importBtn')}</button>
                     </div>
                 </div>
             `;
@@ -926,7 +948,7 @@
         function applyMapping() {
             const valueIdx = parseInt(document.getElementById('mapValue').value);
             if (valueIdx < 0) {
-                App.notify('יש לבחור עמודת שווי', 'error');
+                App.notify(I18n.t('myFunds.selectValueColumn'), 'error');
                 return;
             }
 
@@ -945,10 +967,10 @@
             delete window._importData;
 
             if (imported > 0) {
-                App.notify(`יובאו ${imported} קרנות בהצלחה`, 'success');
+                App.notify(I18n.t('myFunds.importedFunds').replace('{count}', imported), 'success');
                 loadFunds();
             } else {
-                App.notify('לא נמצאו קרנות לייבוא', 'error');
+                App.notify(I18n.t('myFunds.noFundsToImport'), 'error');
             }
         }
     </script>

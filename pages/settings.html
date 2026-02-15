@@ -163,21 +163,21 @@
 
             <nav>
                 <ul class="nav-menu">
-                    <li class="nav-item"><a href="../index.html" class="nav-link"><span class="icon">🏠</span><span>דאשבורד</span></a></li>
-                    <li class="nav-item"><a href="bank.html" class="nav-link"><span class="icon">🏦</span><span>חשבונות בנק</span></a></li>
-                    <li class="nav-item"><a href="credit.html" class="nav-link"><span class="icon">💳</span><span>כרטיסי אשראי</span></a></li>
-                    <li class="nav-item"><a href="stocks.html" class="nav-link"><span class="icon">📈</span><span>מניות</span></a></li>
+                    <li class="nav-item"><a href="../index.html" class="nav-link"><span class="icon">🏠</span><span data-i18n="nav.dashboard">דאשבורד</span></a></li>
+                    <li class="nav-item"><a href="bank.html" class="nav-link"><span class="icon">🏦</span><span data-i18n="nav.bankAccounts">חשבונות בנק</span></a></li>
+                    <li class="nav-item"><a href="credit.html" class="nav-link"><span class="icon">💳</span><span data-i18n="nav.creditCards">כרטיסי אשראי</span></a></li>
+                    <li class="nav-item"><a href="stocks.html" class="nav-link"><span class="icon">📈</span><span data-i18n="nav.stocks">מניות</span></a></li>
                     <li class="nav-item">
-                        <span class="nav-link" style="cursor: default;"><span class="icon">📊</span><span>מוצרים פיננסיים</span></span>
+                        <span class="nav-link" style="cursor: default;"><span class="icon">📊</span><span data-i18n="nav.financialProducts">מוצרים פיננסיים</span></span>
                         <ul class="nav-submenu">
-                            <li class="nav-item"><a href="market-products.html" class="nav-link"><span>🏪 מוצרים בשוק</span></a></li>
-                            <li class="nav-item"><a href="my-funds.html" class="nav-link"><span>💎 המוצרים שלי</span></a></li>
+                            <li class="nav-item"><a href="market-products.html" class="nav-link"><span>🏪 </span><span data-i18n="nav.marketProducts">מוצרים בשוק</span></a></li>
+                            <li class="nav-item"><a href="my-funds.html" class="nav-link"><span>💎 </span><span data-i18n="nav.myProducts">המוצרים שלי</span></a></li>
                         </ul>
                     </li>
-                    <li class="nav-item"><a href="assets.html" class="nav-link"><span class="icon">🏠</span><span>נכסים</span></a></li>
-                    <li class="nav-item"><a href="goals.html" class="nav-link"><span class="icon">🎯</span><span>יעדי חיסכון</span></a></li>
-                    <li class="nav-item"><a href="reports.html" class="nav-link"><span class="icon">📋</span><span>דוחות</span></a></li>
-                    <li class="nav-item"><a href="settings.html" class="nav-link active"><span class="icon">⚙️</span><span>הגדרות</span></a></li>
+                    <li class="nav-item"><a href="assets.html" class="nav-link"><span class="icon">🏠</span><span data-i18n="nav.assets">נכסים</span></a></li>
+                    <li class="nav-item"><a href="goals.html" class="nav-link"><span class="icon">🎯</span><span data-i18n="nav.goals">יעדי חיסכון</span></a></li>
+                    <li class="nav-item"><a href="reports.html" class="nav-link"><span class="icon">📋</span><span data-i18n="nav.reports">דוחות</span></a></li>
+                    <li class="nav-item"><a href="settings.html" class="nav-link active"><span class="icon">⚙️</span><span data-i18n="nav.settings">הגדרות</span></a></li>
                 </ul>
             </nav>
 
@@ -191,19 +191,19 @@
                 <img src="../img/logo.png" alt="FinSight" class="logo-hero-img">
             </div>
             <header class="page-header">
-                <h1>⚙️ הגדרות</h1>
-                <p>התאמה אישית של האפליקציה</p>
+                <h1>⚙️ <span data-i18n="settings.title">הגדרות</span></h1>
+                <p data-i18n="settings.subtitle">התאמה אישית של האפליקציה</p>
             </header>
 
             <!-- Budget Settings -->
             <div class="settings-section">
-                <h2>💰 תקציב חודשי</h2>
-                <p style="color: var(--color-text-secondary); margin-bottom: 20px;">הגדר תקציב להתראות כשחורגים</p>
+                <h2>💰 <span data-i18n="settings.monthlyBudget">תקציב חודשי</span></h2>
+                <p style="color: var(--color-text-secondary); margin-bottom: 20px;" data-i18n="settings.budgetDesc">הגדר תקציב להתראות כשחורגים</p>
 
                 <div class="setting-row">
                     <div class="setting-label">
-                        <span>תקציב כולל</span>
-                        <span>סה״כ הוצאות מותרות בחודש</span>
+                        <span data-i18n="settings.totalBudget">תקציב כולל</span>
+                        <span data-i18n="settings.totalBudgetDesc">סה״כ הוצאות מותרות בחודש</span>
                     </div>
                     <div class="budget-input">
                         <span>₪</span>
@@ -211,12 +211,12 @@
                     </div>
                 </div>
 
-                <h3 style="margin: 25px 0 15px; font-size: 1.1rem;">⚠️ סף התראות</h3>
+                <h3 style="margin: 25px 0 15px; font-size: 1.1rem;">⚠️ <span data-i18n="settings.alertThresholds">סף התראות</span></h3>
 
                 <div class="setting-row">
                     <div class="setting-label">
-                        <span>התראת אזהרה (צהוב)</span>
-                        <span>הצג התראה כשמגיעים לאחוז זה</span>
+                        <span data-i18n="settings.warningAlert">התראת אזהרה (צהוב)</span>
+                        <span data-i18n="settings.warningAlertDesc">הצג התראה כשמגיעים לאחוז זה</span>
                     </div>
                     <div class="budget-input">
                         <input type="number" id="warningThreshold" min="1" max="100" step="5" onchange="saveThresholds()">
@@ -226,8 +226,8 @@
 
                 <div class="setting-row">
                     <div class="setting-label">
-                        <span>התראת חריגה (אדום)</span>
-                        <span>הצג התראה כשמגיעים לאחוז זה</span>
+                        <span data-i18n="settings.dangerAlert">התראת חריגה (אדום)</span>
+                        <span data-i18n="settings.dangerAlertDesc">הצג התראה כשמגיעים לאחוז זה</span>
                     </div>
                     <div class="budget-input">
                         <input type="number" id="dangerThreshold" min="1" max="150" step="5" onchange="saveThresholds()">
@@ -235,7 +235,7 @@
                     </div>
                 </div>
 
-                <h3 style="margin: 25px 0 15px; font-size: 1.1rem;">תקציב לפי קטגוריה</h3>
+                <h3 style="margin: 25px 0 15px; font-size: 1.1rem;"><span data-i18n="settings.categoryBudget">תקציב לפי קטגוריה</span></h3>
                 <div id="categoryBudgets">
                     <!-- Populated by JS -->
                 </div>
@@ -243,8 +243,8 @@
 
             <!-- Custom Categories -->
             <div class="settings-section">
-                <h2>🏷️ קטגוריות מותאמות אישית</h2>
-                <p style="color: var(--color-text-secondary); margin-bottom: 20px;">הוסף קטגוריות משלך להוצאות</p>
+                <h2>🏷️ <span data-i18n="settings.customCategories">קטגוריות מותאמות אישית</span></h2>
+                <p style="color: var(--color-text-secondary); margin-bottom: 20px;" data-i18n="settings.customCategoriesDesc">הוסף קטגוריות משלך להוצאות</p>
 
                 <div id="customCategories">
                     <!-- Populated by JS -->
@@ -252,30 +252,30 @@
 
                 <button class="btn btn-primary" onclick="openCategoryModal()" style="margin-top: 15px;">
                     <span>➕</span>
-                    <span>הוסף קטגוריה</span>
+                    <span data-i18n="settings.addCategory">הוסף קטגוריה</span>
                 </button>
             </div>
 
             <!-- Notification Settings -->
             <div class="settings-section" id="notificationSection">
-                <h2>🔔 התראות</h2>
-                <p style="color: var(--color-text-secondary); margin-bottom: 20px;">הגדר התראות push לאירועים חשובים</p>
+                <h2>🔔 <span data-i18n="settings.notifications">התראות</span></h2>
+                <p style="color: var(--color-text-secondary); margin-bottom: 20px;" data-i18n="settings.notificationsDesc">הגדר התראות push לאירועים חשובים</p>
 
                 <div class="setting-row">
                     <div class="setting-label">
-                        <span>הפעל התראות</span>
-                        <span id="notificationStatus">בודק הרשאות...</span>
+                        <span data-i18n="settings.enableNotifications">הפעל התראות</span>
+                        <span id="notificationStatus" data-i18n="settings.checkingPermissions">בודק הרשאות...</span>
                     </div>
                     <button class="btn btn-primary" id="notificationToggle" onclick="toggleNotifications()">
-                        הפעל
+                        <span data-i18n="settings.enable">הפעל</span>
                     </button>
                 </div>
 
                 <div id="notificationOptions" style="display: none;">
                     <div class="setting-row">
                         <div class="setting-label">
-                            <span>התראות מניות</span>
-                            <span>קבל התראה כשמניה מגיעה ליעד</span>
+                            <span data-i18n="settings.stockAlerts">התראות מניות</span>
+                            <span data-i18n="settings.stockAlertsDesc">קבל התראה כשמניה מגיעה ליעד</span>
                         </div>
                         <label class="toggle-switch">
                             <input type="checkbox" id="stockAlertsToggle" onchange="saveNotificationSettings()">
@@ -285,8 +285,8 @@
 
                     <div class="setting-row">
                         <div class="setting-label">
-                            <span>התראות תקציב</span>
-                            <span>קבל התראה כשחורגים מתקציב</span>
+                            <span data-i18n="settings.budgetAlerts">התראות תקציב</span>
+                            <span data-i18n="settings.budgetAlertsDesc">קבל התראה כשחורגים מתקציב</span>
                         </div>
                         <label class="toggle-switch">
                             <input type="checkbox" id="budgetAlertsToggle" onchange="saveNotificationSettings()">
@@ -296,8 +296,8 @@
 
                     <div class="setting-row">
                         <div class="setting-label">
-                            <span>תזכורת חודשית</span>
-                            <span>תזכורת לעדכון קרנות וקופות</span>
+                            <span data-i18n="settings.monthlyReminder">תזכורת חודשית</span>
+                            <span data-i18n="settings.monthlyReminderDesc">תזכורת לעדכון קרנות וקופות</span>
                         </div>
                         <label class="toggle-switch">
                             <input type="checkbox" id="monthlyReminderToggle" onchange="saveNotificationSettings()">
@@ -307,23 +307,23 @@
 
                     <div class="setting-row">
                         <div class="setting-label">
-                            <span>יום התזכורת</span>
-                            <span>באיזה יום בחודש לשלוח תזכורת</span>
+                            <span data-i18n="settings.reminderDay">יום התזכורת</span>
+                            <span data-i18n="settings.reminderDayDesc">באיזה יום בחודש לשלוח תזכורת</span>
                         </div>
                         <div class="budget-input">
                             <input type="number" id="reminderDay" min="1" max="28" value="1" onchange="saveNotificationSettings()">
-                            <span>בחודש</span>
+                            <span data-i18n="settings.inMonth">בחודש</span>
                         </div>
                     </div>
 
                     <div class="setting-row">
                         <div class="setting-label">
-                            <span>בדוק התראות</span>
-                            <span>שלח התראת בדיקה</span>
+                            <span data-i18n="settings.testNotifications">בדוק התראות</span>
+                            <span data-i18n="settings.testNotificationsDesc">שלח התראת בדיקה</span>
                         </div>
                         <button class="btn btn-secondary" onclick="sendTestNotification()">
                             <span>📤</span>
-                            <span>שלח בדיקה</span>
+                            <span data-i18n="settings.sendTest">שלח בדיקה</span>
                         </button>
                     </div>
                 </div>
@@ -331,92 +331,92 @@
 
             <!-- Data Management -->
             <div class="settings-section">
-                <h2>📦 ניהול נתונים</h2>
+                <h2>📦 <span data-i18n="settings.dataManagement">ניהול נתונים</span></h2>
 
                 <div class="setting-row">
                     <div class="setting-label">
-                        <span>ייצוא נתונים</span>
-                        <span>הורד את כל הנתונים כקובץ JSON</span>
+                        <span data-i18n="settings.exportData">ייצוא נתונים</span>
+                        <span data-i18n="settings.exportDataDesc">הורד את כל הנתונים כקובץ JSON</span>
                     </div>
                     <button class="btn btn-secondary" onclick="App.exportData()">
                         <span>📤</span>
-                        <span>ייצוא</span>
+                        <span data-i18n="settings.exportBtn">ייצוא</span>
                     </button>
                 </div>
 
                 <div class="setting-row">
                     <div class="setting-label">
-                        <span>ייבוא נתונים</span>
-                        <span>שחזר נתונים מקובץ JSON</span>
+                        <span data-i18n="settings.importData">ייבוא נתונים</span>
+                        <span data-i18n="settings.importDataDesc">שחזר נתונים מקובץ JSON</span>
                     </div>
                     <button class="btn btn-secondary" onclick="App.importData()">
                         <span>📥</span>
-                        <span>ייבוא</span>
+                        <span data-i18n="settings.importBtn">ייבוא</span>
                     </button>
                 </div>
 
                 <div class="setting-row">
                     <div class="setting-label">
-                        <span>טען נתוני דוגמה</span>
-                        <span>מילוי האפליקציה בנתוני הדגמה</span>
+                        <span data-i18n="settings.loadSampleData">טען נתוני דוגמה</span>
+                        <span data-i18n="settings.loadSampleDataDesc">מילוי האפליקציה בנתוני הדגמה</span>
                     </div>
                     <button class="btn btn-secondary" onclick="loadSampleData()">
                         <span>📋</span>
-                        <span>טען דוגמה</span>
+                        <span data-i18n="settings.loadSampleBtn">טען דוגמה</span>
                     </button>
                 </div>
             </div>
 
             <!-- Security & Privacy -->
             <div class="settings-section" style="border-color: rgba(16, 185, 129, 0.3);">
-                <h2>🔒 אבטחה ופרטיות</h2>
+                <h2>🔒 <span data-i18n="settings.securityPrivacy">אבטחה ופרטיות</span></h2>
 
                 <div class="setting-row">
                     <div class="setting-label" style="max-width: 100%; flex: 1;">
-                        <span style="color: #10b981; font-size: 1.05rem;">איך הנתונים שלך מוגנים</span>
+                        <span style="color: #10b981; font-size: 1.05rem;" data-i18n="settings.howDataProtected">איך הנתונים שלך מוגנים</span>
                     </div>
                 </div>
 
                 <div style="padding: 15px 0; color: var(--color-text-secondary); font-size: 0.9rem; line-height: 1.8;">
                     <div style="display: flex; align-items: flex-start; gap: 10px; margin-bottom: 12px;">
                         <span style="font-size: 1.2rem;">💾</span>
-                        <span><strong style="color: var(--color-text-primary);">אחסון מקומי</strong> - הנתונים נשמרים על המכשיר שלך בלבד. אף שרת חיצוני לא מקבל גישה אוטומטית.</span>
+                        <span><strong style="color: var(--color-text-primary);" data-i18n="settings.localStorage">אחסון מקומי</strong> - <span data-i18n="settings.localStorageDesc">הנתונים נשמרים על המכשיר שלך בלבד. אף שרת חיצוני לא מקבל גישה אוטומטית.</span></span>
                     </div>
                     <div style="display: flex; align-items: flex-start; gap: 10px; margin-bottom: 12px;">
                         <span style="font-size: 1.2rem;">☁️</span>
-                        <span><strong style="color: var(--color-text-primary);">סנכרון ענן (אופציונלי)</strong> - רק אם תתחבר עם Google. הנתונים מוצפנים לפני העלאה לענן ורק אתה יכול לפענח אותם.</span>
+                        <span><strong style="color: var(--color-text-primary);" data-i18n="settings.cloudSync">סנכרון ענן (אופציונלי)</strong> - <span data-i18n="settings.cloudSyncDesc">רק אם תתחבר עם Google. הנתונים מוצפנים לפני העלאה לענן ורק אתה יכול לפענח אותם.</span></span>
                     </div>
                     <div style="display: flex; align-items: flex-start; gap: 10px; margin-bottom: 12px;">
                         <span style="font-size: 1.2rem;">🚫</span>
-                        <span><strong style="color: var(--color-text-primary);">ללא סיסמאות בנק</strong> - האפליקציה לא שומרת סיסמאות, קודי גישה או פרטי התחברות לבנק.</span>
+                        <span><strong style="color: var(--color-text-primary);" data-i18n="settings.noBankPasswords">ללא סיסמאות בנק</strong> - <span data-i18n="settings.noBankPasswordsDesc">האפליקציה לא שומרת סיסמאות, קודי גישה או פרטי התחברות לבנק.</span></span>
                     </div>
                     <div style="display: flex; align-items: flex-start; gap: 10px; margin-bottom: 12px;">
                         <span style="font-size: 1.2rem;">🔐</span>
-                        <span><strong style="color: var(--color-text-primary);">הצפנת AES-256</strong> - כל הנתונים הרגישים מוצפנים בהצפנה צבאית לפני שליחה לענן.</span>
+                        <span><strong style="color: var(--color-text-primary);" data-i18n="settings.aesEncryption">הצפנת AES-256</strong> - <span data-i18n="settings.aesEncryptionDesc">כל הנתונים הרגישים מוצפנים בהצפנה צבאית לפני שליחה לענן.</span></span>
                     </div>
                     <div style="display: flex; align-items: flex-start; gap: 10px; margin-bottom: 12px;">
                         <span style="font-size: 1.2rem;">⏱️</span>
-                        <span><strong style="color: var(--color-text-primary);">התנתקות אוטומטית</strong> - לאחר 30 דקות ללא פעילות, המערכת מתנתקת אוטומטית.</span>
+                        <span><strong style="color: var(--color-text-primary);" data-i18n="settings.autoLogout">התנתקות אוטומטית</strong> - <span data-i18n="settings.autoLogoutDesc">לאחר 30 דקות ללא פעילות, המערכת מתנתקת אוטומטית.</span></span>
                     </div>
                     <div style="display: flex; align-items: flex-start; gap: 10px;">
                         <span style="font-size: 1.2rem;">🗑️</span>
-                        <span><strong style="color: var(--color-text-primary);">מחיקה מלאה</strong> - בכל רגע תוכל למחוק את כל הנתונים שלך מהמכשיר ומהענן.</span>
+                        <span><strong style="color: var(--color-text-primary);" data-i18n="settings.fullDeletion">מחיקה מלאה</strong> - <span data-i18n="settings.fullDeletionDesc">בכל רגע תוכל למחוק את כל הנתונים שלך מהמכשיר ומהענן.</span></span>
                     </div>
                 </div>
             </div>
 
             <!-- Danger Zone -->
             <div class="settings-section danger-zone">
-                <h2>⚠️ אזור סכנה</h2>
+                <h2>⚠️ <span data-i18n="settings.dangerZone">אזור סכנה</span></h2>
 
                 <div class="setting-row">
                     <div class="setting-label">
-                        <span>מחק את כל הנתונים</span>
-                        <span>מחיקה מהמכשיר ומהענן - פעולה בלתי הפיכה!</span>
+                        <span data-i18n="settings.deleteAllData">מחק את כל הנתונים</span>
+                        <span data-i18n="settings.deleteAllDataDesc">מחיקה מהמכשיר ומהענן - פעולה בלתי הפיכה!</span>
                     </div>
                     <button class="btn btn-danger" onclick="Auth.deleteAllData()">
                         <span>🗑️</span>
-                        <span>מחק הכל</span>
+                        <span data-i18n="settings.deleteAllBtn">מחק הכל</span>
                     </button>
                 </div>
             </div>
@@ -429,13 +429,13 @@
     <div class="modal-overlay" id="categoryModal">
         <div class="modal">
             <div class="modal-header">
-                <h2>הוסף קטגוריה</h2>
+                <h2 data-i18n="settings.addCategory">הוסף קטגוריה</h2>
                 <button class="modal-close" onclick="closeCategoryModal()">&times;</button>
             </div>
             <div class="modal-body">
                 <form id="categoryForm">
                     <div class="form-group">
-                        <label>אייקון</label>
+                        <label data-i18n="settings.categoryIcon">אייקון</label>
                         <select class="form-control" id="catIcon">
                             <option value="🛒">🛒 קניות</option>
                             <option value="🎁">🎁 מתנות</option>
@@ -456,24 +456,24 @@
                     </div>
 
                     <div class="form-group">
-                        <label>שם בעברית</label>
+                        <label data-i18n="settings.categoryNameHe">שם בעברית</label>
                         <input type="text" class="form-control" id="catNameHe" required placeholder="לדוגמה: חיות מחמד">
                     </div>
 
                     <div class="form-group">
-                        <label>שם באנגלית</label>
+                        <label data-i18n="settings.categoryNameEn">שם באנגלית</label>
                         <input type="text" class="form-control" id="catNameEn" placeholder="e.g. Pets">
                     </div>
 
                     <div class="form-group">
-                        <label>צבע</label>
+                        <label data-i18n="settings.categoryColor">צבע</label>
                         <input type="color" class="form-control" id="catColor" value="#6366f1" style="height: 50px; padding: 5px;">
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" onclick="closeCategoryModal()">ביטול</button>
-                <button class="btn btn-primary" onclick="saveCategory()">שמור</button>
+                <button class="btn btn-secondary" onclick="closeCategoryModal()" data-i18n="common.cancel">ביטול</button>
+                <button class="btn btn-primary" onclick="saveCategory()" data-i18n="common.save">שמור</button>
             </div>
         </div>
     </div>
@@ -488,6 +488,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             App.currentPage = 'settings';
+            I18n.init();
             loadSettings();
             loadNotificationSettings();
         });
@@ -525,7 +526,7 @@
             const customContainer = document.getElementById('customCategories');
 
             if (customData.categories.length === 0) {
-                customContainer.innerHTML = '<p style="color: var(--color-text-secondary);">אין קטגוריות מותאמות אישית</p>';
+                customContainer.innerHTML = `<p style="color: var(--color-text-secondary);">${I18n.t('settings.noCustomCategories')}</p>`;
             } else {
                 customContainer.innerHTML = customData.categories.map(cat => `
                     <div class="custom-category-item">
@@ -541,7 +542,7 @@
         function saveTotalBudget() {
             const amount = parseFloat(document.getElementById('totalBudget').value) || 0;
             Alerts.setTotalBudget(amount);
-            App.notify('התקציב נשמר', 'success');
+            App.notify(I18n.t('settings.budgetSaved'), 'success');
         }
 
         function saveThresholds() {
@@ -549,18 +550,18 @@
             const danger = parseInt(document.getElementById('dangerThreshold').value) || 100;
 
             if (warning >= danger) {
-                App.notify('סף האזהרה חייב להיות נמוך מסף החריגה', 'error');
+                App.notify(I18n.t('settings.thresholdError'), 'error');
                 return;
             }
 
             Alerts.setThresholds(warning, danger);
-            App.notify('סף ההתראות נשמר', 'success');
+            App.notify(I18n.t('settings.thresholdSaved'), 'success');
         }
 
         function saveCategoryBudget(category, value) {
             const amount = parseFloat(value) || 0;
             Alerts.setCategoryBudget(category, amount);
-            App.notify('התקציב נשמר', 'success');
+            App.notify(I18n.t('settings.budgetSaved'), 'success');
         }
 
         function openCategoryModal() {
@@ -579,33 +580,33 @@
             const color = document.getElementById('catColor').value;
 
             if (!nameHe) {
-                App.notify('נא להזין שם', 'error');
+                App.notify(I18n.t('settings.enterName'), 'error');
                 return;
             }
 
             Tags.addCategory({ icon, nameHe, nameEn, color });
             closeCategoryModal();
             loadSettings();
-            App.notify('הקטגוריה נוספה', 'success');
+            App.notify(I18n.t('settings.categoryAdded'), 'success');
         }
 
         function deleteCustomCategory(id) {
-            if (confirm('למחוק את הקטגוריה?')) {
+            if (confirm(I18n.t('settings.deleteCategory'))) {
                 Tags.deleteCategory(id);
                 loadSettings();
-                App.notify('הקטגוריה נמחקה', 'success');
+                App.notify(I18n.t('settings.categoryDeleted'), 'success');
             }
         }
 
         function loadSampleData() {
-            if (confirm('פעולה זו תוסיף נתוני דוגמה. להמשיך?')) {
+            if (confirm(I18n.t('settings.sampleDataConfirm'))) {
                 SampleData.load();
             }
         }
 
         function clearAllData() {
-            if (confirm('האם אתה בטוח? כל הנתונים יימחקו לצמיתות!')) {
-                if (confirm('בטוח בטוח? אין דרך חזרה!')) {
+            if (confirm(I18n.t('settings.deleteAllConfirm'))) {
+                if (confirm(I18n.t('settings.deleteAllConfirm2'))) {
                     SampleData.clear();
                 }
             }
@@ -618,10 +619,10 @@
             const optionsEl = document.getElementById('notificationOptions');
 
             if (!Notifications.isSupported()) {
-                statusEl.textContent = 'התראות אינן נתמכות בדפדפן זה';
+                statusEl.textContent = I18n.t('settings.notificationsNotSupported');
                 statusEl.className = 'notification-denied';
                 toggleBtn.disabled = true;
-                toggleBtn.textContent = 'לא נתמך';
+                toggleBtn.textContent = I18n.t('settings.notSupported');
                 return;
             }
 
@@ -630,23 +631,23 @@
 
             switch (permission) {
                 case 'granted':
-                    statusEl.textContent = 'התראות מופעלות';
+                    statusEl.textContent = I18n.t('settings.notificationsEnabled');
                     statusEl.className = 'notification-granted';
-                    toggleBtn.textContent = 'מופעל ✓';
+                    toggleBtn.textContent = I18n.t('settings.enabled');
                     toggleBtn.classList.remove('btn-primary');
                     toggleBtn.classList.add('btn-secondary');
                     optionsEl.style.display = 'block';
                     break;
                 case 'denied':
-                    statusEl.textContent = 'התראות נחסמו - יש לאפשר בהגדרות הדפדפן';
+                    statusEl.textContent = I18n.t('settings.notificationsBlocked');
                     statusEl.className = 'notification-denied';
-                    toggleBtn.textContent = 'נחסם';
+                    toggleBtn.textContent = I18n.t('settings.notificationsBlockedShort');
                     toggleBtn.disabled = true;
                     break;
                 default:
-                    statusEl.textContent = 'לחץ להפעלת התראות';
+                    statusEl.textContent = I18n.t('settings.clickToEnable');
                     statusEl.className = 'notification-default';
-                    toggleBtn.textContent = 'הפעל';
+                    toggleBtn.textContent = I18n.t('settings.enable');
             }
 
             // Load settings
@@ -660,9 +661,9 @@
             const result = await Notifications.requestPermission();
 
             if (result.success) {
-                App.notify('התראות הופעלו בהצלחה', 'success');
+                App.notify(I18n.t('settings.notificationsEnabledMsg'), 'success');
             } else if (result.permission === 'denied') {
-                App.notify('ההתראות נחסמו. אנא אפשר בהגדרות הדפדפן', 'error');
+                App.notify(I18n.t('settings.notificationsBlockedMsg'), 'error');
             }
 
             loadNotificationSettings();
@@ -677,19 +678,19 @@
             };
 
             Notifications.updateSettings(settings);
-            App.notify('ההגדרות נשמרו', 'success');
+            App.notify(I18n.t('settings.settingsSaved'), 'success');
         }
 
         async function sendTestNotification() {
-            const success = await Notifications.show('🔔 התראת בדיקה', {
-                body: 'ההתראות עובדות! תקבל התראות על מניות, תקציב ועוד.',
+            const success = await Notifications.show(I18n.t('settings.testNotificationTitle'), {
+                body: I18n.t('settings.testNotificationBody'),
                 type: 'test'
             });
 
             if (success) {
-                App.notify('התראת בדיקה נשלחה', 'success');
+                App.notify(I18n.t('settings.testSent'), 'success');
             } else {
-                App.notify('שגיאה בשליחת התראה', 'error');
+                App.notify(I18n.t('settings.testError'), 'error');
             }
         }
     </script>

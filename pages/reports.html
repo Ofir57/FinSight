@@ -280,21 +280,21 @@
 
             <nav>
                 <ul class="nav-menu">
-                    <li class="nav-item"><a href="../index.html" class="nav-link"><span class="icon">🏠</span><span>דאשבורד</span></a></li>
-                    <li class="nav-item"><a href="bank.html" class="nav-link"><span class="icon">🏦</span><span>חשבונות בנק</span></a></li>
-                    <li class="nav-item"><a href="credit.html" class="nav-link"><span class="icon">💳</span><span>כרטיסי אשראי</span></a></li>
-                    <li class="nav-item"><a href="stocks.html" class="nav-link"><span class="icon">📈</span><span>מניות</span></a></li>
+                    <li class="nav-item"><a href="../index.html" class="nav-link"><span class="icon">🏠</span><span data-i18n="nav.dashboard">דאשבורד</span></a></li>
+                    <li class="nav-item"><a href="bank.html" class="nav-link"><span class="icon">🏦</span><span data-i18n="nav.bankAccounts">חשבונות בנק</span></a></li>
+                    <li class="nav-item"><a href="credit.html" class="nav-link"><span class="icon">💳</span><span data-i18n="nav.creditCards">כרטיסי אשראי</span></a></li>
+                    <li class="nav-item"><a href="stocks.html" class="nav-link"><span class="icon">📈</span><span data-i18n="nav.stocks">מניות</span></a></li>
                     <li class="nav-item">
-                        <span class="nav-link" style="cursor: default;"><span class="icon">📊</span><span>מוצרים פיננסיים</span></span>
+                        <span class="nav-link" style="cursor: default;"><span class="icon">📊</span><span data-i18n="nav.financialProducts">מוצרים פיננסיים</span></span>
                         <ul class="nav-submenu">
-                            <li class="nav-item"><a href="market-products.html" class="nav-link"><span>🏪 מוצרים בשוק</span></a></li>
-                            <li class="nav-item"><a href="my-funds.html" class="nav-link"><span>💎 המוצרים שלי</span></a></li>
+                            <li class="nav-item"><a href="market-products.html" class="nav-link"><span>🏪 </span><span data-i18n="nav.marketProducts">מוצרים בשוק</span></a></li>
+                            <li class="nav-item"><a href="my-funds.html" class="nav-link"><span>💎 </span><span data-i18n="nav.myProducts">המוצרים שלי</span></a></li>
                         </ul>
                     </li>
-                    <li class="nav-item"><a href="assets.html" class="nav-link"><span class="icon">🏠</span><span>נכסים</span></a></li>
-                    <li class="nav-item"><a href="goals.html" class="nav-link"><span class="icon">🎯</span><span>יעדי חיסכון</span></a></li>
-                    <li class="nav-item"><a href="reports.html" class="nav-link active"><span class="icon">📋</span><span>דוחות</span></a></li>
-                    <li class="nav-item"><a href="settings.html" class="nav-link"><span class="icon">⚙️</span><span>הגדרות</span></a></li>
+                    <li class="nav-item"><a href="assets.html" class="nav-link"><span class="icon">🏠</span><span data-i18n="nav.assets">נכסים</span></a></li>
+                    <li class="nav-item"><a href="goals.html" class="nav-link"><span class="icon">🎯</span><span data-i18n="nav.goals">יעדי חיסכון</span></a></li>
+                    <li class="nav-item"><a href="reports.html" class="nav-link active"><span class="icon">📋</span><span data-i18n="nav.reports">דוחות</span></a></li>
+                    <li class="nav-item"><a href="settings.html" class="nav-link"><span class="icon">⚙️</span><span data-i18n="nav.settings">הגדרות</span></a></li>
                 </ul>
             </nav>
 
@@ -308,8 +308,8 @@
                 <img src="../img/logo.png" alt="FinSight" class="logo-hero-img">
             </div>
             <header class="page-header">
-                <h1>📋 דוחות</h1>
-                <p>סיכומים ומגמות פיננסיות</p>
+                <h1>📋 <span data-i18n="reports.title">דוחות</span></h1>
+                <p data-i18n="reports.subtitle">סיכומים ומגמות פיננסיות</p>
             </header>
 
             <!-- Report Selector -->
@@ -319,7 +319,7 @@
                 </select>
                 <button class="btn print-btn" onclick="window.print()">
                     <span>🖨️</span>
-                    <span>הדפס דוח</span>
+                    <span data-i18n="reports.printReport">הדפס דוח</span>
                 </button>
             </div>
 
@@ -332,7 +332,7 @@
             <div class="charts-row">
                 <div class="card">
                     <div class="card-header">
-                        <h2 class="card-title"><span class="icon">📈</span> מגמת הוצאות (6 חודשים)</h2>
+                        <h2 class="card-title"><span class="icon">📈</span> <span data-i18n="reports.expenseTrend6">מגמת הוצאות (6 חודשים)</span></h2>
                     </div>
                     <div class="chart-container">
                         <canvas id="expenseTrendChart"></canvas>
@@ -341,7 +341,7 @@
 
                 <div class="card">
                     <div class="card-header">
-                        <h2 class="card-title"><span class="icon">📊</span> חלוקה לפי קטגוריות</h2>
+                        <h2 class="card-title"><span class="icon">📊</span> <span data-i18n="reports.categoryBreakdown">חלוקה לפי קטגוריות</span></h2>
                     </div>
                     <div class="chart-container">
                         <canvas id="categoryPieChart"></canvas>
@@ -352,7 +352,7 @@
             <!-- Category Breakdown -->
             <div class="card">
                 <div class="card-header">
-                    <h2 class="card-title"><span class="icon">📑</span> פירוט לפי קטגוריות</h2>
+                    <h2 class="card-title"><span class="icon">📑</span> <span data-i18n="reports.categoryDetails">פירוט לפי קטגוריות</span></h2>
                 </div>
                 <ul class="category-list" id="categoryList">
                     <!-- Populated by JS -->
@@ -362,7 +362,7 @@
             <!-- Top Expenses -->
             <div class="card">
                 <div class="card-header">
-                    <h2 class="card-title"><span class="icon">💸</span> הוצאות גבוהות</h2>
+                    <h2 class="card-title"><span class="icon">💸</span> <span data-i18n="reports.topExpenses">הוצאות גבוהות</span></h2>
                 </div>
                 <div id="topExpenses">
                     <!-- Populated by JS -->
@@ -372,7 +372,7 @@
             <!-- Net Worth Trend -->
             <div class="card">
                 <div class="card-header">
-                    <h2 class="card-title"><span class="icon">💰</span> מגמת יתרת בנק</h2>
+                    <h2 class="card-title"><span class="icon">💰</span> <span data-i18n="reports.bankBalanceTrend">מגמת יתרת בנק</span></h2>
                 </div>
                 <div class="chart-container">
                     <canvas id="netWorthChart"></canvas>
@@ -382,13 +382,13 @@
             <!-- Feature 6: Portfolio vs Benchmarks -->
             <div class="card" id="benchmarkSection">
                 <div class="card-header">
-                    <h2 class="card-title"><span class="icon">📊</span> השוואה למדדים</h2>
+                    <h2 class="card-title"><span class="icon">📊</span> <span data-i18n="reports.benchmarkComparison">השוואה למדדים</span></h2>
                     <button class="btn btn-small" onclick="loadBenchmarkComparison()" id="refreshBenchmarks">
-                        🔄 עדכן
+                        🔄 <span data-i18n="reports.refresh">עדכן</span>
                     </button>
                 </div>
                 <div id="benchmarkContent">
-                    <p style="text-align: center; padding: 20px; color: var(--color-text-secondary);">
+                    <p style="text-align: center; padding: 20px; color: var(--color-text-secondary);" data-i18n="reports.clickToLoadBenchmarks">
                         לחץ על "עדכן" לטעינת נתוני מדדים
                     </p>
                 </div>
@@ -397,7 +397,7 @@
             <!-- Feature 7: Expense Analysis -->
             <div class="card">
                 <div class="card-header">
-                    <h2 class="card-title"><span class="icon">🔍</span> ניתוח הוצאות</h2>
+                    <h2 class="card-title"><span class="icon">🔍</span> <span data-i18n="reports.expenseAnalysis">ניתוח הוצאות</span></h2>
                 </div>
                 <div id="expenseAnalysis">
                     <!-- Populated by JS -->
@@ -407,7 +407,7 @@
             <!-- Unusual Expenses (Anomalies) -->
             <div class="card" id="unusualExpensesCard">
                 <div class="card-header">
-                    <h2 class="card-title"><span class="icon">⚠️</span> הוצאות חריגות</h2>
+                    <h2 class="card-title"><span class="icon">⚠️</span> <span data-i18n="reports.unusualExpenses">הוצאות חריגות</span></h2>
                 </div>
                 <div id="unusualExpenses">
                     <!-- Populated by JS -->
@@ -417,7 +417,7 @@
             <!-- Expense Trends Chart -->
             <div class="card">
                 <div class="card-header">
-                    <h2 class="card-title"><span class="icon">📈</span> מגמת הוצאות (12 חודשים)</h2>
+                    <h2 class="card-title"><span class="icon">📈</span> <span data-i18n="reports.expenseTrend12">מגמת הוצאות (12 חודשים)</span></h2>
                 </div>
                 <div class="chart-container">
                     <canvas id="expenseAnalysisChart"></canvas>
@@ -439,6 +439,7 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             App.currentPage = 'reports';
+            I18n.init();
             initMonthSelector();
             loadReport();
             loadTrendCharts();
@@ -481,39 +482,39 @@
                 <div class="report-card">
                     <div class="icon">💸</div>
                     <div class="value" style="color: var(--color-credit);">${I18n.formatCurrency(report.expenses.total)}</div>
-                    <div class="label">סה״כ הוצאות</div>
+                    <div class="label">${I18n.t('reports.totalExpenses')}</div>
                     <div class="change ${changeClass}">
-                        ${changeIcon} ${Math.abs(report.expenses.changePercent).toFixed(1)}% מהחודש הקודם
+                        ${changeIcon} ${Math.abs(report.expenses.changePercent).toFixed(1)}% ${I18n.t('reports.fromLastMonth')}
                     </div>
                 </div>
                 <div class="report-card">
                     <div class="icon">🧾</div>
                     <div class="value">${report.expenses.count}</div>
-                    <div class="label">מספר הוצאות</div>
+                    <div class="label">${I18n.t('reports.expenseCount')}</div>
                 </div>
                 <div class="report-card">
                     <div class="icon">📅</div>
                     <div class="value">${I18n.formatCurrency(report.expenses.avgPerDay)}</div>
-                    <div class="label">ממוצע יומי</div>
+                    <div class="label">${I18n.t('reports.dailyAvg')}</div>
                 </div>
                 <div class="report-card">
                     <div class="icon">🏦</div>
                     <div class="value" style="color: ${report.bank.change >= 0 ? 'var(--color-positive)' : 'var(--color-negative)'};">
                         ${report.bank.change >= 0 ? '+' : ''}${I18n.formatCurrency(report.bank.change)}
                     </div>
-                    <div class="label">שינוי ביתרה</div>
+                    <div class="label">${I18n.t('reports.balanceChange')}</div>
                 </div>
                 <div class="report-card">
                     <div class="icon">📈</div>
                     <div class="value" style="color: ${report.stocks.profitLoss >= 0 ? 'var(--color-positive)' : 'var(--color-negative)'};">
                         ${report.stocks.profitLoss >= 0 ? '+' : ''}${I18n.formatCurrency(report.stocks.profitLoss)}
                     </div>
-                    <div class="label">רווח/הפסד מניות</div>
+                    <div class="label">${I18n.t('reports.stockProfitLoss')}</div>
                 </div>
                 <div class="report-card">
                     <div class="icon">💰</div>
                     <div class="value" style="color: var(--color-dashboard);">${I18n.formatCurrency(report.summary.netWorth)}</div>
-                    <div class="label">שווי נקי</div>
+                    <div class="label">${I18n.t('reports.netWorth')}</div>
                 </div>
             `;
 
@@ -538,20 +539,20 @@
                         <span style="color: var(--color-text-secondary); min-width: 50px;">${cat.percentage.toFixed(1)}%</span>
                     </div>
                 </li>
-            `).join('') || '<li style="padding: 20px; text-align: center; color: var(--color-text-secondary);">אין הוצאות בחודש זה</li>';
+            `).join('') || `<li style="padding: 20px; text-align: center; color: var(--color-text-secondary);">${I18n.t('reports.noExpensesThisMonth')}</li>`;
 
             // Render top expenses
             document.getElementById('topExpenses').innerHTML = report.expenses.topExpenses.map(exp => `
                 <div class="top-expense">
                     <div>
-                        <strong>${exp.description || 'ללא תיאור'}</strong>
+                        <strong>${exp.description || I18n.t('reports.noDescription')}</strong>
                         <div style="font-size: 0.85rem; color: var(--color-text-secondary);">
                             ${I18n.formatDate(exp.date)} • ${Tags.getCategoryName(exp.category)}
                         </div>
                     </div>
                     <div style="font-weight: bold; color: var(--color-credit);">${I18n.formatCurrency(exp.amount)}</div>
                 </div>
-            `).join('') || '<p style="padding: 20px; text-align: center; color: var(--color-text-secondary);">אין הוצאות בחודש זה</p>';
+            `).join('') || `<p style="padding: 20px; text-align: center; color: var(--color-text-secondary);">${I18n.t('reports.noExpensesThisMonth')}</p>`;
 
             // Update category pie chart
             updateCategoryPieChart(report.expenses.byCategory);
@@ -569,7 +570,7 @@
                 data: {
                     labels: trends.map(t => t.label),
                     datasets: [{
-                        label: 'הוצאות',
+                        label: I18n.t('reports.expenses'),
                         data: trends.map(t => t.total),
                         borderColor: '#ef4444',
                         backgroundColor: 'rgba(239, 68, 68, 0.1)',
@@ -607,7 +608,7 @@
                 data: {
                     labels: netWorthHistory.map(h => h.label),
                     datasets: [{
-                        label: 'יתרת בנק',
+                        label: I18n.t('reports.bankBalance'),
                         data: netWorthHistory.map(h => h.value),
                         borderColor: '#10b981',
                         backgroundColor: 'rgba(16, 185, 129, 0.1)',
@@ -645,7 +646,7 @@
             if (categoryPieChart) categoryPieChart.destroy();
 
             if (categories.length === 0) {
-                ctx.parentElement.innerHTML = '<p style="text-align: center; padding: 40px; color: var(--color-text-secondary);">אין נתונים להצגה</p>';
+                ctx.parentElement.innerHTML = `<p style="text-align: center; padding: 40px; color: var(--color-text-secondary);">${I18n.t('reports.noDataToShow')}</p>`;
                 return;
             }
 
@@ -685,12 +686,12 @@
             const content = document.getElementById('benchmarkContent');
 
             btn.disabled = true;
-            btn.innerHTML = '⏳ טוען...';
+            btn.innerHTML = `⏳ ${I18n.t('reports.loading')}`;
 
             content.innerHTML = `
                 <div style="text-align: center; padding: 30px;">
                     <div class="spin" style="font-size: 2rem;">⏳</div>
-                    <p style="margin-top: 10px; color: var(--color-text-secondary);">טוען נתוני מדדים...</p>
+                    <p style="margin-top: 10px; color: var(--color-text-secondary);">${I18n.t('reports.loadingBenchmarks')}</p>
                 </div>
             `;
 
@@ -703,15 +704,15 @@
                 if (comparison.portfolio.hasData) {
                     html += `
                         <div class="benchmark-card">
-                            <h3>💼 התיק שלך</h3>
+                            <h3>💼 ${I18n.t('reports.yourPortfolio')}</h3>
                             <div class="benchmark-value" style="color: ${comparison.portfolio.totalReturn >= 0 ? 'var(--color-positive)' : 'var(--color-negative)'};">
                                 ${comparison.portfolio.totalReturn >= 0 ? '+' : ''}${comparison.portfolio.totalReturn.toFixed(2)}%
                             </div>
                             <div style="color: var(--color-text-secondary);">
-                                שווי: ${I18n.formatCurrency(comparison.portfolio.currentValue)}
+                                ${I18n.t('reports.portfolioValue')}: ${I18n.formatCurrency(comparison.portfolio.currentValue)}
                             </div>
                             <div style="font-size: 0.9rem; margin-top: 5px;">
-                                רווח/הפסד: <span style="color: ${comparison.portfolio.profitLoss >= 0 ? 'var(--color-positive)' : 'var(--color-negative)'};">
+                                ${I18n.t('reports.profitLoss')}: <span style="color: ${comparison.portfolio.profitLoss >= 0 ? 'var(--color-positive)' : 'var(--color-negative)'};">
                                     ${comparison.portfolio.profitLoss >= 0 ? '+' : ''}${I18n.formatCurrency(comparison.portfolio.profitLoss)}
                                 </span>
                             </div>
@@ -720,8 +721,8 @@
                 } else {
                     html += `
                         <div class="benchmark-card">
-                            <h3>💼 התיק שלך</h3>
-                            <p style="color: var(--color-text-secondary);">אין מניות בתיק</p>
+                            <h3>💼 ${I18n.t('reports.yourPortfolio')}</h3>
+                            <p style="color: var(--color-text-secondary);">${I18n.t('reports.noStocksInPortfolio')}</p>
                         </div>
                     `;
                 }
@@ -737,19 +738,19 @@
                             </div>
                             <div class="benchmark-returns">
                                 <div class="return-item">
-                                    <div class="period">יום</div>
+                                    <div class="period">${I18n.t('reports.day')}</div>
                                     <div class="value" style="color: ${ta125.returns.day >= 0 ? 'var(--color-positive)' : 'var(--color-negative)'};">
                                         ${ta125.returns.day?.toFixed(2) || 'N/A'}%
                                     </div>
                                 </div>
                                 <div class="return-item">
-                                    <div class="period">חודש</div>
+                                    <div class="period">${I18n.t('reports.month')}</div>
                                     <div class="value" style="color: ${ta125.returns.month >= 0 ? 'var(--color-positive)' : 'var(--color-negative)'};">
                                         ${ta125.returns.month?.toFixed(2) || 'N/A'}%
                                     </div>
                                 </div>
                                 <div class="return-item">
-                                    <div class="period">6 חודשים</div>
+                                    <div class="period">${I18n.t('reports.sixMonths')}</div>
                                     <div class="value" style="color: ${ta125.returns.sixMonths >= 0 ? 'var(--color-positive)' : 'var(--color-negative)'};">
                                         ${ta125.returns.sixMonths?.toFixed(2) || 'N/A'}%
                                     </div>
@@ -770,19 +771,19 @@
                             </div>
                             <div class="benchmark-returns">
                                 <div class="return-item">
-                                    <div class="period">יום</div>
+                                    <div class="period">${I18n.t('reports.day')}</div>
                                     <div class="value" style="color: ${sp500.returns.day >= 0 ? 'var(--color-positive)' : 'var(--color-negative)'};">
                                         ${sp500.returns.day?.toFixed(2) || 'N/A'}%
                                     </div>
                                 </div>
                                 <div class="return-item">
-                                    <div class="period">חודש</div>
+                                    <div class="period">${I18n.t('reports.month')}</div>
                                     <div class="value" style="color: ${sp500.returns.month >= 0 ? 'var(--color-positive)' : 'var(--color-negative)'};">
                                         ${sp500.returns.month?.toFixed(2) || 'N/A'}%
                                     </div>
                                 </div>
                                 <div class="return-item">
-                                    <div class="period">6 חודשים</div>
+                                    <div class="period">${I18n.t('reports.sixMonths')}</div>
                                     <div class="value" style="color: ${sp500.returns.sixMonths >= 0 ? 'var(--color-positive)' : 'var(--color-negative)'};">
                                         ${sp500.returns.sixMonths?.toFixed(2) || 'N/A'}%
                                     </div>
@@ -796,15 +797,15 @@
 
                 // Comparison results
                 if (comparison.portfolio.hasData && (comparison.comparison.vsTA125 || comparison.comparison.vsSP500)) {
-                    html += '<div class="comparison-result"><h4 style="margin-bottom: 15px;">📊 השוואה</h4>';
+                    html += `<div class="comparison-result"><h4 style="margin-bottom: 15px;">📊 ${I18n.t('reports.comparison')}</h4>`;
 
                     if (comparison.comparison.vsTA125) {
                         const vs = comparison.comparison.vsTA125;
                         html += `
                             <div class="comparison-row">
-                                <span>התיק שלך vs ת"א 125</span>
+                                <span>${I18n.t('reports.yourPortfolio')} vs ת"א 125</span>
                                 <span class="${vs.outperforming ? 'outperform' : 'underperform'}">
-                                    ${vs.outperforming ? '✓ מכה את המדד' : '✗ מתחת למדד'}
+                                    ${vs.outperforming ? '✓ ' + I18n.t('reports.beatsIndex') : '✗ ' + I18n.t('reports.belowIndex')}
                                     (${vs.difference >= 0 ? '+' : ''}${vs.difference.toFixed(2)}%)
                                 </span>
                             </div>
@@ -815,9 +816,9 @@
                         const vs = comparison.comparison.vsSP500;
                         html += `
                             <div class="comparison-row">
-                                <span>התיק שלך vs S&P 500</span>
+                                <span>${I18n.t('reports.yourPortfolio')} vs S&P 500</span>
                                 <span class="${vs.outperforming ? 'outperform' : 'underperform'}">
-                                    ${vs.outperforming ? '✓ מכה את המדד' : '✗ מתחת למדד'}
+                                    ${vs.outperforming ? '✓ ' + I18n.t('reports.beatsIndex') : '✗ ' + I18n.t('reports.belowIndex')}
                                     (${vs.difference >= 0 ? '+' : ''}${vs.difference.toFixed(2)}%)
                                 </span>
                             </div>
@@ -833,13 +834,13 @@
                 console.error('Error loading benchmarks:', error);
                 content.innerHTML = `
                     <p style="text-align: center; padding: 20px; color: var(--color-negative);">
-                        שגיאה בטעינת נתונים. נסה שוב מאוחר יותר.
+                        ${I18n.t('reports.benchmarkError')}
                     </p>
                 `;
             }
 
             btn.disabled = false;
-            btn.innerHTML = '🔄 עדכן';
+            btn.innerHTML = `🔄 ${I18n.t('reports.refresh')}`;
         }
 
         // Feature 7: Expense Analysis
@@ -850,7 +851,7 @@
             const unusualCard = document.getElementById('unusualExpensesCard');
 
             if (!analysis.hasData) {
-                container.innerHTML = '<p style="text-align: center; padding: 20px; color: var(--color-text-secondary);">אין מספיק נתונים לניתוח</p>';
+                container.innerHTML = `<p style="text-align: center; padding: 20px; color: var(--color-text-secondary);">${I18n.t('reports.notEnoughData')}</p>`;
                 unusualCard.style.display = 'none';
                 return;
             }
@@ -860,22 +861,22 @@
                                analysis.trend.direction === 'decreasing' ? 'trend-down' : 'trend-stable';
             const trendIcon = analysis.trend.direction === 'increasing' ? '📈' :
                               analysis.trend.direction === 'decreasing' ? '📉' : '➡️';
-            const trendText = analysis.trend.direction === 'increasing' ? 'עולה' :
-                              analysis.trend.direction === 'decreasing' ? 'יורד' : 'יציב';
+            const trendText = analysis.trend.direction === 'increasing' ? I18n.t('reports.trendIncreasing') :
+                              analysis.trend.direction === 'decreasing' ? I18n.t('reports.trendDecreasing') : I18n.t('reports.trendStable');
 
             // Main stats
             container.innerHTML = `
                 <div class="analysis-grid">
                     <div class="analysis-stat">
-                        <div class="label">סה"כ (${analysis.period.months} חודשים)</div>
+                        <div class="label">${I18n.t('reports.totalPeriod').replace('{months}', analysis.period.months)}</div>
                         <div class="value">${I18n.formatCurrency(analysis.totals.total)}</div>
                     </div>
                     <div class="analysis-stat">
-                        <div class="label">ממוצע חודשי</div>
+                        <div class="label">${I18n.t('reports.monthlyAverage')}</div>
                         <div class="value">${I18n.formatCurrency(analysis.totals.average)}</div>
                     </div>
                     <div class="analysis-stat">
-                        <div class="label">מגמה</div>
+                        <div class="label">${I18n.t('reports.trend')}</div>
                         <div class="value">
                             <span class="trend-indicator ${trendClass}">
                                 ${trendIcon} ${trendText}
@@ -883,7 +884,7 @@
                         </div>
                     </div>
                     <div class="analysis-stat">
-                        <div class="label">שינוי חודשי</div>
+                        <div class="label">${I18n.t('reports.monthlyChange')}</div>
                         <div class="value" style="color: ${analysis.trend.monthlyChange > 0 ? 'var(--color-negative)' : 'var(--color-positive)'};">
                             ${analysis.trend.monthlyChange > 0 ? '+' : ''}${I18n.formatCurrency(analysis.trend.monthlyChange)}
                         </div>
@@ -891,18 +892,18 @@
                 </div>
 
                 <div style="margin-top: 20px;">
-                    <h4 style="margin-bottom: 10px;">📅 השוואה שנתית</h4>
+                    <h4 style="margin-bottom: 10px;">📅 ${I18n.t('reports.yearlyComparison')}</h4>
                     <div class="yoy-comparison">
                         <div class="yoy-item">
-                            <div style="font-size: 0.85rem; color: var(--color-text-secondary);">השנה</div>
+                            <div style="font-size: 0.85rem; color: var(--color-text-secondary);">${I18n.t('reports.thisYear')}</div>
                             <div style="font-size: 1.2rem; font-weight: bold;">${I18n.formatCurrency(analysis.yearOverYear.thisYear)}</div>
                         </div>
                         <div class="yoy-item">
-                            <div style="font-size: 0.85rem; color: var(--color-text-secondary);">שנה שעברה</div>
+                            <div style="font-size: 0.85rem; color: var(--color-text-secondary);">${I18n.t('reports.lastYear')}</div>
                             <div style="font-size: 1.2rem; font-weight: bold;">${I18n.formatCurrency(analysis.yearOverYear.lastYear)}</div>
                         </div>
                         <div class="yoy-item">
-                            <div style="font-size: 0.85rem; color: var(--color-text-secondary);">שינוי</div>
+                            <div style="font-size: 0.85rem; color: var(--color-text-secondary);">${I18n.t('reports.change')}</div>
                             <div style="font-size: 1.2rem; font-weight: bold; color: ${analysis.yearOverYear.change > 0 ? 'var(--color-negative)' : 'var(--color-positive)'};">
                                 ${analysis.yearOverYear.change > 0 ? '+' : ''}${analysis.yearOverYear.changePercent.toFixed(1)}%
                             </div>
@@ -917,12 +918,12 @@
                 unusualContainer.innerHTML = analysis.unusualExpenses.slice(0, 5).map(exp => `
                     <div class="unusual-item">
                         <div class="unusual-info">
-                            <div><strong>${exp.description || 'ללא תיאור'}</strong></div>
+                            <div><strong>${exp.description || I18n.t('reports.noDescription')}</strong></div>
                             <div style="font-size: 0.85rem; color: var(--color-text-secondary);">
                                 ${I18n.formatDate(exp.date)} • ${Tags.getCategoryName(exp.category)}
                             </div>
                             <div class="unusual-deviation">
-                                ממוצע בקטגוריה: ${I18n.formatCurrency(exp.mean)} | חריגה: +${exp.deviationPercent.toFixed(0)}%
+                                ${I18n.t('reports.categoryAverage')}: ${I18n.formatCurrency(exp.mean)} | ${I18n.t('reports.deviation')}: +${exp.deviationPercent.toFixed(0)}%
                             </div>
                         </div>
                         <div class="unusual-amount">${I18n.formatCurrency(exp.amount)}</div>
@@ -941,7 +942,7 @@
                 data: {
                     labels: analysis.monthlyData.map(d => d.label),
                     datasets: [{
-                        label: 'הוצאות',
+                        label: I18n.t('reports.expenses'),
                         data: analysis.monthlyData.map(d => d.total),
                         backgroundColor: analysis.monthlyData.map(d =>
                             d.total > analysis.totals.average * 1.2 ? 'rgba(239, 68, 68, 0.7)' :
@@ -950,7 +951,7 @@
                         ),
                         borderRadius: 6
                     }, {
-                        label: 'ממוצע',
+                        label: I18n.t('reports.average'),
                         data: analysis.monthlyData.map(() => analysis.totals.average),
                         type: 'line',
                         borderColor: '#f59e0b',

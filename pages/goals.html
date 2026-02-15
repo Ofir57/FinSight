@@ -140,21 +140,21 @@
 
             <nav>
                 <ul class="nav-menu">
-                    <li class="nav-item"><a href="../index.html" class="nav-link"><span class="icon">🏠</span><span>דאשבורד</span></a></li>
-                    <li class="nav-item"><a href="bank.html" class="nav-link"><span class="icon">🏦</span><span>חשבונות בנק</span></a></li>
-                    <li class="nav-item"><a href="credit.html" class="nav-link"><span class="icon">💳</span><span>כרטיסי אשראי</span></a></li>
-                    <li class="nav-item"><a href="stocks.html" class="nav-link"><span class="icon">📈</span><span>מניות</span></a></li>
+                    <li class="nav-item"><a href="../index.html" class="nav-link"><span class="icon">🏠</span><span data-i18n="nav.dashboard">דאשבורד</span></a></li>
+                    <li class="nav-item"><a href="bank.html" class="nav-link"><span class="icon">🏦</span><span data-i18n="nav.bankAccounts">חשבונות בנק</span></a></li>
+                    <li class="nav-item"><a href="credit.html" class="nav-link"><span class="icon">💳</span><span data-i18n="nav.creditCards">כרטיסי אשראי</span></a></li>
+                    <li class="nav-item"><a href="stocks.html" class="nav-link"><span class="icon">📈</span><span data-i18n="nav.stocks">מניות</span></a></li>
                     <li class="nav-item">
-                        <span class="nav-link" style="cursor: default;"><span class="icon">📊</span><span>מוצרים פיננסיים</span></span>
+                        <span class="nav-link" style="cursor: default;"><span class="icon">📊</span><span data-i18n="nav.financialProducts">מוצרים פיננסיים</span></span>
                         <ul class="nav-submenu">
-                            <li class="nav-item"><a href="market-products.html" class="nav-link"><span>🏪 מוצרים בשוק</span></a></li>
-                            <li class="nav-item"><a href="my-funds.html" class="nav-link"><span>💎 המוצרים שלי</span></a></li>
+                            <li class="nav-item"><a href="market-products.html" class="nav-link"><span>🏪 </span><span data-i18n="nav.marketProducts">מוצרים בשוק</span></a></li>
+                            <li class="nav-item"><a href="my-funds.html" class="nav-link"><span>💎 </span><span data-i18n="nav.myProducts">המוצרים שלי</span></a></li>
                         </ul>
                     </li>
-                    <li class="nav-item"><a href="assets.html" class="nav-link"><span class="icon">🏠</span><span>נכסים</span></a></li>
-                    <li class="nav-item"><a href="goals.html" class="nav-link active"><span class="icon">🎯</span><span>יעדי חיסכון</span></a></li>
-                    <li class="nav-item"><a href="reports.html" class="nav-link"><span class="icon">📋</span><span>דוחות</span></a></li>
-                    <li class="nav-item"><a href="settings.html" class="nav-link"><span class="icon">⚙️</span><span>הגדרות</span></a></li>
+                    <li class="nav-item"><a href="assets.html" class="nav-link"><span class="icon">🏠</span><span data-i18n="nav.assets">נכסים</span></a></li>
+                    <li class="nav-item"><a href="goals.html" class="nav-link active"><span class="icon">🎯</span><span data-i18n="nav.goals">יעדי חיסכון</span></a></li>
+                    <li class="nav-item"><a href="reports.html" class="nav-link"><span class="icon">📋</span><span data-i18n="nav.reports">דוחות</span></a></li>
+                    <li class="nav-item"><a href="settings.html" class="nav-link"><span class="icon">⚙️</span><span data-i18n="nav.settings">הגדרות</span></a></li>
                 </ul>
             </nav>
 
@@ -168,8 +168,8 @@
                 <img src="../img/logo.png" alt="FinSight" class="logo-hero-img">
             </div>
             <header class="page-header">
-                <h1>🎯 יעדי חיסכון</h1>
-                <p>עקוב אחר ההתקדמות שלך ליעדים פיננסיים</p>
+                <h1>🎯 <span data-i18n="goals.title">יעדי חיסכון</span></h1>
+                <p data-i18n="goals.subtitle">עקוב אחר ההתקדמות שלך ליעדים פיננסיים</p>
             </header>
 
             <!-- Summary -->
@@ -181,7 +181,7 @@
             <div style="margin-bottom: 20px;">
                 <button class="btn btn-primary" onclick="openGoalModal()">
                     <span>➕</span>
-                    <span>הוסף יעד חדש</span>
+                    <span data-i18n="goals.addGoal">הוסף יעד חדש</span>
                 </button>
             </div>
 
@@ -198,7 +198,7 @@
     <div class="modal-overlay" id="goalModal">
         <div class="modal">
             <div class="modal-header">
-                <h2 id="modalTitle">הוסף יעד חדש</h2>
+                <h2 id="modalTitle" data-i18n="goals.addGoal">הוסף יעד חדש</h2>
                 <button class="modal-close" onclick="closeGoalModal()">&times;</button>
             </div>
             <div class="modal-body">
@@ -206,7 +206,7 @@
                     <input type="hidden" id="goalId">
 
                     <div class="form-group">
-                        <label>אייקון</label>
+                        <label data-i18n="goals.goalIcon">אייקון</label>
                         <select class="form-control" id="goalIcon">
                             <option value="🏠">🏠 בית</option>
                             <option value="🚗">🚗 רכב</option>
@@ -222,29 +222,29 @@
                     </div>
 
                     <div class="form-group">
-                        <label>שם היעד</label>
-                        <input type="text" class="form-control" id="goalName" required placeholder="לדוגמה: מקדמה לדירה">
+                        <label data-i18n="goals.goalName">שם היעד</label>
+                        <input type="text" class="form-control" id="goalName" required data-i18n-placeholder="goals.goalNamePlaceholder" placeholder="לדוגמה: מקדמה לדירה">
                     </div>
 
                     <div class="form-group">
-                        <label>סכום יעד</label>
+                        <label data-i18n="goals.targetAmount">סכום יעד</label>
                         <input type="number" class="form-control" id="goalTarget" required min="1" step="100">
                     </div>
 
                     <div class="form-group">
-                        <label>סכום נוכחי (אופציונלי)</label>
+                        <label data-i18n="goals.currentAmount">סכום נוכחי (אופציונלי)</label>
                         <input type="number" class="form-control" id="goalCurrent" min="0" step="100" value="0">
                     </div>
 
                     <div class="form-group">
-                        <label>תאריך יעד (אופציונלי)</label>
+                        <label data-i18n="goals.goalDeadline">תאריך יעד (אופציונלי)</label>
                         <input type="date" class="form-control" id="goalDeadline">
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" onclick="closeGoalModal()">ביטול</button>
-                <button class="btn btn-primary" onclick="saveGoal()">שמור</button>
+                <button class="btn btn-secondary" onclick="closeGoalModal()" data-i18n="common.cancel">ביטול</button>
+                <button class="btn btn-primary" onclick="saveGoal()" data-i18n="common.save">שמור</button>
             </div>
         </div>
     </div>
@@ -253,21 +253,21 @@
     <div class="modal-overlay" id="addAmountModal">
         <div class="modal">
             <div class="modal-header">
-                <h2>הוסף סכום ליעד</h2>
+                <h2 data-i18n="goals.addAmountTitle">הוסף סכום ליעד</h2>
                 <button class="modal-close" onclick="closeAddAmountModal()">&times;</button>
             </div>
             <div class="modal-body">
                 <form id="addAmountForm">
                     <input type="hidden" id="addAmountGoalId">
                     <div class="form-group">
-                        <label>סכום להוספה</label>
+                        <label data-i18n="goals.amountToAdd">סכום להוספה</label>
                         <input type="number" class="form-control" id="amountToAdd" required min="1" step="100">
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" onclick="closeAddAmountModal()">ביטול</button>
-                <button class="btn btn-primary" onclick="addAmount()">הוסף</button>
+                <button class="btn btn-secondary" onclick="closeAddAmountModal()" data-i18n="common.cancel">ביטול</button>
+                <button class="btn btn-primary" onclick="addAmount()" data-i18n="common.add">הוסף</button>
             </div>
         </div>
     </div>
@@ -279,6 +279,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             App.currentPage = 'goals';
+            I18n.init();
             loadGoals();
         });
 
@@ -291,22 +292,22 @@
                 <div class="summary-item">
                     <div class="icon">🎯</div>
                     <div class="value">${summary.total}</div>
-                    <div class="label">סה״כ יעדים</div>
+                    <div class="label">${I18n.t('goals.totalGoals')}</div>
                 </div>
                 <div class="summary-item">
                     <div class="icon">⏳</div>
                     <div class="value">${summary.active}</div>
-                    <div class="label">בתהליך</div>
+                    <div class="label">${I18n.t('goals.inProgress')}</div>
                 </div>
                 <div class="summary-item">
                     <div class="icon">✅</div>
                     <div class="value">${summary.completed}</div>
-                    <div class="label">הושלמו</div>
+                    <div class="label">${I18n.t('goals.completed')}</div>
                 </div>
                 <div class="summary-item">
                     <div class="icon">💰</div>
                     <div class="value">${I18n.formatCurrency(summary.totalCurrent)}</div>
-                    <div class="label">נחסך עד כה</div>
+                    <div class="label">${I18n.t('goals.savedSoFar')}</div>
                 </div>
             `;
 
@@ -317,8 +318,8 @@
                 container.innerHTML = `
                     <div class="empty-goals">
                         <div class="icon">🎯</div>
-                        <h3>אין יעדים עדיין</h3>
-                        <p>הוסף יעד חיסכון חדש כדי להתחיל לעקוב אחר ההתקדמות שלך</p>
+                        <h3>${I18n.t('goals.noGoalsYet')}</h3>
+                        <p>${I18n.t('goals.noGoalsDesc')}</p>
                     </div>
                 `;
                 return;
@@ -335,12 +336,12 @@
                                 <div class="goal-title">
                                     <span class="goal-icon">${goal.icon || '🎯'}</span>
                                     <span>${goal.name}</span>
-                                    ${progress.isComplete ? '<span class="badge badge-success">הושלם!</span>' : ''}
+                                    ${progress.isComplete ? `<span class="badge badge-success">${I18n.t('goals.goalComplete')}</span>` : ''}
                                 </div>
-                                ${goal.deadline ? `<div class="goal-deadline">יעד: ${I18n.formatDate(goal.deadline)}</div>` : ''}
+                                ${goal.deadline ? `<div class="goal-deadline">${I18n.t('goals.deadline')}: ${I18n.formatDate(goal.deadline)}</div>` : ''}
                             </div>
                             <div class="action-buttons">
-                                <button class="add-amount-btn" onclick="openAddAmountModal('${goal.id}')">➕ הוסף</button>
+                                <button class="add-amount-btn" onclick="openAddAmountModal('${goal.id}')">➕ ${I18n.t('goals.addBtn')}</button>
                                 <button class="btn btn-secondary btn-sm" onclick="editGoal('${goal.id}')">✏️</button>
                                 <button class="btn btn-danger btn-sm" onclick="deleteGoal('${goal.id}')">🗑️</button>
                             </div>
@@ -352,22 +353,22 @@
 
                         <div class="goal-stats">
                             <div class="goal-stat">
-                                <div class="label">נחסך</div>
+                                <div class="label">${I18n.t('goals.saved')}</div>
                                 <div class="value positive">${I18n.formatCurrency(goal.currentAmount)}</div>
                             </div>
                             <div class="goal-stat">
-                                <div class="label">יעד</div>
+                                <div class="label">${I18n.t('goals.target')}</div>
                                 <div class="value">${I18n.formatCurrency(goal.targetAmount)}</div>
                             </div>
                             <div class="goal-stat">
-                                <div class="label">נותר</div>
+                                <div class="label">${I18n.t('goals.remaining')}</div>
                                 <div class="value">${I18n.formatCurrency(progress.remaining)}</div>
                             </div>
                         </div>
 
                         ${progress.monthlyNeeded > 0 ? `
                             <div style="margin-top: 15px; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 8px; text-align: center; color: var(--color-text-secondary);">
-                                כדי להגיע ליעד בזמן, יש לחסוך <strong style="color: var(--color-dashboard);">${I18n.formatCurrency(progress.monthlyNeeded)}</strong> בחודש
+                                ${I18n.t('goals.monthlyNeeded')} <strong style="color: var(--color-dashboard);">${I18n.formatCurrency(progress.monthlyNeeded)}</strong> ${I18n.t('goals.perMonth')}
                             </div>
                         ` : ''}
                     </div>
@@ -376,7 +377,7 @@
         }
 
         function openGoalModal() {
-            document.getElementById('modalTitle').textContent = 'הוסף יעד חדש';
+            document.getElementById('modalTitle').textContent = I18n.t('goals.addGoal');
             document.getElementById('goalForm').reset();
             document.getElementById('goalId').value = '';
             document.getElementById('goalCurrent').value = '0';
@@ -392,7 +393,7 @@
             const goal = goals.find(g => g.id === id);
             if (!goal) return;
 
-            document.getElementById('modalTitle').textContent = 'ערוך יעד';
+            document.getElementById('modalTitle').textContent = I18n.t('goals.editGoal');
             document.getElementById('goalId').value = goal.id;
             document.getElementById('goalIcon').value = goal.icon || '🎯';
             document.getElementById('goalName').value = goal.name;
@@ -411,7 +412,7 @@
             const deadline = document.getElementById('goalDeadline').value || null;
 
             if (!name || !targetAmount) {
-                App.notify('נא למלא את כל השדות', 'error');
+                App.notify(I18n.t('goals.fillAllFields'), 'error');
                 return;
             }
 
@@ -423,14 +424,14 @@
 
             closeGoalModal();
             loadGoals();
-            App.notify('היעד נשמר בהצלחה', 'success');
+            App.notify(I18n.t('goals.goalSaved'), 'success');
         }
 
         function deleteGoal(id) {
-            if (confirm('האם למחוק את היעד?')) {
+            if (confirm(I18n.t('goals.deleteGoalConfirm'))) {
                 Goals.delete(id);
                 loadGoals();
-                App.notify('היעד נמחק', 'success');
+                App.notify(I18n.t('goals.goalDeleted'), 'success');
             }
         }
 
@@ -449,14 +450,14 @@
             const amount = parseFloat(document.getElementById('amountToAdd').value);
 
             if (!amount || amount <= 0) {
-                App.notify('נא להזין סכום תקין', 'error');
+                App.notify(I18n.t('goals.enterValidAmount'), 'error');
                 return;
             }
 
             Goals.addAmount(id, amount);
             closeAddAmountModal();
             loadGoals();
-            App.notify(`נוספו ${I18n.formatCurrency(amount)} ליעד`, 'success');
+            App.notify(I18n.t('goals.amountAdded').replace('{amount}', I18n.formatCurrency(amount)), 'success');
         }
     </script>
 </body>

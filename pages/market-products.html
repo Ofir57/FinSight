@@ -600,17 +600,17 @@
                     <li class="nav-item">
                         <span class="nav-link" style="cursor: default;">
                             <span class="icon">📊</span>
-                            <span>מוצרים פיננסיים</span>
+                            <span data-i18n="nav.financialProducts">מוצרים פיננסיים</span>
                         </span>
                         <ul class="nav-submenu">
                             <li class="nav-item">
                                 <a href="market-products.html" class="nav-link active" data-category="market-products">
-                                    <span>🏪</span><span>מוצרים בשוק</span>
+                                    <span>🏪 </span><span data-i18n="nav.marketProducts">מוצרים בשוק</span>
                                 </a>
                             </li>
                             <li class="nav-item">
                                 <a href="my-funds.html" class="nav-link" data-category="my-products">
-                                    <span>💎</span><span>המוצרים שלי</span>
+                                    <span>💎 </span><span data-i18n="nav.myProducts">המוצרים שלי</span>
                                 </a>
                             </li>
                         </ul>
@@ -619,6 +619,24 @@
                         <a href="assets.html" class="nav-link" data-category="assets">
                             <span class="icon">🏠</span>
                             <span data-i18n="nav.assets">נכסים</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="goals.html" class="nav-link">
+                            <span class="icon">🎯</span>
+                            <span data-i18n="nav.goals">יעדי חיסכון</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="reports.html" class="nav-link">
+                            <span class="icon">📋</span>
+                            <span data-i18n="nav.reports">דוחות</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="settings.html" class="nav-link">
+                            <span class="icon">⚙️</span>
+                            <span data-i18n="nav.settings">הגדרות</span>
                         </a>
                     </li>
                 </ul>
@@ -636,16 +654,16 @@
             <header class="page-header">
                 <h1>
                     <span>🏪</span>
-                    <span>מוצרים בשוק</span>
+                    <span data-i18n="marketProducts.title">מוצרים בשוק</span>
                 </h1>
             </header>
 
             <!-- Product Type Tabs -->
             <div class="product-tabs">
-                <button class="product-tab active" data-tab="training" onclick="switchTab('training', this)">🎓 קרן השתלמות</button>
-                <button class="product-tab" data-tab="pension" onclick="switchTab('pension', this)">🏛️ פנסיה</button>
-                <button class="product-tab" data-tab="gemel" onclick="switchTab('gemel', this)">💼 קופת גמל</button>
-                <button class="product-tab" data-tab="savings" onclick="switchTab('savings', this)">🐷 פוליסת חיסכון</button>
+                <button class="product-tab active" data-tab="training" onclick="switchTab('training', this)">🎓 <span data-i18n="marketProducts.trainingFund">קרן השתלמות</span></button>
+                <button class="product-tab" data-tab="pension" onclick="switchTab('pension', this)">🏛️ <span data-i18n="marketProducts.pension">פנסיה</span></button>
+                <button class="product-tab" data-tab="gemel" onclick="switchTab('gemel', this)">💼 <span data-i18n="marketProducts.providentFund">קופת גמל</span></button>
+                <button class="product-tab" data-tab="savings" onclick="switchTab('savings', this)">🐷 <span data-i18n="marketProducts.savingsPolicy">פוליסת חיסכון</span></button>
             </div>
 
             <!-- Source Toggle -->
@@ -655,14 +673,14 @@
             </div>
 
             <div class="source-info">
-                <span id="sourceLabel">מקור: TheMarker SuperMarker</span>
-                <a id="sourceLink" href="#" target="_blank">לאתר המקור</a>
+                <span id="sourceLabel"></span>
+                <a id="sourceLink" href="#" target="_blank" data-i18n="marketProducts.toSourceSite">לאתר המקור</a>
             </div>
 
             <!-- Import & Status Bar -->
             <div style="display: flex; gap: 15px; align-items: center; margin-bottom: 20px; flex-wrap: wrap;">
                 <button class="import-btn" onclick="openImportModal()" style="padding: 12px 24px; font-size: 1rem; font-weight: 600;">
-                    📥 ייבוא נתונים
+                    📥 <span data-i18n="marketProducts.importData">ייבוא נתונים</span>
                 </button>
                 <div class="update-status-bar" id="updateStatusBar" style="margin-bottom: 0; flex: 1;"></div>
             </div>
@@ -671,10 +689,10 @@
             <div class="my-products-section">
                 <h3>
                     <span>💎</span>
-                    <span id="myProductsTitle">המוצרים שלי - קרן השתלמות</span>
+                    <span id="myProductsTitle"></span>
                 </h3>
                 <div id="myProductsList"></div>
-                <a href="my-funds.html" class="my-products-link">ניהול המוצרים שלי &larr;</a>
+                <a href="my-funds.html" class="my-products-link" data-i18n="marketProducts.manageMyProducts">ניהול המוצרים שלי</a> &larr;
             </div>
 
             <!-- Dynamic content container -->
@@ -682,7 +700,7 @@
 
             <!-- No data message -->
             <div id="noDataMsg" class="no-data-msg" style="display: none;">
-                <p>אין נתוני שוק זמינים לסוג מוצר זה</p>
+                <p data-i18n="marketProducts.noMarketData">אין נתוני שוק זמינים לסוג מוצר זה</p>
             </div>
         </main>
 
@@ -690,7 +708,7 @@
         <div class="modal-overlay" id="importModal">
             <div class="modal">
                 <div class="modal-header">
-                    <h2><span>📥</span> <span>ייבוא נתוני </span><span id="importTypeLabel">קרן השתלמות</span></h2>
+                    <h2><span>📥</span> <span data-i18n="marketProducts.importFundType">ייבוא נתוני</span> <span id="importTypeLabel"></span></h2>
                     <button class="modal-close" onclick="closeImportModal()">&times;</button>
                 </div>
                 <div class="modal-body">
@@ -701,39 +719,40 @@
 
                     <a id="importSourceLink" href="#" target="_blank" class="import-source-link">
                         <span>🔗</span>
-                        <span id="importSourceName">פתח את TheMarker</span>
+                        <span id="importSourceName"></span>
                         <span>↗</span>
                     </a>
 
                     <div class="import-instructions">
-                        <h4>📋 הוראות:</h4>
+                        <h4>📋 <span data-i18n="marketProducts.instructions">הוראות:</span></h4>
                         <ol>
-                            <li>לחץ על הקישור למעלה לפתיחת אתר המקור</li>
-                            <li>סמן את כל הטבלה (Ctrl+A על הטבלה)</li>
-                            <li>העתק (Ctrl+C)</li>
-                            <li>הדבק כאן למטה (Ctrl+V)</li>
+                            <li data-i18n="marketProducts.instruction1">לחץ על הקישור למעלה לפתיחת אתר המקור</li>
+                            <li data-i18n="marketProducts.instruction2">סמן את כל הטבלה (Ctrl+A על הטבלה)</li>
+                            <li data-i18n="marketProducts.instruction3">העתק (Ctrl+C)</li>
+                            <li data-i18n="marketProducts.instruction4">הדבק כאן למטה (Ctrl+V)</li>
                         </ol>
                     </div>
 
                     <textarea class="import-paste-area" id="importPasteArea"
+                        data-i18n-placeholder="marketProducts.pasteHere"
                         placeholder="הדבק כאן את הנתונים מהאתר..."
                         oninput="parseImportData()"></textarea>
 
                     <div class="import-preview" id="importPreview" style="display: none;">
                         <div class="import-preview-header">
-                            <h4>👁️ תצוגה מקדימה</h4>
-                            <span class="import-preview-count" id="importCount">0 קרנות</span>
+                            <h4>👁️ <span data-i18n="marketProducts.preview">תצוגה מקדימה</span></h4>
+                            <span class="import-preview-count" id="importCount"></span>
                         </div>
                         <div style="overflow-x: auto; max-height: 300px;">
                             <table>
                                 <thead>
                                     <tr>
-                                        <th>שם קרן</th>
-                                        <th>חברה</th>
-                                        <th>חודש</th>
-                                        <th>שנה</th>
-                                        <th>3 שנים</th>
-                                        <th>5 שנים</th>
+                                        <th data-i18n="marketProducts.fundName">שם קרן</th>
+                                        <th data-i18n="marketProducts.company">חברה</th>
+                                        <th data-i18n="marketProducts.month">חודש</th>
+                                        <th data-i18n="marketProducts.year">שנה</th>
+                                        <th data-i18n="marketProducts.threeYears">3 שנים</th>
+                                        <th data-i18n="marketProducts.fiveYears">5 שנים</th>
                                     </tr>
                                 </thead>
                                 <tbody id="importPreviewBody"></tbody>
@@ -744,17 +763,17 @@
                     <div class="import-actions">
                         <button class="btn btn-primary" onclick="saveImportData()" style="background: #10b981;">
                             <span>💾</span>
-                            <span>שמור נתונים</span>
+                            <span data-i18n="marketProducts.saveData">שמור נתונים</span>
                         </button>
                         <button class="btn btn-secondary" onclick="clearImportData()">
                             <span>🗑️</span>
-                            <span>נקה</span>
+                            <span data-i18n="marketProducts.clear">נקה</span>
                         </button>
                     </div>
 
                     <div class="import-success" id="importSuccess">
                         <span>✅</span>
-                        <span>הנתונים נשמרו בהצלחה!</span>
+                        <span data-i18n="marketProducts.dataSaved">הנתונים נשמרו בהצלחה!</span>
                     </div>
                 </div>
             </div>
@@ -772,18 +791,20 @@
         let fullSortCol = 'year5';
         let fullSortDir = -1;
 
-        const tabLabels = {
-            training: 'קרן השתלמות',
-            pension: 'פנסיה',
-            gemel: 'קופת גמל',
-            savings: 'פוליסת חיסכון'
-        };
+        function getTabLabels() {
+            return {
+                training: I18n.t('marketProducts.trainingFund'),
+                pension: I18n.t('marketProducts.pension'),
+                gemel: I18n.t('marketProducts.providentFund'),
+                savings: I18n.t('marketProducts.savingsPolicy')
+            };
+        }
 
         function switchTab(tab, btn) {
             currentTab = tab;
             document.querySelectorAll('.product-tab').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-            document.getElementById('myProductsTitle').textContent = 'המוצרים שלי - ' + tabLabels[tab];
+            document.getElementById('myProductsTitle').textContent = I18n.t('marketProducts.myProductsPrefix') + getTabLabels()[tab];
             fullSortCol = 'year5';
             fullSortDir = -1;
             renderAll();
@@ -809,11 +830,13 @@
         }
 
         function updateSourceInfo() {
+            const srcLabel = I18n.t('marketProducts.source');
+            const updateLabel = I18n.t('marketProducts.update');
             if (currentSource === 'themarker') {
-                document.getElementById('sourceLabel').textContent = 'מקור: TheMarker SuperMarker | עדכון: ' + (MarketFunds.getLastUpdate() || '');
+                document.getElementById('sourceLabel').textContent = srcLabel + ': TheMarker SuperMarker | ' + updateLabel + ': ' + (MarketFunds.getLastUpdate() || '');
                 document.getElementById('sourceLink').href = MarketFunds.getSourceUrl(currentTab) || '#';
             } else {
-                document.getElementById('sourceLabel').textContent = 'מקור: iGemel-Net | עדכון: ' + (MyGemelFunds.getLastUpdate() || '');
+                document.getElementById('sourceLabel').textContent = srcLabel + ': iGemel-Net | ' + updateLabel + ': ' + (MyGemelFunds.getLastUpdate() || '');
                 document.getElementById('sourceLink').href = (MyGemelFunds.meta.sourceUrls[currentTab]) || '#';
             }
         }
@@ -825,7 +848,7 @@
             try { funds = JSON.parse(localStorage.getItem('finance_my_funds') || '[]'); } catch (e) { }
             const filtered = funds.filter(f => f.type === currentTab);
             if (filtered.length === 0) {
-                container.innerHTML = '<div class="my-products-empty">לא הוספת עדיין מוצרים מסוג זה. <a href="my-funds.html" style="color:#00d2ff;">הוסף דרך המוצרים שלי</a></div>';
+                container.innerHTML = `<div class="my-products-empty">${I18n.t('marketProducts.noProductsYet')} <a href="my-funds.html" style="color:#00d2ff;">${I18n.t('marketProducts.addViaMyProducts')}</a></div>`;
                 return;
             }
             container.innerHTML = filtered.map(f => {
@@ -853,9 +876,9 @@
                 container.innerHTML = '';
                 noData.style.display = 'block';
                 if (currentTab === 'savings') {
-                    noData.innerHTML = '<p>🐷 אין נתוני שוק זמינים עבור פוליסות חיסכון.<br>ניתן לנהל את הפוליסות שלך דרך <a href="my-funds.html" style="color:#00d2ff;">המוצרים שלי</a></p>';
+                    noData.innerHTML = `<p>🐷 ${I18n.t('marketProducts.noSavingsData')}<br>${I18n.t('marketProducts.manageViaMyProducts')} <a href="my-funds.html" style="color:#00d2ff;">${I18n.t('marketProducts.myProducts')}</a></p>`;
                 } else {
-                    noData.innerHTML = '<p>אין נתונים זמינים</p>';
+                    noData.innerHTML = `<p>${I18n.t('marketProducts.noDataAvailable')}</p>`;
                 }
                 return;
             }
@@ -869,22 +892,22 @@
             const maxYear5 = y5Data.length ? Math.max(...y5Data.map(f => f.year5)) : 0;
 
             let html = `<div class="stats-row">
-                <div class="stat-card"><h3>סה"כ קרנות</h3><div class="value">${data.length}</div></div>
-                <div class="stat-card"><h3>תשואה חודשית מובילה</h3><div class="value">${maxMonth.toFixed(2)}%</div></div>
-                <div class="stat-card"><h3>תשואה שנתית מובילה</h3><div class="value">${maxYear1.toFixed(2)}%</div></div>
-                <div class="stat-card"><h3>תשואה מובילה 5 שנים</h3><div class="value">${maxYear5.toFixed(2)}%</div></div>
+                <div class="stat-card"><h3>${I18n.t('marketProducts.totalFunds')}</h3><div class="value">${data.length}</div></div>
+                <div class="stat-card"><h3>${I18n.t('marketProducts.topMonthlyReturn')}</h3><div class="value">${maxMonth.toFixed(2)}%</div></div>
+                <div class="stat-card"><h3>${I18n.t('marketProducts.topYearlyReturn')}</h3><div class="value">${maxYear1.toFixed(2)}%</div></div>
+                <div class="stat-card"><h3>${I18n.t('marketProducts.topFiveYearReturn')}</h3><div class="value">${maxYear5.toFixed(2)}%</div></div>
             </div>`;
 
             // Winners (top 3 by 5-year)
             const top3 = [...data].filter(f => f.year5 != null).sort((a, b) => b.year5 - a.year5).slice(0, 3);
             const icons = ['🥇', '🥈', '🥉'];
-            const places = ['מקום ראשון', 'מקום שני', 'מקום שלישי'];
+            const places = [I18n.t('marketProducts.firstPlace'), I18n.t('marketProducts.secondPlace'), I18n.t('marketProducts.thirdPlace')];
             const badges = ['winner-badge', 'winner-badge silver', 'winner-badge bronze'];
             const cards = ['winner-card', 'winner-card second', 'winner-card third'];
 
             if (top3.length > 0) {
                 html += `<div class="analysis-section">
-                    <h2 class="analysis-title"><span>🏆</span><span>ניתוח: הקרנות המובילות</span></h2>
+                    <h2 class="analysis-title"><span>🏆</span><span>${I18n.t('marketProducts.topFundsAnalysis')}</span></h2>
                     <div class="winners-grid">`;
 
                 top3.forEach((f, i) => {
@@ -895,27 +918,26 @@
                             <div class="winner-company">${f.companyHe || f.companyEn}</div>
                         </div>
                         <div class="winner-stats">
-                            <div class="winner-stat"><div class="winner-stat-value">${f.year5?.toFixed(2) || '-'}%</div><div class="winner-stat-label">5 שנים</div></div>
-                            <div class="winner-stat"><div class="winner-stat-value">${f.year3?.toFixed(2) || '-'}%</div><div class="winner-stat-label">3 שנים</div></div>
-                            <div class="winner-stat"><div class="winner-stat-value">${f.year1?.toFixed(2) || '-'}%</div><div class="winner-stat-label">שנה</div></div>
-                            <div class="winner-stat"><div class="winner-stat-value">${f.month?.toFixed(2) || '-'}%</div><div class="winner-stat-label">חודש</div></div>
+                            <div class="winner-stat"><div class="winner-stat-value">${f.year5?.toFixed(2) || '-'}%</div><div class="winner-stat-label">${I18n.t('marketProducts.fiveYears')}</div></div>
+                            <div class="winner-stat"><div class="winner-stat-value">${f.year3?.toFixed(2) || '-'}%</div><div class="winner-stat-label">${I18n.t('marketProducts.threeYears')}</div></div>
+                            <div class="winner-stat"><div class="winner-stat-value">${f.year1?.toFixed(2) || '-'}%</div><div class="winner-stat-label">${I18n.t('marketProducts.year')}</div></div>
+                            <div class="winner-stat"><div class="winner-stat-value">${f.month?.toFixed(2) || '-'}%</div><div class="winner-stat-label">${I18n.t('marketProducts.month')}</div></div>
                         </div>
                     </div>`;
                 });
 
-                const topCompany = top3[0]?.companyHe || top3[0]?.companyEn || '';
                 const srcName = currentSource === 'themarker' ? 'TheMarker' : 'iGemel-Net';
                 html += `</div>
-                    <div class="analysis-note">הדירוג מבוסס על ביצועים לאורך כל התקופות. מקור: ${srcName}.</div>
+                    <div class="analysis-note">${I18n.t('marketProducts.source')}: ${srcName}.</div>
                 </div>`;
             }
 
             // 4 sorted tables (top 5 each)
             const sortConfigs = [
-                { key: 'year5', icon: '🏆', label: 'ממוין לפי 5 שנים', cols: ['year5', 'year3', 'year1', 'month'], headers: ['5 שנים ▼', '3 שנים', 'שנה', 'חודש'] },
-                { key: 'year3', icon: '🚀', label: 'ממוין לפי 3 שנים', cols: ['year3', 'year5', 'year1', 'month'], headers: ['3 שנים ▼', '5 שנים', 'שנה', 'חודש'] },
-                { key: 'year1', icon: '📈', label: 'ממוין לפי שנה אחרונה', cols: ['year1', 'year5', 'year3', 'month'], headers: ['שנה ▼', '5 שנים', '3 שנים', 'חודש'] },
-                { key: 'month', icon: '📅', label: 'ממוין לפי חודש אחרון', cols: ['month', 'year5', 'year3', 'year1'], headers: ['חודש ▼', '5 שנים', '3 שנים', 'שנה'] }
+                { key: 'year5', icon: '🏆', label: I18n.t('marketProducts.sortedBy5Years'), cols: ['year5', 'year3', 'year1', 'month'], headers: [I18n.t('marketProducts.fiveYears') + ' ▼', I18n.t('marketProducts.threeYears'), I18n.t('marketProducts.year'), I18n.t('marketProducts.month')] },
+                { key: 'year3', icon: '🚀', label: I18n.t('marketProducts.sortedBy3Years'), cols: ['year3', 'year5', 'year1', 'month'], headers: [I18n.t('marketProducts.threeYears') + ' ▼', I18n.t('marketProducts.fiveYears'), I18n.t('marketProducts.year'), I18n.t('marketProducts.month')] },
+                { key: 'year1', icon: '📈', label: I18n.t('marketProducts.sortedByYear'), cols: ['year1', 'year5', 'year3', 'month'], headers: [I18n.t('marketProducts.year') + ' ▼', I18n.t('marketProducts.fiveYears'), I18n.t('marketProducts.threeYears'), I18n.t('marketProducts.month')] },
+                { key: 'month', icon: '📅', label: I18n.t('marketProducts.sortedByMonth'), cols: ['month', 'year5', 'year3', 'year1'], headers: [I18n.t('marketProducts.month') + ' ▼', I18n.t('marketProducts.fiveYears'), I18n.t('marketProducts.threeYears'), I18n.t('marketProducts.year')] }
             ];
 
             html += '<div class="tables-grid">';
@@ -924,7 +946,7 @@
                 html += `<div class="table-block">
                     <h2 class="section-title"><span class="icon">${cfg.icon}</span><span>${cfg.label}</span><span class="sort-indicator">▼</span></h2>
                     <table><thead><tr>
-                        <th class="rank">#</th><th>שם קרן</th><th>חברה</th>`;
+                        <th class="rank">#</th><th>${I18n.t('marketProducts.fundName')}</th><th>${I18n.t('marketProducts.company')}</th>`;
                 cfg.headers.forEach((h, i) => {
                     html += `<th${i === 0 ? ' class="sorted"' : ''}>${h}</th>`;
                 });
@@ -944,20 +966,20 @@
 
             // Full sortable table with search
             html += `<div class="full-table-section card">
-                <div class="card-header"><h2 class="card-title"><span class="icon">📋</span><span>כל הקרנות - טבלה מלאה</span></h2></div>
+                <div class="card-header"><h2 class="card-title"><span class="icon">📋</span><span>${I18n.t('marketProducts.allFundsFullTable')}</span></h2></div>
                 <div style="padding: 0 20px;">
-                    <input type="text" class="search-box" id="searchBox" placeholder="חיפוש קרן..." oninput="renderFullTable()">
+                    <input type="text" class="search-box" id="searchBox" placeholder="${I18n.t('marketProducts.searchFund')}" oninput="renderFullTable()">
                 </div>
                 <div class="full-table" style="padding: 0 20px 20px;">
                     <table>
                         <thead><tr>
-                            <th onclick="sortFull('name')"># שם הקרן <span class="sort-arrow"></span></th>
-                            <th onclick="sortFull('company')">חברה <span class="sort-arrow"></span></th>
-                            <th onclick="sortFull('month')">חודש <span class="sort-arrow"></span></th>
-                            <th onclick="sortFull('year1')">שנה <span class="sort-arrow"></span></th>
-                            <th onclick="sortFull('year3')">3 שנים <span class="sort-arrow"></span></th>
-                            <th onclick="sortFull('year5')">5 שנים <span class="sort-arrow"></span></th>
-                            <th onclick="sortFull('fee')">דמי ניהול <span class="sort-arrow"></span></th>
+                            <th onclick="sortFull('name')"># ${I18n.t('marketProducts.fundName')} <span class="sort-arrow"></span></th>
+                            <th onclick="sortFull('company')">${I18n.t('marketProducts.company')} <span class="sort-arrow"></span></th>
+                            <th onclick="sortFull('month')">${I18n.t('marketProducts.month')} <span class="sort-arrow"></span></th>
+                            <th onclick="sortFull('year1')">${I18n.t('marketProducts.year')} <span class="sort-arrow"></span></th>
+                            <th onclick="sortFull('year3')">${I18n.t('marketProducts.threeYears')} <span class="sort-arrow"></span></th>
+                            <th onclick="sortFull('year5')">${I18n.t('marketProducts.fiveYears')} <span class="sort-arrow"></span></th>
+                            <th onclick="sortFull('fee')">${I18n.t('marketProducts.managementFee')} <span class="sort-arrow"></span></th>
                         </tr></thead>
                         <tbody id="fullTableBody"></tbody>
                     </table>
@@ -1030,10 +1052,10 @@
 
             bar.innerHTML = `
                 <span class="status-label">TheMarker:</span>
-                <span class="${tmClass}">${tmUpdate || 'לא עודכן'}</span>
+                <span class="${tmClass}">${tmUpdate || I18n.t('marketProducts.notUpdated')}</span>
                 <span style="color: var(--color-border);">|</span>
                 <span class="status-label">iGemel-Net:</span>
-                <span class="${igClass}">${igUpdate || 'לא עודכן'}</span>
+                <span class="${igClass}">${igUpdate || I18n.t('marketProducts.notUpdated')}</span>
             `;
         }
 
@@ -1054,7 +1076,7 @@
         };
 
         function openImportModal() {
-            document.getElementById('importTypeLabel').textContent = tabLabels[currentTab];
+            document.getElementById('importTypeLabel').textContent = getTabLabels()[currentTab];
             importSource = 'themarker';
             importParsedData = [];
             document.getElementById('importPasteArea').value = '';
@@ -1095,12 +1117,13 @@
             }
 
             link.style.display = 'inline-flex';
+            const tabLabels = getTabLabels();
             if (importSource === 'themarker') {
                 link.href = theMarkerUrls[currentTab] || '#';
-                nameEl.textContent = 'פתח את TheMarker - ' + tabLabels[currentTab];
+                nameEl.textContent = I18n.t('marketProducts.openTheMarker') + ' - ' + tabLabels[currentTab];
             } else {
                 link.href = iGemelUrls[currentTab] || '#';
-                nameEl.textContent = 'פתח את iGemel-Net - ' + tabLabels[currentTab];
+                nameEl.textContent = I18n.t('marketProducts.openIGemel') + ' - ' + tabLabels[currentTab];
             }
         }
 
@@ -1128,7 +1151,7 @@
                 </tr>
             `).join('');
 
-            document.getElementById('importCount').textContent = `${funds.length} קרנות`;
+            document.getElementById('importCount').textContent = I18n.t('marketProducts.fundsCount').replace('{count}', funds.length);
             document.getElementById('importPreview').style.display = 'block';
             document.getElementById('importSuccess').classList.remove('active');
         }
@@ -1188,7 +1211,7 @@
                     return company;
                 }
             }
-            return 'לא ידוע';
+            return '';
         }
 
         function findPercentValue(parts, index) {
@@ -1206,7 +1229,7 @@
 
         function saveImportData() {
             if (importParsedData.length === 0) {
-                alert('אין נתונים לשמירה');
+                alert(I18n.t('marketProducts.noDataToSave'));
                 return;
             }
 
@@ -1223,7 +1246,7 @@
                 // Refresh the analysis view with updated data
                 renderAll();
             } else {
-                alert('שגיאה בשמירת הנתונים');
+                alert(I18n.t('marketProducts.saveError'));
             }
         }
 
@@ -1235,6 +1258,8 @@
         }
 
         // ========= Init =========
+        I18n.init();
+        document.getElementById('myProductsTitle').textContent = I18n.t('marketProducts.myProductsPrefix') + getTabLabels()[currentTab];
         renderAll();
         updateStatusBar();
     </script>
