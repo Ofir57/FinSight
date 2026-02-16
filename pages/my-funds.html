@@ -421,6 +421,35 @@
                             <option value="S&P 500">
                         </datalist>
                     </div>
+
+                    <div class="form-group">
+                        <label style="cursor: pointer;" onclick="document.getElementById('returnsSection').style.display = document.getElementById('returnsSection').style.display === 'none' ? 'block' : 'none'">
+                            <span>📊</span> <span data-i18n="myFunds.returns">תשואות</span> ▾
+                        </label>
+                        <div id="returnsSection" style="display: none;">
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+                                <div>
+                                    <label style="font-size: 0.8rem;" data-i18n="myFunds.returnMonth">תשואה חודשית (%)</label>
+                                    <input type="number" class="form-control" id="fundReturnMonth" step="0.01" placeholder="0.00">
+                                </div>
+                                <div>
+                                    <label style="font-size: 0.8rem;" data-i18n="myFunds.returnYear">תשואה שנתית (%)</label>
+                                    <input type="number" class="form-control" id="fundReturnYear" step="0.01" placeholder="0.00">
+                                </div>
+                                <div>
+                                    <label style="font-size: 0.8rem;" data-i18n="myFunds.return3y">תשואה 3 שנים (%)</label>
+                                    <input type="number" class="form-control" id="fundReturn3y" step="0.01" placeholder="0.00">
+                                </div>
+                                <div>
+                                    <label style="font-size: 0.8rem;" data-i18n="myFunds.return5y">תשואה 5 שנים (%)</label>
+                                    <input type="number" class="form-control" id="fundReturn5y" step="0.01" placeholder="0.00">
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-secondary btn-sm" onclick="autoFillReturns()">
+                                🔍 <span data-i18n="myFunds.fetchFromMarket">שלוף מנתוני שוק</span>
+                            </button>
+                        </div>
+                    </div>
                 </form>
                 <script>
                     document.getElementById('fundType').addEventListener('change', function() {
@@ -459,6 +488,8 @@
         </div>
     </div>
 
+    <script src="../data/market-funds.js"></script>
+    <script src="../data/mygemel-funds.js"></script>
     <script src="../js/storage.js"></script>
     <script src="../js/i18n.js"></script>
     <script src="../js/smart-import.js"></script>
@@ -496,6 +527,75 @@
                 more: I18n.t('myFunds.companyMore'),
                 other: I18n.t('myFunds.companyOther')
             };
+        }
+
+        function matchMarketFund(name, company, type) {
+            const marketType = type === 'savings' ? null : type;
+            if (!marketType) return null;
+
+            const sources = [];
+            if (typeof MarketFunds !== 'undefined' && MarketFunds[marketType]) {
+                sources.push(...MarketFunds[marketType]);
+            }
+            if (typeof MyGemelFunds !== 'undefined' && MyGemelFunds[marketType]) {
+                sources.push(...MyGemelFunds[marketType]);
+            }
+            if (sources.length === 0) return null;
+
+            const nameLower = name.toLowerCase().trim();
+            const companyNames = getCompanyNames();
+            const companyDisplay = companyNames[company] || company || '';
+
+            // Try exact substring match on fund name
+            let match = sources.find(f => f.nameHe && nameLower.includes(f.nameHe.toLowerCase()));
+            if (!match) match = sources.find(f => f.nameHe && f.nameHe.toLowerCase().includes(nameLower));
+
+            // Try matching by company + partial name
+            if (!match && companyDisplay) {
+                const companyLower = companyDisplay.toLowerCase();
+                const companyMatches = sources.filter(f => f.companyHe && f.companyHe.toLowerCase().includes(companyLower));
+                if (companyMatches.length === 1) {
+                    match = companyMatches[0];
+                } else if (companyMatches.length > 1) {
+                    // Try to narrow down by name keywords
+                    const nameWords = nameLower.split(/\s+/).filter(w => w.length > 2);
+                    match = companyMatches.find(f => {
+                        const fName = f.nameHe.toLowerCase();
+                        return nameWords.some(w => fName.includes(w));
+                    }) || companyMatches[0];
+                }
+            }
+
+            if (!match) return null;
+            return {
+                month: match.month,
+                year1: match.year1,
+                year3: match.year3,
+                year5: match.year5,
+                matchName: match.nameHe
+            };
+        }
+
+        function autoFillReturns() {
+            const name = document.getElementById('fundName').value.trim();
+            const company = document.getElementById('fundCompany').value;
+            const type = document.getElementById('fundType').value;
+
+            if (!name) {
+                App.notify(I18n.t('myFunds.fillNameAndValue'), 'error');
+                return;
+            }
+
+            const result = matchMarketFund(name, company, type);
+            if (result) {
+                document.getElementById('fundReturnMonth').value = result.month ?? '';
+                document.getElementById('fundReturnYear').value = result.year1 ?? '';
+                document.getElementById('fundReturn3y').value = result.year3 ?? '';
+                document.getElementById('fundReturn5y').value = result.year5 ?? '';
+                App.notify(I18n.t('myFunds.marketMatchFound') + ' (' + result.matchName + ')', 'success');
+            } else {
+                App.notify(I18n.t('myFunds.marketMatchNotFound'), 'error');
+            }
         }
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -553,7 +653,7 @@
             const totalDeposit = filteredFunds.reduce((sum, f) => sum + (f.monthlyDeposit || 0), 0);
 
             tbody.innerHTML = filteredFunds.map(fund => {
-                const returns = calculateReturns(fund);
+                const returns = fund.returns || calculateReturns(fund);
                 const formatReturn = (val) => {
                     if (val === null) return '<span style="color: var(--color-text-secondary);">-</span>';
                     const num = parseFloat(val);
@@ -693,6 +793,11 @@
             document.getElementById('fundId').value = '';
             document.getElementById('tracksContainer').innerHTML = '';
             document.getElementById('trackTotal').textContent = '';
+            document.getElementById('fundReturnMonth').value = '';
+            document.getElementById('fundReturnYear').value = '';
+            document.getElementById('fundReturn3y').value = '';
+            document.getElementById('fundReturn5y').value = '';
+            document.getElementById('returnsSection').style.display = 'none';
             document.getElementById('fundModal').classList.add('active');
         }
 
@@ -722,6 +827,13 @@
                 fund.tracks.forEach(t => addTrackRow(t.name, t.percentage));
             }
             updateTrackTotal();
+            // Load returns
+            const r = fund.returns || {};
+            document.getElementById('fundReturnMonth').value = r.month ?? '';
+            document.getElementById('fundReturnYear').value = r.year1 ?? '';
+            document.getElementById('fundReturn3y').value = r.year3 ?? '';
+            document.getElementById('fundReturn5y').value = r.year5 ?? '';
+            document.getElementById('returnsSection').style.display = (r.month != null || r.year1 != null || r.year3 != null || r.year5 != null) ? 'block' : 'none';
             document.getElementById('fundModal').classList.add('active');
         }
 
@@ -736,6 +848,19 @@
             const actuarialBalance = parseFloat(document.getElementById('actuarialBalance').value) || null;
             const notes = document.getElementById('fundNotes').value.trim();
             const tracks = getTracksFromForm();
+
+            // Collect returns
+            const rMonth = document.getElementById('fundReturnMonth').value;
+            const rYear = document.getElementById('fundReturnYear').value;
+            const r3y = document.getElementById('fundReturn3y').value;
+            const r5y = document.getElementById('fundReturn5y').value;
+            const hasReturns = rMonth !== '' || rYear !== '' || r3y !== '' || r5y !== '';
+            const returns = hasReturns ? {
+                month: rMonth !== '' ? parseFloat(rMonth) : null,
+                year1: rYear !== '' ? parseFloat(rYear) : null,
+                year3: r3y !== '' ? parseFloat(r3y) : null,
+                year5: r5y !== '' ? parseFloat(r5y) : null
+            } : null;
 
             if (!name || !value) {
                 App.notify(I18n.t('myFunds.fillNameAndValue'), 'error');
@@ -756,7 +881,7 @@
                     if (oldFund.value !== value) {
                         history = [...history, { date: today, value: value }];
                     }
-                    funds[idx] = { ...oldFund, type, name, company, value, monthlyDeposit, accountNumber, actuarialBalance, notes, tracks, history, updatedAt: now };
+                    funds[idx] = { ...oldFund, type, name, company, value, monthlyDeposit, accountNumber, actuarialBalance, notes, tracks, returns, history, updatedAt: now };
                 }
             } else {
                 // Add new with initial history
@@ -771,6 +896,7 @@
                     actuarialBalance,
                     notes,
                     tracks,
+                    returns,
                     history: [{ date: today, value: value }],
                     createdAt: now,
                     updatedAt: now
@@ -831,13 +957,13 @@
 
             const getValueAtDate = (targetDate) => {
                 const sorted = [...history].sort((a, b) => new Date(a.date) - new Date(b.date));
-                let closest = sorted[0];
+                let closest = null;
                 for (const h of sorted) {
                     if (new Date(h.date) <= targetDate) {
                         closest = h;
                     }
                 }
-                return closest?.value;
+                return closest ? closest.value : null;
             };
 
             const monthAgo = new Date(now);

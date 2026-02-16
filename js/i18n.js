@@ -730,7 +730,15 @@ const I18n = {
                 trackName: 'שם מסלול',
                 percentage: 'אחוז',
                 totalPercentage: 'סה"כ אחוזים',
-                percentageWarning: 'סה"כ האחוזים חייב להיות 100%'
+                percentageWarning: 'סה"כ האחוזים חייב להיות 100%',
+                returns: 'תשואות',
+                returnMonth: 'תשואה חודשית (%)',
+                returnYear: 'תשואה שנתית (%)',
+                return3y: 'תשואה 3 שנים (%)',
+                return5y: 'תשואה 5 שנים (%)',
+                fetchFromMarket: 'שלוף מנתוני שוק',
+                marketMatchFound: 'נמצאה התאמה! התשואות עודכנו',
+                marketMatchNotFound: 'לא נמצאה התאמה בנתוני השוק'
             },
             // Market Products
             marketProducts: {
@@ -1547,7 +1555,15 @@ const I18n = {
                 trackName: 'Track Name',
                 percentage: 'Percentage',
                 totalPercentage: 'Total Percentage',
-                percentageWarning: 'Total percentage must equal 100%'
+                percentageWarning: 'Total percentage must equal 100%',
+                returns: 'Returns',
+                returnMonth: 'Monthly Return (%)',
+                returnYear: 'Yearly Return (%)',
+                return3y: '3-Year Return (%)',
+                return5y: '5-Year Return (%)',
+                fetchFromMarket: 'Fetch from Market Data',
+                marketMatchFound: 'Match found! Returns updated',
+                marketMatchNotFound: 'No match found in market data'
             },
             // Market Products
             marketProducts: {
