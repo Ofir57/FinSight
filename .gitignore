@@ -14,3 +14,6 @@ Thumbs.db
 
 # Dependencies
 node_modules/
+
+# Generated files
+scripts/update-summary.txt
