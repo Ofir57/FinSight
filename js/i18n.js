@@ -94,7 +94,14 @@ const I18n = {
                 deleteConfirm1: 'האם אתה בטוח? כל הנתונים יימחקו לצמיתות מהמכשיר ומהענן.',
                 deleteConfirm2: 'פעולה זו בלתי הפיכה. להמשיך?',
                 allDataDeleted: 'כל הנתונים נמחקו בהצלחה',
-                deleteError: 'שגיאה במחיקת הנתונים'
+                deleteError: 'שגיאה במחיקת הנתונים',
+                confirmPassword: 'אימות סיסמה',
+                confirmPasswordPlaceholder: 'הזן סיסמה שוב',
+                passwordMismatch: 'הסיסמאות לא תואמות',
+                passwordMinLength: 'מינימום 6 תווים',
+                passwordTooShort: 'הסיסמה קצרה מדי (מינימום 6 תווים)',
+                passwordStrong: 'סיסמה חזקה',
+                passwordOk: 'סיסמה תקינה'
             },
             // Bank
             bank: {
@@ -898,7 +905,14 @@ const I18n = {
                 deleteConfirm1: 'Are you sure? All data will be permanently deleted from device and cloud.',
                 deleteConfirm2: 'This action is irreversible. Continue?',
                 allDataDeleted: 'All data deleted successfully',
-                deleteError: 'Error deleting data'
+                deleteError: 'Error deleting data',
+                confirmPassword: 'Confirm Password',
+                confirmPasswordPlaceholder: 'Enter password again',
+                passwordMismatch: 'Passwords do not match',
+                passwordMinLength: 'Minimum 6 characters',
+                passwordTooShort: 'Password too short (minimum 6 characters)',
+                passwordStrong: 'Strong password',
+                passwordOk: 'Password OK'
             },
             // Bank
             bank: {

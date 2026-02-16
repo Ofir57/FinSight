@@ -30,34 +30,7 @@
                 </div>
             </div>
 
-            <!-- Auth Section -->
-            <div class="auth-section" style="padding: 10px 15px; border-bottom: 1px solid var(--color-border);">
-                <div id="userInfo" style="display: none; align-items: center; gap: 10px; margin-bottom: 10px;">
-                    <style>
-                        .user-avatar { width: 32px; height: 32px; border-radius: 50%; }
-                        .user-name { font-size: 0.9rem; color: var(--color-text); }
-                        .user-profile { display: flex; align-items: center; gap: 8px; }
-                        .sync-status { font-size: 0.75rem; padding: 3px 8px; border-radius: 10px; }
-                        .sync-status.synced { background: rgba(16, 185, 129, 0.2); color: #10b981; }
-                        .sync-status.local { background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
-                        .sync-status.syncing { background: rgba(59, 130, 246, 0.2); color: #3b82f6; }
-                    </style>
-                </div>
-                <div id="authButtons" class="auth-buttons">
-                    <button class="btn btn-auth" onclick="Auth.signInWithGoogle()">
-                        <span>G</span> Google
-                    </button>
-                    <button class="btn btn-auth" onclick="Auth.showEmailLogin()">
-                        <span>📧</span> <span data-i18n="auth.email">אימייל</span>
-                    </button>
-                </div>
-                <div id="authLogout" style="display: none;">
-                    <button id="authBtn" class="btn btn-secondary btn-sm" style="width: 100%;" onclick="Auth.signOut()">
-                        <span data-i18n="auth.signOut">התנתק</span>
-                    </button>
-                </div>
-                <span id="syncStatus" class="sync-status local" data-i18n="auth.local">💾 מקומי</span>
-            </div>
+            <!-- Auth Section injected by auth.js -->
 
             <nav>
                 <ul class="nav-menu">

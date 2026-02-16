@@ -12,6 +12,9 @@ const Auth = {
         if (this.isInitialized) return;
         this.isInitialized = true;
 
+        // Inject auth UI into sidebar if not already present
+        this.injectAuthUI();
+
         firebaseAuth.onAuthStateChanged(async (user) => {
             this.currentUser = user;
             this.updateUI();
@@ -24,6 +27,60 @@ const Auth = {
                 console.log('User signed out');
             }
         });
+    },
+
+    /**
+     * Inject auth UI into sidebar
+     */
+    injectAuthUI() {
+        const sidebar = document.querySelector('.sidebar');
+        if (!sidebar || document.getElementById('authButtons')) return;
+
+        // Add styles if not present
+        if (!document.getElementById('authStyles')) {
+            const style = document.createElement('style');
+            style.id = 'authStyles';
+            style.textContent = `
+                .user-avatar { width: 32px; height: 32px; border-radius: 50%; }
+                .user-name { font-size: 0.9rem; color: var(--color-text); }
+                .user-profile { display: flex; align-items: center; gap: 8px; }
+                .sync-status { font-size: 0.75rem; padding: 3px 8px; border-radius: 10px; }
+                .sync-status.synced { background: rgba(16, 185, 129, 0.2); color: #10b981; }
+                .sync-status.local { background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
+                .sync-status.syncing { background: rgba(59, 130, 246, 0.2); color: #3b82f6; }
+                .auth-section .btn-auth { width: 100%; margin-bottom: 5px; padding: 8px; font-size: 0.85rem; display: flex; align-items: center; justify-content: center; gap: 6px; }
+            `;
+            document.head.appendChild(style);
+        }
+
+        const authSection = document.createElement('div');
+        authSection.className = 'auth-section';
+        authSection.style.cssText = 'padding: 10px 15px; border-bottom: 1px solid var(--color-border);';
+        authSection.innerHTML = `
+            <div id="userInfo" style="display: none; align-items: center; gap: 10px; margin-bottom: 10px;"></div>
+            <div id="authButtons" class="auth-buttons">
+                <button class="btn btn-auth" onclick="Auth.signInWithGoogle()">
+                    <span>G</span> Google
+                </button>
+                <button class="btn btn-auth" onclick="Auth.showEmailLogin()">
+                    <span>📧</span> <span data-i18n="auth.email">${typeof I18n !== 'undefined' ? I18n.t('auth.email') : 'אימייל'}</span>
+                </button>
+            </div>
+            <div id="authLogout" style="display: none;">
+                <button id="authBtn" class="btn btn-secondary btn-sm" style="width: 100%;" onclick="Auth.signOut()">
+                    <span data-i18n="auth.signOut">${typeof I18n !== 'undefined' ? I18n.t('auth.signOut') : 'התנתק'}</span>
+                </button>
+            </div>
+            <span id="syncStatus" class="sync-status local" data-i18n="auth.local">${typeof I18n !== 'undefined' ? I18n.t('auth.local') : '💾 מקומי'}</span>
+        `;
+
+        // Insert after sidebar-header
+        const sidebarHeader = sidebar.querySelector('.sidebar-header');
+        if (sidebarHeader) {
+            sidebarHeader.after(authSection);
+        } else {
+            sidebar.prepend(authSection);
+        }
     },
 
     /**
@@ -97,8 +154,7 @@ const Auth = {
     showEmailLogin() {
         let modal = document.getElementById('emailAuthModal');
         if (modal) {
-            modal.style.display = 'flex';
-            return;
+            modal.remove();
         }
 
         modal = document.createElement('div');
@@ -111,6 +167,16 @@ const Auth = {
                     <button class="modal-close" onclick="Auth.closeEmailModal()">&times;</button>
                 </div>
                 <div class="modal-body">
+                    <!-- Tabs -->
+                    <div style="display: flex; margin-bottom: 20px; border-bottom: 2px solid var(--color-border);">
+                        <button id="authTabLogin" class="auth-tab active" onclick="Auth.switchAuthTab('login')" style="flex: 1; padding: 10px; background: none; border: none; cursor: pointer; color: var(--color-text); font-size: 1rem; font-weight: 600; border-bottom: 2px solid var(--color-training); margin-bottom: -2px;">
+                            ${I18n.t('auth.signIn')}
+                        </button>
+                        <button id="authTabRegister" class="auth-tab" onclick="Auth.switchAuthTab('register')" style="flex: 1; padding: 10px; background: none; border: none; cursor: pointer; color: var(--color-text-secondary); font-size: 1rem; border-bottom: 2px solid transparent; margin-bottom: -2px;">
+                            ${I18n.t('auth.register')}
+                        </button>
+                    </div>
+
                     <div class="form-group">
                         <label>${I18n.t('auth.email')}</label>
                         <input type="email" id="emailAuthInput" class="form-control" placeholder="email@example.com" dir="ltr">
@@ -118,19 +184,26 @@ const Auth = {
                     <div class="form-group">
                         <label>${I18n.t('auth.password')}</label>
                         <div style="position: relative;">
-                            <input type="password" id="emailAuthPassword" class="form-control" placeholder="${I18n.t('auth.passwordPlaceholder')}" dir="ltr" style="padding-left: 40px;">
+                            <input type="password" id="emailAuthPassword" class="form-control" placeholder="${I18n.t('auth.passwordPlaceholder')}" dir="ltr" style="padding-left: 40px;" oninput="Auth.checkPasswordStrength()">
                             <button type="button" id="togglePasswordBtn" onclick="Auth.togglePasswordVisibility()" style="position: absolute; left: 8px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 1.2rem; color: var(--color-text-secondary); padding: 4px;">👁️</button>
                         </div>
+                        <div id="passwordStrength" style="display: none; margin-top: 5px; font-size: 0.8rem;"></div>
                     </div>
-                    <div style="text-align: center; margin-top: 5px;">
+
+                    <!-- Confirm password (register only) -->
+                    <div class="form-group" id="confirmPasswordGroup" style="display: none;">
+                        <label>${I18n.t('auth.confirmPassword')}</label>
+                        <input type="password" id="emailAuthPasswordConfirm" class="form-control" placeholder="${I18n.t('auth.confirmPasswordPlaceholder')}" dir="ltr">
+                    </div>
+
+                    <!-- Forgot password (login only) -->
+                    <div id="forgotPasswordLink" style="text-align: center; margin-top: 5px;">
                         <a href="#" onclick="Auth.resetPassword(); return false;" style="color: var(--color-training); font-size: 0.85rem; text-decoration: none;">${I18n.t('auth.forgotPassword')}</a>
                     </div>
-                    <div class="auth-buttons" style="margin-top: 15px;">
-                        <button class="btn btn-primary" style="flex: 1;" onclick="Auth.signInWithEmail(document.getElementById('emailAuthInput').value, document.getElementById('emailAuthPassword').value)">
+
+                    <div style="margin-top: 15px;">
+                        <button id="authSubmitBtn" class="btn btn-primary" style="width: 100%; padding: 12px;" onclick="Auth.submitEmailAuth()">
                             ${I18n.t('auth.signIn')}
-                        </button>
-                        <button class="btn btn-secondary" style="flex: 1;" onclick="Auth.registerWithEmail(document.getElementById('emailAuthInput').value, document.getElementById('emailAuthPassword').value)">
-                            ${I18n.t('auth.register')}
                         </button>
                     </div>
                 </div>
@@ -140,7 +213,90 @@ const Auth = {
         modal.addEventListener('click', (e) => {
             if (e.target === modal) this.closeEmailModal();
         });
+        this._authMode = 'login';
         document.getElementById('emailAuthInput').focus();
+    },
+
+    _authMode: 'login',
+
+    /**
+     * Switch between login and register tabs
+     */
+    switchAuthTab(mode) {
+        this._authMode = mode;
+        const loginTab = document.getElementById('authTabLogin');
+        const registerTab = document.getElementById('authTabRegister');
+        const confirmGroup = document.getElementById('confirmPasswordGroup');
+        const forgotLink = document.getElementById('forgotPasswordLink');
+        const submitBtn = document.getElementById('authSubmitBtn');
+        const strengthEl = document.getElementById('passwordStrength');
+
+        if (mode === 'register') {
+            loginTab.style.color = 'var(--color-text-secondary)';
+            loginTab.style.borderBottomColor = 'transparent';
+            registerTab.style.color = 'var(--color-text)';
+            registerTab.style.borderBottomColor = 'var(--color-training)';
+            confirmGroup.style.display = 'block';
+            forgotLink.style.display = 'none';
+            submitBtn.textContent = I18n.t('auth.register');
+            strengthEl.style.display = 'block';
+            this.checkPasswordStrength();
+        } else {
+            loginTab.style.color = 'var(--color-text)';
+            loginTab.style.borderBottomColor = 'var(--color-training)';
+            registerTab.style.color = 'var(--color-text-secondary)';
+            registerTab.style.borderBottomColor = 'transparent';
+            confirmGroup.style.display = 'none';
+            forgotLink.style.display = 'block';
+            submitBtn.textContent = I18n.t('auth.signIn');
+            strengthEl.style.display = 'none';
+        }
+    },
+
+    /**
+     * Submit email auth (login or register based on active tab)
+     */
+    submitEmailAuth() {
+        const email = document.getElementById('emailAuthInput').value;
+        const password = document.getElementById('emailAuthPassword').value;
+
+        if (this._authMode === 'register') {
+            const confirm = document.getElementById('emailAuthPasswordConfirm').value;
+            if (password !== confirm) {
+                App.notify(I18n.t('auth.passwordMismatch'), 'error');
+                return;
+            }
+            if (password.length < 6) {
+                App.notify(I18n.t('auth.weakPassword'), 'error');
+                return;
+            }
+            this.registerWithEmail(email, password);
+        } else {
+            this.signInWithEmail(email, password);
+        }
+    },
+
+    /**
+     * Check password strength indicator
+     */
+    checkPasswordStrength() {
+        const el = document.getElementById('passwordStrength');
+        const password = document.getElementById('emailAuthPassword')?.value || '';
+        if (!el || this._authMode !== 'register') return;
+
+        if (password.length === 0) {
+            el.innerHTML = `<span style="color: var(--color-text-secondary);">${I18n.t('auth.passwordMinLength')}</span>`;
+            return;
+        }
+        if (password.length < 6) {
+            el.innerHTML = `<span style="color: var(--color-negative);">⚠️ ${I18n.t('auth.passwordTooShort')}</span>`;
+            return;
+        }
+        if (password.length >= 8 && /[A-Z]/.test(password) && /[0-9]/.test(password)) {
+            el.innerHTML = `<span style="color: var(--color-positive);">✅ ${I18n.t('auth.passwordStrong')}</span>`;
+        } else {
+            el.innerHTML = `<span style="color: #f59e0b;">👍 ${I18n.t('auth.passwordOk')}</span>`;
+        }
     },
 
     /**
