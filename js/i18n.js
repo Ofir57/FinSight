@@ -738,7 +738,9 @@ const I18n = {
                 return5y: 'תשואה 5 שנים (%)',
                 fetchFromMarket: 'שלוף מנתוני שוק',
                 marketMatchFound: 'נמצאה התאמה! התשואות עודכנו',
-                marketMatchNotFound: 'לא נמצאה התאמה בנתוני השוק'
+                marketMatchNotFound: 'לא נמצאה התאמה בנתוני השוק',
+                sourceMarket: 'שוק',
+                sourceManual: 'ידני'
             },
             // Market Products
             marketProducts: {
@@ -1563,7 +1565,9 @@ const I18n = {
                 return5y: '5-Year Return (%)',
                 fetchFromMarket: 'Fetch from Market Data',
                 marketMatchFound: 'Match found! Returns updated',
-                marketMatchNotFound: 'No match found in market data'
+                marketMatchNotFound: 'No match found in market data',
+                sourceMarket: 'Market',
+                sourceManual: 'Manual'
             },
             // Market Products
             marketProducts: {

@@ -502,6 +502,7 @@
         const FUNDS_KEY = 'finance_my_funds';
         let currentFilter = 'all';
         let fundsChart = null;
+        let _returnsSource = null;
 
         function getFundTypeNames() {
             return {
@@ -592,6 +593,7 @@
                 document.getElementById('fundReturnYear').value = result.year1 ?? '';
                 document.getElementById('fundReturn3y').value = result.year3 ?? '';
                 document.getElementById('fundReturn5y').value = result.year5 ?? '';
+                _returnsSource = 'market';
                 App.notify(I18n.t('myFunds.marketMatchFound') + ' (' + result.matchName + ')', 'success');
             } else {
                 App.notify(I18n.t('myFunds.marketMatchNotFound'), 'error');
@@ -666,12 +668,18 @@
                 const trackBadges = fund.tracks && fund.tracks.length > 0
                     ? `<div class="track-badges">${fund.tracks.map(t => `<span class="track-badge">${t.name} ${t.percentage}%</span>`).join('')}</div>`
                     : '';
+                const srcLabel = fund.returns
+                    ? (fund.returnsSource === 'market'
+                        ? `<span class="track-badge" style="background:#3b82f6; color:#fff; border-color:#3b82f6;">📊 ${I18n.t('myFunds.sourceMarket')}</span>`
+                        : `<span class="track-badge" style="background:#f59e0b; color:#fff; border-color:#f59e0b;">✏️ ${I18n.t('myFunds.sourceManual')}</span>`)
+                    : '';
                 return `
                 <tr>
                     <td>
                         <strong>${fund.name}</strong>
                         <br><small style="color: var(--color-text-secondary);">${getCompanyNames()[fund.company] || fund.company || ''}</small>
                         ${trackBadges}
+                        ${srcLabel ? `<div class="track-badges">${srcLabel}</div>` : ''}
                     </td>
                     <td>${fundTypeNames[fund.type] || fund.type}</td>
                     <td>${I18n.formatCurrency(fund.value)}${actuarialInfo}</td>
@@ -798,6 +806,7 @@
             document.getElementById('fundReturn3y').value = '';
             document.getElementById('fundReturn5y').value = '';
             document.getElementById('returnsSection').style.display = 'none';
+            _returnsSource = null;
             document.getElementById('fundModal').classList.add('active');
         }
 
@@ -834,6 +843,7 @@
             document.getElementById('fundReturn3y').value = r.year3 ?? '';
             document.getElementById('fundReturn5y').value = r.year5 ?? '';
             document.getElementById('returnsSection').style.display = (r.month != null || r.year1 != null || r.year3 != null || r.year5 != null) ? 'block' : 'none';
+            _returnsSource = fund.returnsSource || null;
             document.getElementById('fundModal').classList.add('active');
         }
 
@@ -861,6 +871,7 @@
                 year3: r3y !== '' ? parseFloat(r3y) : null,
                 year5: r5y !== '' ? parseFloat(r5y) : null
             } : null;
+            const returnsSource = hasReturns ? (_returnsSource || 'manual') : null;
 
             if (!name || !value) {
                 App.notify(I18n.t('myFunds.fillNameAndValue'), 'error');
@@ -881,7 +892,7 @@
                     if (oldFund.value !== value) {
                         history = [...history, { date: today, value: value }];
                     }
-                    funds[idx] = { ...oldFund, type, name, company, value, monthlyDeposit, accountNumber, actuarialBalance, notes, tracks, returns, history, updatedAt: now };
+                    funds[idx] = { ...oldFund, type, name, company, value, monthlyDeposit, accountNumber, actuarialBalance, notes, tracks, returns, returnsSource, history, updatedAt: now };
                 }
             } else {
                 // Add new with initial history
@@ -897,6 +908,7 @@
                     notes,
                     tracks,
                     returns,
+                    returnsSource,
                     history: [{ date: today, value: value }],
                     createdAt: now,
                     updatedAt: now
