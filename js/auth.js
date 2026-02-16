@@ -32,14 +32,14 @@ const Auth = {
     async signInWithGoogle() {
         try {
             const result = await firebaseAuth.signInWithPopup(googleProvider);
-            App.notify(`ברוך הבא, ${result.user.displayName}!`, 'success');
+            App.notify(`${I18n.t('auth.welcome')}, ${result.user.displayName}!`, 'success');
             return result.user;
         } catch (error) {
             console.error('Sign in error:', error);
             if (error.code === 'auth/popup-closed-by-user') {
-                App.notify('ההתחברות בוטלה', 'info');
+                App.notify(I18n.t('auth.loginCancelled'), 'info');
             } else {
-                App.notify('שגיאה בהתחברות: ' + error.message, 'error');
+                App.notify(I18n.t('auth.loginError') + ': ' + error.message, 'error');
             }
             return null;
         }
@@ -51,17 +51,17 @@ const Auth = {
     async signInWithEmail(email, password) {
         try {
             const result = await firebaseAuth.signInWithEmailAndPassword(email, password);
-            App.notify(`ברוך הבא, ${result.user.email}!`, 'success');
+            App.notify(`${I18n.t('auth.welcome')}, ${result.user.email}!`, 'success');
             this.closeEmailModal();
             return result.user;
         } catch (error) {
             console.error('Email sign in error:', error);
             if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
-                App.notify('אימייל או סיסמה שגויים', 'error');
+                App.notify(I18n.t('auth.wrongPassword'), 'error');
             } else if (error.code === 'auth/invalid-email') {
-                App.notify('כתובת אימייל לא תקינה', 'error');
+                App.notify(I18n.t('auth.invalidEmail'), 'error');
             } else {
-                App.notify('שגיאה בהתחברות: ' + error.message, 'error');
+                App.notify(I18n.t('auth.loginError') + ': ' + error.message, 'error');
             }
             return null;
         }
@@ -73,19 +73,19 @@ const Auth = {
     async registerWithEmail(email, password) {
         try {
             const result = await firebaseAuth.createUserWithEmailAndPassword(email, password);
-            App.notify(`נרשמת בהצלחה! ברוך הבא`, 'success');
+            App.notify(I18n.t('auth.registered'), 'success');
             this.closeEmailModal();
             return result.user;
         } catch (error) {
             console.error('Email register error:', error);
             if (error.code === 'auth/email-already-in-use') {
-                App.notify('אימייל זה כבר רשום, נסה להתחבר', 'error');
+                App.notify(I18n.t('auth.emailInUse'), 'error');
             } else if (error.code === 'auth/weak-password') {
-                App.notify('הסיסמה חלשה מדי (מינימום 6 תווים)', 'error');
+                App.notify(I18n.t('auth.weakPassword'), 'error');
             } else if (error.code === 'auth/invalid-email') {
-                App.notify('כתובת אימייל לא תקינה', 'error');
+                App.notify(I18n.t('auth.invalidEmail'), 'error');
             } else {
-                App.notify('שגיאה בהרשמה: ' + error.message, 'error');
+                App.notify(I18n.t('auth.registerError') + ': ' + error.message, 'error');
             }
             return null;
         }
@@ -107,24 +107,30 @@ const Auth = {
         modal.innerHTML = `
             <div class="modal" style="max-width: 400px;">
                 <div class="modal-header">
-                    <h2>📧 התחברות עם אימייל</h2>
+                    <h2>📧 ${I18n.t('auth.emailLogin')}</h2>
                     <button class="modal-close" onclick="Auth.closeEmailModal()">&times;</button>
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
-                        <label>אימייל</label>
+                        <label>${I18n.t('auth.email')}</label>
                         <input type="email" id="emailAuthInput" class="form-control" placeholder="email@example.com" dir="ltr">
                     </div>
                     <div class="form-group">
-                        <label>סיסמה</label>
-                        <input type="password" id="emailAuthPassword" class="form-control" placeholder="סיסמה (מינימום 6 תווים)" dir="ltr">
+                        <label>${I18n.t('auth.password')}</label>
+                        <div style="position: relative;">
+                            <input type="password" id="emailAuthPassword" class="form-control" placeholder="${I18n.t('auth.passwordPlaceholder')}" dir="ltr" style="padding-left: 40px;">
+                            <button type="button" id="togglePasswordBtn" onclick="Auth.togglePasswordVisibility()" style="position: absolute; left: 8px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 1.2rem; color: var(--color-text-secondary); padding: 4px;">👁️</button>
+                        </div>
+                    </div>
+                    <div style="text-align: center; margin-top: 5px;">
+                        <a href="#" onclick="Auth.resetPassword(); return false;" style="color: var(--color-training); font-size: 0.85rem; text-decoration: none;">${I18n.t('auth.forgotPassword')}</a>
                     </div>
                     <div class="auth-buttons" style="margin-top: 15px;">
                         <button class="btn btn-primary" style="flex: 1;" onclick="Auth.signInWithEmail(document.getElementById('emailAuthInput').value, document.getElementById('emailAuthPassword').value)">
-                            התחבר
+                            ${I18n.t('auth.signIn')}
                         </button>
                         <button class="btn btn-secondary" style="flex: 1;" onclick="Auth.registerWithEmail(document.getElementById('emailAuthInput').value, document.getElementById('emailAuthPassword').value)">
-                            הרשמה
+                            ${I18n.t('auth.register')}
                         </button>
                     </div>
                 </div>
@@ -135,6 +141,45 @@ const Auth = {
             if (e.target === modal) this.closeEmailModal();
         });
         document.getElementById('emailAuthInput').focus();
+    },
+
+    /**
+     * Toggle password visibility
+     */
+    togglePasswordVisibility() {
+        const input = document.getElementById('emailAuthPassword');
+        const btn = document.getElementById('togglePasswordBtn');
+        if (input.type === 'password') {
+            input.type = 'text';
+            btn.textContent = '🙈';
+        } else {
+            input.type = 'password';
+            btn.textContent = '👁️';
+        }
+    },
+
+    /**
+     * Reset password via email
+     */
+    async resetPassword() {
+        const email = document.getElementById('emailAuthInput')?.value?.trim();
+        if (!email) {
+            App.notify(I18n.t('auth.enterEmailFirst'), 'warning');
+            return;
+        }
+        try {
+            await firebaseAuth.sendPasswordResetEmail(email);
+            App.notify(I18n.t('auth.resetSent'), 'success');
+        } catch (error) {
+            console.error('Password reset error:', error);
+            if (error.code === 'auth/user-not-found') {
+                App.notify(I18n.t('auth.userNotFound'), 'error');
+            } else if (error.code === 'auth/invalid-email') {
+                App.notify(I18n.t('auth.invalidEmail'), 'error');
+            } else {
+                App.notify(I18n.t('auth.resetError') + ': ' + error.message, 'error');
+            }
+        }
     },
 
     /**
@@ -151,10 +196,10 @@ const Auth = {
     async signOut() {
         try {
             await firebaseAuth.signOut();
-            App.notify('התנתקת בהצלחה', 'success');
+            App.notify(I18n.t('auth.signedOut'), 'success');
         } catch (error) {
             console.error('Sign out error:', error);
-            App.notify('שגיאה בהתנתקות', 'error');
+            App.notify(I18n.t('auth.signOutError'), 'error');
         }
     },
 
@@ -188,7 +233,7 @@ const Auth = {
             }
 
             if (syncStatus) {
-                syncStatus.innerHTML = '☁️ מסונכרן';
+                syncStatus.innerHTML = '☁️ ' + I18n.t('auth.cloudSynced');
                 syncStatus.className = 'sync-status synced';
             }
         } else {
@@ -201,7 +246,7 @@ const Auth = {
             }
 
             if (syncStatus) {
-                syncStatus.innerHTML = '💾 מקומי בלבד';
+                syncStatus.innerHTML = '💾 ' + I18n.t('auth.localOnly');
                 syncStatus.className = 'sync-status local';
             }
         }
@@ -257,17 +302,17 @@ const Auth = {
             // Update sync status
             const syncStatus = document.getElementById('syncStatus');
             if (syncStatus) {
-                syncStatus.innerHTML = '☁️ נשמר';
+                syncStatus.innerHTML = '☁️ ' + I18n.t('auth.cloudSaved');
                 syncStatus.className = 'sync-status synced';
                 setTimeout(() => {
-                    syncStatus.innerHTML = '☁️ מסונכרן';
+                    syncStatus.innerHTML = '☁️ ' + I18n.t('auth.cloudSynced');
                 }, 2000);
             }
 
             return true;
         } catch (error) {
             console.error('Cloud save error:', error);
-            App.notify('שגיאה בשמירה לענן', 'error');
+            App.notify(I18n.t('auth.cloudSaveError'), 'error');
             return false;
         }
     },
@@ -298,7 +343,7 @@ const Auth = {
                         data = await DataCrypto.decrypt(rawData.encryptedData, userId);
                         if (!data) {
                             console.error('Failed to decrypt cloud data');
-                            App.notify('שגיאה בפענוח הנתונים מהענן', 'error');
+                            App.notify(I18n.t('auth.decryptError'), 'error');
                             return false;
                         }
                     } else {
@@ -320,7 +365,7 @@ const Auth = {
 
                     localStorage.setItem('finance_last_update', new Date().toISOString());
                     console.log('Data synced from cloud (decrypted)');
-                    App.notify('הנתונים סונכרנו מהענן', 'success');
+                    App.notify(I18n.t('auth.dataSynced'), 'success');
 
                     // Refresh current page
                     if (typeof loadStocks === 'function') loadStocks();
@@ -341,7 +386,7 @@ const Auth = {
             return true;
         } catch (error) {
             console.error('Cloud sync error:', error);
-            App.notify('שגיאה בסנכרון מהענן', 'error');
+            App.notify(I18n.t('auth.cloudSyncError'), 'error');
             return false;
         }
     },
@@ -351,26 +396,26 @@ const Auth = {
      */
     async forceSync() {
         if (!this.currentUser) {
-            App.notify('יש להתחבר קודם', 'warning');
+            App.notify(I18n.t('auth.loginFirst'), 'warning');
             return;
         }
 
         const syncStatus = document.getElementById('syncStatus');
         if (syncStatus) {
-            syncStatus.innerHTML = '🔄 מסנכרן...';
+            syncStatus.innerHTML = '🔄 ' + I18n.t('auth.syncing');
             syncStatus.className = 'sync-status syncing';
         }
 
         await this.saveToCloud();
-        App.notify('הנתונים סונכרנו בהצלחה', 'success');
+        App.notify(I18n.t('auth.syncSuccess'), 'success');
     },
 
     /**
      * Delete all user data from cloud and local
      */
     async deleteAllData() {
-        if (!confirm('האם אתה בטוח? כל הנתונים יימחקו לצמיתות מהמכשיר ומהענן.')) return;
-        if (!confirm('פעולה זו בלתי הפיכה. להמשיך?')) return;
+        if (!confirm(I18n.t('auth.deleteConfirm1'))) return;
+        if (!confirm(I18n.t('auth.deleteConfirm2'))) return;
 
         try {
             // Delete from Firestore
@@ -382,11 +427,11 @@ const Auth = {
             const keysToDelete = Object.keys(localStorage).filter(k => k.startsWith('finance_') || k.startsWith('market_') || k.startsWith('mygemel_'));
             keysToDelete.forEach(k => localStorage.removeItem(k));
 
-            App.notify('כל הנתונים נמחקו בהצלחה', 'success');
+            App.notify(I18n.t('auth.allDataDeleted'), 'success');
             setTimeout(() => location.reload(), 1500);
         } catch (error) {
             console.error('Delete all data error:', error);
-            App.notify('שגיאה במחיקת הנתונים', 'error');
+            App.notify(I18n.t('auth.deleteError'), 'error');
         }
     }
 };
@@ -400,7 +445,7 @@ function resetInactivityTimer() {
     if (Auth.currentUser) {
         inactivityTimer = setTimeout(() => {
             Auth.signOut();
-            App.notify('התנתקת אוטומטית עקב חוסר פעילות', 'info');
+            App.notify(I18n.t('auth.autoLogout'), 'info');
         }, INACTIVITY_TIMEOUT);
     }
 }

@@ -60,17 +60,41 @@
                     <li class="nav-item">
                         <span class="nav-link" style="cursor: default;">
                             <span class="icon">📊</span>
-                            <span>מוצרים פיננסיים</span>
+                            <span data-i18n="nav.financialProducts">מוצרים פיננסיים</span>
                         </span>
                         <ul class="nav-submenu">
-                            <li class="nav-item"><a href="market-products.html" class="nav-link" data-category="market-products"><span>🏪 מוצרים בשוק</span></a></li>
-                            <li class="nav-item"><a href="my-funds.html" class="nav-link" data-category="my-products"><span>💎 המוצרים שלי</span></a></li>
+                            <li class="nav-item"><a href="market-products.html" class="nav-link" data-category="market-products"><span data-i18n="nav.marketProducts">🏪 מוצרים בשוק</span></a></li>
+                            <li class="nav-item"><a href="my-funds.html" class="nav-link" data-category="my-products"><span data-i18n="nav.myProducts">💎 המוצרים שלי</span></a></li>
                         </ul>
                     </li>
                     <li class="nav-item">
                         <a href="assets.html" class="nav-link" data-category="assets">
                             <span class="icon">🏠</span>
                             <span data-i18n="nav.assets">נכסים</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="goals.html" class="nav-link" data-category="goals">
+                            <span class="icon">🎯</span>
+                            <span data-i18n="nav.goals">יעדי חיסכון</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="pension-calc.html" class="nav-link" data-category="pension-calc">
+                            <span class="icon">🧮</span>
+                            <span data-i18n="nav.pensionCalc">מחשבון פנסיה</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="reports.html" class="nav-link" data-category="reports">
+                            <span class="icon">📋</span>
+                            <span data-i18n="nav.reports">דוחות</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="settings.html" class="nav-link" data-category="settings">
+                            <span class="icon">⚙️</span>
+                            <span data-i18n="nav.settings">הגדרות</span>
                         </a>
                     </li>
                 </ul>
@@ -106,11 +130,11 @@
                 </button>
                 <button class="btn btn-secondary" onclick="importSmartFile()">
                     <span>📥</span>
-                    <span>ייבוא חכם</span>
+                    <span data-i18n="bank.smartImport">ייבוא חכם</span>
                 </button>
                 <button class="btn btn-secondary" onclick="ImageImport.openImagePicker('bank')">
                     <span>📷</span>
-                    <span>ייבוא מתמונה</span>
+                    <span data-i18n="bank.importImage">ייבוא מתמונה</span>
                 </button>
             </div>
 
@@ -138,7 +162,7 @@
                         </tbody>
                         <tfoot id="accountsFooter" style="display: none;">
                             <tr style="background: var(--color-bg-secondary); font-weight: bold;">
-                                <td colspan="3" style="text-align: right;">סה"כ יתרות</td>
+                                <td colspan="3" style="text-align: right;" data-i18n="bank.totalBalanceLabel">סה"כ יתרות</td>
                                 <td id="totalBalanceFooter">₪0</td>
                                 <td></td>
                             </tr>
@@ -469,7 +493,7 @@
                     }
 
                     if (rows.length < 2) {
-                        App.notify('הקובץ ריק או לא תקין', 'error');
+                        App.notify(I18n.t('bank.fileEmptyOrInvalid'), 'error');
                         return;
                     }
 
@@ -490,14 +514,14 @@
                     const imported = importBankData(rows, headerIdx, detected);
 
                     if (imported > 0) {
-                        App.notify(`יובאו ${imported} חשבונות בהצלחה`, 'success');
+                        App.notify(I18n.t('bank.importedAccounts') + ` (${imported})`, 'success');
                         loadAccounts();
                     } else {
-                        App.notify('לא נמצאו חשבונות לייבוא', 'error');
+                        App.notify(I18n.t('bank.noAccountsToImport'), 'error');
                     }
                 } catch (error) {
                     console.error('Import error:', error);
-                    App.notify('שגיאה בייבוא הקובץ: ' + error.message, 'error');
+                    App.notify(I18n.t('bank.importError') + ': ' + error.message, 'error');
                 }
             };
 
@@ -552,7 +576,7 @@
                     parseFloat(String(balanceVal || '0').replace(/[^\d.-]/g, ''));
                 if (isNaN(balance)) continue;
 
-                const name = detected.name !== undefined ? String(row[detected.name] || 'חשבון מיובא').trim() : 'חשבון מיובא';
+                const name = detected.name !== undefined ? String(row[detected.name] || I18n.t('bank.importedAccount')).trim() : I18n.t('bank.importedAccount');
                 const bank = detected.bank !== undefined ? String(row[detected.bank] || 'other') : 'other';
                 const accountNumber = detected.accountNumber !== undefined ?
                     String(row[detected.accountNumber] || '').replace(/[^\d]/g, '').slice(-10) : '';
@@ -581,43 +605,43 @@
             modal.innerHTML = `
                 <div class="modal" style="max-width: 500px;">
                     <div class="modal-header">
-                        <h2>בחר עמודות</h2>
+                        <h2>${I18n.t('bank.selectColumns')}</h2>
                         <button class="modal-close" onclick="document.getElementById('mappingModal').remove()">&times;</button>
                     </div>
                     <div class="modal-body">
-                        <p>לא הצלחנו לזהות את העמודות אוטומטית. אנא בחר:</p>
+                        <p>${I18n.t('bank.autoDetectFailed')}</p>
                         <div class="form-group">
-                            <label>עמודת שם/תיאור:</label>
+                            <label>${I18n.t('bank.nameDescCol')}</label>
                             <select id="mapName" class="form-control">
-                                <option value="-1">-- לא נבחר --</option>
+                                <option value="-1">${I18n.t('bank.notSelected')}</option>
                                 ${headers.map((h, i) => `<option value="${i}">${h || 'עמודה ' + (i+1)}</option>`).join('')}
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>עמודת יתרה/סכום: *</label>
+                            <label>${I18n.t('bank.balanceCol')}</label>
                             <select id="mapBalance" class="form-control" required>
-                                <option value="-1">-- בחר עמודה --</option>
+                                <option value="-1">${I18n.t('bank.selectBalanceCol')}</option>
                                 ${headers.map((h, i) => `<option value="${i}">${h || 'עמודה ' + (i+1)}</option>`).join('')}
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>עמודת בנק:</label>
+                            <label>${I18n.t('bank.bankCol')}</label>
                             <select id="mapBank" class="form-control">
-                                <option value="-1">-- לא נבחר --</option>
+                                <option value="-1">${I18n.t('bank.notSelected')}</option>
                                 ${headers.map((h, i) => `<option value="${i}">${h || 'עמודה ' + (i+1)}</option>`).join('')}
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>עמודת מספר חשבון:</label>
+                            <label>${I18n.t('bank.accountCol')}</label>
                             <select id="mapAccount" class="form-control">
-                                <option value="-1">-- לא נבחר --</option>
+                                <option value="-1">${I18n.t('bank.notSelected')}</option>
                                 ${headers.map((h, i) => `<option value="${i}">${h || 'עמודה ' + (i+1)}</option>`).join('')}
                             </select>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button class="btn btn-secondary" onclick="document.getElementById('mappingModal').remove()">ביטול</button>
-                        <button class="btn btn-primary" onclick="applyManualMapping()">ייבא</button>
+                        <button class="btn btn-secondary" onclick="document.getElementById('mappingModal').remove()">${I18n.t('common.cancel')}</button>
+                        <button class="btn btn-primary" onclick="applyManualMapping()">${I18n.t('bank.smartImport')}</button>
                     </div>
                 </div>
             `;
@@ -630,7 +654,7 @@
         function applyManualMapping() {
             const balanceIdx = parseInt(document.getElementById('mapBalance').value);
             if (balanceIdx < 0) {
-                App.notify('יש לבחור עמודת יתרה', 'error');
+                App.notify(I18n.t('bank.mustSelectBalance'), 'error');
                 return;
             }
 
@@ -653,10 +677,10 @@
             delete window._importData;
 
             if (imported > 0) {
-                App.notify(`יובאו ${imported} חשבונות בהצלחה`, 'success');
+                App.notify(I18n.t('bank.importedAccounts') + ` (${imported})`, 'success');
                 loadAccounts();
             } else {
-                App.notify('לא נמצאו חשבונות לייבוא', 'error');
+                App.notify(I18n.t('bank.noAccountsToImport'), 'error');
             }
         }
 

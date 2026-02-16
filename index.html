@@ -48,15 +48,15 @@
                         <span>G</span> Google
                     </button>
                     <button class="btn btn-auth" onclick="Auth.showEmailLogin()">
-                        <span>📧</span> אימייל
+                        <span>📧</span> <span data-i18n="auth.email">אימייל</span>
                     </button>
                 </div>
                 <div id="authLogout" style="display: none;">
                     <button id="authBtn" class="btn btn-secondary btn-sm" style="width: 100%;" onclick="Auth.signOut()">
-                        התנתק
+                        <span data-i18n="auth.signOut">התנתק</span>
                     </button>
                 </div>
-                <span id="syncStatus" class="sync-status local">💾 מקומי</span>
+                <span id="syncStatus" class="sync-status local" data-i18n="auth.local">💾 מקומי</span>
             </div>
 
             <nav>
@@ -88,17 +88,17 @@
                     <li class="nav-item">
                         <span class="nav-link" style="cursor: default;">
                             <span class="icon">📊</span>
-                            <span>מוצרים פיננסיים</span>
+                            <span data-i18n="nav.financialProducts">מוצרים פיננסיים</span>
                         </span>
                         <ul class="nav-submenu">
                             <li class="nav-item">
                                 <a href="pages/market-products.html" class="nav-link" data-category="market-products">
-                                    <span>🏪 מוצרים בשוק</span>
+                                    <span data-i18n="nav.marketProducts">🏪 מוצרים בשוק</span>
                                 </a>
                             </li>
                             <li class="nav-item">
                                 <a href="pages/my-funds.html" class="nav-link" data-category="my-products">
-                                    <span>💎 המוצרים שלי</span>
+                                    <span data-i18n="nav.myProducts">💎 המוצרים שלי</span>
                                 </a>
                             </li>
                         </ul>
@@ -112,25 +112,25 @@
                     <li class="nav-item">
                         <a href="pages/goals.html" class="nav-link" data-category="goals">
                             <span class="icon">🎯</span>
-                            <span>יעדי חיסכון</span>
+                            <span data-i18n="nav.goals">יעדי חיסכון</span>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a href="pages/pension-calc.html" class="nav-link" data-category="pension-calc">
                             <span class="icon">🧮</span>
-                            <span>מחשבון פנסיה</span>
+                            <span data-i18n="nav.pensionCalc">מחשבון פנסיה</span>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a href="pages/reports.html" class="nav-link" data-category="reports">
                             <span class="icon">📋</span>
-                            <span>דוחות</span>
+                            <span data-i18n="nav.reports">דוחות</span>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a href="pages/settings.html" class="nav-link" data-category="settings">
                             <span class="icon">⚙️</span>
-                            <span>הגדרות</span>
+                            <span data-i18n="nav.settings">הגדרות</span>
                         </a>
                     </li>
                 </ul>
@@ -160,7 +160,7 @@
                     </div>
                     <button class="btn btn-secondary btn-sm" onclick="WidgetManager.showCustomizeModal()" style="white-space: nowrap;">
                         <span>⚙️</span>
-                        <span>התאמה אישית</span>
+                        <span data-i18n="dashboard.customize">התאמה אישית</span>
                     </button>
                 </div>
             </header>
@@ -236,12 +236,12 @@
                 <div class="card-header">
                     <h2 class="card-title">
                         <span class="icon">🎯</span>
-                        <span>התקדמות יעדים</span>
+                        <span data-i18n="dashboard.goalsProgress">התקדמות יעדים</span>
                     </h2>
                 </div>
                 <div class="card-body" id="goalsProgressWidget">
                     <div style="padding: 20px; text-align: center; color: var(--color-text-secondary);">
-                        <a href="pages/goals.html" style="color: var(--color-primary);">הוסף יעדי חיסכון</a>
+                        <a href="pages/goals.html" style="color: var(--color-primary);" data-i18n="dashboard.addSavingsGoals">הוסף יעדי חיסכון</a>
                     </div>
                 </div>
             </div>
@@ -251,12 +251,12 @@
                 <div class="card-header">
                     <h2 class="card-title">
                         <span class="icon">💱</span>
-                        <span>שערי מטבע</span>
+                        <span data-i18n="dashboard.currencyRates">שערי מטבע</span>
                     </h2>
                     <button class="btn btn-sm btn-secondary" onclick="loadCurrencyWidget()">🔄</button>
                 </div>
                 <div class="card-body" id="currencyRatesWidget" style="padding: 20px;">
-                    <div style="text-align: center; color: var(--color-text-secondary);">טוען...</div>
+                    <div style="text-align: center; color: var(--color-text-secondary);"><span data-i18n="stocks.loading">טוען...</span></div>
                 </div>
             </div>
 
@@ -265,7 +265,7 @@
                 <div class="card-header">
                     <h2 class="card-title">
                         <span class="icon">📈</span>
-                        <span>סטטיסטיקות מהירות</span>
+                        <span data-i18n="dashboard.quickStats">סטטיסטיקות מהירות</span>
                     </h2>
                 </div>
                 <div class="card-body">
@@ -410,7 +410,7 @@
                 if (goals.length === 0) {
                     widget.innerHTML = `
                         <div style="padding: 20px; text-align: center; color: var(--color-text-secondary);">
-                            <a href="pages/goals.html" style="color: var(--color-primary);">הוסף יעדי חיסכון</a>
+                            <a href="pages/goals.html" style="color: var(--color-primary);">${I18n.t('dashboard.addSavingsGoals')}</a>
                         </div>
                     `;
                     return;
@@ -498,20 +498,20 @@
                     .quick-stat-item .change.negative { color: var(--color-negative); }
                 </style>
                 <div class="quick-stat-item">
-                    <div class="label">הוצאות החודש</div>
+                    <div class="label">${I18n.t('dashboard.monthExpenses')}</div>
                     <div class="value">${I18n.formatCurrency(thisMonthExpenses)}</div>
-                    <div class="change ${expenseChange > 0 ? 'negative' : 'positive'}">${expenseChange > 0 ? '▲' : '▼'} ${Math.abs(expenseChange)}% מחודש שעבר</div>
+                    <div class="change ${expenseChange > 0 ? 'negative' : 'positive'}">${expenseChange > 0 ? '▲' : '▼'} ${Math.abs(expenseChange)}% ${I18n.t('dashboard.fromLastMonth')}</div>
                 </div>
                 <div class="quick-stat-item">
-                    <div class="label">תשואת מניות</div>
+                    <div class="label">${I18n.t('dashboard.stockReturn')}</div>
                     <div class="value ${stocksReturn >= 0 ? 'positive' : 'negative'}">${stocksReturn >= 0 ? '+' : ''}${stocksReturn}%</div>
                 </div>
                 <div class="quick-stat-item">
-                    <div class="label">חשבונות בנק</div>
+                    <div class="label">${I18n.t('dashboard.bankAccountsCount')}</div>
                     <div class="value">${bankAccounts.length}</div>
                 </div>
                 <div class="quick-stat-item">
-                    <div class="label">הפקדה חודשית לקרנות</div>
+                    <div class="label">${I18n.t('dashboard.monthlyFundDeposit')}</div>
                     <div class="value">${I18n.formatCurrency(fundsMonthlyDeposit)}</div>
                 </div>
             `;
@@ -522,7 +522,7 @@
             const widget = document.getElementById('currencyRatesWidget');
             if (!widget || !WidgetManager.isEnabled('currencyRates')) return;
 
-            widget.innerHTML = '<div style="text-align: center; color: var(--color-text-secondary);">טוען...</div>';
+            widget.innerHTML = '<div style="text-align: center; color: var(--color-text-secondary);">' + I18n.t('stocks.loading') + '</div>';
 
             try {
                 const rates = await CurrencyRates.getRates();
@@ -572,11 +572,11 @@
                         </div>
                     </div>
                     <div style="text-align: center; margin-top: 10px; font-size: 0.75rem; color: var(--color-text-secondary);">
-                        עדכון: ${new Date().toLocaleTimeString('he-IL')}
+                        ${I18n.t('dashboard.updated')}: ${new Date().toLocaleTimeString('he-IL')}
                     </div>
                 `;
             } catch (e) {
-                widget.innerHTML = '<div style="text-align: center; color: var(--color-negative);">שגיאה בטעינת שערים</div>';
+                widget.innerHTML = '<div style="text-align: center; color: var(--color-negative);">' + I18n.t('dashboard.rateLoadError') + '</div>';
             }
         }
 

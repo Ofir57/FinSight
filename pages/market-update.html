@@ -232,22 +232,22 @@
 
             <nav>
                 <ul class="nav-menu">
-                    <li class="nav-item"><a href="../index.html" class="nav-link"><span class="icon">🏠</span><span>דאשבורד</span></a></li>
-                    <li class="nav-item"><a href="bank.html" class="nav-link"><span class="icon">🏦</span><span>חשבונות בנק</span></a></li>
-                    <li class="nav-item"><a href="credit.html" class="nav-link"><span class="icon">💳</span><span>כרטיסי אשראי</span></a></li>
-                    <li class="nav-item"><a href="stocks.html" class="nav-link"><span class="icon">📈</span><span>מניות</span></a></li>
+                    <li class="nav-item"><a href="../index.html" class="nav-link"><span class="icon">🏠</span><span data-i18n="nav.dashboard">דאשבורד</span></a></li>
+                    <li class="nav-item"><a href="bank.html" class="nav-link"><span class="icon">🏦</span><span data-i18n="nav.bankAccounts">חשבונות בנק</span></a></li>
+                    <li class="nav-item"><a href="credit.html" class="nav-link"><span class="icon">💳</span><span data-i18n="nav.creditCards">כרטיסי אשראי</span></a></li>
+                    <li class="nav-item"><a href="stocks.html" class="nav-link"><span class="icon">📈</span><span data-i18n="nav.stocks">מניות</span></a></li>
                     <li class="nav-item">
-                        <span class="nav-link" style="cursor: default;"><span class="icon">📊</span><span>מוצרים פיננסיים</span></span>
+                        <span class="nav-link" style="cursor: default;"><span class="icon">📊</span><span data-i18n="nav.financialProducts">מוצרים פיננסיים</span></span>
                         <ul class="nav-submenu">
-                            <li class="nav-item"><a href="market-products.html" class="nav-link"><span>🏪 מוצרים בשוק</span></a></li>
-                            <li class="nav-item"><a href="my-funds.html" class="nav-link"><span>💎 המוצרים שלי</span></a></li>
+                            <li class="nav-item"><a href="market-products.html" class="nav-link"><span>🏪 </span><span data-i18n="nav.marketProducts">מוצרים בשוק</span></a></li>
+                            <li class="nav-item"><a href="my-funds.html" class="nav-link"><span>💎 </span><span data-i18n="nav.myProducts">המוצרים שלי</span></a></li>
                         </ul>
                     </li>
-                    <li class="nav-item"><a href="assets.html" class="nav-link"><span class="icon">🏠</span><span>נכסים</span></a></li>
-                    <li class="nav-item"><a href="goals.html" class="nav-link"><span class="icon">🎯</span><span>יעדי חיסכון</span></a></li>
-                    <li class="nav-item"><a href="reports.html" class="nav-link"><span class="icon">📋</span><span>דוחות</span></a></li>
-                    <li class="nav-item"><a href="market-update.html" class="nav-link active"><span class="icon">📊</span><span>עדכון נתוני שוק</span></a></li>
-                    <li class="nav-item"><a href="settings.html" class="nav-link"><span class="icon">⚙️</span><span>הגדרות</span></a></li>
+                    <li class="nav-item"><a href="assets.html" class="nav-link"><span class="icon">🏠</span><span data-i18n="nav.assets">נכסים</span></a></li>
+                    <li class="nav-item"><a href="goals.html" class="nav-link"><span class="icon">🎯</span><span data-i18n="nav.goals">יעדי חיסכון</span></a></li>
+                    <li class="nav-item"><a href="reports.html" class="nav-link"><span class="icon">📋</span><span data-i18n="nav.reports">דוחות</span></a></li>
+                    <li class="nav-item"><a href="market-update.html" class="nav-link active"><span class="icon">📊</span><span data-i18n="nav.marketDataUpdate">עדכון נתוני שוק</span></a></li>
+                    <li class="nav-item"><a href="settings.html" class="nav-link"><span class="icon">⚙️</span><span data-i18n="nav.settings">הגדרות</span></a></li>
                 </ul>
             </nav>
 
@@ -261,71 +261,67 @@
                 <img src="../img/logo.png" alt="FinSight" class="logo-hero-img">
             </div>
             <header class="page-header">
-                <h1>📊 עדכון נתוני שוק</h1>
-                <p>עדכון נתוני קרנות השתלמות, פנסיה וגמל מהשוק</p>
+                <h1>📊 <span data-i18n="marketUpdate.title">עדכון נתוני שוק</span></h1>
+                <p data-i18n="marketUpdate.subtitle">עדכון נתוני קרנות השתלמות, פנסיה וגמל מהשוק</p>
             </header>
 
             <!-- Update Status -->
             <div class="update-status" id="updateStatus">
                 <div class="status-icon">📅</div>
                 <div class="status-info">
-                    <h3>עדכון אחרון: <span id="lastUpdateDate">טוען...</span></h3>
-                    <p id="statusMessage">בודק מצב...</p>
+                    <h3><span data-i18n="marketUpdate.lastUpdateLabel">עדכון אחרון:</span> <span id="lastUpdateDate" data-i18n="marketUpdate.loading">טוען...</span></h3>
+                    <p id="statusMessage" data-i18n="marketUpdate.checking">בודק מצב...</p>
                 </div>
             </div>
 
             <!-- Tab Buttons -->
             <div class="tab-buttons">
-                <button class="tab-btn active" onclick="switchTab('training')">📚 קרנות השתלמות</button>
-                <button class="tab-btn" onclick="switchTab('pension')">👴 פנסיה</button>
-                <button class="tab-btn" onclick="switchTab('gemel')">💰 קופות גמל</button>
+                <button class="tab-btn active" onclick="switchTab('training')" data-i18n="marketUpdate.trainingTab">📚 קרנות השתלמות</button>
+                <button class="tab-btn" onclick="switchTab('pension')" data-i18n="marketUpdate.pensionTab">👴 פנסיה</button>
+                <button class="tab-btn" onclick="switchTab('gemel')" data-i18n="marketUpdate.gemelTab">💰 קופות גמל</button>
             </div>
 
             <!-- Training Funds Tab -->
             <div class="tab-content active" id="tab-training">
                 <div class="update-section">
-                    <h2><span>📚</span> עדכון קרנות השתלמות</h2>
+                    <h2><span>📚</span> <span data-i18n="marketUpdate.updateTraining">עדכון קרנות השתלמות</span></h2>
 
                     <a href="https://www.supermarker.themarker.com/Gemel/CompareHishtalmutFunds.aspx" target="_blank" class="source-link">
                         <span>🔗</span>
-                        <span>פתח את TheMarker - קרנות השתלמות</span>
+                        <span data-i18n="marketUpdate.openTheMarker">פתח את TheMarker</span>
                         <span>↗</span>
                     </a>
 
                     <div class="instructions">
-                        <h4>📋 הוראות:</h4>
+                        <h4>📋 <span data-i18n="marketUpdate.instructions">הוראות:</span></h4>
                         <ol>
-                            <li>לחץ על הקישור למעלה לפתיחת אתר TheMarker</li>
-                            <li>סמן את כל הטבלה (Ctrl+A על הטבלה)</li>
-                            <li>העתק (Ctrl+C)</li>
-                            <li>הדבק כאן למטה (Ctrl+V)</li>
+                            <li data-i18n="marketUpdate.instruction1">לחץ על הקישור למעלה לפתיחת אתר TheMarker</li>
+                            <li data-i18n="marketUpdate.instruction2">סמן את כל הטבלה (Ctrl+A על הטבלה)</li>
+                            <li data-i18n="marketUpdate.instruction3">העתק (Ctrl+C)</li>
+                            <li data-i18n="marketUpdate.instruction4">הדבק כאן למטה (Ctrl+V)</li>
                         </ol>
                     </div>
 
                     <textarea class="paste-area" id="pasteTraining"
-                        placeholder="הדבק כאן את הנתונים מ-TheMarker...
-
-לדוגמה:
-שם הקרן    חברה מנהלת    תשואה חודשית    תשואה שנתית    תשואה 3 שנים    תשואה 5 שנים
-אינפיניטי השתלמות    אינפיניטי    2.86%    48.74%    110.99%    128.34%
-..."
+                        data-i18n-placeholder="marketUpdate.pasteHere"
+                        placeholder="הדבק כאן את הנתונים מ-TheMarker..."
                         oninput="parseAndPreview('training')"></textarea>
 
                     <div class="preview-section" id="preview-training">
                         <div class="preview-header">
-                            <h4>👁️ תצוגה מקדימה</h4>
-                            <span class="preview-count" id="count-training">0 קרנות</span>
+                            <h4 data-i18n="marketUpdate.preview">👁️ תצוגה מקדימה</h4>
+                            <span class="preview-count" id="count-training">0 <span data-i18n="marketUpdate.fundsCount">קרנות</span></span>
                         </div>
                         <div style="overflow-x: auto;">
                             <table class="preview-table">
                                 <thead>
                                     <tr>
-                                        <th>שם קרן</th>
-                                        <th>חברה</th>
-                                        <th>חודש</th>
-                                        <th>שנה</th>
-                                        <th>3 שנים</th>
-                                        <th>5 שנים</th>
+                                        <th data-i18n="marketUpdate.fundNameCol">שם קרן</th>
+                                        <th data-i18n="marketUpdate.companyCol">חברה</th>
+                                        <th data-i18n="marketUpdate.monthCol">חודש</th>
+                                        <th data-i18n="marketUpdate.yearCol">שנה</th>
+                                        <th data-i18n="marketUpdate.threeYearsCol">3 שנים</th>
+                                        <th data-i18n="marketUpdate.fiveYearsCol">5 שנים</th>
                                     </tr>
                                 </thead>
                                 <tbody id="tbody-training"></tbody>
@@ -334,16 +330,16 @@
                         <div class="action-buttons">
                             <button class="btn btn-primary" onclick="saveData('training')">
                                 <span>💾</span>
-                                <span>שמור נתונים</span>
+                                <span data-i18n="marketUpdate.saveData">שמור נתונים</span>
                             </button>
                             <button class="btn btn-secondary" onclick="clearPreview('training')">
                                 <span>🗑️</span>
-                                <span>נקה</span>
+                                <span data-i18n="marketUpdate.clear">נקה</span>
                             </button>
                         </div>
                         <div class="success-message" id="success-training">
                             <span>✅</span>
-                            <span>הנתונים נשמרו בהצלחה!</span>
+                            <span data-i18n="marketUpdate.dataSaved">הנתונים נשמרו בהצלחה!</span>
                         </div>
                     </div>
                 </div>
@@ -352,43 +348,44 @@
             <!-- Pension Tab -->
             <div class="tab-content" id="tab-pension">
                 <div class="update-section">
-                    <h2><span>👴</span> עדכון קרנות פנסיה</h2>
+                    <h2><span>👴</span> <span data-i18n="marketUpdate.updatePension">עדכון קרנות פנסיה</span></h2>
 
                     <a href="https://www.supermarker.themarker.com/pension/ComparePensionFunds.aspx" target="_blank" class="source-link">
                         <span>🔗</span>
-                        <span>פתח את TheMarker - פנסיה</span>
+                        <span data-i18n="marketUpdate.openTheMarker">פתח את TheMarker</span>
                         <span>↗</span>
                     </a>
 
                     <div class="instructions">
-                        <h4>📋 הוראות:</h4>
+                        <h4>📋 <span data-i18n="marketUpdate.instructions">הוראות:</span></h4>
                         <ol>
-                            <li>לחץ על הקישור למעלה לפתיחת אתר TheMarker</li>
-                            <li>סמן את כל הטבלה (Ctrl+A על הטבלה)</li>
-                            <li>העתק (Ctrl+C)</li>
-                            <li>הדבק כאן למטה (Ctrl+V)</li>
+                            <li data-i18n="marketUpdate.instruction1">לחץ על הקישור למעלה לפתיחת אתר TheMarker</li>
+                            <li data-i18n="marketUpdate.instruction2">סמן את כל הטבלה (Ctrl+A על הטבלה)</li>
+                            <li data-i18n="marketUpdate.instruction3">העתק (Ctrl+C)</li>
+                            <li data-i18n="marketUpdate.instruction4">הדבק כאן למטה (Ctrl+V)</li>
                         </ol>
                     </div>
 
                     <textarea class="paste-area" id="pastePension"
+                        data-i18n-placeholder="marketUpdate.pasteHere"
                         placeholder="הדבק כאן את הנתונים מ-TheMarker..."
                         oninput="parseAndPreview('pension')"></textarea>
 
                     <div class="preview-section" id="preview-pension">
                         <div class="preview-header">
-                            <h4>👁️ תצוגה מקדימה</h4>
-                            <span class="preview-count" id="count-pension">0 קרנות</span>
+                            <h4 data-i18n="marketUpdate.preview">👁️ תצוגה מקדימה</h4>
+                            <span class="preview-count" id="count-pension">0 <span data-i18n="marketUpdate.fundsCount">קרנות</span></span>
                         </div>
                         <div style="overflow-x: auto;">
                             <table class="preview-table">
                                 <thead>
                                     <tr>
-                                        <th>שם קרן</th>
-                                        <th>חברה</th>
-                                        <th>חודש</th>
-                                        <th>שנה</th>
-                                        <th>3 שנים</th>
-                                        <th>5 שנים</th>
+                                        <th data-i18n="marketUpdate.fundNameCol">שם קרן</th>
+                                        <th data-i18n="marketUpdate.companyCol">חברה</th>
+                                        <th data-i18n="marketUpdate.monthCol">חודש</th>
+                                        <th data-i18n="marketUpdate.yearCol">שנה</th>
+                                        <th data-i18n="marketUpdate.threeYearsCol">3 שנים</th>
+                                        <th data-i18n="marketUpdate.fiveYearsCol">5 שנים</th>
                                     </tr>
                                 </thead>
                                 <tbody id="tbody-pension"></tbody>
@@ -397,16 +394,16 @@
                         <div class="action-buttons">
                             <button class="btn btn-primary" onclick="saveData('pension')">
                                 <span>💾</span>
-                                <span>שמור נתונים</span>
+                                <span data-i18n="marketUpdate.saveData">שמור נתונים</span>
                             </button>
                             <button class="btn btn-secondary" onclick="clearPreview('pension')">
                                 <span>🗑️</span>
-                                <span>נקה</span>
+                                <span data-i18n="marketUpdate.clear">נקה</span>
                             </button>
                         </div>
                         <div class="success-message" id="success-pension">
                             <span>✅</span>
-                            <span>הנתונים נשמרו בהצלחה!</span>
+                            <span data-i18n="marketUpdate.dataSaved">הנתונים נשמרו בהצלחה!</span>
                         </div>
                     </div>
                 </div>
@@ -415,43 +412,44 @@
             <!-- Gemel Tab -->
             <div class="tab-content" id="tab-gemel">
                 <div class="update-section">
-                    <h2><span>💰</span> עדכון קופות גמל</h2>
+                    <h2><span>💰</span> <span data-i18n="marketUpdate.updateGemel">עדכון קופות גמל</span></h2>
 
                     <a href="https://www.supermarker.themarker.com/Gemel/CompareGemelFunds.aspx" target="_blank" class="source-link">
                         <span>🔗</span>
-                        <span>פתח את TheMarker - קופות גמל</span>
+                        <span data-i18n="marketUpdate.openTheMarker">פתח את TheMarker</span>
                         <span>↗</span>
                     </a>
 
                     <div class="instructions">
-                        <h4>📋 הוראות:</h4>
+                        <h4>📋 <span data-i18n="marketUpdate.instructions">הוראות:</span></h4>
                         <ol>
-                            <li>לחץ על הקישור למעלה לפתיחת אתר TheMarker</li>
-                            <li>סמן את כל הטבלה (Ctrl+A על הטבלה)</li>
-                            <li>העתק (Ctrl+C)</li>
-                            <li>הדבק כאן למטה (Ctrl+V)</li>
+                            <li data-i18n="marketUpdate.instruction1">לחץ על הקישור למעלה לפתיחת אתר TheMarker</li>
+                            <li data-i18n="marketUpdate.instruction2">סמן את כל הטבלה (Ctrl+A על הטבלה)</li>
+                            <li data-i18n="marketUpdate.instruction3">העתק (Ctrl+C)</li>
+                            <li data-i18n="marketUpdate.instruction4">הדבק כאן למטה (Ctrl+V)</li>
                         </ol>
                     </div>
 
                     <textarea class="paste-area" id="pasteGemel"
+                        data-i18n-placeholder="marketUpdate.pasteHere"
                         placeholder="הדבק כאן את הנתונים מ-TheMarker..."
                         oninput="parseAndPreview('gemel')"></textarea>
 
                     <div class="preview-section" id="preview-gemel">
                         <div class="preview-header">
-                            <h4>👁️ תצוגה מקדימה</h4>
-                            <span class="preview-count" id="count-gemel">0 קרנות</span>
+                            <h4 data-i18n="marketUpdate.preview">👁️ תצוגה מקדימה</h4>
+                            <span class="preview-count" id="count-gemel">0 <span data-i18n="marketUpdate.fundsCount">קרנות</span></span>
                         </div>
                         <div style="overflow-x: auto;">
                             <table class="preview-table">
                                 <thead>
                                     <tr>
-                                        <th>שם קרן</th>
-                                        <th>חברה</th>
-                                        <th>חודש</th>
-                                        <th>שנה</th>
-                                        <th>3 שנים</th>
-                                        <th>5 שנים</th>
+                                        <th data-i18n="marketUpdate.fundNameCol">שם קרן</th>
+                                        <th data-i18n="marketUpdate.companyCol">חברה</th>
+                                        <th data-i18n="marketUpdate.monthCol">חודש</th>
+                                        <th data-i18n="marketUpdate.yearCol">שנה</th>
+                                        <th data-i18n="marketUpdate.threeYearsCol">3 שנים</th>
+                                        <th data-i18n="marketUpdate.fiveYearsCol">5 שנים</th>
                                     </tr>
                                 </thead>
                                 <tbody id="tbody-gemel"></tbody>
@@ -460,16 +458,16 @@
                         <div class="action-buttons">
                             <button class="btn btn-primary" onclick="saveData('gemel')">
                                 <span>💾</span>
-                                <span>שמור נתונים</span>
+                                <span data-i18n="marketUpdate.saveData">שמור נתונים</span>
                             </button>
                             <button class="btn btn-secondary" onclick="clearPreview('gemel')">
                                 <span>🗑️</span>
-                                <span>נקה</span>
+                                <span data-i18n="marketUpdate.clear">נקה</span>
                             </button>
                         </div>
                         <div class="success-message" id="success-gemel">
                             <span>✅</span>
-                            <span>הנתונים נשמרו בהצלחה!</span>
+                            <span data-i18n="marketUpdate.dataSaved">הנתונים נשמרו בהצלחה!</span>
                         </div>
                     </div>
                 </div>
@@ -494,6 +492,7 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             App.currentPage = 'market-update';
+            I18n.translatePage();
             updateStatusDisplay();
         });
 
@@ -504,17 +503,17 @@
             const dateEl = document.getElementById('lastUpdateDate');
             const msgEl = document.getElementById('statusMessage');
 
-            dateEl.textContent = lastUpdate || 'לא עודכן';
+            dateEl.textContent = lastUpdate || I18n.t('marketUpdate.notUpdated');
 
             if (!lastUpdate) {
                 statusEl.className = 'update-status status-old';
-                msgEl.textContent = 'לא נמצאו נתונים - יש לעדכן';
+                msgEl.textContent = I18n.t('marketUpdate.noData');
             } else if (needsUpdate) {
                 statusEl.className = 'update-status status-warning';
-                msgEl.textContent = 'הנתונים מהחודש שעבר - מומלץ לעדכן';
+                msgEl.textContent = I18n.t('marketUpdate.outdated');
             } else {
                 statusEl.className = 'update-status status-ok';
-                msgEl.textContent = 'הנתונים מעודכנים';
+                msgEl.textContent = I18n.t('marketUpdate.upToDate');
             }
         }
 
@@ -555,7 +554,7 @@
                 </tr>
             `).join('');
 
-            document.getElementById(`count-${type}`).textContent = `${funds.length} קרנות`;
+            document.getElementById(`count-${type}`).textContent = `${funds.length} ${I18n.t('marketUpdate.fundsCount')}`;
             document.getElementById(`preview-${type}`).classList.add('active');
             document.getElementById(`success-${type}`).classList.remove('active');
         }
@@ -613,7 +612,7 @@
                     return company;
                 }
             }
-            return 'לא ידוע';
+            return I18n.t('marketUpdate.unknown');
         }
 
         function findPercentValue(parts, index) {
@@ -639,7 +638,7 @@
 
         function saveData(type) {
             if (parsedData[type].length === 0) {
-                App.notify('אין נתונים לשמירה', 'error');
+                App.notify(I18n.t('marketUpdate.noDataToSave'), 'error');
                 return;
             }
 
@@ -648,9 +647,9 @@
             if (success) {
                 document.getElementById(`success-${type}`).classList.add('active');
                 updateStatusDisplay();
-                App.notify(`נשמרו ${parsedData[type].length} קרנות`, 'success');
+                App.notify(`${parsedData[type].length} ${I18n.t('marketUpdate.savedFunds')}`, 'success');
             } else {
-                App.notify('שגיאה בשמירת הנתונים', 'error');
+                App.notify(I18n.t('marketUpdate.saveError'), 'error');
             }
         }
 

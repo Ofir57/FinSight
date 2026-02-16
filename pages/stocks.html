@@ -170,7 +170,7 @@
 </head>
 <body>
     <!-- Sidebar Toggle Button -->
-    <button class="sidebar-toggle" onclick="toggleSidebar()" title="פתח/סגור תפריט">
+    <button class="sidebar-toggle" onclick="toggleSidebar()" title="פתח/סגור תפריט" data-i18n-title="stocks.toggleMenu">
         <span class="toggle-icon">💰</span>
     </button>
 
@@ -213,17 +213,41 @@
                     <li class="nav-item">
                         <span class="nav-link" style="cursor: default;">
                             <span class="icon">📊</span>
-                            <span>מוצרים פיננסיים</span>
+                            <span data-i18n="nav.financialProducts">מוצרים פיננסיים</span>
                         </span>
                         <ul class="nav-submenu">
-                            <li class="nav-item"><a href="market-products.html" class="nav-link" data-category="market-products"><span>🏪 מוצרים בשוק</span></a></li>
-                            <li class="nav-item"><a href="my-funds.html" class="nav-link" data-category="my-products"><span>💎 המוצרים שלי</span></a></li>
+                            <li class="nav-item"><a href="market-products.html" class="nav-link" data-category="market-products"><span data-i18n="nav.marketProducts">🏪 מוצרים בשוק</span></a></li>
+                            <li class="nav-item"><a href="my-funds.html" class="nav-link" data-category="my-products"><span data-i18n="nav.myProducts">💎 המוצרים שלי</span></a></li>
                         </ul>
                     </li>
                     <li class="nav-item">
                         <a href="assets.html" class="nav-link" data-category="assets">
                             <span class="icon">🏠</span>
                             <span data-i18n="nav.assets">נכסים</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="goals.html" class="nav-link" data-category="goals">
+                            <span class="icon">🎯</span>
+                            <span data-i18n="nav.goals">יעדי חיסכון</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="pension-calc.html" class="nav-link" data-category="pension-calc">
+                            <span class="icon">🧮</span>
+                            <span data-i18n="nav.pensionCalc">מחשבון פנסיה</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="reports.html" class="nav-link" data-category="reports">
+                            <span class="icon">📋</span>
+                            <span data-i18n="nav.reports">דוחות</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="settings.html" class="nav-link" data-category="settings">
+                            <span class="icon">⚙️</span>
+                            <span data-i18n="nav.settings">הגדרות</span>
                         </a>
                     </li>
                 </ul>
@@ -255,7 +279,7 @@
                     <div class="value" id="totalValue" style="color: var(--color-stocks);">₪0</div>
                 </div>
                 <div class="metric-card">
-                    <div class="label">עלות</div>
+                    <div class="label" data-i18n="stocks.cost">עלות</div>
                     <div class="value" id="totalCost">₪0</div>
                 </div>
                 <div class="metric-card">
@@ -263,7 +287,7 @@
                     <div class="value" id="totalProfitLoss">₪0</div>
                 </div>
                 <div class="metric-card">
-                    <div class="label">תשואה</div>
+                    <div class="label" data-i18n="stocks.returnPct">תשואה</div>
                     <div class="value" id="totalReturn">0%</div>
                 </div>
             </div>
@@ -276,28 +300,28 @@
                 </button>
                 <button class="btn btn-secondary" onclick="refreshAllPrices()" id="refreshBtn">
                     <span>🔄</span>
-                    <span>עדכן מחירים</span>
+                    <span data-i18n="stocks.refreshPrices">עדכן מחירים</span>
                 </button>
                 <button class="btn btn-secondary" onclick="importCSV()">
                     <span>📥</span>
-                    <span>ייבוא CSV</span>
+                    <span data-i18n="stocks.importCSV">ייבוא CSV</span>
                 </button>
                 <button class="btn btn-secondary" onclick="importBrokerXLS()">
                     <span>📂</span>
-                    <span>ייבוא מברוקר (XLS)</span>
+                    <span data-i18n="stocks.importBroker">ייבוא מברוקר (XLS)</span>
                 </button>
                 <button class="btn btn-secondary" onclick="exportHoldingsToExcel()">
                     <span>📊</span>
-                    <span>ייצוא Excel</span>
+                    <span data-i18n="stocks.exportExcel">ייצוא Excel</span>
                 </button>
                 <button class="btn btn-secondary" onclick="ImageImport.openImagePicker('stocks')">
                     <span>📷</span>
-                    <span>ייבוא מתמונה</span>
+                    <span data-i18n="stocks.importImage">ייבוא מתמונה</span>
                 </button>
                 <input type="file" id="brokerFileInput" accept=".xls,.xlsx,.xml" style="display: none;" onchange="handleBrokerFile(event)">
                 <label class="auto-refresh-toggle" style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
                     <input type="checkbox" id="autoRefreshToggle" onchange="toggleAutoRefresh()" checked>
-                    <span style="font-size: 0.9rem; color: var(--color-text-secondary);">רענון אוטומטי</span>
+                    <span style="font-size: 0.9rem; color: var(--color-text-secondary);" data-i18n="stocks.autoRefresh">רענון אוטומטי</span>
                 </label>
             </div>
 
@@ -306,20 +330,20 @@
                 <div class="card-header">
                     <h2 class="card-title">
                         <span class="icon">📋</span>
-                        <span>אחזקות</span>
+                        <span data-i18n="stocks.holdings">אחזקות</span>
                     </h2>
                     <div style="display: flex; align-items: center; gap: 15px;">
                         <div style="display: flex; align-items: center; gap: 5px;">
-                            <label style="font-size: 0.85rem; color: var(--color-text-secondary);">מיון:</label>
+                            <label style="font-size: 0.85rem; color: var(--color-text-secondary);" data-i18n="stocks.sortBy">מיון:</label>
                             <select id="sortBy" onchange="loadStocks()" style="padding: 5px 10px; border-radius: 5px; background: var(--color-card-bg); color: var(--color-text); border: 1px solid var(--color-border);">
-                                <option value="symbol">סימול</option>
-                                <option value="name">שם</option>
-                                <option value="valueILS" selected>שווי ₪</option>
-                                <option value="portfolioPercent">% מהתיק</option>
-                                <option value="profitILS">רווח ₪</option>
-                                <option value="profitPercent">רווח %</option>
-                                <option value="dailyChange">שינוי יומי</option>
-                                <option value="quantity">כמות</option>
+                                <option value="symbol" data-i18n="stocks.sortSymbol">סימול</option>
+                                <option value="name" data-i18n="stocks.sortName">שם</option>
+                                <option value="valueILS" selected data-i18n="stocks.sortValueILS">שווי ₪</option>
+                                <option value="portfolioPercent" data-i18n="stocks.sortPortfolio">% מהתיק</option>
+                                <option value="profitILS" data-i18n="stocks.sortProfitILS">רווח ₪</option>
+                                <option value="profitPercent" data-i18n="stocks.sortProfitPct">רווח %</option>
+                                <option value="dailyChange" data-i18n="stocks.sortDailyChange">שינוי יומי</option>
+                                <option value="quantity" data-i18n="stocks.sortQuantity">כמות</option>
                             </select>
                             <button onclick="toggleSortDirection()" id="sortDirBtn" class="btn btn-sm btn-secondary" style="padding: 5px 8px;">⬇️</button>
                         </div>
@@ -333,17 +357,17 @@
                                 <th class="col-static" data-i18n="stocks.symbol" style="cursor: pointer;" onclick="setSortBy('symbol')">סימול</th>
                                 <th class="col-static" data-i18n="stocks.companyName" style="cursor: pointer;" onclick="setSortBy('name')">שם</th>
                                 <th class="col-static" data-i18n="stocks.quantity" style="cursor: pointer;" onclick="setSortBy('quantity')">כמות</th>
-                                <th class="col-static" style="cursor: pointer;" onclick="setSortBy('avgPrice')">מחיר רכישה</th>
-                                <th class="col-static">עלות רכישה ₪</th>
-                                <th class="col-dynamic" style="cursor: pointer;" onclick="setSortBy('currentPrice')">מחיר נוכחי</th>
-                                <th class="col-dynamic" style="cursor: pointer;" onclick="setSortBy('dailyChange')">שינוי יומי</th>
+                                <th class="col-static" data-i18n="stocks.purchasePrice" style="cursor: pointer;" onclick="setSortBy('avgPrice')">מחיר רכישה</th>
+                                <th class="col-static" data-i18n="stocks.purchaseCost">עלות רכישה ₪</th>
+                                <th class="col-dynamic" data-i18n="stocks.currentPrice" style="cursor: pointer;" onclick="setSortBy('currentPrice')">מחיר נוכחי</th>
+                                <th class="col-dynamic" data-i18n="stocks.dailyChange" style="cursor: pointer;" onclick="setSortBy('dailyChange')">שינוי יומי</th>
                                 <th class="col-dynamic">MA150</th>
-                                <th class="col-dynamic">טרנד</th>
-                                <th class="col-dynamic" style="cursor: pointer;" onclick="setSortBy('valueILS')">שווי נוכחי ₪</th>
-                                <th class="col-dynamic">רווח (מט"ח)</th>
-                                <th class="col-dynamic" style="cursor: pointer;" onclick="setSortBy('profitILS')">רווח ₪</th>
-                                <th class="col-dynamic" style="cursor: pointer;" onclick="setSortBy('profitPercent')">שינוי %</th>
-                                <th class="col-dynamic" style="cursor: pointer;" onclick="setSortBy('portfolioPercent')">% מהתיק</th>
+                                <th class="col-dynamic" data-i18n="stocks.trend">טרנד</th>
+                                <th class="col-dynamic" data-i18n="stocks.currentValueILS" style="cursor: pointer;" onclick="setSortBy('valueILS')">שווי נוכחי ₪</th>
+                                <th class="col-dynamic" data-i18n="stocks.profitFX">רווח (מט"ח)</th>
+                                <th class="col-dynamic" data-i18n="stocks.profitILS" style="cursor: pointer;" onclick="setSortBy('profitILS')">רווח ₪</th>
+                                <th class="col-dynamic" data-i18n="stocks.changePct" style="cursor: pointer;" onclick="setSortBy('profitPercent')">שינוי %</th>
+                                <th class="col-dynamic" data-i18n="stocks.portfolioPct" style="cursor: pointer;" onclick="setSortBy('portfolioPercent')">% מהתיק</th>
                                 <th class="col-dynamic" data-i18n="common.actions">פעולות</th>
                             </tr>
                         </thead>
@@ -359,30 +383,30 @@
                 <div class="card-header">
                     <h2 class="card-title">
                         <span class="icon">📋</span>
-                        <span>רשימת מעקב</span>
+                        <span data-i18n="stocks.watchlist">רשימת מעקב</span>
                     </h2>
                     <button class="btn btn-sm btn-secondary" onclick="openAddWatchlistModal()">
                         <span>➕</span>
-                        <span>הוסף מניה למעקב</span>
+                        <span data-i18n="stocks.addToWatchlist">הוסף מניה למעקב</span>
                     </button>
                 </div>
                 <div class="table-container">
                     <table>
                         <thead>
                             <tr>
-                                <th>סימול</th>
-                                <th>שם</th>
-                                <th>שוק</th>
-                                <th>מחיר נוכחי</th>
-                                <th>שינוי</th>
+                                <th data-i18n="stocks.symbol">סימול</th>
+                                <th data-i18n="stocks.companyName">שם</th>
+                                <th data-i18n="stocks.market">שוק</th>
+                                <th data-i18n="stocks.currentPrice">מחיר נוכחי</th>
+                                <th data-i18n="stocks.dailyChange">שינוי</th>
                                 <th>MA150</th>
-                                <th>מיקום</th>
-                                <th>התראות</th>
-                                <th>פעולות</th>
+                                <th data-i18n="stocks.position">מיקום</th>
+                                <th data-i18n="stocks.alerts">התראות</th>
+                                <th data-i18n="common.actions">פעולות</th>
                             </tr>
                         </thead>
                         <tbody id="watchlistTable">
-                            <tr><td colspan="9" style="text-align: center; color: var(--color-text-secondary);">אין מניות ברשימת המעקב</td></tr>
+                            <tr><td colspan="9" style="text-align: center; color: var(--color-text-secondary);" data-i18n="stocks.noWatchlistStocks">אין מניות ברשימת המעקב</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -408,23 +432,23 @@
                 <div class="card-header">
                     <h2 class="card-title">
                         <span class="icon">📈</span>
-                        <span>גרף מחיר ו-MA150</span>
+                        <span data-i18n="stocks.priceMA150Chart">גרף מחיר ו-MA150</span>
                     </h2>
                     <div style="display: flex; gap: 10px; align-items: center;">
                         <select id="ma150ChartSelect" class="form-control" style="width: auto; min-width: 150px;" onchange="updateMA150Chart()">
-                            <option value="">בחר מניה...</option>
+                            <option value="" data-i18n="stocks.selectStock">בחר מניה...</option>
                         </select>
                         <select id="ma150TimeRange" class="form-control" style="width: auto;" onchange="updateMA150Chart()">
-                            <option value="3m">3 חודשים</option>
-                            <option value="6m" selected>6 חודשים</option>
-                            <option value="1y">שנה</option>
+                            <option value="3m" data-i18n="stocks.threeMonths">3 חודשים</option>
+                            <option value="6m" selected data-i18n="stocks.sixMonths">6 חודשים</option>
+                            <option value="1y" data-i18n="stocks.oneYear">שנה</option>
                         </select>
                     </div>
                 </div>
                 <div class="ma150-chart-info" id="ma150ChartInfo" style="display: none;">
                     <div class="ma150-metrics">
                         <div class="ma150-metric">
-                            <span class="label">מחיר נוכחי</span>
+                            <span class="label" data-i18n="stocks.currentPrice">מחיר נוכחי</span>
                             <span class="value" id="chartCurrentPrice">-</span>
                         </div>
                         <div class="ma150-metric">
@@ -432,11 +456,11 @@
                             <span class="value" id="chartMA150">-</span>
                         </div>
                         <div class="ma150-metric">
-                            <span class="label">מיקום</span>
+                            <span class="label" data-i18n="stocks.position">מיקום</span>
                             <span class="value" id="chartPosition">-</span>
                         </div>
                         <div class="ma150-metric">
-                            <span class="label">שינוי 30 יום</span>
+                            <span class="label" data-i18n="stocks.thirtyDayChange">שינוי 30 יום</span>
                             <span class="value" id="chart30DayChange">-</span>
                         </div>
                     </div>
@@ -446,7 +470,7 @@
                 </div>
                 <div id="ma150ChartEmpty" style="text-align: center; padding: 60px 20px; color: var(--color-text-secondary);">
                     <span style="font-size: 3rem;">📊</span>
-                    <p style="margin-top: 15px;">בחר מניה מהרשימה לצפייה בגרף המחיר וה-MA150</p>
+                    <p style="margin-top: 15px;" data-i18n="stocks.selectStockForChart">בחר מניה מהרשימה לצפייה בגרף המחיר וה-MA150</p>
                 </div>
             </div>
 
@@ -455,7 +479,7 @@
                 <div class="card-header">
                     <h2 class="card-title">
                         <span class="icon">📺</span>
-                        <span>גרף מתקדם - TradingView</span>
+                        <span data-i18n="stocks.advancedChart">גרף מתקדם - TradingView</span>
                     </h2>
                     <div style="display: flex; gap: 10px; align-items: center;">
                         <select id="tvChartSelect" class="form-control" style="width: auto; min-width: 180px;" onchange="updateTVChart()">
@@ -470,9 +494,9 @@
                             <option value="TLV:TA125.TA">TA-125 - ת״א 125</option>
                             <option value="TLV:TA35.TA">TA-35 - ת״א 35</option>
                         </select>
-                        <input type="text" id="tvCustomSymbol" class="form-control" placeholder="הקלד סימול..." style="width: 150px;" onkeydown="if(event.key==='Enter'){addCustomTVSymbol(); event.preventDefault();}">
-                        <button class="btn btn-sm btn-secondary" onclick="addCustomTVSymbol()" title="הוסף מניה">➕</button>
-                        <button class="btn btn-sm btn-secondary" onclick="removeSelectedTVSymbol()" title="הסר מניה שנבחרה" style="color: #ff4757;">🗑️</button>
+                        <input type="text" id="tvCustomSymbol" class="form-control" placeholder="הקלד סימול..." data-i18n-placeholder="stocks.typeSymbol" style="width: 150px;" onkeydown="if(event.key==='Enter'){addCustomTVSymbol(); event.preventDefault();}">
+                        <button class="btn btn-sm btn-secondary" onclick="addCustomTVSymbol()" title="הוסף מניה" data-i18n-title="stocks.addStockTooltip">➕</button>
+                        <button class="btn btn-sm btn-secondary" onclick="removeSelectedTVSymbol()" title="הסר מניה שנבחרה" data-i18n-title="stocks.removeStock" style="color: #ff4757;">🗑️</button>
                     </div>
                 </div>
                 <div id="tvChartContainer" style="height: 500px; padding: 0 20px 20px;">
@@ -501,7 +525,7 @@
                                 <th data-i18n="common.type">סוג</th>
                                 <th data-i18n="stocks.symbol">סימול</th>
                                 <th data-i18n="stocks.quantity">כמות</th>
-                                <th>מחיר</th>
+                                <th data-i18n="stocks.price">מחיר</th>
                                 <th data-i18n="common.total">סה״כ</th>
                             </tr>
                         </thead>
@@ -535,10 +559,10 @@
                         <input type="text" class="form-control" id="stockName" placeholder="Apple Inc.">
                     </div>
                     <div class="form-group">
-                        <label>שוק</label>
+                        <label data-i18n="stocks.market">שוק</label>
                         <select class="form-control" id="stockMarket">
-                            <option value="US">ארה"ב (NYSE/NASDAQ)</option>
-                            <option value="IL">ישראל (TASE)</option>
+                            <option value="US" data-i18n="stocks.marketUS">ארה"ב (NYSE/NASDAQ)</option>
+                            <option value="IL" data-i18n="stocks.marketIL">ישראל (TASE)</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -609,7 +633,7 @@
                         <input type="number" class="form-control" id="sellQuantity" min="0.01" step="0.01" required>
                     </div>
                     <div class="form-group">
-                        <label>מחיר מכירה</label>
+                        <label data-i18n="stocks.sellPrice">מחיר מכירה</label>
                         <input type="number" class="form-control" id="sellPrice" min="0.01" step="0.01" required>
                     </div>
                 </form>
@@ -625,36 +649,36 @@
     <div class="modal-overlay" id="watchlistModal">
         <div class="modal">
             <div class="modal-header">
-                <h2>הוסף מניה למעקב</h2>
+                <h2 data-i18n="stocks.addToWatchlist">הוסף מניה למעקב</h2>
                 <button class="modal-close" onclick="closeAddWatchlistModal()">&times;</button>
             </div>
             <div class="modal-body">
                 <form id="watchlistForm">
                     <div class="form-group">
-                        <label>חפש מניה</label>
-                        <input type="text" class="form-control" id="watchlistSearch" placeholder="הקלד סימול או שם..." oninput="searchStocks()">
+                        <label data-i18n="stocks.searchStock">חפש מניה</label>
+                        <input type="text" class="form-control" id="watchlistSearch" placeholder="הקלד סימול או שם..." data-i18n-placeholder="stocks.searchPlaceholder" oninput="searchStocks()">
                         <div id="searchResults" class="search-results"></div>
                     </div>
                     <div class="form-group">
-                        <label>סימול</label>
+                        <label data-i18n="stocks.symbol">סימול</label>
                         <input type="text" class="form-control" id="watchlistSymbol" required placeholder="AAPL" style="text-transform: uppercase;">
                     </div>
                     <div class="form-group">
-                        <label>שם החברה</label>
+                        <label data-i18n="stocks.companyName">שם החברה</label>
                         <input type="text" class="form-control" id="watchlistName" placeholder="Apple Inc.">
                     </div>
                     <div class="form-group">
-                        <label>שוק</label>
+                        <label data-i18n="stocks.market">שוק</label>
                         <select class="form-control" id="watchlistMarket">
-                            <option value="US">ארה"ב (NYSE/NASDAQ)</option>
-                            <option value="IL">ישראל (TASE)</option>
+                            <option value="US" data-i18n="stocks.marketUS">ארה"ב (NYSE/NASDAQ)</option>
+                            <option value="IL" data-i18n="stocks.marketIL">ישראל (TASE)</option>
                         </select>
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" onclick="closeAddWatchlistModal()">ביטול</button>
-                <button class="btn btn-primary" onclick="addToWatchlist()">הוסף למעקב</button>
+                <button class="btn btn-secondary" onclick="closeAddWatchlistModal()" data-i18n="common.cancel">ביטול</button>
+                <button class="btn btn-primary" onclick="addToWatchlist()" data-i18n="stocks.addToWatchlist">הוסף למעקב</button>
             </div>
         </div>
     </div>
@@ -663,7 +687,7 @@
     <div class="modal-overlay" id="alertModal">
         <div class="modal">
             <div class="modal-header">
-                <h2>הוסף התראה</h2>
+                <h2 data-i18n="stocks.addAlert">הוסף התראה</h2>
                 <button class="modal-close" onclick="closeAlertModal()">&times;</button>
             </div>
             <div class="modal-body">
@@ -671,24 +695,24 @@
                     <input type="hidden" id="alertSymbol">
                     <p id="alertInfo" style="margin-bottom: 15px; color: var(--color-text-secondary);"></p>
                     <div class="form-group">
-                        <label>סוג התראה</label>
+                        <label data-i18n="stocks.alertType">סוג התראה</label>
                         <select class="form-control" id="alertType" onchange="updateAlertValueLabel()">
-                            <option value="price_above">מחיר מעל</option>
-                            <option value="price_below">מחיר מתחת</option>
-                            <option value="percent_change">שינוי אחוזי</option>
-                            <option value="ma150_cross_above">חציית MA150 מלמעלה</option>
-                            <option value="ma150_cross_below">חציית MA150 מלמטה</option>
+                            <option value="price_above" data-i18n="stocks.priceAbove">מחיר מעל</option>
+                            <option value="price_below" data-i18n="stocks.priceBelow">מחיר מתחת</option>
+                            <option value="percent_change" data-i18n="stocks.percentChange">שינוי אחוזי</option>
+                            <option value="ma150_cross_above" data-i18n="stocks.ma150CrossAbove">חציית MA150 מלמעלה</option>
+                            <option value="ma150_cross_below" data-i18n="stocks.ma150CrossBelow">חציית MA150 מלמטה</option>
                         </select>
                     </div>
                     <div class="form-group" id="alertValueGroup">
-                        <label id="alertValueLabel">מחיר יעד</label>
+                        <label id="alertValueLabel" data-i18n="stocks.targetPrice">מחיר יעד</label>
                         <input type="number" class="form-control" id="alertValue" step="0.01" placeholder="0">
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" onclick="closeAlertModal()">ביטול</button>
-                <button class="btn btn-primary" onclick="saveAlert()">הוסף התראה</button>
+                <button class="btn btn-secondary" onclick="closeAlertModal()" data-i18n="common.cancel">ביטול</button>
+                <button class="btn btn-primary" onclick="saveAlert()" data-i18n="stocks.addAlert">הוסף התראה</button>
             </div>
         </div>
     </div>
@@ -697,14 +721,14 @@
     <div class="modal-overlay" id="viewAlertsModal">
         <div class="modal">
             <div class="modal-header">
-                <h2 id="viewAlertsTitle">התראות</h2>
+                <h2 id="viewAlertsTitle" data-i18n="stocks.viewAlerts">התראות</h2>
                 <button class="modal-close" onclick="closeViewAlertsModal()">&times;</button>
             </div>
             <div class="modal-body">
                 <div id="alertsList"></div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" onclick="closeViewAlertsModal()">סגור</button>
+                <button class="btn btn-secondary" onclick="closeViewAlertsModal()" data-i18n="stocks.closeAlerts">סגור</button>
             </div>
         </div>
     </div>
@@ -942,10 +966,10 @@
                             <td class="col-dynamic">${portfolioPercent.toFixed(1)}%</td>
                             <td class="col-dynamic">
                                 <div class="action-buttons">
-                                    <button class="btn btn-secondary btn-sm" onclick="openAlertModal('${h.symbol}', ${currentPrice})" title="הוסף התראה למניה">🔔</button>
-                                    <button class="btn btn-secondary btn-sm" onclick="openUpdatePriceModal('${h.symbol}', ${currentPrice})" title="עדכן מחיר ידנית">💰</button>
-                                    <button class="btn btn-secondary btn-sm" onclick="openSellModal('${h.symbol}', ${h.quantity}, ${currentPrice})" title="מכור מניות">📤</button>
-                                    <button class="btn btn-danger btn-sm" onclick="deleteStock('${h.symbol}')" title="מחק מהתיק">🗑️</button>
+                                    <button class="btn btn-secondary btn-sm" onclick="openAlertModal('${h.symbol}', ${currentPrice})" title="${I18n.t('stocks.addAlertTooltip')}">🔔</button>
+                                    <button class="btn btn-secondary btn-sm" onclick="openUpdatePriceModal('${h.symbol}', ${currentPrice})" title="${I18n.t('stocks.updatePriceTooltip')}">💰</button>
+                                    <button class="btn btn-secondary btn-sm" onclick="openSellModal('${h.symbol}', ${h.quantity}, ${currentPrice})" title="${I18n.t('stocks.sellTooltip')}">📤</button>
+                                    <button class="btn btn-danger btn-sm" onclick="deleteStock('${h.symbol}')" title="${I18n.t('stocks.deleteTooltip')}">🗑️</button>
                                 </div>
                             </td>
                         </tr>
@@ -1030,7 +1054,7 @@
             const watchlistTable = document.getElementById('watchlistTable');
 
             if (watchlist.length === 0) {
-                watchlistTable.innerHTML = `<tr><td colspan="9" style="text-align: center; color: var(--color-text-secondary);">אין מניות ברשימת המעקב</td></tr>`;
+                watchlistTable.innerHTML = `<tr><td colspan="9" style="text-align: center; color: var(--color-text-secondary);">${I18n.t('stocks.noWatchlistStocks')}</td></tr>`;
                 return;
             }
 
@@ -1049,7 +1073,7 @@
                 const activeAlerts = alerts.filter(a => a.enabled && !a.triggered).length;
 
                 // Price display
-                let priceDisplay = '<span class="ma150-na">טוען...</span>';
+                let priceDisplay = `<span class="ma150-na">${I18n.t('stocks.loading')}</span>`;
                 let changeDisplay = '<span class="ma150-na">-</span>';
 
                 if (currentPrice !== undefined) {
@@ -1088,9 +1112,9 @@
                         </td>
                         <td>
                             <div class="action-buttons">
-                                <button class="btn btn-secondary btn-sm" onclick="openAlertModal('${item.symbol}', ${currentPrice || 0})" title="הוסף התראה">🔔</button>
-                                <button class="btn btn-secondary btn-sm" onclick="viewAlerts('${item.symbol}')" title="צפה בהתראות">👁️</button>
-                                <button class="btn btn-danger btn-sm" onclick="removeFromWatchlist('${item.symbol}')" title="הסר מהמעקב">🗑️</button>
+                                <button class="btn btn-secondary btn-sm" onclick="openAlertModal('${item.symbol}', ${currentPrice || 0})" title="${I18n.t('stocks.watchlistAddAlertTooltip')}">🔔</button>
+                                <button class="btn btn-secondary btn-sm" onclick="viewAlerts('${item.symbol}')" title="${I18n.t('stocks.watchlistViewTooltip')}">👁️</button>
+                                <button class="btn btn-danger btn-sm" onclick="removeFromWatchlist('${item.symbol}')" title="${I18n.t('stocks.watchlistRemoveTooltip')}">🗑️</button>
                             </div>
                         </td>
                     </tr>
@@ -1111,7 +1135,7 @@
             isRefreshing = true;
             const refreshBtn = document.getElementById('refreshBtn');
             refreshBtn.disabled = true;
-            refreshBtn.innerHTML = '<span class="spin">🔄</span><span>מעדכן...</span>';
+            refreshBtn.innerHTML = `<span class="spin">🔄</span><span>${I18n.t('stocks.updating')}</span>`;
 
             try {
                 // Get all symbols to fetch (holdings + watchlist)
@@ -1163,7 +1187,7 @@
                 }
 
                 // Update last update time
-                document.getElementById('lastUpdateTime').textContent = `עדכון אחרון: ${new Date().toLocaleTimeString('he-IL')}`;
+                document.getElementById('lastUpdateTime').textContent = `${I18n.t('stocks.lastUpdate')} ${new Date().toLocaleTimeString('he-IL')}`;
 
                 // Reload displays
                 loadStocks();
@@ -1173,11 +1197,11 @@
 
             } catch (error) {
                 console.error('Error refreshing prices:', error);
-                App.notify('שגיאה בעדכון מחירים', 'error');
+                App.notify(I18n.t('stocks.priceUpdateError'), 'error');
             } finally {
                 isRefreshing = false;
                 refreshBtn.disabled = false;
-                refreshBtn.innerHTML = '<span>🔄</span><span>עדכן מחירים</span>';
+                refreshBtn.innerHTML = `<span>🔄</span><span>${I18n.t('stocks.refreshPrices')}</span>`;
             }
         }
 
@@ -1202,10 +1226,10 @@
 
             if (enabled) {
                 startAutoRefresh();
-                App.notify('רענון אוטומטי הופעל', 'info');
+                App.notify(I18n.t('stocks.autoRefreshEnabled'), 'info');
             } else {
                 stopAutoRefresh();
-                App.notify('רענון אוטומטי בוטל', 'info');
+                App.notify(I18n.t('stocks.autoRefreshDisabled'), 'info');
             }
         }
 
@@ -1224,14 +1248,14 @@
             alertsBar.innerHTML = `
                 <div class="alerts-bar-content">
                     <span class="alerts-icon">🔔</span>
-                    <span class="alerts-count">${triggered.length} התראות פעילות</span>
+                    <span class="alerts-count">${triggered.length} ${I18n.t('stocks.activeAlerts')}</span>
                     <div class="alerts-list">
                         ${triggered.slice(0, 3).map(a => `
                             <span class="alert-item">${a.symbol}: ${StockAlerts.getAlertTypeName(a.type)}</span>
                         `).join('')}
-                        ${triggered.length > 3 ? `<span class="alert-more">+${triggered.length - 3} נוספות</span>` : ''}
+                        ${triggered.length > 3 ? `<span class="alert-more">+${triggered.length - 3} ${I18n.t('stocks.more')}</span>` : ''}
                     </div>
-                    <button class="btn btn-sm" onclick="dismissTriggeredAlerts()">סגור הכל</button>
+                    <button class="btn btn-sm" onclick="dismissTriggeredAlerts()">${I18n.t('stocks.closeAll')}</button>
                 </div>
             `;
         }
@@ -1258,7 +1282,7 @@
 
         function openAlertModal(symbol, currentPrice) {
             document.getElementById('alertSymbol').value = symbol;
-            document.getElementById('alertInfo').textContent = `${symbol} - מחיר נוכחי: ${currentPrice ? currentPrice.toFixed(2) : 'לא זמין'}`;
+            document.getElementById('alertInfo').textContent = `${symbol} - ${I18n.t('stocks.currentPriceInfo')} ${currentPrice ? currentPrice.toFixed(2) : I18n.t('stocks.notAvailable')}`;
             document.getElementById('alertType').value = 'price_above';
             document.getElementById('alertValue').value = currentPrice ? (currentPrice * 1.05).toFixed(2) : '';
             updateAlertValueLabel();
@@ -1279,9 +1303,9 @@
             } else {
                 valueGroup.style.display = 'block';
                 if (type === 'percent_change') {
-                    valueLabel.textContent = 'אחוז שינוי (%)';
+                    valueLabel.textContent = I18n.t('stocks.percentChangeLabel');
                 } else {
-                    valueLabel.textContent = 'מחיר יעד';
+                    valueLabel.textContent = I18n.t('stocks.targetPrice');
                 }
             }
         }
@@ -1292,22 +1316,22 @@
             const value = document.getElementById('alertValue').value;
 
             if (!type.includes('ma150') && !value) {
-                App.notify('נא להזין ערך', 'error');
+                App.notify(I18n.t('stocks.enterValue'), 'error');
                 return;
             }
 
             StockAlerts.addAlert(symbol, type, value || 0);
             closeAlertModal();
             loadWatchlist();
-            App.notify('התראה נוספה בהצלחה', 'success');
+            App.notify(I18n.t('stocks.alertAdded'), 'success');
         }
 
         function viewAlerts(symbol) {
             const alerts = StockAlerts.getAlertsForSymbol(symbol);
-            document.getElementById('viewAlertsTitle').textContent = `התראות - ${symbol}`;
+            document.getElementById('viewAlertsTitle').textContent = `${I18n.t('stocks.viewAlerts')} - ${symbol}`;
 
             if (alerts.length === 0) {
-                document.getElementById('alertsList').innerHTML = '<p style="color: var(--color-text-secondary);">אין התראות למניה זו</p>';
+                document.getElementById('alertsList').innerHTML = `<p style="color: var(--color-text-secondary);">${I18n.t('stocks.noStocks')}</p>`;
             } else {
                 document.getElementById('alertsList').innerHTML = alerts.map(alert => `
                     <div class="alert-row ${alert.triggered ? 'triggered' : ''} ${!alert.enabled ? 'disabled' : ''}">
@@ -1345,7 +1369,7 @@
             if (confirm('האם למחוק התראה זו?')) {
                 StockAlerts.removeAlert(alertId);
                 const title = document.getElementById('viewAlertsTitle').textContent;
-                const symbol = title.replace('התראות - ', '');
+                const symbol = title.replace(I18n.t('stocks.viewAlerts') + ' - ', '');
                 viewAlerts(symbol);
                 loadWatchlist();
                 App.notify('התראה נמחקה', 'success');
@@ -1379,13 +1403,13 @@
             }
 
             searchTimeout = setTimeout(async () => {
-                resultsDiv.innerHTML = '<div class="search-loading">מחפש...</div>';
+                resultsDiv.innerHTML = `<div class="search-loading">${I18n.t('stocks.loading')}</div>`;
 
                 try {
                     const results = await StockAPI.searchStock(query);
 
                     if (results.length === 0) {
-                        resultsDiv.innerHTML = '<div class="search-empty">לא נמצאו תוצאות</div>';
+                        resultsDiv.innerHTML = `<div class="search-empty">${I18n.t('stocks.notAvailable')}</div>`;
                         return;
                     }
 

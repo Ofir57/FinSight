@@ -98,17 +98,41 @@
                     <li class="nav-item">
                         <span class="nav-link" style="cursor: default;">
                             <span class="icon">📊</span>
-                            <span>מוצרים פיננסיים</span>
+                            <span data-i18n="nav.financialProducts">מוצרים פיננסיים</span>
                         </span>
                         <ul class="nav-submenu">
-                            <li class="nav-item"><a href="market-products.html" class="nav-link" data-category="market-products"><span>🏪 מוצרים בשוק</span></a></li>
-                            <li class="nav-item"><a href="my-funds.html" class="nav-link" data-category="my-products"><span>💎 המוצרים שלי</span></a></li>
+                            <li class="nav-item"><a href="market-products.html" class="nav-link" data-category="market-products"><span data-i18n="nav.marketProducts">🏪 מוצרים בשוק</span></a></li>
+                            <li class="nav-item"><a href="my-funds.html" class="nav-link" data-category="my-products"><span data-i18n="nav.myProducts">💎 המוצרים שלי</span></a></li>
                         </ul>
                     </li>
                     <li class="nav-item">
                         <a href="assets.html" class="nav-link active" data-category="assets">
                             <span class="icon">🏠</span>
                             <span data-i18n="nav.assets">נכסים</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="goals.html" class="nav-link" data-category="goals">
+                            <span class="icon">🎯</span>
+                            <span data-i18n="nav.goals">יעדי חיסכון</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="pension-calc.html" class="nav-link" data-category="pension-calc">
+                            <span class="icon">🧮</span>
+                            <span data-i18n="nav.pensionCalc">מחשבון פנסיה</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="reports.html" class="nav-link" data-category="reports">
+                            <span class="icon">📋</span>
+                            <span data-i18n="nav.reports">דוחות</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="settings.html" class="nav-link" data-category="settings">
+                            <span class="icon">⚙️</span>
+                            <span data-i18n="nav.settings">הגדרות</span>
                         </a>
                     </li>
                 </ul>
@@ -162,7 +186,7 @@
                 <div class="card-header">
                     <h2 class="card-title">
                         <span class="icon">📊</span>
-                        <span>חלוקת נכסים לפי סוג</span>
+                        <span data-i18n="assets.chartTitle">חלוקת נכסים לפי סוג</span>
                     </h2>
                 </div>
                 <div class="chart-container">
@@ -275,7 +299,7 @@
                         </div>
                         <div style="text-align: left;">
                             <div class="value">${I18n.formatCurrency(asset.value)}</div>
-                            ${depreciation > 0 ? `<div class="depreciation">פחת: -${I18n.formatCurrency(depreciation)}</div>` : ''}
+                            ${depreciation > 0 ? `<div class="depreciation">${I18n.t('assets.depreciation')}: -${I18n.formatCurrency(depreciation)}</div>` : ''}
                         </div>
                         <div class="action-buttons">
                             <button class="btn btn-secondary btn-sm" onclick="editAsset('${asset.id}')" title="${I18n.t('common.edit')}">✏️</button>

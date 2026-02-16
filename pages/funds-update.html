@@ -349,47 +349,23 @@
 
             <nav>
                 <ul class="nav-menu">
+                    <li class="nav-item"><a href="../index.html" class="nav-link" data-category="dashboard"><span class="icon">🏠</span><span data-i18n="nav.dashboard">דאשבורד</span></a></li>
+                    <li class="nav-item"><a href="bank.html" class="nav-link" data-category="bank"><span class="icon">🏦</span><span data-i18n="nav.bankAccounts">חשבונות בנק</span></a></li>
+                    <li class="nav-item"><a href="credit.html" class="nav-link" data-category="credit"><span class="icon">💳</span><span data-i18n="nav.creditCards">כרטיסי אשראי</span></a></li>
+                    <li class="nav-item"><a href="stocks.html" class="nav-link" data-category="stocks"><span class="icon">📈</span><span data-i18n="nav.stocks">מניות</span></a></li>
                     <li class="nav-item">
-                        <a href="../index.html" class="nav-link" data-category="dashboard">
-                            <span class="icon">🏠</span>
-                            <span>דאשבורד</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="bank.html" class="nav-link" data-category="bank">
-                            <span class="icon">🏦</span>
-                            <span>חשבונות בנק</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="credit.html" class="nav-link" data-category="credit">
-                            <span class="icon">💳</span>
-                            <span>כרטיסי אשראי</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="stocks.html" class="nav-link" data-category="stocks">
-                            <span class="icon">📈</span>
-                            <span>מניות</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <span class="nav-link" style="cursor: default;">
-                            <span class="icon">📊</span>
-                            <span>מוצרים פיננסיים</span>
-                        </span>
+                        <span class="nav-link" style="cursor: default;"><span class="icon">📊</span><span data-i18n="nav.financialProducts">מוצרים פיננסיים</span></span>
                         <ul class="nav-submenu">
-                            <li class="nav-item"><a href="market-products.html" class="nav-link" data-category="market-products"><span>🏪 מוצרים בשוק</span></a></li>
-                            <li class="nav-item"><a href="my-funds.html" class="nav-link" data-category="my-products"><span>💎 המוצרים שלי</span></a></li>
-                            <li class="nav-item"><a href="funds-update.html" class="nav-link active" data-category="training"><span>📝 עדכון חודשי</span></a></li>
+                            <li class="nav-item"><a href="market-products.html" class="nav-link" data-category="market-products"><span>🏪 </span><span data-i18n="nav.marketProducts">מוצרים בשוק</span></a></li>
+                            <li class="nav-item"><a href="my-funds.html" class="nav-link" data-category="my-products"><span>💎 </span><span data-i18n="nav.myProducts">המוצרים שלי</span></a></li>
+                            <li class="nav-item"><a href="funds-update.html" class="nav-link active" data-category="training"><span>📝 </span><span data-i18n="fundsUpdate.monthlyUpdate">עדכון חודשי</span></a></li>
                         </ul>
                     </li>
-                    <li class="nav-item">
-                        <a href="assets.html" class="nav-link" data-category="assets">
-                            <span class="icon">🏠</span>
-                            <span>נכסים</span>
-                        </a>
-                    </li>
+                    <li class="nav-item"><a href="assets.html" class="nav-link" data-category="assets"><span class="icon">🏠</span><span data-i18n="nav.assets">נכסים</span></a></li>
+                    <li class="nav-item"><a href="goals.html" class="nav-link"><span class="icon">🎯</span><span data-i18n="nav.goals">יעדי חיסכון</span></a></li>
+                    <li class="nav-item"><a href="pension-calc.html" class="nav-link"><span class="icon">🧮</span><span data-i18n="nav.pensionCalc">מחשבון פנסיה</span></a></li>
+                    <li class="nav-item"><a href="reports.html" class="nav-link"><span class="icon">📋</span><span data-i18n="nav.reports">דוחות</span></a></li>
+                    <li class="nav-item"><a href="settings.html" class="nav-link"><span class="icon">⚙️</span><span data-i18n="nav.settings">הגדרות</span></a></li>
                 </ul>
             </nav>
 
@@ -405,27 +381,27 @@
             <header class="page-header">
                 <h1>
                     <span>📊</span>
-                    <span>עדכון חודשי - קרנות וקופות</span>
+                    <span data-i18n="fundsUpdate.title">עדכון חודשי - קרנות וקופות</span>
                 </h1>
-                <p style="color: var(--color-text-secondary); margin-top: 5px;">עדכן את כל הקרנות שלך במקום אחד</p>
+                <p style="color: var(--color-text-secondary); margin-top: 5px;" data-i18n="fundsUpdate.subtitle">עדכן את כל הקרנות שלך במקום אחד</p>
             </header>
 
             <!-- Summary Bar -->
             <div class="summary-bar">
                 <div class="summary-item training">
-                    <div class="label">קרנות השתלמות</div>
+                    <div class="label" data-i18n="fundsUpdate.trainingFunds">קרנות השתלמות</div>
                     <div class="value" id="trainingTotal">₪0</div>
                 </div>
                 <div class="summary-item pension">
-                    <div class="label">פנסיה</div>
+                    <div class="label" data-i18n="fundsUpdate.pension">פנסיה</div>
                     <div class="value" id="pensionTotal">₪0</div>
                 </div>
                 <div class="summary-item gemel">
-                    <div class="label">קופות גמל</div>
+                    <div class="label" data-i18n="fundsUpdate.providentFunds">קופות גמל</div>
                     <div class="value" id="gemelTotal">₪0</div>
                 </div>
                 <div class="summary-item total">
-                    <div class="label">סה"כ קרנות</div>
+                    <div class="label" data-i18n="fundsUpdate.totalFunds">סה"כ קרנות</div>
                     <div class="value" id="allFundsTotal">₪0</div>
                 </div>
             </div>
@@ -435,7 +411,7 @@
                 <div class="card-header">
                     <h2 class="card-title">
                         <span class="icon">📈</span>
-                        <span>תשואות אישיות</span>
+                        <span data-i18n="fundsUpdate.personalReturns">תשואות אישיות</span>
                     </h2>
                 </div>
                 <div class="performance-grid" id="performanceGrid">
@@ -443,39 +419,39 @@
                 </div>
                 <div class="performance-summary" id="performanceSummary">
                     <div class="perf-item">
-                        <div class="perf-label">סה"כ הפקדות</div>
+                        <div class="perf-label" data-i18n="fundsUpdate.totalDeposits">סה"כ הפקדות</div>
                         <div class="perf-value" id="totalDeposits">₪0</div>
                     </div>
                     <div class="perf-item">
-                        <div class="perf-label">שווי נוכחי</div>
+                        <div class="perf-label" data-i18n="fundsUpdate.currentValue">שווי נוכחי</div>
                         <div class="perf-value" id="totalCurrentValue">₪0</div>
                     </div>
                     <div class="perf-item">
-                        <div class="perf-label">רווח/הפסד</div>
+                        <div class="perf-label" data-i18n="fundsUpdate.profitLoss">רווח/הפסד</div>
                         <div class="perf-value" id="totalProfit">₪0</div>
                     </div>
                     <div class="perf-item highlight">
-                        <div class="perf-label">תשואה כוללת</div>
+                        <div class="perf-label" data-i18n="fundsUpdate.totalReturn">תשואה כוללת</div>
                         <div class="perf-value" id="totalReturn">0%</div>
                     </div>
                 </div>
                 <div class="period-returns" id="periodReturns">
-                    <h4>תשואות לפי תקופה:</h4>
+                    <h4 data-i18n="fundsUpdate.returnsByPeriod">תשואות לפי תקופה:</h4>
                     <div class="period-grid">
                         <div class="period-item">
-                            <span class="period-label">חודש אחרון</span>
+                            <span class="period-label" data-i18n="fundsUpdate.lastMonth">חודש אחרון</span>
                             <span class="period-value" id="returnMonth">-</span>
                         </div>
                         <div class="period-item">
-                            <span class="period-label">שנה</span>
+                            <span class="period-label" data-i18n="fundsUpdate.year">שנה</span>
                             <span class="period-value" id="returnYear">-</span>
                         </div>
                         <div class="period-item">
-                            <span class="period-label">3 שנים</span>
+                            <span class="period-label" data-i18n="fundsUpdate.threeYears">3 שנים</span>
                             <span class="period-value" id="return3Year">-</span>
                         </div>
                         <div class="period-item">
-                            <span class="period-label">5 שנים</span>
+                            <span class="period-label" data-i18n="fundsUpdate.fiveYears">5 שנים</span>
                             <span class="period-value" id="return5Year">-</span>
                         </div>
                     </div>
@@ -485,20 +461,20 @@
             <!-- Action Bar -->
             <div class="action-bar">
                 <div class="month-selector">
-                    <label>חודש עדכון:</label>
+                    <label data-i18n="fundsUpdate.updateMonth">חודש עדכון:</label>
                     <input type="month" class="month-input" id="updateMonth">
                 </div>
                 <button class="btn btn-primary" onclick="saveAllUpdates()">
                     <span>💾</span>
-                    <span>שמור עדכונים</span>
+                    <span data-i18n="fundsUpdate.saveUpdates">שמור עדכונים</span>
                 </button>
                 <button class="btn btn-secondary" onclick="importFundsCSV()">
                     <span>📥</span>
-                    <span>ייבוא מ-CSV</span>
+                    <span data-i18n="fundsUpdate.importCSV">ייבוא מ-CSV</span>
                 </button>
                 <button class="btn btn-secondary" onclick="openAddFundModal()">
                     <span>➕</span>
-                    <span>הוסף קרן</span>
+                    <span data-i18n="fundsUpdate.addFund">הוסף קרן</span>
                 </button>
             </div>
 
@@ -507,15 +483,15 @@
                 <div class="section-header">
                     <h2 class="section-title">
                         <span class="section-icon">🎓</span>
-                        <span>קרנות השתלמות</span>
+                        <span data-i18n="fundsUpdate.trainingFunds">קרנות השתלמות</span>
                     </h2>
                 </div>
                 <div class="fund-update-row header" style="grid-template-columns: 2fr 1fr 1fr 1fr 1fr auto;">
-                    <div>שם הקרן</div>
-                    <div>סה"כ הפקדות</div>
-                    <div>ערך נוכחי</div>
-                    <div>ערך חדש</div>
-                    <div>שינוי</div>
+                    <div data-i18n="fundsUpdate.fundName">שם הקרן</div>
+                    <div data-i18n="fundsUpdate.totalDepositsCol">סה"כ הפקדות</div>
+                    <div data-i18n="fundsUpdate.currentValueCol">ערך נוכחי</div>
+                    <div data-i18n="fundsUpdate.newValue">ערך חדש</div>
+                    <div data-i18n="fundsUpdate.change">שינוי</div>
                     <div></div>
                 </div>
                 <div id="trainingFunds"></div>
@@ -526,15 +502,15 @@
                 <div class="section-header">
                     <h2 class="section-title">
                         <span class="section-icon">👴</span>
-                        <span>פנסיה</span>
+                        <span data-i18n="fundsUpdate.pension">פנסיה</span>
                     </h2>
                 </div>
                 <div class="fund-update-row header" style="grid-template-columns: 2fr 1fr 1fr 1fr 1fr auto;">
-                    <div>שם הקרן</div>
-                    <div>סה"כ הפקדות</div>
-                    <div>ערך נוכחי</div>
-                    <div>ערך חדש</div>
-                    <div>שינוי</div>
+                    <div data-i18n="fundsUpdate.fundName">שם הקרן</div>
+                    <div data-i18n="fundsUpdate.totalDepositsCol">סה"כ הפקדות</div>
+                    <div data-i18n="fundsUpdate.currentValueCol">ערך נוכחי</div>
+                    <div data-i18n="fundsUpdate.newValue">ערך חדש</div>
+                    <div data-i18n="fundsUpdate.change">שינוי</div>
                     <div></div>
                 </div>
                 <div id="pensionFunds"></div>
@@ -545,15 +521,15 @@
                 <div class="section-header">
                     <h2 class="section-title">
                         <span class="section-icon">💼</span>
-                        <span>קופות גמל</span>
+                        <span data-i18n="fundsUpdate.providentFunds">קופות גמל</span>
                     </h2>
                 </div>
                 <div class="fund-update-row header" style="grid-template-columns: 2fr 1fr 1fr 1fr 1fr auto;">
-                    <div>שם הקרן</div>
-                    <div>סה"כ הפקדות</div>
-                    <div>ערך נוכחי</div>
-                    <div>ערך חדש</div>
-                    <div>שינוי</div>
+                    <div data-i18n="fundsUpdate.fundName">שם הקרן</div>
+                    <div data-i18n="fundsUpdate.totalDepositsCol">סה"כ הפקדות</div>
+                    <div data-i18n="fundsUpdate.currentValueCol">ערך נוכחי</div>
+                    <div data-i18n="fundsUpdate.newValue">ערך חדש</div>
+                    <div data-i18n="fundsUpdate.change">שינוי</div>
                     <div></div>
                 </div>
                 <div id="gemelFunds"></div>
@@ -563,9 +539,9 @@
             <div class="card" style="background: rgba(0, 210, 255, 0.05);">
                 <h3 style="margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
                     <span>📋</span>
-                    <span>פורמט CSV לייבוא</span>
+                    <span data-i18n="fundsUpdate.csvFormat">פורמט CSV לייבוא</span>
                 </h3>
-                <p style="color: var(--color-text-secondary); margin-bottom: 10px;">
+                <p style="color: var(--color-text-secondary); margin-bottom: 10px;" data-i18n="fundsUpdate.csvDesc">
                     ניתן לייבא קרנות מקובץ CSV בפורמט הבא:
                 </p>
                 <pre style="background: var(--color-bg-secondary); padding: 15px; border-radius: 8px; overflow-x: auto; font-size: 0.85rem;">
@@ -574,7 +550,7 @@ training,קרן השתלמות הייטק,מיטב,150000,2500
 pension,פנסיה כללית,מנורה,85000,3000
 gemel,קופת גמל להשקעה,אלטשולר,45000,1000</pre>
                 <p style="color: var(--color-text-secondary); font-size: 0.85rem; margin-top: 10px;">
-                    <strong>סוג:</strong> training (השתלמות), pension (פנסיה), gemel (גמל)
+                    <strong data-i18n="common.type">סוג:</strong> <span data-i18n="fundsUpdate.csvTypeDesc">training (השתלמות), pension (פנסיה), gemel (גמל)</span>
                 </p>
             </div>
         </main>
@@ -587,49 +563,49 @@ gemel,קופת גמל להשקעה,אלטשולר,45000,1000</pre>
     <div class="modal-overlay" id="addFundModal">
         <div class="modal">
             <div class="modal-header">
-                <h2>הוסף קרן חדשה</h2>
+                <h2 data-i18n="fundsUpdate.addNewFund">הוסף קרן חדשה</h2>
                 <button class="modal-close" onclick="closeAddFundModal()">&times;</button>
             </div>
             <div class="modal-body">
                 <form id="addFundForm">
                     <div class="form-group">
-                        <label>סוג קרן</label>
+                        <label data-i18n="fundsUpdate.fundType">סוג קרן</label>
                         <select class="form-control" id="fundType" required>
-                            <option value="training">קרן השתלמות</option>
-                            <option value="pension">פנסיה</option>
-                            <option value="gemel">קופת גמל</option>
+                            <option value="training" data-i18n="fundsUpdate.trainingFund">קרן השתלמות</option>
+                            <option value="pension" data-i18n="fundsUpdate.pensionFund">פנסיה</option>
+                            <option value="gemel" data-i18n="fundsUpdate.providentFund">קופת גמל</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>שם הקרן</label>
-                        <input type="text" class="form-control" id="fundName" required placeholder="לדוגמה: קרן השתלמות הייטק">
+                        <label data-i18n="fundsUpdate.fundName">שם הקרן</label>
+                        <input type="text" class="form-control" id="fundName" required placeholder="לדוגמה: קרן השתלמות הייטק" data-i18n-placeholder="fundsUpdate.fundNamePlaceholder">
                     </div>
                     <div class="form-group">
-                        <label>חברה מנהלת</label>
-                        <input type="text" class="form-control" id="fundCompany" placeholder="לדוגמה: מיטב, הראל">
+                        <label data-i18n="fundsUpdate.managingCompany">חברה מנהלת</label>
+                        <input type="text" class="form-control" id="fundCompany" placeholder="לדוגמה: מיטב, הראל" data-i18n-placeholder="fundsUpdate.companyPlaceholder">
                     </div>
                     <div class="form-group">
-                        <label>ערך נוכחי (₪)</label>
+                        <label data-i18n="fundsUpdate.currentValueInput">ערך נוכחי (₪)</label>
                         <input type="number" class="form-control" id="fundValue" min="0" step="0.01" required placeholder="0">
                     </div>
                     <div class="form-group">
-                        <label>סה"כ הפקדות עד היום (₪)</label>
-                        <input type="number" class="form-control" id="fundTotalDeposits" min="0" step="0.01" placeholder="סכום כל הכסף שהפקדת">
-                        <small style="color: var(--color-text-secondary);">חשוב לחישוב תשואה!</small>
+                        <label data-i18n="fundsUpdate.totalDepositsInput">סה"כ הפקדות עד היום (₪)</label>
+                        <input type="number" class="form-control" id="fundTotalDeposits" min="0" step="0.01" placeholder="סכום כל הכסף שהפקדת" data-i18n-placeholder="fundsUpdate.totalDepositsHint">
+                        <small style="color: var(--color-text-secondary);" data-i18n="fundsUpdate.importantForReturn">חשוב לחישוב תשואה!</small>
                     </div>
                     <div class="form-group">
-                        <label>הפקדה חודשית (₪)</label>
+                        <label data-i18n="fundsUpdate.monthlyDeposit">הפקדה חודשית (₪)</label>
                         <input type="number" class="form-control" id="fundDeposit" min="0" step="0.01" placeholder="0">
                     </div>
                     <div class="form-group">
-                        <label>מספר חשבון (אופציונלי)</label>
+                        <label data-i18n="fundsUpdate.accountNumber">מספר חשבון (אופציונלי)</label>
                         <input type="text" class="form-control" id="fundAccount" placeholder="">
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" onclick="closeAddFundModal()">ביטול</button>
-                <button class="btn btn-primary" onclick="saveFund()">שמור</button>
+                <button class="btn btn-secondary" onclick="closeAddFundModal()" data-i18n="common.cancel">ביטול</button>
+                <button class="btn btn-primary" onclick="saveFund()" data-i18n="common.save">שמור</button>
             </div>
         </div>
     </div>
@@ -644,6 +620,7 @@ gemel,קופת גמל להשקעה,אלטשולר,45000,1000</pre>
 
         document.addEventListener('DOMContentLoaded', () => {
             App.currentPage = 'funds-update';
+            I18n.translatePage();
 
             // Set default month to current
             const now = new Date();
@@ -673,8 +650,8 @@ gemel,קופת גמל להשקעה,אלטשולר,45000,1000</pre>
                 container.innerHTML = `
                     <div class="empty-state">
                         <div class="icon">📭</div>
-                        <p>אין קרנות מסוג זה</p>
-                        <button class="btn btn-secondary btn-sm" onclick="openAddFundModal()">➕ הוסף קרן</button>
+                        <p>${I18n.t('fundsUpdate.noFundsOfType')}</p>
+                        <button class="btn btn-secondary btn-sm" onclick="openAddFundModal()">➕ ${I18n.t('fundsUpdate.addFund')}</button>
                     </div>
                 `;
                 return;
@@ -693,26 +670,26 @@ gemel,קופת גמל להשקעה,אלטשולר,45000,1000</pre>
                 let changeText = '-';
                 if (pendingValue !== undefined) {
                     changeClass = change >= 0 ? 'positive' : 'negative';
-                    changeText = `${change >= 0 ? '+' : ''}${formatCurrency(change)} (${change >= 0 ? '+' : ''}${changePercent}%)`;
+                    changeText = `${change >= 0 ? '+' : ''}${I18n.formatCurrency(change)} (${change >= 0 ? '+' : ''}${changePercent}%)`;
                 }
 
                 return `
                     <div class="fund-update-row" style="grid-template-columns: 2fr 1fr 1fr 1fr 1fr auto;">
-                        <div data-label="שם הקרן">
+                        <div data-label="${I18n.t('fundsUpdate.fundName')}">
                             <div class="fund-name">${fund.name}</div>
                             <div class="fund-company">${fund.company || ''}</div>
                         </div>
-                        <div data-label="סה״כ הפקדות">
+                        <div data-label="${I18n.t('fundsUpdate.totalDepositsCol')}">
                             <input type="number"
                                    class="new-value-input"
                                    style="width: 100px; font-size: 0.9rem;"
                                    value="${totalDeposits || ''}"
                                    placeholder="0"
                                    onchange="updateDeposits('${fund.id}', this.value)"
-                                   title="סה״כ הפקדות">
+                                   title="${I18n.t('fundsUpdate.totalDepositsCol')}">
                         </div>
-                        <div data-label="ערך נוכחי" class="current-value">${formatCurrency(currentValue)}</div>
-                        <div data-label="ערך חדש">
+                        <div data-label="${I18n.t('fundsUpdate.currentValueCol')}" class="current-value">${I18n.formatCurrency(currentValue)}</div>
+                        <div data-label="${I18n.t('fundsUpdate.newValue')}">
                             <input type="number"
                                    class="new-value-input"
                                    id="update-${fund.id}"
@@ -721,9 +698,9 @@ gemel,קופת גמל להשקעה,אלטשולר,45000,1000</pre>
                                    onchange="updatePendingValue('${fund.id}', this.value)"
                                    oninput="updatePendingValue('${fund.id}', this.value)">
                         </div>
-                        <div data-label="שינוי" class="change-indicator ${changeClass}" id="change-${fund.id}">${changeText}</div>
+                        <div data-label="${I18n.t('fundsUpdate.change')}" class="change-indicator ${changeClass}" id="change-${fund.id}">${changeText}</div>
                         <div>
-                            <button class="btn btn-danger btn-sm" onclick="deleteFund('${fund.id}')" title="מחק">🗑️</button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteFund('${fund.id}')" title="${I18n.t('common.delete')}">🗑️</button>
                         </div>
                     </div>
                 `;
@@ -755,7 +732,7 @@ gemel,קופת גמל להשקעה,אלטשולר,45000,1000</pre>
                 const changeClass = change >= 0 ? 'positive' : 'negative';
 
                 document.getElementById(`change-${fundId}`).textContent =
-                    `${change >= 0 ? '+' : ''}${formatCurrency(change)} (${change >= 0 ? '+' : ''}${changePercent}%)`;
+                    `${change >= 0 ? '+' : ''}${I18n.formatCurrency(change)} (${change >= 0 ? '+' : ''}${changePercent}%)`;
                 document.getElementById(`change-${fundId}`).className = `change-indicator ${changeClass}`;
             }
 
@@ -767,7 +744,7 @@ gemel,קופת גמל להשקעה,אלטשולר,45000,1000</pre>
             const updateIds = Object.keys(pendingUpdates);
 
             if (updateIds.length === 0) {
-                App.notify('אין עדכונים לשמירה', 'info');
+                App.notify(I18n.t('fundsUpdate.noUpdatesToSave'), 'info');
                 return;
             }
 
@@ -803,7 +780,7 @@ gemel,קופת גמל להשקעה,אלטשולר,45000,1000</pre>
             updateSummary();
             updatePerformance();
 
-            App.notify(`עודכנו ${updated} קרנות בהצלחה`, 'success');
+            App.notify(`${updated} ${I18n.t('fundsUpdate.updatedFunds')}`, 'success');
         }
 
         function updateSummary() {
@@ -826,15 +803,13 @@ gemel,קופת גמל להשקעה,אלטשולר,45000,1000</pre>
                 }
             });
 
-            document.getElementById('trainingTotal').textContent = formatCurrency(trainingTotal);
-            document.getElementById('pensionTotal').textContent = formatCurrency(pensionTotal);
-            document.getElementById('gemelTotal').textContent = formatCurrency(gemelTotal);
-            document.getElementById('allFundsTotal').textContent = formatCurrency(trainingTotal + pensionTotal + gemelTotal);
+            document.getElementById('trainingTotal').textContent = I18n.formatCurrency(trainingTotal);
+            document.getElementById('pensionTotal').textContent = I18n.formatCurrency(pensionTotal);
+            document.getElementById('gemelTotal').textContent = I18n.formatCurrency(gemelTotal);
+            document.getElementById('allFundsTotal').textContent = I18n.formatCurrency(trainingTotal + pensionTotal + gemelTotal);
         }
 
-        function formatCurrency(amount) {
-            return '₪' + amount.toLocaleString('he-IL', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
-        }
+        // formatCurrency is now handled by I18n.formatCurrency()
 
         // Add Fund Modal
         function openAddFundModal() {
@@ -856,7 +831,7 @@ gemel,קופת גמל להשקעה,אלטשולר,45000,1000</pre>
             const account = document.getElementById('fundAccount').value.trim();
 
             if (!name) {
-                App.notify('נא להזין שם קרן', 'error');
+                App.notify(I18n.t('fundsUpdate.enterFundName'), 'error');
                 return;
             }
 
@@ -879,17 +854,17 @@ gemel,קופת גמל להשקעה,אלטשולר,45000,1000</pre>
             loadAllFunds();
             updateSummary();
             updatePerformance();
-            App.notify('קרן נוספה בהצלחה', 'success');
+            App.notify(I18n.t('fundsUpdate.fundAdded'), 'success');
         }
 
         function deleteFund(fundId) {
-            if (confirm('האם למחוק קרן זו?')) {
+            if (confirm(I18n.t('fundsUpdate.deleteFundConfirm'))) {
                 Storage.deleteMyFund(fundId);
                 delete pendingUpdates[fundId];
                 loadAllFunds();
                 updateSummary();
                 updatePerformance();
-                App.notify('קרן נמחקה', 'success');
+                App.notify(I18n.t('fundsUpdate.fundDeleted'), 'success');
             }
         }
 
@@ -905,21 +880,21 @@ gemel,קופת גמל להשקעה,אלטשולר,45000,1000</pre>
             const perfGrid = document.getElementById('performanceGrid');
 
             if (funds.length === 0) {
-                perfGrid.innerHTML = '<p style="color: var(--color-text-secondary); text-align: center;">הוסף קרנות כדי לראות תשואות</p>';
-                document.getElementById('totalDeposits').textContent = '₪0';
-                document.getElementById('totalCurrentValue').textContent = '₪0';
-                document.getElementById('totalProfit').textContent = '₪0';
+                perfGrid.innerHTML = `<p style="color: var(--color-text-secondary); text-align: center;">${I18n.t('fundsUpdate.addFundsForReturns')}</p>`;
+                document.getElementById('totalDeposits').textContent = I18n.formatCurrency(0);
+                document.getElementById('totalCurrentValue').textContent = I18n.formatCurrency(0);
+                document.getElementById('totalProfit').textContent = I18n.formatCurrency(0);
                 document.getElementById('totalReturn').textContent = '0%';
                 return;
             }
 
             let gridHtml = `
                 <div class="fund-perf-row header">
-                    <div>קרן</div>
-                    <div>הפקדות</div>
-                    <div>שווי נוכחי</div>
-                    <div>רווח/הפסד</div>
-                    <div>תשואה</div>
+                    <div>${I18n.t('fundsUpdate.fund')}</div>
+                    <div>${I18n.t('fundsUpdate.deposits')}</div>
+                    <div>${I18n.t('fundsUpdate.currentValue')}</div>
+                    <div>${I18n.t('fundsUpdate.profitLoss')}</div>
+                    <div>${I18n.t('fundsUpdate.returnPct')}</div>
                 </div>
             `;
 
@@ -941,9 +916,9 @@ gemel,קופת גמל להשקעה,אלטשולר,45000,1000</pre>
                             <span class="fund-perf-name">${fund.name}</span>
                             <span class="fund-perf-type">${typeLabels[fund.type] || ''}</span>
                         </div>
-                        <div>${formatCurrency(deposits)}</div>
-                        <div>${formatCurrency(currentVal)}</div>
-                        <div class="${profitClass}">${profit >= 0 ? '+' : ''}${formatCurrency(profit)}</div>
+                        <div>${I18n.formatCurrency(deposits)}</div>
+                        <div>${I18n.formatCurrency(currentVal)}</div>
+                        <div class="${profitClass}">${profit >= 0 ? '+' : ''}${I18n.formatCurrency(profit)}</div>
                         <div class="${profitClass}">${profit >= 0 ? '+' : ''}${returnPct.toFixed(1)}%</div>
                     </div>
                 `;
@@ -956,11 +931,11 @@ gemel,קופת גמל להשקעה,אלטשולר,45000,1000</pre>
             const totalReturnPct = totalDepositsSum > 0 ? ((totalProfit / totalDepositsSum) * 100) : 0;
             const profitClass = totalProfit >= 0 ? 'positive' : 'negative';
 
-            document.getElementById('totalDeposits').textContent = formatCurrency(totalDepositsSum);
-            document.getElementById('totalCurrentValue').textContent = formatCurrency(totalCurrentValue);
+            document.getElementById('totalDeposits').textContent = I18n.formatCurrency(totalDepositsSum);
+            document.getElementById('totalCurrentValue').textContent = I18n.formatCurrency(totalCurrentValue);
 
             const profitEl = document.getElementById('totalProfit');
-            profitEl.textContent = (totalProfit >= 0 ? '+' : '') + formatCurrency(totalProfit);
+            profitEl.textContent = (totalProfit >= 0 ? '+' : '') + I18n.formatCurrency(totalProfit);
             profitEl.className = 'perf-value ' + profitClass;
 
             document.getElementById('totalReturn').textContent = (totalProfit >= 0 ? '+' : '') + totalReturnPct.toFixed(1) + '%';
@@ -1048,9 +1023,9 @@ gemel,קופת גמל להשקעה,אלטשולר,45000,1000</pre>
                 loadAllFunds();
                 updateSummary();
                 updatePerformance();
-                App.notify(`יובאו ${result.imported} קרנות בהצלחה`, 'success');
+                App.notify(`${result.imported} ${I18n.t('fundsUpdate.importedFunds')}`, 'success');
             } else {
-                App.notify(result.error || 'שגיאה בייבוא', 'error');
+                App.notify(result.error || I18n.t('fundsUpdate.importError'), 'error');
             }
 
             if (result.errors && result.errors.length > 0) {

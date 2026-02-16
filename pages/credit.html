@@ -140,17 +140,41 @@
                     <li class="nav-item">
                         <span class="nav-link" style="cursor: default;">
                             <span class="icon">📊</span>
-                            <span>מוצרים פיננסיים</span>
+                            <span data-i18n="nav.financialProducts">מוצרים פיננסיים</span>
                         </span>
                         <ul class="nav-submenu">
-                            <li class="nav-item"><a href="market-products.html" class="nav-link" data-category="market-products"><span>🏪 מוצרים בשוק</span></a></li>
-                            <li class="nav-item"><a href="my-funds.html" class="nav-link" data-category="my-products"><span>💎 המוצרים שלי</span></a></li>
+                            <li class="nav-item"><a href="market-products.html" class="nav-link" data-category="market-products"><span data-i18n="nav.marketProducts">🏪 מוצרים בשוק</span></a></li>
+                            <li class="nav-item"><a href="my-funds.html" class="nav-link" data-category="my-products"><span data-i18n="nav.myProducts">💎 המוצרים שלי</span></a></li>
                         </ul>
                     </li>
                     <li class="nav-item">
                         <a href="assets.html" class="nav-link" data-category="assets">
                             <span class="icon">🏠</span>
                             <span data-i18n="nav.assets">נכסים</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="goals.html" class="nav-link" data-category="goals">
+                            <span class="icon">🎯</span>
+                            <span data-i18n="nav.goals">יעדי חיסכון</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="pension-calc.html" class="nav-link" data-category="pension-calc">
+                            <span class="icon">🧮</span>
+                            <span data-i18n="nav.pensionCalc">מחשבון פנסיה</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="reports.html" class="nav-link" data-category="reports">
+                            <span class="icon">📋</span>
+                            <span data-i18n="nav.reports">דוחות</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="settings.html" class="nav-link" data-category="settings">
+                            <span class="icon">⚙️</span>
+                            <span data-i18n="nav.settings">הגדרות</span>
                         </a>
                     </li>
                 </ul>
@@ -182,7 +206,7 @@
                 <div id="budgetProgressContainer" style="display: none; width: 100%; max-width: 400px; margin-top: 15px;">
                     <div style="display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--color-text-secondary);">
                         <span id="budgetSpent">₪0</span>
-                        <span id="budgetLimit">מתוך ₪0</span>
+                        <span id="budgetLimit"></span>
                     </div>
                     <div class="budget-progress">
                         <div class="budget-progress-bar" id="budgetProgressBar" style="width: 0%; background: var(--color-credit);"></div>
@@ -212,7 +236,7 @@
                 <div class="card-header">
                     <h2 class="card-title">
                         <span class="icon">📋</span>
-                        <span>הוצאות</span>
+                        <span data-i18n="credit.expenses">הוצאות</span>
                     </h2>
                     <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
                         <button class="btn btn-primary btn-sm" onclick="openExpenseModal()">
@@ -221,16 +245,16 @@
                         </button>
                         <button class="btn btn-secondary btn-sm" onclick="document.getElementById('smartImportInput').click()">
                             <span>📥</span>
-                            <span>ייבוא חכם</span>
+                            <span data-i18n="credit.smartImport">ייבוא חכם</span>
                         </button>
                         <button class="btn btn-secondary btn-sm" onclick="ImageImport.openImagePicker('credit')">
                             <span>📷</span>
-                            <span>ייבוא מתמונה</span>
+                            <span data-i18n="credit.importImage">ייבוא מתמונה</span>
                         </button>
                         <input type="file" id="smartImportInput" accept=".xlsx,.xls,.csv" style="display: none;" onchange="smartImportFile(event)">
                         <button class="btn btn-danger btn-sm" onclick="deleteAllExpenses()">
                             <span>🗑️</span>
-                            <span>מחק הכל</span>
+                            <span data-i18n="credit.deleteAll">מחק הכל</span>
                         </button>
                     </div>
                 </div>
@@ -240,18 +264,18 @@
                         <!-- Will be populated by JS -->
                     </select>
                     <select id="categoryFilter" onchange="loadExpenses()">
-                        <option value="">כל הקטגוריות</option>
-                        <option value="food">מזון ומסעדות</option>
-                        <option value="transport">תחבורה ודלק</option>
-                        <option value="shopping">קניות</option>
-                        <option value="entertainment">בילויים</option>
-                        <option value="bills">חשבונות קבועים</option>
-                        <option value="health">בריאות</option>
-                        <option value="education">חינוך</option>
-                        <option value="other">אחר</option>
+                        <option value="" data-i18n="credit.allCategories">כל הקטגוריות</option>
+                        <option value="food" data-i18n="credit.categories.food">מזון ומסעדות</option>
+                        <option value="transport" data-i18n="credit.categories.transport">תחבורה ודלק</option>
+                        <option value="shopping" data-i18n="credit.categories.shopping">קניות</option>
+                        <option value="entertainment" data-i18n="credit.categories.entertainment">בילויים</option>
+                        <option value="bills" data-i18n="credit.categories.bills">חשבונות קבועים</option>
+                        <option value="health" data-i18n="credit.categories.health">בריאות</option>
+                        <option value="education" data-i18n="credit.categories.education">חינוך</option>
+                        <option value="other" data-i18n="credit.categories.other">אחר</option>
                     </select>
-                    <input type="text" id="searchFilter" placeholder="🔍 חיפוש לפי תיאור..." oninput="loadExpenses()">
-                    <button class="btn btn-secondary btn-sm" onclick="clearFilters()">נקה סינון</button>
+                    <input type="text" id="searchFilter" placeholder="🔍 חיפוש לפי תיאור..." data-i18n-placeholder="credit.searchByDesc" oninput="loadExpenses()">
+                    <button class="btn btn-secondary btn-sm" onclick="clearFilters()" data-i18n="credit.clearFilter">נקה סינון</button>
                 </div>
                 <div class="table-container">
                     <table>
@@ -260,7 +284,7 @@
                                 <th data-i18n="credit.expenseDate">תאריך</th>
                                 <th data-i18n="credit.expenseCategory">קטגוריה</th>
                                 <th data-i18n="credit.expenseDescription">תיאור</th>
-                                <th>מקור</th>
+                                <th data-i18n="credit.source">מקור</th>
                                 <th data-i18n="credit.expenseAmount">סכום</th>
                                 <th data-i18n="common.actions">פעולות</th>
                             </tr>
@@ -278,7 +302,7 @@
                     <div class="card-header">
                         <h2 class="card-title">
                             <span class="icon">📊</span>
-                            <span>חלוקה לפי קטגוריות</span>
+                            <span data-i18n="credit.categoryBreakdown">חלוקה לפי קטגוריות</span>
                         </h2>
                     </div>
                     <div class="chart-container">
@@ -335,7 +359,7 @@
                 <form id="expenseForm">
                     <input type="hidden" id="expenseId">
                     <div class="form-group">
-                        <label>כרטיס</label>
+                        <label data-i18n="credit.card">כרטיס</label>
                         <select class="form-control" id="expenseCard" required>
                             <!-- Will be populated by JS -->
                         </select>
@@ -351,14 +375,14 @@
                     <div class="form-group">
                         <label data-i18n="credit.expenseCategory">קטגוריה</label>
                         <select class="form-control" id="expenseCategory" required>
-                            <option value="food">מזון ומסעדות</option>
-                            <option value="transport">תחבורה ודלק</option>
-                            <option value="shopping">קניות</option>
-                            <option value="entertainment">בילויים</option>
-                            <option value="bills">חשבונות קבועים</option>
-                            <option value="health">בריאות</option>
-                            <option value="education">חינוך</option>
-                            <option value="other">אחר</option>
+                            <option value="food" data-i18n="credit.categories.food">מזון ומסעדות</option>
+                            <option value="transport" data-i18n="credit.categories.transport">תחבורה ודלק</option>
+                            <option value="shopping" data-i18n="credit.categories.shopping">קניות</option>
+                            <option value="entertainment" data-i18n="credit.categories.entertainment">בילויים</option>
+                            <option value="bills" data-i18n="credit.categories.bills">חשבונות קבועים</option>
+                            <option value="health" data-i18n="credit.categories.health">בריאות</option>
+                            <option value="education" data-i18n="credit.categories.education">חינוך</option>
+                            <option value="other" data-i18n="credit.categories.other">אחר</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -531,8 +555,8 @@
                         <td class="negative">${I18n.formatCurrency(exp.amount)}</td>
                         <td>
                             <div class="action-buttons">
-                                <button class="btn btn-secondary btn-sm" onclick="editExpense('${exp.id}')" title="ערוך">✏️</button>
-                                <button class="btn btn-danger btn-sm" onclick="deleteExpense('${exp.id}')" title="מחק">🗑️</button>
+                                <button class="btn btn-secondary btn-sm" onclick="editExpense('${exp.id}')" title="${I18n.t('common.edit')}">✏️</button>
+                                <button class="btn btn-danger btn-sm" onclick="deleteExpense('${exp.id}')" title="${I18n.t('common.delete')}">🗑️</button>
                             </div>
                         </td>
                     </tr>
@@ -542,7 +566,7 @@
             // Add totals row
             rows.push(`
                 <tr style="font-weight: bold; background: var(--color-bg-hover); border-top: 2px solid var(--color-border);">
-                    <td colspan="4" style="text-align: left;">סה"כ (${monthExpenses.length} עסקאות)</td>
+                    <td colspan="4" style="text-align: left;">${I18n.t('credit.totalTransactions')} (${monthExpenses.length} ${I18n.t('credit.transactions')})</td>
                     <td class="negative">${I18n.formatCurrency(total)}</td>
                     <td></td>
                 </tr>
@@ -648,7 +672,7 @@
             const total = Object.values(categoryTotals).reduce((a, b) => a + b, 0);
 
             if (categories.length === 0) {
-                breakdownDiv.innerHTML = '<p style="text-align: center; color: var(--color-text-secondary);">אין נתונים</p>';
+                breakdownDiv.innerHTML = '<p style="text-align: center; color: var(--color-text-secondary);">' + I18n.t('credit.noDataChart') + '</p>';
                 if (Charts.charts.categoryChart) {
                     Charts.charts.categoryChart.destroy();
                     Charts.charts.categoryChart = null;
@@ -697,9 +721,9 @@
             // Build breakdown table
             var breakdownHtml = '<table style="width: 100%; border-collapse: collapse;">';
             breakdownHtml += '<thead><tr style="border-bottom: 2px solid var(--color-border);">';
-            breakdownHtml += '<th style="text-align: right; padding: 8px 5px;">קטגוריה</th>';
-            breakdownHtml += '<th style="text-align: center; padding: 8px 5px; width: 60px;">אחוז</th>';
-            breakdownHtml += '<th style="text-align: left; padding: 8px 5px; width: 100px;">סכום</th>';
+            breakdownHtml += '<th style="text-align: right; padding: 8px 5px;">' + I18n.t('credit.expenseCategory') + '</th>';
+            breakdownHtml += '<th style="text-align: center; padding: 8px 5px; width: 60px;">%</th>';
+            breakdownHtml += '<th style="text-align: left; padding: 8px 5px; width: 100px;">' + I18n.t('common.amount') + '</th>';
             breakdownHtml += '</tr></thead><tbody>';
 
             categories.forEach(function(cat) {
@@ -715,7 +739,7 @@
 
             // Add total row
             breakdownHtml += '<tr style="font-weight: bold; background: var(--color-bg-hover);">';
-            breakdownHtml += '<td style="padding: 12px 5px;">סה"כ</td>';
+            breakdownHtml += '<td style="padding: 12px 5px;">' + I18n.t('credit.totalTransactions') + '</td>';
             breakdownHtml += '<td style="text-align: center; padding: 12px 5px;">100%</td>';
             breakdownHtml += '<td style="text-align: left; padding: 12px 5px; color: var(--color-negative);">' + I18n.formatCurrency(total) + '</td>';
             breakdownHtml += '</tr></tbody></table>';
@@ -765,7 +789,7 @@
         function openExpenseModal() {
             const data = Storage.getCreditCards();
             if (data.cards.length === 0) {
-                App.notify(I18n.currentLanguage === 'he' ? 'יש להוסיף כרטיס אשראי תחילה' : 'Please add a credit card first', 'error');
+                App.notify(I18n.t('credit.addCardFirst'), 'error');
                 return;
             }
 
@@ -831,14 +855,14 @@
             var data = Storage.getCreditCards();
             var count = data.expenses.length;
             if (count === 0) {
-                App.notify('אין הוצאות למחיקה', 'warning');
+                App.notify(I18n.t('credit.noExpensesToDelete'), 'warning');
                 return;
             }
-            if (confirm('האם למחוק את כל ' + count + ' ההוצאות?')) {
+            if (confirm(I18n.t('credit.deleteAllConfirm').replace('{}', count))) {
                 data.expenses = [];
                 Storage.saveCreditCards(data);
                 loadExpenses();
-                App.notify('נמחקו ' + count + ' הוצאות', 'success');
+                App.notify(I18n.t('credit.deletedExpenses') + ' (' + count + ')', 'success');
             }
         }
 
@@ -858,17 +882,17 @@
                         if (processResult.success) {
                             importExpensesFromSmartImport(processResult.items);
                         } else {
-                            App.notify(processResult.error || 'שגיאה בייבוא', 'error');
+                            App.notify(processResult.error || I18n.t('bank.importError'), 'error');
                         }
                     });
                 } else if (result.success) {
                     importExpensesFromSmartImport(result.items);
                 } else {
-                    App.notify(result.error || 'שגיאה בייבוא', 'error');
+                    App.notify(result.error || I18n.t('bank.importError'), 'error');
                 }
             } catch (error) {
                 console.error('Smart import error:', error);
-                App.notify('שגיאה בקריאת הקובץ: ' + error.message, 'error');
+                App.notify(I18n.t('credit.fileReadError') + ': ' + error.message, 'error');
             }
 
             event.target.value = '';
@@ -876,7 +900,7 @@
 
         function importExpensesFromSmartImport(items) {
             if (items.length === 0) {
-                App.notify('לא נמצאו עסקאות בקובץ', 'warning');
+                App.notify(I18n.t('credit.noTransactionsFound'), 'warning');
                 return;
             }
 
@@ -885,13 +909,13 @@
 
             // Show confirmation
             var confirmed = confirm(
-                'נמצאו ' + items.length + ' עסקאות\n' +
-                'סה"כ: ₪' + total.toLocaleString() + '\n\n' +
-                'דוגמאות:\n' + items.slice(0, 3).map(function(e) {
-                    return '  ' + e.date + ' - ' + e.description + ' - ₪' + e.amount;
+                I18n.t('credit.foundTransactions') + ': ' + items.length + ' ' + I18n.t('credit.transactions') + '\n' +
+                I18n.t('credit.totalTransactions') + ': ' + I18n.formatCurrency(total) + '\n\n' +
+                items.slice(0, 3).map(function(e) {
+                    return '  ' + e.date + ' - ' + e.description + ' - ' + I18n.formatCurrency(e.amount);
                 }).join('\n') + '\n' +
-                (items.length > 3 ? '  ...ועוד ' + (items.length - 3) + ' עסקאות' : '') + '\n\n' +
-                'לייבא את העסקאות?'
+                (items.length > 3 ? '  ...' + I18n.t('credit.moreTransactions') + ' ' + (items.length - 3) : '') + '\n\n' +
+                I18n.t('credit.importTransactions')
             );
 
             if (!confirmed) return;
@@ -902,7 +926,7 @@
 
             if (!cardId) {
                 var card = Storage.addCreditCard({
-                    name: 'כרטיס אשראי',
+                    name: I18n.t('credit.defaultCardName'),
                     lastFour: items[0].cardLastFour || '0000',
                     limit: 50000
                 });
@@ -942,8 +966,8 @@
             });
 
             var msg = skipped > 0
-                ? 'יובאו ' + imported + ' עסקאות (' + skipped + ' כפולות דולגו)'
-                : 'יובאו ' + imported + ' עסקאות בהצלחה!';
+                ? I18n.t('credit.importSuccess') + ' ' + imported + ' ' + I18n.t('credit.transactions') + ' (' + skipped + ' ' + I18n.t('credit.duplicatesSkipped') + ')'
+                : I18n.t('credit.importSuccess') + ' ' + imported + ' ' + I18n.t('credit.transactions');
             App.notify(msg, 'success');
 
             // Switch to imported month
@@ -982,7 +1006,7 @@
                 const percentage = (spent / budgets.total) * 100;
 
                 document.getElementById('budgetSpent').textContent = I18n.formatCurrency(spent);
-                document.getElementById('budgetLimit').textContent = `מתוך ${I18n.formatCurrency(budgets.total)}`;
+                document.getElementById('budgetLimit').textContent = `${I18n.t('credit.budgetOf')} ${I18n.formatCurrency(budgets.total)}`;
 
                 bar.style.width = `${Math.min(100, percentage)}%`;
 
@@ -1002,10 +1026,9 @@
             const format = CSVImport.showImportHelp('expenses');
             const confirmed = confirm(
                 `${format.title}\n\n` +
-                `עמודות נדרשות:\n${format.columns.join(', ')}\n\n` +
-                `דוגמה:\n${format.example}\n\n` +
-                `קטגוריות אפשריות: מזון, תחבורה, קניות, בילויים, חשבונות, בריאות, חינוך\n\n` +
-                `להמשיך?`
+                `${format.columns.join(', ')}\n\n` +
+                `${format.example}\n\n` +
+                `${I18n.t('credit.csvContinue')}`
             );
 
             if (!confirmed) return;
@@ -1013,11 +1036,11 @@
             const result = await CSVImport.openFilePicker('expenses');
 
             if (result.success) {
-                App.notify(`יובאו ${result.imported} הוצאות בהצלחה`, 'success');
+                App.notify(I18n.t('credit.importSuccess') + ' ' + result.imported + ' ' + I18n.t('credit.transactions'), 'success');
                 loadCards();
                 loadExpenses();
             } else {
-                App.notify(result.error || 'שגיאה בייבוא', 'error');
+                App.notify(result.error || I18n.t('bank.importError'), 'error');
             }
 
             if (result.errors && result.errors.length > 0) {
@@ -1035,7 +1058,7 @@
                 const expenses = parseCreditExcel(content);
 
                 if (expenses.length === 0) {
-                    App.notify('לא נמצאו עסקאות בקובץ', 'warning');
+                    App.notify(I18n.t('credit.noTransactionsFound'), 'warning');
                     return;
                 }
 
@@ -1044,11 +1067,11 @@
 
                 // Show confirmation
                 const confirmed = confirm(
-                    `נמצאו ${expenses.length} עסקאות\n` +
-                    `סה"כ: ₪${total.toLocaleString(undefined, {minimumFractionDigits: 0})}\n\n` +
-                    `דוגמאות:\n${expenses.slice(0, 5).map(e => `  ${e.date} - ${e.description} - ₪${e.amount}`).join('\n')}\n` +
-                    `${expenses.length > 5 ? `  ...ועוד ${expenses.length - 5} עסקאות` : ''}\n\n` +
-                    `לייבא את העסקאות?`
+                    `${I18n.t('credit.foundTransactions')}: ${expenses.length} ${I18n.t('credit.transactions')}\n` +
+                    `${I18n.t('credit.totalTransactions')}: ${I18n.formatCurrency(total)}\n\n` +
+                    `${expenses.slice(0, 5).map(e => `  ${e.date} - ${e.description} - ${I18n.formatCurrency(e.amount)}`).join('\n')}\n` +
+                    `${expenses.length > 5 ? `  ...${I18n.t('credit.moreTransactions')} ${expenses.length - 5}` : ''}\n\n` +
+                    `${I18n.t('credit.importTransactions')}`
                 );
 
                 if (!confirmed) return;
@@ -1060,7 +1083,7 @@
                 if (!cardId) {
                     // Create default card
                     const card = Storage.addCreditCard({
-                        name: 'כרטיס אשראי',
+                        name: I18n.t('credit.defaultCardName'),
                         lastFour: expenses[0]?.cardLastFour || '0000',
                         limit: 50000
                     });
@@ -1100,8 +1123,8 @@
                 });
 
                 const msg = skipped > 0
-                    ? `יובאו ${imported} עסקאות (${skipped} כפולות דולגו)`
-                    : `יובאו ${imported} עסקאות בהצלחה!`;
+                    ? `${I18n.t('credit.importSuccess')} ${imported} ${I18n.t('credit.transactions')} (${skipped} ${I18n.t('credit.duplicatesSkipped')})`
+                    : `${I18n.t('credit.importSuccess')} ${imported} ${I18n.t('credit.transactions')}`;
                 App.notify(msg, 'success');
 
                 // Switch to the month of the first imported expense
@@ -1123,7 +1146,7 @@
 
             } catch (error) {
                 console.error('Excel import error:', error);
-                App.notify('שגיאה בקריאת הקובץ: ' + error.message, 'error');
+                App.notify(I18n.t('credit.fileReadError') + ': ' + error.message, 'error');
             }
 
             event.target.value = '';
@@ -1166,7 +1189,7 @@
             }
 
             if (headerIdx === -1) {
-                throw new Error('לא נמצא פורמט מוכר בקובץ');
+                throw new Error(I18n.t('credit.badFormat'));
             }
 
             // Category mapping from Hebrew to internal
