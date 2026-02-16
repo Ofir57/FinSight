@@ -1,0 +1,60 @@
+name: Update Market Data
+
+  on:
+    schedule:
+      # Run on the 1st and 15th of each month at 8am UTC
+      - cron: '0 8 1,15 * *'
+    workflow_dispatch: {} # Manual trigger
+
+  jobs:
+    update:
+      runs-on: ubuntu-latest
+      permissions:
+        contents: write
+        pull-requests: write
+
+      steps:
+        - uses: actions/checkout@v4
+
+        - uses: actions/setup-node@v4
+          with:
+            node-version: '20'
+
+        - name: Install dependencies
+          run: npm ci
+
+        - name: Run market data updater
+          run: node scripts/update-market-data.js
+
+        - name: Read update summary
+          id: summary
+          run: |
+            if [ -f scripts/update-summary.txt ]; then
+              echo "body<<EOF" >> $GITHUB_OUTPUT
+              cat scripts/update-summary.txt >> $GITHUB_OUTPUT
+              echo "EOF" >> $GITHUB_OUTPUT
+            else
+              echo "body=No summary generated" >> $GITHUB_OUTPUT
+            fi
+
+        - name: Check for changes
+          id: changes
+          run: |
+            git diff --quiet data/ && echo "changed=false" >> $GITHUB_OUTPUT || echo "changed=true" >> $GITHUB_OUTPUT
+
+        - name: Create Pull Request
+          if: steps.changes.outputs.changed == 'true'
+          uses: peter-evans/create-pull-request@v6
+          with:
+            title: "עדכון נתוני שוק"
+            body: |
+              ## עדכון אוטומטי של נתוני שוק
+
+              ${{ steps.summary.outputs.body }}
+
+              ---
+              🤖 עדכון אוטומטי מ-GitHub Actions
+            branch: auto-update-market-data
+            commit-message: "Update market fund data"
+            labels: market-data
+            delete-branch: true
