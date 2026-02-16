@@ -1,4 +1,4 @@
-const CACHE_NAME = 'finsight-v26';
+const CACHE_NAME = 'finsight-v27';
 const ASSETS_TO_CACHE = [
     './',
     './index.html',
@@ -6,6 +6,7 @@ const ASSETS_TO_CACHE = [
     './css/app.css',
     './js/app.js',
     './js/storage.js',
+    './js/pin-lock.js',
     './js/i18n.js',
     './js/charts.js',
     './js/csv-import.js',

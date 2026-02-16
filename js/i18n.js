@@ -874,7 +874,27 @@ const I18n = {
             },
             // Months
             months: ['ינואר', 'פברואר', 'מרץ', 'אפריל', 'מאי', 'יוני', 'יולי', 'אוגוסט', 'ספטמבר', 'אוקטובר', 'נובמבר', 'דצמבר'],
-            monthsShort: ['ינו', 'פבר', 'מרץ', 'אפר', 'מאי', 'יונ', 'יול', 'אוג', 'ספט', 'אוק', 'נוב', 'דצמ']
+            monthsShort: ['ינו', 'פבר', 'מרץ', 'אפר', 'מאי', 'יונ', 'יול', 'אוג', 'ספט', 'אוק', 'נוב', 'דצמ'],
+            pinLock: {
+                appLock: 'נעילת אפליקציה',
+                enablePin: 'הפעל קוד PIN',
+                changePin: 'שנה קוד PIN',
+                enterPin: 'הזן קוד PIN',
+                setupPin: 'הגדר קוד PIN',
+                confirmPin: 'אשר קוד PIN',
+                pinMismatch: 'הקודים לא תואמים',
+                wrongPin: 'קוד שגוי',
+                forgotPin: 'שכחת קוד?',
+                resetWarning: 'שחזור ימחק את כל הנתונים!',
+                pinEnabled: 'נעילת PIN הופעלה',
+                pinDisabled: 'נעילת PIN בוטלה',
+                pinChanged: 'קוד PIN שונה בהצלחה',
+                autoLockAfter: 'נעילה אוטומטית אחרי',
+                minutes: 'דקות',
+                resetAllData: 'אפס את כל הנתונים',
+                pinTooShort: 'קוד PIN חייב להיות 4-6 ספרות',
+                appLockDesc: 'הגן על הנתונים שלך עם קוד PIN'
+            }
         },
         en: {
             // Navigation
@@ -1745,7 +1765,27 @@ const I18n = {
             },
             // Months
             months: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
-            monthsShort: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+            monthsShort: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            pinLock: {
+                appLock: 'App Lock',
+                enablePin: 'Enable PIN',
+                changePin: 'Change PIN',
+                enterPin: 'Enter PIN',
+                setupPin: 'Set PIN',
+                confirmPin: 'Confirm PIN',
+                pinMismatch: "PINs don't match",
+                wrongPin: 'Wrong PIN',
+                forgotPin: 'Forgot PIN?',
+                resetWarning: 'Reset will delete all data!',
+                pinEnabled: 'PIN lock enabled',
+                pinDisabled: 'PIN lock disabled',
+                pinChanged: 'PIN changed successfully',
+                autoLockAfter: 'Auto-lock after',
+                minutes: 'minutes',
+                resetAllData: 'Reset all data',
+                pinTooShort: 'PIN must be 4-6 digits',
+                appLockDesc: 'Protect your data with a PIN code'
+            }
         },
         pt: {
             // Navigation
@@ -1953,7 +1993,27 @@ const I18n = {
                 confirmDelete: 'Tem certeza que deseja excluir?'
             },
             // Months
-            months: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro']
+            months: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'],
+            pinLock: {
+                appLock: 'Bloqueio do App',
+                enablePin: 'Ativar PIN',
+                changePin: 'Alterar PIN',
+                enterPin: 'Digite o PIN',
+                setupPin: 'Definir PIN',
+                confirmPin: 'Confirmar PIN',
+                pinMismatch: 'Os PINs não coincidem',
+                wrongPin: 'PIN incorreto',
+                forgotPin: 'Esqueceu o PIN?',
+                resetWarning: 'A redefinição excluirá todos os dados!',
+                pinEnabled: 'Bloqueio PIN ativado',
+                pinDisabled: 'Bloqueio PIN desativado',
+                pinChanged: 'PIN alterado com sucesso',
+                autoLockAfter: 'Bloqueio automático após',
+                minutes: 'minutos',
+                resetAllData: 'Redefinir todos os dados',
+                pinTooShort: 'O PIN deve ter 4-6 dígitos',
+                appLockDesc: 'Proteja seus dados com um código PIN'
+            }
         }
     },
 

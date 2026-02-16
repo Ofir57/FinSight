@@ -2,6 +2,12 @@
  * Storage Module - Manages localStorage operations for the finance app
  */
 const Storage = {
+    _encryptionKey: null,
+    _skipEncryptionKeys: [
+        'finance_settings', 'finance_pin_hash', 'finance_pin_salt',
+        'finance_lock_timeout', 'finance_last_update'
+    ],
+
     KEYS: {
         BANK_ACCOUNTS: 'finance_bank_accounts',
         CREDIT_CARDS: 'finance_credit_cards',
@@ -19,14 +25,29 @@ const Storage = {
     },
 
     /**
+     * Check if a stored value is encrypted
+     */
+    _isEncrypted(key) {
+        try {
+            const raw = localStorage.getItem(key);
+            if (!raw) return false;
+            const parsed = JSON.parse(raw);
+            return parsed && parsed.__enc === true;
+        } catch { return false; }
+    },
+
+    /**
      * Get data from localStorage
-     * @param {string} key - Storage key
-     * @returns {any} Parsed data or null
+     * During unlocked session: data is plain JSON (readable synchronously)
+     * During locked session: encrypted data returns null
      */
     get(key) {
         try {
-            const data = localStorage.getItem(key);
-            return data ? JSON.parse(data) : null;
+            const raw = localStorage.getItem(key);
+            if (!raw) return null;
+            const parsed = JSON.parse(raw);
+            if (parsed && parsed.__enc === true) return null;
+            return parsed;
         } catch (error) {
             console.error('Storage get error:', error);
             return null;
@@ -34,9 +55,7 @@ const Storage = {
     },
 
     /**
-     * Set data in localStorage
-     * @param {string} key - Storage key
-     * @param {any} data - Data to store
+     * Set data in localStorage (plain JSON — encryption happens on lock)
      */
     set(key, data) {
         try {
@@ -44,6 +63,104 @@ const Storage = {
         } catch (error) {
             console.error('Storage set error:', error);
         }
+    },
+
+    async _encrypt(data, cryptoKey) {
+        const encoder = new TextEncoder();
+        const iv = crypto.getRandomValues(new Uint8Array(12));
+        const plaintext = encoder.encode(JSON.stringify(data));
+        const ciphertext = await crypto.subtle.encrypt(
+            { name: 'AES-GCM', iv },
+            cryptoKey,
+            plaintext
+        );
+        return {
+            __enc: true,
+            iv: btoa(String.fromCharCode(...iv)),
+            data: btoa(String.fromCharCode(...new Uint8Array(ciphertext)))
+        };
+    },
+
+    async _decrypt(ivB64, dataB64, cryptoKey) {
+        const iv = Uint8Array.from(atob(ivB64), c => c.charCodeAt(0));
+        const ciphertext = Uint8Array.from(atob(dataB64), c => c.charCodeAt(0));
+        const plaintext = await crypto.subtle.decrypt(
+            { name: 'AES-GCM', iv },
+            cryptoKey,
+            ciphertext
+        );
+        return JSON.parse(new TextDecoder().decode(plaintext));
+    },
+
+    setEncryptionKey(cryptoKey) {
+        this._encryptionKey = cryptoKey;
+    },
+
+    clearEncryptionKey() {
+        this._encryptionKey = null;
+    },
+
+    /**
+     * Decrypt all sensitive keys in-place (called on unlock)
+     * After this, all data is plain JSON and get() works synchronously
+     */
+    async decryptAll(cryptoKey) {
+        this._encryptionKey = cryptoKey;
+        const allKeys = Object.keys(localStorage);
+        for (const key of allKeys) {
+            if (!key.startsWith('finance_')) continue;
+            if (this._skipEncryptionKeys.includes(key)) continue;
+            try {
+                const raw = localStorage.getItem(key);
+                if (!raw) continue;
+                const parsed = JSON.parse(raw);
+                if (!parsed || parsed.__enc !== true) continue;
+                const decrypted = await this._decrypt(parsed.iv, parsed.data, cryptoKey);
+                localStorage.setItem(key, JSON.stringify(decrypted));
+            } catch (e) {
+                console.error('Decrypt error for', key, e);
+            }
+        }
+    },
+
+    /**
+     * Encrypt all sensitive keys in-place (called on lock)
+     * After this, sensitive data is encrypted and get() returns null for them
+     */
+    async encryptAll(cryptoKey) {
+        const key = cryptoKey || this._encryptionKey;
+        if (!key) return;
+        const allKeys = Object.keys(localStorage);
+        for (const k of allKeys) {
+            if (!k.startsWith('finance_')) continue;
+            if (this._skipEncryptionKeys.includes(k)) continue;
+            try {
+                const raw = localStorage.getItem(k);
+                if (!raw) continue;
+                const parsed = JSON.parse(raw);
+                if (parsed && parsed.__enc === true) continue;
+                const enc = await this._encrypt(parsed, key);
+                localStorage.setItem(k, JSON.stringify(enc));
+            } catch (e) {
+                console.error('Encrypt error for', k, e);
+            }
+        }
+        this._encryptionKey = null;
+    },
+
+    /**
+     * Migrate to encrypted (first time enabling PIN)
+     */
+    async migrateToEncrypted(cryptoKey) {
+        await this.encryptAll(cryptoKey);
+    },
+
+    /**
+     * Migrate back to plain (disabling PIN)
+     */
+    async migrateToDecrypted(cryptoKey) {
+        await this.decryptAll(cryptoKey);
+        this._encryptionKey = null;
     },
 
     /**

@@ -374,6 +374,50 @@
                 </div>
             </div>
 
+            <!-- App Lock (PIN) -->
+            <div class="settings-section" style="border-color: rgba(16, 185, 129, 0.3);">
+                <h2>🔐 <span data-i18n="pinLock.appLock">נעילת אפליקציה</span></h2>
+                <p style="color: var(--color-text-secondary); margin-bottom: 20px;" data-i18n="pinLock.appLockDesc">הגן על הנתונים שלך עם קוד PIN</p>
+
+                <div class="setting-row">
+                    <div class="setting-label">
+                        <span data-i18n="pinLock.enablePin">הפעל קוד PIN</span>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="pinToggle" onchange="togglePinLock()">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div id="pinEnabledOptions" style="display: none;">
+                    <div class="setting-row">
+                        <div class="setting-label">
+                            <span data-i18n="pinLock.changePin">שנה קוד PIN</span>
+                        </div>
+                        <button class="btn btn-secondary" onclick="changePinCode()">
+                            <span>🔑</span>
+                            <span data-i18n="pinLock.changePin">שנה קוד PIN</span>
+                        </button>
+                    </div>
+
+                    <div class="setting-row">
+                        <div class="setting-label">
+                            <span data-i18n="pinLock.autoLockAfter">נעילה אוטומטית אחרי</span>
+                        </div>
+                        <div class="budget-input">
+                            <select id="autoLockTimeout" onchange="saveAutoLockTimeout()" style="padding: 8px 12px; background: var(--color-bg-card); border: 1px solid var(--color-border); border-radius: 8px; color: white;">
+                                <option value="1">1</option>
+                                <option value="5">5</option>
+                                <option value="10">10</option>
+                                <option value="15">15</option>
+                                <option value="30">30</option>
+                            </select>
+                            <span data-i18n="pinLock.minutes">דקות</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Security & Privacy -->
             <div class="settings-section" style="border-color: rgba(16, 185, 129, 0.3);">
                 <h2>🔒 <span data-i18n="settings.securityPrivacy">אבטחה ופרטיות</span></h2>
@@ -486,6 +530,7 @@
     </div>
 
     <script src="../js/storage.js"></script>
+    <script src="../js/pin-lock.js"></script>
     <script src="../js/i18n.js"></script>
     <script src="../js/alerts.js"></script>
     <script src="../js/tags.js"></script>
@@ -501,7 +546,72 @@
             I18n.init();
             loadSettings();
             loadNotificationSettings();
+            loadPinSettings();
         });
+
+        // PIN Lock Settings
+        function loadPinSettings() {
+            const enabled = PinLock.isEnabled();
+            document.getElementById('pinToggle').checked = enabled;
+            document.getElementById('pinEnabledOptions').style.display = enabled ? 'block' : 'none';
+            if (enabled) {
+                document.getElementById('autoLockTimeout').value = PinLock.getTimeout();
+            }
+        }
+
+        function togglePinLock() {
+            const checkbox = document.getElementById('pinToggle');
+            if (checkbox.checked) {
+                // Enable PIN — show setup screen
+                PinLock.showSetupScreen(async (pin) => {
+                    await PinLock.enable(pin);
+                    App.notify(I18n.t('pinLock.pinEnabled'), 'success');
+                    loadPinSettings();
+                });
+                // If user cancels, revert checkbox
+                const checkCancel = setInterval(() => {
+                    const overlay = document.getElementById('pinLockOverlay');
+                    if (!overlay || overlay.style.display === 'none') {
+                        clearInterval(checkCancel);
+                        if (!PinLock.isEnabled()) {
+                            checkbox.checked = false;
+                        }
+                    }
+                }, 300);
+            } else {
+                // Disable PIN — verify current PIN first
+                PinLock.showVerifyScreen(async (pin) => {
+                    await PinLock.disable(pin);
+                    App.notify(I18n.t('pinLock.pinDisabled'), 'success');
+                    loadPinSettings();
+                });
+                // If user cancels, revert checkbox
+                const checkCancel = setInterval(() => {
+                    const overlay = document.getElementById('pinLockOverlay');
+                    if (!overlay || overlay.style.display === 'none') {
+                        clearInterval(checkCancel);
+                        if (PinLock.isEnabled()) {
+                            checkbox.checked = true;
+                        }
+                    }
+                }, 300);
+            }
+        }
+
+        function changePinCode() {
+            PinLock.showVerifyScreen(async (oldPin) => {
+                PinLock.showSetupScreen(async (newPin) => {
+                    await PinLock.changePin(oldPin, newPin);
+                    App.notify(I18n.t('pinLock.pinChanged'), 'success');
+                });
+            });
+        }
+
+        function saveAutoLockTimeout() {
+            const val = parseInt(document.getElementById('autoLockTimeout').value);
+            PinLock.setTimeout(val);
+            PinLock._resetTimer();
+        }
 
         function loadSettings() {
             // Load budget settings
