@@ -1,4 +1,4 @@
-const CACHE_NAME = 'finsight-v24';
+const CACHE_NAME = 'finsight-v25';
 const ASSETS_TO_CACHE = [
     './',
     './index.html',
@@ -19,6 +19,7 @@ const ASSETS_TO_CACHE = [
     './js/notifications.js',
     './js/export.js',
     './js/widgets.js',
+    './js/smart-tips.js',
     './js/currency.js',
     './js/data-updates.js',
     './js/image-import.js',
@@ -44,6 +45,7 @@ const ASSETS_TO_CACHE = [
     './pages/pension-calc.html',
     './pages/reports.html',
     './pages/settings.html',
+    './pages/profile.html',
     './pages/market-products.html',
     './data/sample-data.js',
     './data/market-funds.js',

@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="../img/logo.png">
+    <meta name="theme-color" content="#10b981">
+    <link rel="manifest" href="../manifest.json">
+    <link rel="icon" type="image/png" href="../img/logo.png">
+    <title>פרופיל פיננסי - FinSight</title>
+    <link rel="stylesheet" href="../css/app.css">
+    <style>
+        .nav-link.active { background: #10b981 !important; }
+
+        .profile-section, .tips-section {
+            background: var(--color-bg-card);
+            border: 1px solid var(--color-border);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+
+        .profile-section h2, .tips-header h2 {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid var(--color-border);
+        }
+        .form-row:last-of-type { border-bottom: none; }
+        .form-row > label:first-child { font-weight: 500; min-width: 140px; }
+
+        .form-row .form-control {
+            width: 200px;
+            padding: 8px 12px;
+            background: var(--color-bg-primary);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            color: white;
+            font-size: 0.95rem;
+        }
+
+        .input-with-currency {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Toggle switch */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 26px;
+        }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: var(--color-border);
+            transition: .3s;
+            border-radius: 26px;
+        }
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 20px; width: 20px;
+            left: 3px; bottom: 3px;
+            background-color: white;
+            transition: .3s;
+            border-radius: 50%;
+        }
+        .toggle-switch input:checked + .toggle-slider { background-color: var(--color-positive); }
+        .toggle-switch input:checked + .toggle-slider:before { transform: translateX(24px); }
+
+        /* Risk selector */
+        .risk-selector { display: flex; gap: 8px; }
+        .risk-btn {
+            padding: 8px 18px;
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            background: transparent;
+            color: var(--color-text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+        }
+        .risk-btn:hover { border-color: var(--color-primary); color: white; }
+        .risk-btn.active {
+            background: var(--color-primary);
+            color: white;
+            border-color: var(--color-primary);
+        }
+
+        /* Tips */
+        .tips-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .tips-header h2 { margin-bottom: 0; }
+
+        .tip-card {
+            background: var(--color-bg-primary);
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            border-right: 4px solid transparent;
+        }
+        .tip-card.severity-green  { border-right-color: var(--color-positive); }
+        .tip-card.severity-yellow { border-right-color: #f59e0b; }
+        .tip-card.severity-red    { border-right-color: var(--color-negative); }
+        .tip-card.severity-blue   { border-right-color: #3b82f6; }
+
+        .tip-icon { font-size: 1.8rem; flex-shrink: 0; }
+        .tip-content { flex: 1; }
+        .tip-title { font-weight: 600; font-size: 1rem; margin-bottom: 4px; }
+        .tip-description { color: var(--color-text-secondary); font-size: 0.9rem; line-height: 1.5; }
+
+        .tip-badge {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 10px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            margin-bottom: 6px;
+        }
+        .tip-badge.spending    { background: rgba(245,158,11,0.15); color: #f59e0b; }
+        .tip-badge.savings     { background: rgba(16,185,129,0.15); color: var(--color-positive); }
+        .tip-badge.investment  { background: rgba(139,92,246,0.15); color: #8b5cf6; }
+        .tip-badge.pension     { background: rgba(59,130,246,0.15); color: #3b82f6; }
+        .tip-badge.family      { background: rgba(236,72,153,0.15); color: #ec4899; }
+        .tip-badge.general     { background: rgba(107,114,128,0.15); color: #9ca3af; }
+
+        .tip-dismiss {
+            background: none;
+            border: none;
+            color: var(--color-text-secondary);
+            cursor: pointer;
+            font-size: 1.3rem;
+            padding: 4px;
+            opacity: 0.4;
+            transition: opacity 0.2s;
+            flex-shrink: 0;
+        }
+        .tip-dismiss:hover { opacity: 1; }
+
+        .no-tips {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--color-text-secondary);
+        }
+        .no-tips .emoji { font-size: 3rem; margin-bottom: 15px; }
+
+        @media (max-width: 768px) {
+            .form-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            .form-row .form-control { width: 100%; }
+            .risk-selector { flex-wrap: wrap; }
+        }
+    </style>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="brand">
+                    <img src="../img/logo.png" class="brand-icon" alt="FinSight">
+                    <span class="brand-name">Fin<span class="brand-highlight">Sight</span></span>
+                </div>
+            </div>
+
+            <nav>
+                <ul class="nav-menu">
+                    <li class="nav-item"><a href="../index.html" class="nav-link"><span class="icon">🏠</span><span data-i18n="nav.dashboard">דאשבורד</span></a></li>
+                    <li class="nav-item"><a href="bank.html" class="nav-link"><span class="icon">🏦</span><span data-i18n="nav.bankAccounts">חשבונות בנק</span></a></li>
+                    <li class="nav-item"><a href="credit.html" class="nav-link"><span class="icon">💳</span><span data-i18n="nav.creditCards">כרטיסי אשראי</span></a></li>
+                    <li class="nav-item"><a href="stocks.html" class="nav-link"><span class="icon">📈</span><span data-i18n="nav.stocks">מניות</span></a></li>
+                    <li class="nav-item">
+                        <span class="nav-link" style="cursor: default;"><span class="icon">📊</span><span data-i18n="nav.financialProducts">מוצרים פיננסיים</span></span>
+                        <ul class="nav-submenu">
+                            <li class="nav-item"><a href="market-products.html" class="nav-link"><span>🏪 </span><span data-i18n="nav.marketProducts">מוצרים בשוק</span></a></li>
+                            <li class="nav-item"><a href="my-funds.html" class="nav-link"><span>💎 </span><span data-i18n="nav.myProducts">המוצרים שלי</span></a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item"><a href="assets.html" class="nav-link"><span class="icon">🏠</span><span data-i18n="nav.assets">נכסים</span></a></li>
+                    <li class="nav-item"><a href="goals.html" class="nav-link"><span class="icon">🎯</span><span data-i18n="nav.goals">יעדי חיסכון</span></a></li>
+                    <li class="nav-item"><a href="reports.html" class="nav-link"><span class="icon">📋</span><span data-i18n="nav.reports">דוחות</span></a></li>
+                    <li class="nav-item"><a href="profile.html" class="nav-link active"><span class="icon">👤</span><span data-i18n="nav.profile">פרופיל פיננסי</span></a></li>
+                    <li class="nav-item"><a href="settings.html" class="nav-link"><span class="icon">⚙️</span><span data-i18n="nav.settings">הגדרות</span></a></li>
+                </ul>
+            </nav>
+
+            <div class="sidebar-footer">
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="logo-hero">
+                <img src="../img/logo.png" alt="FinSight" class="logo-hero-img">
+            </div>
+            <header class="page-header">
+                <h1>👤 <span data-i18n="profile.title">פרופיל פיננסי</span></h1>
+                <p data-i18n="profile.subtitle">מלא את הפרטים שלך לקבלת טיפים מותאמים אישית</p>
+            </header>
+
+            <!-- Profile Form -->
+            <div class="profile-section">
+                <h2>📋 <span data-i18n="profile.personalInfo">פרטים אישיים</span></h2>
+
+                <div class="form-row">
+                    <label data-i18n="profile.age">גיל</label>
+                    <input type="number" id="profileAge" min="18" max="120" class="form-control" placeholder="30">
+                </div>
+
+                <div class="form-row">
+                    <label data-i18n="profile.familyStatus">מצב משפחתי</label>
+                    <select id="profileFamilyStatus" class="form-control">
+                        <option value="single" data-i18n="profile.single">רווק/ה</option>
+                        <option value="married" data-i18n="profile.married">נשוי/אה</option>
+                        <option value="divorced" data-i18n="profile.divorced">גרוש/ה</option>
+                    </select>
+                </div>
+
+                <div class="form-row">
+                    <label data-i18n="profile.numChildren">מספר ילדים</label>
+                    <input type="number" id="profileChildren" min="0" max="20" value="0" class="form-control">
+                </div>
+
+                <div class="form-row">
+                    <label data-i18n="profile.monthlyIncome">הכנסה חודשית נטו</label>
+                    <div class="input-with-currency">
+                        <span>₪</span>
+                        <input type="number" id="profileIncome" min="0" step="500" class="form-control" placeholder="15,000">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <label data-i18n="profile.employmentType">סוג תעסוקה</label>
+                    <select id="profileEmployment" class="form-control">
+                        <option value="employee" data-i18n="profile.employee">שכיר/ה</option>
+                        <option value="selfEmployed" data-i18n="profile.selfEmployed">עצמאי/ת</option>
+                        <option value="both" data-i18n="profile.both">שכיר+עצמאי</option>
+                    </select>
+                </div>
+
+                <div class="form-row">
+                    <label data-i18n="profile.hasPension">יש פנסיה?</label>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="profilePension">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div class="form-row">
+                    <label data-i18n="profile.hasTrainingFund">יש קרן השתלמות?</label>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="profileTrainingFund">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div class="form-row">
+                    <label data-i18n="profile.riskTolerance">סבילות לסיכון</label>
+                    <div class="risk-selector" id="riskSelector">
+                        <button type="button" class="risk-btn" data-risk="conservative" data-i18n="profile.conservative">שמרני</button>
+                        <button type="button" class="risk-btn active" data-risk="balanced" data-i18n="profile.balanced">מאוזן</button>
+                        <button type="button" class="risk-btn" data-risk="aggressive" data-i18n="profile.aggressive">אגרסיבי</button>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <label data-i18n="profile.financialGoal">יעד פיננסי</label>
+                    <select id="profileGoal" class="form-control">
+                        <option value="none" data-i18n="profile.goalNone">אין ספציפי</option>
+                        <option value="apartment" data-i18n="profile.goalApartment">חיסכון לדירה</option>
+                        <option value="earlyRetirement" data-i18n="profile.goalRetirement">פרישה מוקדמת</option>
+                        <option value="childrenSavings" data-i18n="profile.goalChildren">חיסכון לילדים</option>
+                        <option value="wealthBuilding" data-i18n="profile.goalWealth">בניית הון</option>
+                    </select>
+                </div>
+
+                <div style="margin-top: 20px; text-align: center;">
+                    <button class="btn btn-primary" onclick="saveProfile()" style="min-width: 200px;">
+                        <span>💾</span>
+                        <span data-i18n="common.save">שמור</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Smart Tips -->
+            <div class="tips-section">
+                <div class="tips-header">
+                    <h2>💡 <span data-i18n="profile.smartTips">טיפים חכמים</span></h2>
+                    <button class="btn btn-secondary btn-sm" onclick="resetDismissedTips()" data-i18n="profile.showAllTips">הצג הכל</button>
+                </div>
+                <div id="tipsList">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+        </main>
+
+        <button class="mobile-menu-toggle">☰</button>
+    </div>
+
+    <script src="../js/storage.js"></script>
+    <script src="../js/i18n.js"></script>
+    <script src="../js/alerts.js"></script>
+    <script src="../js/goals.js"></script>
+    <script src="../js/smart-tips.js"></script>
+    <script src="../js/app.js"></script>
+    <script src="../js/firebase-config.js"></script>
+    <script src="../js/crypto.js"></script>
+    <script src="../js/auth.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            App.currentPage = 'profile';
+            I18n.init();
+            loadProfile();
+            renderTips();
+
+            // Risk selector click handlers
+            document.querySelectorAll('.risk-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.risk-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                });
+            });
+        });
+
+        function loadProfile() {
+            const profile = Storage.getUserProfile();
+            if (!profile) return;
+
+            document.getElementById('profileAge').value = profile.age || '';
+            document.getElementById('profileFamilyStatus').value = profile.familyStatus || 'single';
+            document.getElementById('profileChildren').value = profile.numChildren || 0;
+            document.getElementById('profileIncome').value = profile.monthlyIncome || '';
+            document.getElementById('profileEmployment').value = profile.employmentType || 'employee';
+            document.getElementById('profilePension').checked = profile.hasPension || false;
+            document.getElementById('profileTrainingFund').checked = profile.hasTrainingFund || false;
+            document.getElementById('profileGoal').value = profile.financialGoal || 'none';
+
+            // Set risk tolerance
+            document.querySelectorAll('.risk-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.risk === (profile.riskTolerance || 'balanced'));
+            });
+        }
+
+        function saveProfile() {
+            const profile = {
+                age: parseInt(document.getElementById('profileAge').value) || null,
+                familyStatus: document.getElementById('profileFamilyStatus').value,
+                numChildren: parseInt(document.getElementById('profileChildren').value) || 0,
+                monthlyIncome: parseFloat(document.getElementById('profileIncome').value) || null,
+                employmentType: document.getElementById('profileEmployment').value,
+                hasPension: document.getElementById('profilePension').checked,
+                hasTrainingFund: document.getElementById('profileTrainingFund').checked,
+                riskTolerance: document.querySelector('.risk-btn.active')?.dataset.risk || 'balanced',
+                financialGoal: document.getElementById('profileGoal').value,
+                updatedAt: new Date().toISOString()
+            };
+
+            Storage.saveUserProfile(profile);
+            const lang = I18n?.currentLanguage || 'he';
+            App.notify(lang === 'he' ? 'הפרופיל נשמר בהצלחה' : 'Profile saved successfully', 'success');
+            renderTips();
+        }
+
+        function renderTips() {
+            const tips = SmartTips.generateTips();
+            const lang = I18n?.currentLanguage || 'he';
+            const container = document.getElementById('tipsList');
+
+            if (tips.length === 0) {
+                container.innerHTML = `<div class="no-tips">
+                    <div class="emoji">✨</div>
+                    <p>${lang === 'he' ? 'אין טיפים כרגע. מלא את הפרופיל והנתונים הפיננסיים שלך' : 'No tips right now. Fill in your profile and financial data'}</p>
+                </div>`;
+                return;
+            }
+
+            tips.sort((a, b) => a.priority - b.priority);
+
+            const categoryLabels = {
+                spending: { he: 'הוצאות', en: 'Spending' },
+                savings: { he: 'חיסכון', en: 'Savings' },
+                investment: { he: 'השקעות', en: 'Investment' },
+                pension: { he: 'פנסיה', en: 'Pension' },
+                family: { he: 'משפחה', en: 'Family' },
+                general: { he: 'כללי', en: 'General' }
+            };
+
+            container.innerHTML = tips.map(tip => {
+                const badgeLabel = categoryLabels[tip.category]?.[lang] || tip.category;
+                const title = tip.title[lang] || tip.title.he;
+                const desc = tip.description[lang] || tip.description.he;
+                return `
+                    <div class="tip-card severity-${tip.severity}">
+                        <div class="tip-icon">${tip.icon}</div>
+                        <div class="tip-content">
+                            <div class="tip-badge ${tip.category}">${badgeLabel}</div>
+                            <div class="tip-title">${escapeHtml(title)}</div>
+                            <div class="tip-description">${escapeHtml(desc)}</div>
+                        </div>
+                        <button class="tip-dismiss" onclick="dismissTip('${tip.id}')" title="${lang === 'he' ? 'הסתר' : 'Dismiss'}">&times;</button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function dismissTip(tipId) {
+            Storage.dismissTip(tipId);
+            renderTips();
+        }
+
+        function resetDismissedTips() {
+            Storage.resetDismissedTips();
+            renderTips();
+            const lang = I18n?.currentLanguage || 'he';
+            App.notify(lang === 'he' ? 'כל הטיפים הוצגו מחדש' : 'All tips restored', 'success');
+        }
+    </script>
+</body>
+</html>

@@ -13,7 +13,9 @@ const Storage = {
         TV_CUSTOM_SYMBOLS: 'finance_tv_custom_symbols',
         NOTIFICATIONS: 'finance_notifications',
         DASHBOARD_WIDGETS: 'finance_dashboard_widgets',
-        IMPORT_TEMPLATES: 'finance_import_templates'
+        IMPORT_TEMPLATES: 'finance_import_templates',
+        USER_PROFILE: 'finance_user_profile',
+        DISMISSED_TIPS: 'finance_dismissed_tips'
     },
 
     /**
@@ -354,6 +356,36 @@ const Storage = {
         this.set(this.KEYS.IMPORT_TEMPLATES, templates);
     },
 
+    // User Profile
+    getUserProfile() {
+        return this.get(this.KEYS.USER_PROFILE) || null;
+    },
+
+    saveUserProfile(profile) {
+        this.set(this.KEYS.USER_PROFILE, profile);
+    },
+
+    // Dismissed Tips
+    getDismissedTips() {
+        return this.get(this.KEYS.DISMISSED_TIPS) || [];
+    },
+
+    saveDismissedTips(tips) {
+        this.set(this.KEYS.DISMISSED_TIPS, tips);
+    },
+
+    dismissTip(tipId) {
+        const dismissed = this.getDismissedTips();
+        if (!dismissed.includes(tipId)) {
+            dismissed.push(tipId);
+            this.saveDismissedTips(dismissed);
+        }
+    },
+
+    resetDismissedTips() {
+        this.saveDismissedTips([]);
+    },
+
     // Settings
     getSettings() {
         return this.get(this.KEYS.SETTINGS) || { language: 'he', currency: 'ILS' };
@@ -377,6 +409,8 @@ const Storage = {
             notifications: this.getNotifications(),
             dashboardWidgets: this.getDashboardWidgets(),
             importTemplates: this.getImportTemplates(),
+            userProfile: this.getUserProfile(),
+            dismissedTips: this.getDismissedTips(),
             exportDate: new Date().toISOString()
         };
     },
@@ -393,6 +427,8 @@ const Storage = {
         if (data.notifications) this.saveNotifications(data.notifications);
         if (data.dashboardWidgets) this.saveDashboardWidgets(data.dashboardWidgets);
         if (data.importTemplates) this.saveImportTemplates(data.importTemplates);
+        if (data.userProfile) this.saveUserProfile(data.userProfile);
+        if (data.dismissedTips) this.saveDismissedTips(data.dismissedTips);
     },
 
     // Summary calculations

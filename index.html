@@ -101,6 +101,12 @@
                         </a>
                     </li>
                     <li class="nav-item">
+                        <a href="pages/profile.html" class="nav-link" data-category="profile">
+                            <span class="icon">👤</span>
+                            <span data-i18n="nav.profile">פרופיל פיננסי</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a href="pages/settings.html" class="nav-link" data-category="settings">
                             <span class="icon">⚙️</span>
                             <span data-i18n="nav.settings">הגדרות</span>
@@ -233,6 +239,19 @@
                 </div>
             </div>
 
+            <!-- Smart Tips Widget (hidden by default) -->
+            <div class="card" data-widget="smartTips" style="display: none;">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <span class="icon">💡</span>
+                        <span data-i18n="dashboard.smartTips">טיפים חכמים</span>
+                    </h2>
+                    <a href="pages/profile.html" class="btn btn-sm btn-secondary" data-i18n="profile.showAllTips">הצג הכל</a>
+                </div>
+                <div class="card-body" id="smartTipsWidget">
+                </div>
+            </div>
+
             <!-- Quick Stats Widget (hidden by default) -->
             <div class="card" data-widget="quickStats" style="display: none;">
                 <div class="card-header">
@@ -292,6 +311,7 @@
     <script src="js/goals.js"></script>
     <script src="js/tags.js"></script>
     <script src="js/export.js"></script>
+    <script src="js/smart-tips.js"></script>
     <script src="js/widgets.js"></script>
     <script src="js/currency.js"></script>
     <script src="js/data-updates.js"></script>
@@ -553,11 +573,39 @@
             }
         }
 
+        // Load smart tips widget
+        function loadSmartTipsWidget() {
+            const widget = document.getElementById('smartTipsWidget');
+            if (!widget || !WidgetManager.isEnabled('smartTips')) return;
+
+            const tips = SmartTips.generateTips();
+            const lang = I18n?.currentLanguage || 'he';
+
+            if (tips.length === 0) {
+                widget.innerHTML = `<div style="padding: 20px; text-align: center; color: var(--color-text-secondary);">
+                    <a href="pages/profile.html" style="color: var(--color-primary);">${lang === 'he' ? 'מלא פרופיל לקבלת טיפים' : 'Fill your profile to get tips'}</a>
+                </div>`;
+                return;
+            }
+
+            tips.sort((a, b) => a.priority - b.priority);
+            widget.innerHTML = tips.slice(0, 3).map(tip => `
+                <div style="display: flex; gap: 12px; padding: 12px 15px; border-bottom: 1px solid var(--color-border);">
+                    <span style="font-size: 1.3rem;">${tip.icon}</span>
+                    <div>
+                        <div style="font-weight: 500; margin-bottom: 2px;">${tip.title[lang] || tip.title.he}</div>
+                        <div style="font-size: 0.85rem; color: var(--color-text-secondary);">${tip.description[lang] || tip.description.he}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
         // Update widget loading on dashboard load
         document.addEventListener('DOMContentLoaded', () => {
             loadGoalsProgressWidget();
             loadQuickStatsWidget();
             loadCurrencyWidget();
+            loadSmartTipsWidget();
         });
     </script>
 </body>

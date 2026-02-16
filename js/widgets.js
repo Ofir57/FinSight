@@ -14,7 +14,8 @@ const WidgetManager = {
         { id: 'stockAlerts', name: { he: 'התראות מניות', en: 'Stock Alerts' }, icon: '🔔', default: false },
         { id: 'goalsProgress', name: { he: 'התקדמות יעדים', en: 'Goals Progress' }, icon: '🎯', default: false },
         { id: 'quickStats', name: { he: 'סטטיסטיקות מהירות', en: 'Quick Stats' }, icon: '📈', default: false },
-        { id: 'currencyRates', name: { he: 'שערי מטבע', en: 'Currency Rates' }, icon: '💱', default: false }
+        { id: 'currencyRates', name: { he: 'שערי מטבע', en: 'Currency Rates' }, icon: '💱', default: false },
+        { id: 'smartTips', name: { he: 'טיפים חכמים', en: 'Smart Tips' }, icon: '💡', default: false }
     ],
 
     /**

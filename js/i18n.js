@@ -24,7 +24,8 @@ const I18n = {
                 marketProducts: 'מוצרים בשוק',
                 myProducts: 'המוצרים שלי',
                 pensionCalc: 'מחשבון פנסיה',
-                marketDataUpdate: 'עדכון נתוני שוק'
+                marketDataUpdate: 'עדכון נתוני שוק',
+                profile: 'פרופיל פיננסי'
             },
             // Dashboard
             dashboard: {
@@ -49,6 +50,7 @@ const I18n = {
                 stockReturn: 'תשואת מניות',
                 bankAccountsCount: 'חשבונות בנק',
                 monthlyFundDeposit: 'הפקדה חודשית לקרנות',
+                smartTips: 'טיפים חכמים',
                 fromLastMonth: 'מחודש שעבר',
                 updated: 'עדכון',
                 rateLoadError: 'שגיאה בטעינת שערים'
@@ -801,6 +803,37 @@ const I18n = {
                 openIGemel: 'פתח את iGemel-Net',
                 update: 'עדכון'
             },
+            // Profile
+            profile: {
+                title: 'פרופיל פיננסי',
+                subtitle: 'מלא את הפרטים שלך לקבלת טיפים מותאמים אישית',
+                personalInfo: 'פרטים אישיים',
+                age: 'גיל',
+                familyStatus: 'מצב משפחתי',
+                single: 'רווק/ה',
+                married: 'נשוי/אה',
+                divorced: 'גרוש/ה',
+                numChildren: 'מספר ילדים',
+                monthlyIncome: 'הכנסה חודשית נטו',
+                employmentType: 'סוג תעסוקה',
+                employee: 'שכיר/ה',
+                selfEmployed: 'עצמאי/ת',
+                both: 'שכיר+עצמאי',
+                hasPension: 'יש פנסיה?',
+                hasTrainingFund: 'יש קרן השתלמות?',
+                riskTolerance: 'סבילות לסיכון',
+                conservative: 'שמרני',
+                balanced: 'מאוזן',
+                aggressive: 'אגרסיבי',
+                financialGoal: 'יעד פיננסי',
+                goalApartment: 'חיסכון לדירה',
+                goalRetirement: 'פרישה מוקדמת',
+                goalChildren: 'חיסכון לילדים',
+                goalWealth: 'בניית הון',
+                goalNone: 'אין ספציפי',
+                smartTips: 'טיפים חכמים',
+                showAllTips: 'הצג הכל'
+            },
             // Common
             common: {
                 save: 'שמור',
@@ -851,7 +884,8 @@ const I18n = {
                 marketProducts: 'Market Products',
                 myProducts: 'My Products',
                 pensionCalc: 'Pension Calculator',
-                marketDataUpdate: 'Market Data Update'
+                marketDataUpdate: 'Market Data Update',
+                profile: 'Financial Profile'
             },
             // Dashboard
             dashboard: {
@@ -876,6 +910,7 @@ const I18n = {
                 stockReturn: 'Stock Return',
                 bankAccountsCount: 'Bank Accounts',
                 monthlyFundDeposit: 'Monthly Fund Deposits',
+                smartTips: 'Smart Tips',
                 fromLastMonth: 'from last month',
                 updated: 'Updated',
                 rateLoadError: 'Error loading rates'
@@ -1628,6 +1663,37 @@ const I18n = {
                 openIGemel: 'Open iGemel-Net',
                 update: 'Update'
             },
+            // Profile
+            profile: {
+                title: 'Financial Profile',
+                subtitle: 'Fill in your details to receive personalized tips',
+                personalInfo: 'Personal Information',
+                age: 'Age',
+                familyStatus: 'Family Status',
+                single: 'Single',
+                married: 'Married',
+                divorced: 'Divorced',
+                numChildren: 'Number of Children',
+                monthlyIncome: 'Monthly Net Income',
+                employmentType: 'Employment Type',
+                employee: 'Employee',
+                selfEmployed: 'Self-employed',
+                both: 'Employee + Self-employed',
+                hasPension: 'Has Pension?',
+                hasTrainingFund: 'Has Training Fund?',
+                riskTolerance: 'Risk Tolerance',
+                conservative: 'Conservative',
+                balanced: 'Balanced',
+                aggressive: 'Aggressive',
+                financialGoal: 'Financial Goal',
+                goalApartment: 'Save for Apartment',
+                goalRetirement: 'Early Retirement',
+                goalChildren: "Children's Savings",
+                goalWealth: 'Wealth Building',
+                goalNone: 'No Specific Goal',
+                smartTips: 'Smart Tips',
+                showAllTips: 'Show All'
+            },
             // Common
             common: {
                 save: 'Save',
@@ -1672,7 +1738,8 @@ const I18n = {
                 gemel: 'Fundos de Investimento',
                 assets: 'Ativos',
                 settings: 'Configurações',
-                marketDataUpdate: 'Atualização de Dados de Mercado'
+                marketDataUpdate: 'Atualização de Dados de Mercado',
+                profile: 'Perfil Financeiro'
             },
             // Dashboard
             dashboard: {
@@ -1793,6 +1860,37 @@ const I18n = {
                     other: 'Outro'
                 },
                 noAssets: 'Nenhum ativo'
+            },
+            // Profile
+            profile: {
+                title: 'Perfil Financeiro',
+                subtitle: 'Preencha seus dados para receber dicas personalizadas',
+                personalInfo: 'Informações Pessoais',
+                age: 'Idade',
+                familyStatus: 'Estado Civil',
+                single: 'Solteiro(a)',
+                married: 'Casado(a)',
+                divorced: 'Divorciado(a)',
+                numChildren: 'Número de Filhos',
+                monthlyIncome: 'Renda Mensal Líquida',
+                employmentType: 'Tipo de Emprego',
+                employee: 'Empregado(a)',
+                selfEmployed: 'Autônomo(a)',
+                both: 'Empregado + Autônomo',
+                hasPension: 'Tem Previdência?',
+                hasTrainingFund: 'Tem Fundo de Capacitação?',
+                riskTolerance: 'Tolerância ao Risco',
+                conservative: 'Conservador',
+                balanced: 'Equilibrado',
+                aggressive: 'Agressivo',
+                financialGoal: 'Objetivo Financeiro',
+                goalApartment: 'Poupar para Apartamento',
+                goalRetirement: 'Aposentadoria Antecipada',
+                goalChildren: 'Poupança para Filhos',
+                goalWealth: 'Construção de Patrimônio',
+                goalNone: 'Sem Objetivo Específico',
+                smartTips: 'Dicas Inteligentes',
+                showAllTips: 'Mostrar Tudo'
             },
             // Common
             common: {
