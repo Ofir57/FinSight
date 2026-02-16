@@ -284,11 +284,25 @@ const SmartTips = {
             }
         }
 
-        // Rule 11: Portfolio in the red
+        // Rule 11: Portfolio in the red (compare per-holding in same currency)
         if (stockData.holdings.length > 0) {
-            const cost = stockData.holdings.reduce((sum, h) => sum + (h.quantity * h.avgPrice), 0);
-            if (cost > 0 && stocksTotal < cost) {
-                const loss = Math.round((1 - stocksTotal / cost) * 100);
+            let totalCost = 0;
+            let totalValue = 0;
+            for (const h of stockData.holdings) {
+                if (h.valueILS && h.valueILS > 0) {
+                    // ILS-based: use valueILS vs costILS, or skip if no cost basis in ILS
+                    if (h.costILS) {
+                        totalValue += h.valueILS;
+                        totalCost += h.costILS;
+                    }
+                } else {
+                    // Same currency comparison (both in original currency)
+                    totalCost += h.quantity * h.avgPrice;
+                    totalValue += h.quantity * (h.currentPrice || h.avgPrice);
+                }
+            }
+            if (totalCost > 0 && totalValue < totalCost) {
+                const loss = Math.round((1 - totalValue / totalCost) * 100);
                 tips.push({
                     id: 'invest-portfolio-loss',
                     category: 'investment', icon: '📊', severity: 'blue', priority: 5,
