@@ -3,7 +3,12 @@
  */
 const StockAPI = {
     YAHOO_URL: 'https://query2.finance.yahoo.com/v8/finance/chart',
-    PROXY_URL: 'https://api.allorigins.win/raw?url=',
+    PROXY_URLS: [
+        'https://api.allorigins.win/raw?url=',
+        'https://corsproxy.io/?url=',
+        'https://api.codetabs.com/v1/proxy/?quest='
+    ],
+    _currentProxyIndex: 0,
 
     /**
      * Format symbol for Yahoo Finance API
@@ -34,6 +39,28 @@ const StockAPI = {
     },
 
     /**
+     * Fetch URL through CORS proxy with fallback
+     */
+    async _fetchWithFallback(targetUrl) {
+        const startIndex = this._currentProxyIndex;
+        for (let i = 0; i < this.PROXY_URLS.length; i++) {
+            const proxyIndex = (startIndex + i) % this.PROXY_URLS.length;
+            const proxy = this.PROXY_URLS[proxyIndex];
+            const url = `${proxy}${encodeURIComponent(targetUrl)}`;
+            try {
+                const response = await fetch(url, { signal: AbortSignal.timeout(10000) });
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const data = await response.json();
+                this._currentProxyIndex = proxyIndex;
+                return data;
+            } catch (e) {
+                console.warn(`Proxy ${proxyIndex} failed:`, proxy, e.message);
+            }
+        }
+        throw new Error('All proxies failed');
+    },
+
+    /**
      * Fetch stock data including historical prices for MA150 calculation
      * @param {string} symbol - Stock symbol
      * @param {string} market - Market code ('US' or 'IL')
@@ -45,14 +72,7 @@ const StockAPI = {
 
         try {
             const yahooUrl = `${this.YAHOO_URL}/${encodeURIComponent(formattedSymbol)}?interval=1d&range=1y&includePrePost=false`;
-            const url = `${this.PROXY_URL}${encodeURIComponent(yahooUrl)}`;
-            const response = await fetch(url);
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const data = await response.json();
+            const data = await this._fetchWithFallback(yahooUrl);
 
             if (!data.chart || !data.chart.result || data.chart.result.length === 0) {
                 throw new Error('No data found for symbol');
@@ -212,14 +232,7 @@ const StockAPI = {
         try {
             // Yahoo Finance search endpoint via CORS proxy
             const yahooUrl = `https://query2.finance.yahoo.com/v1/finance/search?q=${encodeURIComponent(query)}&quotesCount=6&newsCount=0`;
-            const url = `${this.PROXY_URL}${encodeURIComponent(yahooUrl)}`;
-            const response = await fetch(url);
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const data = await response.json();
+            const data = await this._fetchWithFallback(yahooUrl);
 
             if (!data.quotes) {
                 return [];
