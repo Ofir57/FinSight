@@ -724,7 +724,13 @@ const I18n = {
                 companyAnalyst: 'אנליסט',
                 companyYelin: 'ילין לפידות',
                 companyMore: 'מור',
-                companyOther: 'אחר'
+                companyOther: 'אחר',
+                tracks: 'מסלולי השקעה',
+                addTrack: 'הוסף מסלול',
+                trackName: 'שם מסלול',
+                percentage: 'אחוז',
+                totalPercentage: 'סה"כ אחוזים',
+                percentageWarning: 'סה"כ האחוזים חייב להיות 100%'
             },
             // Market Products
             marketProducts: {
@@ -1535,7 +1541,13 @@ const I18n = {
                 companyAnalyst: 'Analyst',
                 companyYelin: 'Yelin Lapidot',
                 companyMore: 'Mor',
-                companyOther: 'Other'
+                companyOther: 'Other',
+                tracks: 'Investment Tracks',
+                addTrack: 'Add Track',
+                trackName: 'Track Name',
+                percentage: 'Percentage',
+                totalPercentage: 'Total Percentage',
+                percentageWarning: 'Total percentage must equal 100%'
             },
             // Market Products
             marketProducts: {

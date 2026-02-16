@@ -77,6 +77,49 @@
             font-weight: 700;
         }
 
+        .track-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .track-row input[type="text"] { flex: 2; }
+        .track-row input[type="number"] { flex: 1; min-width: 70px; }
+        .track-row .btn-remove-track {
+            background: #ef4444;
+            color: #fff;
+            border: none;
+            border-radius: var(--radius-sm);
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            font-size: 1rem;
+            line-height: 1;
+            flex-shrink: 0;
+        }
+        .track-row .btn-remove-track:hover { background: #dc2626; }
+        .track-total {
+            font-size: 0.85rem;
+            margin-top: 4px;
+            font-weight: 600;
+        }
+        .track-total.ok { color: #10b981; }
+        .track-total.warn { color: #ef4444; }
+        .track-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-top: 4px;
+        }
+        .track-badge {
+            font-size: 0.75rem;
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            padding: 1px 8px;
+            color: var(--color-text-secondary);
+        }
+
         .summary-card.pension .value { color: #f59e0b; }
         .summary-card.training .value { color: #10b981; }
         .summary-card.gemel .value { color: #3b82f6; }
@@ -359,6 +402,25 @@
                         <label data-i18n="myFunds.notes">הערות</label>
                         <textarea class="form-control" id="fundNotes" rows="2"></textarea>
                     </div>
+
+                    <div class="form-group">
+                        <label data-i18n="myFunds.tracks">מסלולי השקעה</label>
+                        <div id="tracksContainer"></div>
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="addTrackRow()" style="margin-top: 6px;">
+                            ➕ <span data-i18n="myFunds.addTrack">הוסף מסלול</span>
+                        </button>
+                        <div id="trackTotal" class="track-total"></div>
+                        <datalist id="trackSuggestions">
+                            <option value="מניות">
+                            <option value="אג&quot;ח">
+                            <option value="כללי">
+                            <option value="שקלי">
+                            <option value="מדדי">
+                            <option value="חו&quot;ל">
+                            <option value="הלכתי">
+                            <option value="S&P 500">
+                        </datalist>
+                    </div>
                 </form>
                 <script>
                     document.getElementById('fundType').addEventListener('change', function() {
@@ -501,11 +563,15 @@
                 const fundTypeNames = getFundTypeNames();
                 const actuarialInfo = fund.type === 'pension' && fund.actuarialBalance
                     ? `<br><small style="color: var(--color-text-secondary);">${I18n.t('myFunds.balance')}: ${I18n.formatCurrency(fund.actuarialBalance)}</small>` : '';
+                const trackBadges = fund.tracks && fund.tracks.length > 0
+                    ? `<div class="track-badges">${fund.tracks.map(t => `<span class="track-badge">${t.name} ${t.percentage}%</span>`).join('')}</div>`
+                    : '';
                 return `
                 <tr>
                     <td>
                         <strong>${fund.name}</strong>
                         <br><small style="color: var(--color-text-secondary);">${getCompanyNames()[fund.company] || fund.company || ''}</small>
+                        ${trackBadges}
                     </td>
                     <td>${fundTypeNames[fund.type] || fund.type}</td>
                     <td>${I18n.formatCurrency(fund.value)}${actuarialInfo}</td>
@@ -577,10 +643,56 @@
             loadFunds();
         }
 
+        function addTrackRow(name, percentage) {
+            const container = document.getElementById('tracksContainer');
+            const row = document.createElement('div');
+            row.className = 'track-row';
+            row.innerHTML = `
+                <input type="text" class="form-control" list="trackSuggestions" placeholder="${I18n.t('myFunds.trackName')}" value="${name || ''}">
+                <input type="number" class="form-control" placeholder="%" min="0" max="100" step="0.1" value="${percentage != null ? percentage : ''}" oninput="updateTrackTotal()">
+                <button type="button" class="btn-remove-track" onclick="removeTrackRow(this)">&times;</button>
+            `;
+            container.appendChild(row);
+            updateTrackTotal();
+        }
+
+        function removeTrackRow(btn) {
+            btn.closest('.track-row').remove();
+            updateTrackTotal();
+        }
+
+        function getTracksFromForm() {
+            const rows = document.querySelectorAll('#tracksContainer .track-row');
+            const tracks = [];
+            rows.forEach(row => {
+                const name = row.querySelector('input[type="text"]').value.trim();
+                const pct = parseFloat(row.querySelector('input[type="number"]').value);
+                if (name && !isNaN(pct)) {
+                    tracks.push({ name, percentage: pct });
+                }
+            });
+            return tracks;
+        }
+
+        function updateTrackTotal() {
+            const rows = document.querySelectorAll('#tracksContainer .track-row');
+            const el = document.getElementById('trackTotal');
+            if (rows.length === 0) { el.textContent = ''; return; }
+            let sum = 0;
+            rows.forEach(row => {
+                sum += parseFloat(row.querySelector('input[type="number"]').value) || 0;
+            });
+            const isOk = Math.abs(sum - 100) < 0.01;
+            el.className = 'track-total ' + (isOk ? 'ok' : 'warn');
+            el.textContent = I18n.t('myFunds.totalPercentage') + ': ' + sum.toFixed(1) + '%' + (isOk ? '' : ' — ' + I18n.t('myFunds.percentageWarning'));
+        }
+
         function openAddModal() {
             document.getElementById('modalTitle').textContent = I18n.t('myFunds.addFund');
             document.getElementById('fundForm').reset();
             document.getElementById('fundId').value = '';
+            document.getElementById('tracksContainer').innerHTML = '';
+            document.getElementById('trackTotal').textContent = '';
             document.getElementById('fundModal').classList.add('active');
         }
 
@@ -604,6 +716,12 @@
             document.getElementById('accountNumber').value = fund.accountNumber || '';
             document.getElementById('actuarialBalance').value = fund.actuarialBalance || '';
             document.getElementById('fundNotes').value = fund.notes || '';
+            // Load tracks
+            document.getElementById('tracksContainer').innerHTML = '';
+            if (fund.tracks && fund.tracks.length > 0) {
+                fund.tracks.forEach(t => addTrackRow(t.name, t.percentage));
+            }
+            updateTrackTotal();
             document.getElementById('fundModal').classList.add('active');
         }
 
@@ -617,6 +735,7 @@
             const accountNumber = document.getElementById('accountNumber').value.trim();
             const actuarialBalance = parseFloat(document.getElementById('actuarialBalance').value) || null;
             const notes = document.getElementById('fundNotes').value.trim();
+            const tracks = getTracksFromForm();
 
             if (!name || !value) {
                 App.notify(I18n.t('myFunds.fillNameAndValue'), 'error');
@@ -637,7 +756,7 @@
                     if (oldFund.value !== value) {
                         history = [...history, { date: today, value: value }];
                     }
-                    funds[idx] = { ...oldFund, type, name, company, value, monthlyDeposit, accountNumber, actuarialBalance, notes, history, updatedAt: now };
+                    funds[idx] = { ...oldFund, type, name, company, value, monthlyDeposit, accountNumber, actuarialBalance, notes, tracks, history, updatedAt: now };
                 }
             } else {
                 // Add new with initial history
@@ -651,6 +770,7 @@
                     accountNumber,
                     actuarialBalance,
                     notes,
+                    tracks,
                     history: [{ date: today, value: value }],
                     createdAt: now,
                     updatedAt: now
