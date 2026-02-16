@@ -1,12 +1,12 @@
-name: Update Market Data
+  name: Update Market Data
 
   on:
     schedule:
-      # Run on the 1st and 15th of each month at 8am UTC
       - cron: '0 8 1,15 * *'
-    workflow_dispatch: {} # Manual trigger
+    workflow_dispatch:
 
   jobs:
+
     update:
       runs-on: ubuntu-latest
       permissions:
