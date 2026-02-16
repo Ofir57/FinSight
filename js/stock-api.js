@@ -97,7 +97,9 @@ const StockAPI = {
             const closePrices = historicalData.map(d => d.close);
 
             const currentPrice = meta.regularMarketPrice;
-            const previousClose = meta.previousClose || meta.chartPreviousClose;
+            // previousClose from meta is unreliable (often missing or shows chart start price)
+            // Use second-to-last close from historical data instead
+            const previousClose = closePrices.length >= 2 ? closePrices[closePrices.length - 2] : meta.previousClose || meta.chartPreviousClose;
             const currency = meta.currency || 'USD';
             const ma150 = this.calculateMA150(closePrices);
 
