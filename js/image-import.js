@@ -785,5 +785,245 @@ const ImageImport = {
         if (t.includes('גמל') || t.includes('gemel')) return 'gemel';
         if (t.includes('חיסכון') || t.includes('saving')) return 'savings';
         return 'gemel';
+    },
+
+    // ---- Payslip Scanner ----
+
+    /**
+     * Open file picker for payslip photo
+     */
+    openPayslipPicker() {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+        input.onchange = (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                this.processPayslipImage(file);
+            }
+        };
+        input.click();
+    },
+
+    /**
+     * Process payslip image with Tesseract OCR
+     */
+    async processPayslipImage(file) {
+        this.showLoadingModal();
+
+        try {
+            const result = await Tesseract.recognize(file, 'heb+eng', {
+                logger: (info) => {
+                    if (info.status === 'recognizing text') {
+                        this.updateProgress(Math.round(info.progress * 100));
+                    }
+                }
+            });
+
+            this.closeLoadingModal();
+
+            const text = result.data.text;
+            if (!text || text.trim().length < 5) {
+                App.notify('לא זוהה טקסט בתמונה', 'error');
+                return;
+            }
+
+            console.log('Payslip OCR raw text:', text);
+
+            const data = this.extractPayslip(text);
+            if (!data) {
+                App.notify('לא זוהה תלוש משכורת בתמונה', 'error');
+                return;
+            }
+
+            this.showPayslipPreviewModal(data);
+        } catch (error) {
+            this.closeLoadingModal();
+            console.error('Payslip OCR error:', error);
+            App.notify('שגיאה בזיהוי טקסט: ' + error.message, 'error');
+        }
+    },
+
+    /**
+     * Detect if OCR text is a payslip and extract fields
+     */
+    extractPayslip(text) {
+        // Detection: is this a payslip?
+        const isPayslip = text.includes('תלוש') ||
+            (text.includes('ברוטו') && text.includes('נטו')) ||
+            (text.includes('שכר') && text.includes('ניכויים'));
+
+        if (!isPayslip) return null;
+
+        const lines = text.split('\n').map(l => l.trim());
+
+        /**
+         * Extract a number near a keyword.
+         * Searches the line containing the keyword, then the next line.
+         */
+        const findAmount = (keywords) => {
+            for (const keyword of keywords) {
+                for (let i = 0; i < lines.length; i++) {
+                    if (lines[i].includes(keyword)) {
+                        // Search this line and the next for a number
+                        const searchLines = [lines[i]];
+                        if (i + 1 < lines.length) searchLines.push(lines[i + 1]);
+
+                        for (const sl of searchLines) {
+                            // Remove the keyword itself to avoid matching numbers within it
+                            const afterKeyword = sl.substring(sl.indexOf(keyword) + keyword.length);
+                            // Match numbers: ₪1,234.56 or 1,234.56 or 1234.56 or 1234 or 1,234
+                            const nums = afterKeyword.match(/₪?\s*[\d][,\d]*\.?\d*/g);
+                            if (nums) {
+                                for (const n of nums) {
+                                    const val = parseFloat(n.replace(/[₪\s,]/g, ''));
+                                    if (!isNaN(val) && val > 0) return val;
+                                }
+                            }
+                            // Also try the whole line
+                            const allNums = sl.match(/₪?\s*[\d][,\d]*\.?\d*/g);
+                            if (allNums) {
+                                for (const n of allNums) {
+                                    const val = parseFloat(n.replace(/[₪\s,]/g, ''));
+                                    if (!isNaN(val) && val > 0) return val;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return 0;
+        };
+
+        const grossSalary = findAmount(['סה"כ ברוטו', 'סה״כ ברוטו', 'ברוטו', 'שכר ברוטו']);
+        const netSalary = findAmount(['נטו לתשלום', 'לתשלום', 'סה"כ נטו', 'סה״כ נטו', 'נטו']);
+        const pensionEmployee = findAmount(['פנסיה עובד', 'הפרשה פנסיה עובד', 'פנסיה  עובד']);
+        const pensionEmployer = findAmount(['פנסיה מעביד', 'פנסיה מעסיק', 'הפרשה פנסיה מעביד', 'פנסיה  מעביד']);
+        const trainingEmployee = findAmount(['קרן השתלמות עובד', 'השתלמות עובד', 'ק. השתלמות עובד']);
+        const trainingEmployer = findAmount(['קרן השתלמות מעביד', 'קרן השתלמות מעסיק', 'השתלמות מעביד', 'ק. השתלמות מעביד']);
+        const incomeTax = findAmount(['מס הכנסה', 'מ. הכנסה', 'מ.הכנסה']);
+        const nationalInsurance = findAmount(['ביטוח לאומי', 'בט. לאומי', 'ב.לאומי', 'בט.לאומי']);
+        const healthInsurance = findAmount(['ביטוח בריאות', 'בט. בריאות', 'בט.בריאות']);
+
+        return {
+            grossSalary,
+            netSalary,
+            pensionEmployee,
+            pensionEmployer,
+            trainingEmployee,
+            trainingEmployer,
+            incomeTax,
+            nationalInsurance,
+            healthInsurance
+        };
+    },
+
+    /**
+     * Show payslip preview modal with editable fields
+     */
+    showPayslipPreviewModal(data) {
+        const fields = [
+            { id: 'psGross', label: 'שכר ברוטו', labelKey: 'grossSalary', value: data.grossSalary },
+            { id: 'psNet', label: 'שכר נטו', labelKey: 'netSalary', value: data.netSalary },
+            { id: 'psPensionEmp', label: 'פנסיה עובד', labelKey: 'pensionEmployee', value: data.pensionEmployee },
+            { id: 'psPensionEr', label: 'פנסיה מעביד', labelKey: 'pensionEmployer', value: data.pensionEmployer },
+            { id: 'psTrainEmp', label: 'קרן השתלמות עובד', labelKey: 'trainingEmployee', value: data.trainingEmployee },
+            { id: 'psTrainEr', label: 'קרן השתלמות מעביד', labelKey: 'trainingEmployer', value: data.trainingEmployer },
+            { id: 'psTax', label: 'מס הכנסה', labelKey: 'incomeTax', value: data.incomeTax },
+            { id: 'psNI', label: 'ביטוח לאומי', labelKey: 'nationalInsurance', value: data.nationalInsurance },
+            { id: 'psHealth', label: 'ביטוח בריאות', labelKey: 'healthInsurance', value: data.healthInsurance }
+        ];
+
+        const lang = (typeof I18n !== 'undefined' && I18n.currentLanguage) || 'he';
+        const t = (key) => {
+            try { return I18n.translations[lang].profile[key]; } catch(e) { return null; }
+        };
+
+        let fieldsHTML = fields.map(f => `
+            <div class="form-group" style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--color-border);">
+                <label style="font-weight: 500;">${t(f.labelKey) || f.label}</label>
+                <div style="display: flex; align-items: center; gap: 6px;">
+                    <span>₪</span>
+                    <input type="number" class="form-control" id="${f.id}" value="${f.value || 0}" step="0.01"
+                           style="width: 140px; padding: 6px 10px; background: var(--color-bg-primary); border: 1px solid var(--color-border); border-radius: 8px; color: white; font-size: 0.95rem;">
+                </div>
+            </div>
+        `).join('');
+
+        const modal = document.createElement('div');
+        modal.className = 'modal-overlay active';
+        modal.id = 'payslipPreviewModal';
+        modal.innerHTML = `
+            <div class="modal" style="max-width: 500px;">
+                <div class="modal-header">
+                    <h2>${lang === 'he' ? 'נתוני תלוש משכורת' : 'Payslip Data'}</h2>
+                    <button class="modal-close" onclick="document.getElementById('payslipPreviewModal').remove()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p style="margin-bottom: 15px; color: var(--color-text-secondary); font-size: 0.9rem;">
+                        ${lang === 'he' ? 'זוהו נתוני תלוש — ניתן לערוך לפני שמירה.' : 'Payslip data detected — you can edit before saving.'}
+                    </p>
+                    ${fieldsHTML}
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" onclick="document.getElementById('payslipPreviewModal').remove()">${lang === 'he' ? 'ביטול' : 'Cancel'}</button>
+                    <button class="btn btn-primary" onclick="ImageImport.confirmPayslipImport()">${lang === 'he' ? 'שמור בפרופיל' : 'Save to Profile'}</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    },
+
+    /**
+     * Save payslip data to profile
+     */
+    confirmPayslipImport() {
+        const payslipData = {
+            grossSalary: parseFloat(document.getElementById('psGross').value) || 0,
+            netSalary: parseFloat(document.getElementById('psNet').value) || 0,
+            pensionEmployee: parseFloat(document.getElementById('psPensionEmp').value) || 0,
+            pensionEmployer: parseFloat(document.getElementById('psPensionEr').value) || 0,
+            trainingEmployee: parseFloat(document.getElementById('psTrainEmp').value) || 0,
+            trainingEmployer: parseFloat(document.getElementById('psTrainEr').value) || 0,
+            incomeTax: parseFloat(document.getElementById('psTax').value) || 0,
+            nationalInsurance: parseFloat(document.getElementById('psNI').value) || 0,
+            healthInsurance: parseFloat(document.getElementById('psHealth').value) || 0,
+            scannedAt: new Date().toISOString()
+        };
+
+        document.getElementById('payslipPreviewModal').remove();
+
+        // Update profile
+        const profile = Storage.getUserProfile() || {};
+        profile.payslipData = payslipData;
+
+        // Auto-fill profile fields
+        if (payslipData.netSalary > 0) {
+            profile.monthlyIncome = payslipData.netSalary;
+        }
+        if (payslipData.pensionEmployee > 0 || payslipData.pensionEmployer > 0) {
+            profile.hasPension = true;
+        }
+        if (payslipData.trainingEmployee > 0 || payslipData.trainingEmployer > 0) {
+            profile.hasTrainingFund = true;
+        }
+        profile.updatedAt = new Date().toISOString();
+
+        Storage.saveUserProfile(profile);
+
+        // Update form fields on profile page if they exist
+        const incomeEl = document.getElementById('profileIncome');
+        if (incomeEl) incomeEl.value = profile.monthlyIncome || '';
+        const pensionEl = document.getElementById('profilePension');
+        if (pensionEl) pensionEl.checked = profile.hasPension || false;
+        const trainingEl = document.getElementById('profileTrainingFund');
+        if (trainingEl) trainingEl.checked = profile.hasTrainingFund || false;
+
+        // Render payslip summary if function exists
+        if (typeof renderPayslipSummary === 'function') {
+            renderPayslipSummary(payslipData);
+        }
+
+        App.notify('נתוני התלוש נשמרו בהצלחה', 'success');
     }
 };

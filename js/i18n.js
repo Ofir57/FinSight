@@ -832,7 +832,18 @@ const I18n = {
                 goalWealth: 'בניית הון',
                 goalNone: 'אין ספציפי',
                 smartTips: 'טיפים חכמים',
-                showAllTips: 'הצג הכל'
+                showAllTips: 'הצג הכל',
+                scanPayslip: 'סרוק תלוש משכורת',
+                payslipSummary: 'סיכום תלוש',
+                grossSalary: 'שכר ברוטו',
+                netSalary: 'שכר נטו',
+                pensionEmployee: 'פנסיה עובד',
+                pensionEmployer: 'פנסיה מעביד',
+                trainingEmployee: 'קרן השתלמות עובד',
+                trainingEmployer: 'קרן השתלמות מעביד',
+                incomeTax: 'מס הכנסה',
+                nationalInsurance: 'ביטוח לאומי',
+                healthInsurance: 'ביטוח בריאות'
             },
             // Common
             common: {
@@ -1692,7 +1703,18 @@ const I18n = {
                 goalWealth: 'Wealth Building',
                 goalNone: 'No Specific Goal',
                 smartTips: 'Smart Tips',
-                showAllTips: 'Show All'
+                showAllTips: 'Show All',
+                scanPayslip: 'Scan Payslip',
+                payslipSummary: 'Payslip Summary',
+                grossSalary: 'Gross Salary',
+                netSalary: 'Net Salary',
+                pensionEmployee: 'Pension (Employee)',
+                pensionEmployer: 'Pension (Employer)',
+                trainingEmployee: 'Training Fund (Employee)',
+                trainingEmployer: 'Training Fund (Employer)',
+                incomeTax: 'Income Tax',
+                nationalInsurance: 'National Insurance',
+                healthInsurance: 'Health Insurance'
             },
             // Common
             common: {
@@ -1890,7 +1912,18 @@ const I18n = {
                 goalWealth: 'Construção de Patrimônio',
                 goalNone: 'Sem Objetivo Específico',
                 smartTips: 'Dicas Inteligentes',
-                showAllTips: 'Mostrar Tudo'
+                showAllTips: 'Mostrar Tudo',
+                scanPayslip: 'Escanear Contracheque',
+                payslipSummary: 'Resumo do Contracheque',
+                grossSalary: 'Salário Bruto',
+                netSalary: 'Salário Líquido',
+                pensionEmployee: 'Previdência (Empregado)',
+                pensionEmployer: 'Previdência (Empregador)',
+                trainingEmployee: 'Fundo de Capacitação (Empregado)',
+                trainingEmployer: 'Fundo de Capacitação (Empregador)',
+                incomeTax: 'Imposto de Renda',
+                nationalInsurance: 'Seguro Nacional',
+                healthInsurance: 'Seguro Saúde'
             },
             // Common
             common: {
