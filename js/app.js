@@ -54,6 +54,16 @@ const App = {
             btn.addEventListener('click', () => I18n.toggleLanguage());
         });
 
+        // Brand click → dashboard
+        const brand = document.querySelector('.sidebar-header .brand');
+        if (brand) {
+            brand.style.cursor = 'pointer';
+            brand.addEventListener('click', () => {
+                const isInPages = window.location.pathname.includes('/pages/');
+                window.location.href = isInPages ? '../index.html' : './index.html';
+            });
+        }
+
         // Mobile menu toggle
         const menuToggle = document.querySelector('.mobile-menu-toggle');
         const sidebar = document.querySelector('.sidebar');

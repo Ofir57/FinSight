@@ -920,7 +920,7 @@
                     if (ma150 !== null && ma150 !== undefined) {
                         const isAbove = currentPrice > ma150;
                         const positionIcon = isAbove ? '🟢' : '🔴';
-                        const distPercent = ma150PositionPercent !== null && ma150PositionPercent !== undefined ? ma150PositionPercent.toFixed(1) : '0';
+                        const distPercent = ma150PositionPercent !== null && ma150PositionPercent !== undefined ? ma150PositionPercent.toFixed(2) : '0';
                         ma150Display = `<span class="${isAbove ? 'profit' : 'loss'}">${positionIcon} ${isAbove ? '+' : ''}${distPercent}%</span>`;
                     }
 
@@ -1091,7 +1091,7 @@
                 if (ma150 !== null && ma150 !== undefined) {
                     ma150Display = formatStockPrice(ma150, currency);
                     const positionIcon = ma150Position === 'above' ? '🟢' : '🔴';
-                    const positionPercent = ma150PositionPercent?.toFixed(1) || '0';
+                    const positionPercent = ma150PositionPercent?.toFixed(2) || '0';
                     const positionSign = ma150PositionPercent >= 0 ? '+' : '';
                     positionDisplay = `<span class="${ma150Position === 'above' ? 'profit' : 'loss'}">${positionIcon} ${positionSign}${positionPercent}%</span>`;
                 }
