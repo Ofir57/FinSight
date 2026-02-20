@@ -673,7 +673,8 @@
                 const funds = Storage.getMyFunds();
                 const monthExpenses = SmartTips.getMonthlyExpenses(SmartTips.getCurrentMonth());
 
-                const factors = {
+                // Only include factors that have real data
+                const allFactors = {
                     paymentDiscipline: this.calcPaymentDiscipline(loans),
                     creditUtilization: this.calcCreditUtilization(creditData, profile, monthExpenses),
                     debtToIncome: this.calcDebtToIncome(loans, profile, monthExpenses),
@@ -681,7 +682,7 @@
                     creditHistoryLength: this.calcCreditHistoryLength(loans, creditData)
                 };
 
-                const weights = {
+                const baseWeights = {
                     paymentDiscipline: 0.30,
                     creditUtilization: 0.25,
                     debtToIncome: 0.20,
@@ -689,19 +690,39 @@
                     creditHistoryLength: 0.10
                 };
 
-                let totalScore = 0;
-                for (const [key, weight] of Object.entries(weights)) {
-                    totalScore += factors[key] * weight;
+                // Separate factors with real data from those without
+                const factors = {};
+                const noData = {};
+                for (const [key, val] of Object.entries(allFactors)) {
+                    if (val === null) {
+                        noData[key] = null;
+                    } else {
+                        factors[key] = val;
+                    }
                 }
 
-                return { score: Math.round(totalScore), factors };
+                // Redistribute weights among factors that have data
+                let totalWeight = 0;
+                for (const key of Object.keys(factors)) {
+                    totalWeight += baseWeights[key];
+                }
+
+                let totalScore = 0;
+                if (totalWeight > 0) {
+                    for (const [key, val] of Object.entries(factors)) {
+                        totalScore += val * (baseWeights[key] / totalWeight);
+                    }
+                }
+
+                return { score: Math.round(totalScore), factors, noData };
             },
 
             calcPaymentDiscipline(loans) {
-                if (loans.length === 0) return this.DEFAULT_SCORE;
+                // No loans = no data to assess payment discipline
+                const loansWithData = loans.filter(l => l.originalAmount && l.remainingBalance && l.totalMonths && l.startDate);
+                if (loansWithData.length === 0) return null;
                 let score = 85;
-                for (const loan of loans) {
-                    if (!loan.originalAmount || !loan.remainingBalance || !loan.totalMonths || !loan.startDate) continue;
+                for (const loan of loansWithData) {
                     const start = new Date(loan.startDate);
                     const monthsElapsed = Math.max(1, Math.floor((Date.now() - start.getTime()) / (1000*60*60*24*30)));
                     const expectedProgress = monthsElapsed / loan.totalMonths;
@@ -717,7 +738,7 @@
 
             calcCreditUtilization(creditData, profile, monthExpenses) {
                 const income = profile?.monthlyIncome;
-                if (!income || monthExpenses === 0) return this.DEFAULT_SCORE;
+                if (!income || monthExpenses === 0) return null;
                 const ratio = monthExpenses / income;
                 if (ratio <= 0.3) return 95;
                 if (ratio <= 0.5) return 80;
@@ -728,8 +749,9 @@
 
             calcDebtToIncome(loans, profile, monthExpenses) {
                 const income = profile?.monthlyIncome;
-                if (!income) return this.DEFAULT_SCORE;
+                if (!income) return null;
                 const loanPayments = Storage.getTotalMonthlyLoanPayments();
+                if (loanPayments === 0 && monthExpenses === 0) return null;
                 const totalObligations = loanPayments + monthExpenses;
                 const ratio = totalObligations / income;
                 if (ratio <= 0.4) return 95;
@@ -766,7 +788,8 @@
                     }
                 }
                 const numProducts = loans.length + (creditData.cards?.length || 0);
-                if (!oldest && numProducts === 0) return this.DEFAULT_SCORE;
+                // No credit products at all = no data
+                if (!oldest && numProducts === 0) return null;
 
                 let score = 50;
                 if (oldest) {
@@ -795,10 +818,12 @@
                 try { return I18n.translations[lang].profile[key] || fallback; } catch(e) { return fallback; }
             };
 
-            const { score, factors } = CreditScoreCalculator.calculate();
+            const { score, factors, noData } = CreditScoreCalculator.calculate();
 
-            // Save to history
-            Storage.addScoreToHistory(score, factors);
+            // Only save to history if we have real data
+            if (Object.keys(factors).length > 0) {
+                Storage.addScoreToHistory(score, factors);
+            }
 
             // Update gauge needle: rotate from -90 (0 score) to +90 (100 score)
             const angle = -90 + (score / 100) * 180;
@@ -850,18 +875,37 @@
 
             const breakdownEl = document.getElementById('factorsBreakdown');
             if (breakdownEl) {
-                breakdownEl.innerHTML = Object.entries(factors).map(([key, val]) => `
-                    <div class="factor-row">
-                        <span class="factor-name">${factorLabels[key]}</span>
-                        <div class="factor-bar-bg">
-                            <div class="factor-bar" style="width:${val}%; background:${getScoreColor(val)};"></div>
-                        </div>
-                        <span class="factor-score" style="color:${getScoreColor(val)}">${val}</span>
-                    </div>
-                `).join('');
+                const noDataLabel = lang === 'he' ? 'אין נתונים' : 'No data';
+                // Show factors with data first, then no-data factors
+                const allKeys = [...Object.keys(factors), ...Object.keys(noData)];
+                breakdownEl.innerHTML = allKeys.map(key => {
+                    const val = factors[key];
+                    const hasData = val !== undefined;
+                    if (hasData) {
+                        return `
+                            <div class="factor-row">
+                                <span class="factor-name">${factorLabels[key]}</span>
+                                <div class="factor-bar-bg">
+                                    <div class="factor-bar" style="width:${val}%; background:${getScoreColor(val)};"></div>
+                                </div>
+                                <span class="factor-score" style="color:${getScoreColor(val)}">${val}</span>
+                            </div>
+                        `;
+                    } else {
+                        return `
+                            <div class="factor-row" style="opacity: 0.5;">
+                                <span class="factor-name">${factorLabels[key]}</span>
+                                <div class="factor-bar-bg">
+                                    <div class="factor-bar" style="width:0%;"></div>
+                                </div>
+                                <span class="factor-score" style="color:var(--color-text-secondary); font-size:0.8rem;">${noDataLabel}</span>
+                            </div>
+                        `;
+                    }
+                }).join('');
             }
 
-            // Improvement tips (top 3 weakest)
+            // Improvement tips (top 3 weakest, only from factors with data)
             renderImprovementTips(factors, factorLabels, lang);
         }
 
