@@ -960,6 +960,7 @@ const ImageImport = {
         };
 
         // Salary fields — large numbers OK
+        const baseSalary = findAmount(['שכר לקצבה', 'שכר לקרן השתלמות', 'שכר בסיס', 'סה"כ תשלומים בגין משרה', 'סה״כ תשלומים בגין משרה', 'תשלומים בגין משרה'], 500);
         const grossSalary = findAmount(['סה"כ ברוטו', 'סה״כ ברוטו', 'שכר ברוטו', 'סך-כל התשלומים', 'סה"כ תשלומים', 'סה״כ תשלומים', 'ברוטו למס', 'ברוטו'], 500);
         const netSalary = findAmount(['נטו לתשלום', 'שכר 103', 'סה"כ נטו', 'סה״כ נטו', 'נטו'], 500);
 
@@ -1001,6 +1002,7 @@ const ImageImport = {
         // Severance (פיצויים) — employer-only, use strict regex
         const severancePair = findContributionPair(['פיצויים']);
         const severance = severancePair?.single || severancePair?.employer || findAmount(['פיצויים'], 50, 10000);
+        const severancePct = severancePair?.singlePct || severancePair?.employerPct || 0;
 
         // Training fund: try pair detection, then individual keyword fallback
         const trainingPair = findContributionPair(['השתלמות']);
@@ -1051,18 +1053,20 @@ const ImageImport = {
         const trainingEmployerPct = trainingPair?.employerPct || 0;
 
         return {
+            baseSalary,
             grossSalary,
             netSalary,
             pensionEmployee,
             pensionEmployer,
+            severance,
             trainingEmployee,
             trainingEmployer,
             incomeTax,
             nationalInsurance,
             healthInsurance,
-            severance,
             pensionEmployeePct,
             pensionEmployerPct,
+            severancePct,
             trainingEmployeePct,
             trainingEmployerPct
         };
@@ -1073,11 +1077,12 @@ const ImageImport = {
      */
     showPayslipPreviewModal(data) {
         const fields = [
+            { id: 'psBase', label: 'שכר בסיס', labelKey: 'baseSalary', value: data.baseSalary },
             { id: 'psGross', label: 'שכר ברוטו', labelKey: 'grossSalary', value: data.grossSalary },
             { id: 'psNet', label: 'שכר נטו', labelKey: 'netSalary', value: data.netSalary },
             { id: 'psPensionEmp', label: 'פנסיה עובד', labelKey: 'pensionEmployee', value: data.pensionEmployee, pctId: 'psPensionEmpPct', pctValue: data.pensionEmployeePct },
             { id: 'psPensionEr', label: 'פנסיה מעביד', labelKey: 'pensionEmployer', value: data.pensionEmployer, pctId: 'psPensionErPct', pctValue: data.pensionEmployerPct },
-            { id: 'psSeverance', label: 'פיצויים', labelKey: 'severance', value: data.severance },
+            { id: 'psSeverance', label: 'פיצויים', labelKey: 'severance', value: data.severance, pctId: 'psSeverancePct', pctValue: data.severancePct },
             { id: 'psTrainEmp', label: 'קרן השתלמות עובד', labelKey: 'trainingEmployee', value: data.trainingEmployee, pctId: 'psTrainEmpPct', pctValue: data.trainingEmployeePct },
             { id: 'psTrainEr', label: 'קרן השתלמות מעביד', labelKey: 'trainingEmployer', value: data.trainingEmployer, pctId: 'psTrainErPct', pctValue: data.trainingEmployerPct },
             { id: 'psTax', label: 'מס הכנסה', labelKey: 'incomeTax', value: data.incomeTax },
@@ -1137,6 +1142,7 @@ const ImageImport = {
      */
     confirmPayslipImport() {
         const payslipData = {
+            baseSalary: parseFloat(document.getElementById('psBase').value) || 0,
             grossSalary: parseFloat(document.getElementById('psGross').value) || 0,
             netSalary: parseFloat(document.getElementById('psNet').value) || 0,
             pensionEmployee: parseFloat(document.getElementById('psPensionEmp').value) || 0,
@@ -1149,6 +1155,7 @@ const ImageImport = {
             healthInsurance: parseFloat(document.getElementById('psHealth').value) || 0,
             pensionEmployeePct: parseFloat(document.getElementById('psPensionEmpPct').value) || 0,
             pensionEmployerPct: parseFloat(document.getElementById('psPensionErPct').value) || 0,
+            severancePct: parseFloat(document.getElementById('psSeverancePct').value) || 0,
             trainingEmployeePct: parseFloat(document.getElementById('psTrainEmpPct').value) || 0,
             trainingEmployerPct: parseFloat(document.getElementById('psTrainErPct').value) || 0,
             scannedAt: new Date().toISOString()
