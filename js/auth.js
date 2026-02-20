@@ -430,7 +430,10 @@ const Auth = {
                 tvCustomSymbols: Storage.getTVCustomSymbols(),
                 notifications: Storage.getNotifications(),
                 dashboardWidgets: Storage.getDashboardWidgets(),
-                importTemplates: Storage.getImportTemplates()
+                importTemplates: Storage.getImportTemplates(),
+                userProfile: Storage.getUserProfile(),
+                dismissedTips: Storage.getDismissedTips(),
+                loans: Storage.getLoans()
             };
 
             // Encrypt sensitive data before uploading
@@ -518,6 +521,9 @@ const Auth = {
                     if (data.notifications) Storage.saveNotifications(data.notifications);
                     if (data.dashboardWidgets) Storage.saveDashboardWidgets(data.dashboardWidgets);
                     if (data.importTemplates) Storage.saveImportTemplates(data.importTemplates);
+                    if (data.userProfile) Storage.saveUserProfile(data.userProfile);
+                    if (data.dismissedTips) Storage.saveDismissedTips(data.dismissedTips);
+                    if (data.loans) Storage.saveLoans(data.loans);
 
                     localStorage.setItem('finance_last_update', new Date().toISOString());
                     console.log('Data synced from cloud (decrypted)');
@@ -527,6 +533,7 @@ const Auth = {
                     if (typeof loadStocks === 'function') loadStocks();
                     if (typeof loadWatchlist === 'function') loadWatchlist();
                     if (typeof rebuildTVDropdown === 'function') rebuildTVDropdown();
+                    if (typeof loadLoans === 'function') loadLoans();
 
                     return true;
                 } else {

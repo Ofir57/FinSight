@@ -1,4 +1,4 @@
-const CACHE_NAME = 'finsight-v27';
+const CACHE_NAME = 'finsight-v28';
 const ASSETS_TO_CACHE = [
     './',
     './index.html',
@@ -47,6 +47,7 @@ const ASSETS_TO_CACHE = [
     './pages/reports.html',
     './pages/settings.html',
     './pages/profile.html',
+    './pages/loans.html',
     './pages/market-products.html',
     './data/sample-data.js',
     './data/market-funds.js',

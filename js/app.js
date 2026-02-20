@@ -116,6 +116,7 @@ const App = {
         const stocksTotal = Storage.getTotalStocksValue();
         const fundsTotal = Storage.getTotalFundsValue();
         const assetsTotal = Storage.getTotalAssetsValue();
+        const loansTotal = Storage.getTotalLoansBalance();
         const netWorth = Storage.getNetWorth();
 
         // Update summary cards
@@ -124,6 +125,7 @@ const App = {
         this.updateElement('stocksTotal', I18n.formatCurrency(stocksTotal));
         this.updateElement('fundsTotal', I18n.formatCurrency(fundsTotal));
         this.updateElement('assetsTotal', I18n.formatCurrency(assetsTotal));
+        this.updateElement('loansTotal', I18n.formatCurrency(loansTotal));
         this.updateElement('netWorthTotal', I18n.formatCurrency(netWorth));
 
         // Update charts if Charts module is available

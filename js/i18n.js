@@ -25,7 +25,8 @@ const I18n = {
                 myProducts: 'המוצרים שלי',
                 pensionCalc: 'מחשבון פנסיה',
                 marketDataUpdate: 'עדכון נתוני שוק',
-                profile: 'פרופיל פיננסי'
+                profile: 'פרופיל פיננסי',
+                loans: 'הלוואות'
             },
             // Dashboard
             dashboard: {
@@ -53,7 +54,8 @@ const I18n = {
                 smartTips: 'טיפים חכמים',
                 fromLastMonth: 'מחודש שעבר',
                 updated: 'עדכון',
-                rateLoadError: 'שגיאה בטעינת שערים'
+                rateLoadError: 'שגיאה בטעינת שערים',
+                loansBalance: 'יתרת הלוואות'
             },
             // Auth
             auth: {
@@ -845,6 +847,73 @@ const I18n = {
                 nationalInsurance: 'ביטוח לאומי',
                 healthInsurance: 'ביטוח בריאות'
             },
+            // Loans
+            loans: {
+                title: 'הלוואות ומשכנתאות',
+                addLoan: 'הוסף הלוואה',
+                editLoan: 'ערוך הלוואה',
+                loanName: 'שם ההלוואה',
+                loanType: 'סוג הלוואה',
+                lender: 'גוף מלווה',
+                originalAmount: 'סכום מקורי',
+                remainingBalance: 'יתרה נוכחית',
+                interestRate: 'ריבית שנתית (%)',
+                interestType: 'סוג ריבית',
+                monthlyPayment: 'תשלום חודשי',
+                totalMonths: 'תקופה (חודשים)',
+                startDate: 'תאריך התחלה',
+                types: {
+                    mortgage: 'משכנתא',
+                    personal: 'הלוואה אישית',
+                    car: 'הלוואת רכב',
+                    business: 'הלוואה עסקית',
+                    education: 'הלוואת לימודים',
+                    other: 'אחר'
+                },
+                interestTypes: {
+                    fixed: 'קבועה',
+                    variable: 'משתנה',
+                    prime: 'פריים'
+                },
+                noLoans: 'אין הלוואות',
+                totalRemaining: 'סה"כ יתרת הלוואות',
+                totalOriginal: 'סה"כ סכום מקורי',
+                totalMonthlyPayments: 'סה"כ תשלום חודשי',
+                totalInterestCost: 'סה"כ עלות ריבית',
+                amortizationTable: 'לוח סילוקין',
+                month: 'חודש',
+                payment: 'תשלום',
+                principal: 'קרן',
+                interest: 'ריבית',
+                balance: 'יתרה',
+                paidSoFar: 'שולם עד כה',
+                remainingToPay: 'נותר לתשלום',
+                monthsRemaining: 'חודשים שנותרו',
+                loanProgress: 'התקדמות',
+                deleteLoanConfirm: 'האם למחוק את ההלוואה?',
+                loanSaved: 'ההלוואה נשמרה',
+                loanDeleted: 'ההלוואה נמחקה',
+                closeTable: 'סגור',
+                currentMonth: 'חודש נוכחי',
+                totalInterestPaid: 'סה"כ ריבית שתשולם'
+            },
+            // Benchmark
+            benchmark: {
+                title: 'ביצועים מול מדד',
+                period1M: 'חודש',
+                period3M: '3 חודשים',
+                period6M: '6 חודשים',
+                period1Y: 'שנה',
+                periodAll: 'הכל',
+                selectBenchmark: 'בחר מדד',
+                yourPortfolio: 'התיק שלך',
+                yourReturn: 'התשואה שלך',
+                difference: 'הפרש',
+                beatingMarket: 'מכה את השוק!',
+                belowMarket: 'מתחת לשוק',
+                noData: 'אין מספיק נתונים להשוואה',
+                loading: 'טוען נתוני מדדים...'
+            },
             // Common
             common: {
                 save: 'שמור',
@@ -916,7 +985,8 @@ const I18n = {
                 myProducts: 'My Products',
                 pensionCalc: 'Pension Calculator',
                 marketDataUpdate: 'Market Data Update',
-                profile: 'Financial Profile'
+                profile: 'Financial Profile',
+                loans: 'Loans'
             },
             // Dashboard
             dashboard: {
@@ -944,7 +1014,8 @@ const I18n = {
                 smartTips: 'Smart Tips',
                 fromLastMonth: 'from last month',
                 updated: 'Updated',
-                rateLoadError: 'Error loading rates'
+                rateLoadError: 'Error loading rates',
+                loansBalance: 'Loans Balance'
             },
             // Auth
             auth: {
@@ -1736,6 +1807,73 @@ const I18n = {
                 nationalInsurance: 'National Insurance',
                 healthInsurance: 'Health Insurance'
             },
+            // Loans
+            loans: {
+                title: 'Loans & Mortgages',
+                addLoan: 'Add Loan',
+                editLoan: 'Edit Loan',
+                loanName: 'Loan Name',
+                loanType: 'Loan Type',
+                lender: 'Lender',
+                originalAmount: 'Original Amount',
+                remainingBalance: 'Remaining Balance',
+                interestRate: 'Annual Interest Rate (%)',
+                interestType: 'Interest Type',
+                monthlyPayment: 'Monthly Payment',
+                totalMonths: 'Term (Months)',
+                startDate: 'Start Date',
+                types: {
+                    mortgage: 'Mortgage',
+                    personal: 'Personal Loan',
+                    car: 'Car Loan',
+                    business: 'Business Loan',
+                    education: 'Education Loan',
+                    other: 'Other'
+                },
+                interestTypes: {
+                    fixed: 'Fixed',
+                    variable: 'Variable',
+                    prime: 'Prime'
+                },
+                noLoans: 'No loans',
+                totalRemaining: 'Total Loan Balance',
+                totalOriginal: 'Total Original Amount',
+                totalMonthlyPayments: 'Total Monthly Payments',
+                totalInterestCost: 'Total Interest Cost',
+                amortizationTable: 'Amortization Table',
+                month: 'Month',
+                payment: 'Payment',
+                principal: 'Principal',
+                interest: 'Interest',
+                balance: 'Balance',
+                paidSoFar: 'Paid So Far',
+                remainingToPay: 'Remaining to Pay',
+                monthsRemaining: 'Months Remaining',
+                loanProgress: 'Progress',
+                deleteLoanConfirm: 'Delete this loan?',
+                loanSaved: 'Loan saved',
+                loanDeleted: 'Loan deleted',
+                closeTable: 'Close',
+                currentMonth: 'Current Month',
+                totalInterestPaid: 'Total Interest to be Paid'
+            },
+            // Benchmark
+            benchmark: {
+                title: 'Performance vs Benchmark',
+                period1M: '1M',
+                period3M: '3M',
+                period6M: '6M',
+                period1Y: '1Y',
+                periodAll: 'All',
+                selectBenchmark: 'Select Benchmark',
+                yourPortfolio: 'Your Portfolio',
+                yourReturn: 'Your Return',
+                difference: 'Difference',
+                beatingMarket: 'Beating the market!',
+                belowMarket: 'Below market',
+                noData: 'Not enough data for comparison',
+                loading: 'Loading benchmark data...'
+            },
             // Common
             common: {
                 save: 'Save',
@@ -1801,7 +1939,8 @@ const I18n = {
                 assets: 'Ativos',
                 settings: 'Configurações',
                 marketDataUpdate: 'Atualização de Dados de Mercado',
-                profile: 'Perfil Financeiro'
+                profile: 'Perfil Financeiro',
+                loans: 'Empréstimos'
             },
             // Dashboard
             dashboard: {
@@ -1816,7 +1955,8 @@ const I18n = {
                 assetsValue: 'Valor dos Ativos',
                 assetDistribution: 'Distribuição de Ativos',
                 monthlyExpenses: 'Despesas Mensais',
-                recentTransactions: 'Transações Recentes'
+                recentTransactions: 'Transações Recentes',
+                loansBalance: 'Saldo de Empréstimos'
             },
             // Bank
             bank: {
@@ -1964,6 +2104,73 @@ const I18n = {
                 incomeTax: 'Imposto de Renda',
                 nationalInsurance: 'Seguro Nacional',
                 healthInsurance: 'Seguro Saúde'
+            },
+            // Loans
+            loans: {
+                title: 'Empréstimos e Hipotecas',
+                addLoan: 'Adicionar Empréstimo',
+                editLoan: 'Editar Empréstimo',
+                loanName: 'Nome do Empréstimo',
+                loanType: 'Tipo de Empréstimo',
+                lender: 'Credor',
+                originalAmount: 'Valor Original',
+                remainingBalance: 'Saldo Restante',
+                interestRate: 'Taxa de Juros Anual (%)',
+                interestType: 'Tipo de Juros',
+                monthlyPayment: 'Pagamento Mensal',
+                totalMonths: 'Prazo (Meses)',
+                startDate: 'Data de Início',
+                types: {
+                    mortgage: 'Hipoteca',
+                    personal: 'Empréstimo Pessoal',
+                    car: 'Empréstimo de Carro',
+                    business: 'Empréstimo Empresarial',
+                    education: 'Empréstimo Estudantil',
+                    other: 'Outro'
+                },
+                interestTypes: {
+                    fixed: 'Fixo',
+                    variable: 'Variável',
+                    prime: 'Prime'
+                },
+                noLoans: 'Sem empréstimos',
+                totalRemaining: 'Saldo Total de Empréstimos',
+                totalOriginal: 'Valor Original Total',
+                totalMonthlyPayments: 'Pagamentos Mensais Totais',
+                totalInterestCost: 'Custo Total de Juros',
+                amortizationTable: 'Tabela de Amortização',
+                month: 'Mês',
+                payment: 'Pagamento',
+                principal: 'Principal',
+                interest: 'Juros',
+                balance: 'Saldo',
+                paidSoFar: 'Pago Até Agora',
+                remainingToPay: 'Restante a Pagar',
+                monthsRemaining: 'Meses Restantes',
+                loanProgress: 'Progresso',
+                deleteLoanConfirm: 'Excluir este empréstimo?',
+                loanSaved: 'Empréstimo salvo',
+                loanDeleted: 'Empréstimo excluído',
+                closeTable: 'Fechar',
+                currentMonth: 'Mês Atual',
+                totalInterestPaid: 'Total de Juros a Pagar'
+            },
+            // Benchmark
+            benchmark: {
+                title: 'Desempenho vs Índice',
+                period1M: '1M',
+                period3M: '3M',
+                period6M: '6M',
+                period1Y: '1A',
+                periodAll: 'Tudo',
+                selectBenchmark: 'Selecionar Índice',
+                yourPortfolio: 'Sua Carteira',
+                yourReturn: 'Seu Retorno',
+                difference: 'Diferença',
+                beatingMarket: 'Superando o mercado!',
+                belowMarket: 'Abaixo do mercado',
+                noData: 'Dados insuficientes para comparação',
+                loading: 'Carregando dados de índice...'
             },
             // Common
             common: {

@@ -226,6 +226,60 @@ const StockAPI = {
     },
 
     /**
+     * Benchmark indices available for comparison
+     */
+    BENCHMARKS: [
+        { symbol: '^GSPC', name: 'S&P 500', market: 'US' },
+        { symbol: '^IXIC', name: 'NASDAQ', market: 'US' },
+        { symbol: '^TA125.TA', name: 'TA-125', market: 'IL' },
+        { symbol: '^TA35.TA', name: 'TA-35', market: 'IL' },
+        { symbol: 'URTH', name: 'MSCI World', market: 'US' }
+    ],
+
+    /**
+     * Fetch benchmark/index historical data
+     * @param {string} symbol - Index symbol (e.g. '^GSPC')
+     * @param {string} range - Time range ('1mo','3mo','6mo','1y','5y')
+     * @returns {Promise<Object>} Historical data with timestamps and prices
+     */
+    async fetchBenchmarkData(symbol, range = '1y') {
+        try {
+            const yahooUrl = `${this.YAHOO_URL}/${encodeURIComponent(symbol)}?interval=1d&range=${range}&includePrePost=false`;
+            const data = await this._fetchWithFallback(yahooUrl);
+
+            if (!data.chart || !data.chart.result || data.chart.result.length === 0) {
+                throw new Error('No data found for benchmark');
+            }
+
+            const result = data.chart.result[0];
+            const meta = result.meta;
+            const quotes = result.indicators.quote[0];
+            const timestamps = result.timestamp || [];
+
+            const historicalData = [];
+            for (let i = 0; i < timestamps.length; i++) {
+                if (quotes.close[i] !== null) {
+                    historicalData.push({
+                        date: new Date(timestamps[i] * 1000),
+                        close: quotes.close[i]
+                    });
+                }
+            }
+
+            return {
+                symbol,
+                name: meta.shortName || meta.symbol || symbol,
+                currency: meta.currency || 'USD',
+                historicalData,
+                success: true
+            };
+        } catch (error) {
+            console.error(`Error fetching benchmark data for ${symbol}:`, error);
+            return { symbol, error: error.message, success: false };
+        }
+    },
+
+    /**
      * Search for stock by name/symbol (basic implementation)
      * @param {string} query - Search query
      * @returns {Promise<Array>} Array of matching stocks

@@ -227,6 +227,12 @@
                         </a>
                     </li>
                     <li class="nav-item">
+                        <a href="loans.html" class="nav-link" data-category="loans">
+                            <span class="icon">🏦</span>
+                            <span data-i18n="nav.loans">הלוואות</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a href="goals.html" class="nav-link" data-category="goals">
                             <span class="icon">🎯</span>
                             <span data-i18n="nav.goals">יעדי חיסכון</span>
@@ -539,6 +545,56 @@
                             <!-- Will be populated by JS -->
                         </tbody>
                     </table>
+                </div>
+            </div>
+
+            <!-- Benchmark Comparison Section -->
+            <div class="card" id="benchmarkSection">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <span class="icon">📊</span>
+                        <span data-i18n="benchmark.title">ביצועים מול מדד</span>
+                    </h2>
+                </div>
+                <div style="padding: 15px 20px;">
+                    <!-- Period Selector -->
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 15px;">
+                        <button class="btn btn-sm btn-secondary benchmark-period" data-range="1mo" onclick="setBenchmarkPeriod('1mo')" data-i18n="benchmark.period1M">חודש</button>
+                        <button class="btn btn-sm btn-secondary benchmark-period" data-range="3mo" onclick="setBenchmarkPeriod('3mo')" data-i18n="benchmark.period3M">3 חודשים</button>
+                        <button class="btn btn-sm btn-secondary benchmark-period active" data-range="6mo" onclick="setBenchmarkPeriod('6mo')" style="background: var(--color-stocks);" data-i18n="benchmark.period6M">6 חודשים</button>
+                        <button class="btn btn-sm btn-secondary benchmark-period" data-range="1y" onclick="setBenchmarkPeriod('1y')" data-i18n="benchmark.period1Y">שנה</button>
+                        <button class="btn btn-sm btn-secondary benchmark-period" data-range="5y" onclick="setBenchmarkPeriod('5y')" data-i18n="benchmark.periodAll">הכל</button>
+                    </div>
+                    <!-- Benchmark Selector -->
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 15px;">
+                        <label style="display: flex; align-items: center; gap: 5px; cursor: pointer; font-size: 0.9rem;">
+                            <input type="checkbox" class="benchmark-check" value="^GSPC" checked onchange="loadBenchmarkChart()"> S&P 500
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 5px; cursor: pointer; font-size: 0.9rem;">
+                            <input type="checkbox" class="benchmark-check" value="^TA125.TA" onchange="loadBenchmarkChart()"> TA-125
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 5px; cursor: pointer; font-size: 0.9rem;">
+                            <input type="checkbox" class="benchmark-check" value="^IXIC" onchange="loadBenchmarkChart()"> NASDAQ
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 5px; cursor: pointer; font-size: 0.9rem;">
+                            <input type="checkbox" class="benchmark-check" value="^TA35.TA" onchange="loadBenchmarkChart()"> TA-35
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 5px; cursor: pointer; font-size: 0.9rem;">
+                            <input type="checkbox" class="benchmark-check" value="URTH" onchange="loadBenchmarkChart()"> MSCI World
+                        </label>
+                    </div>
+                </div>
+                <!-- Chart -->
+                <div class="chart-container" style="height: 350px; padding: 0 20px 10px;">
+                    <canvas id="benchmarkChart"></canvas>
+                </div>
+                <div id="benchmarkLoading" style="display: none; text-align: center; padding: 40px; color: var(--color-text-secondary);">
+                    <span data-i18n="benchmark.loading">טוען נתוני מדדים...</span>
+                </div>
+                <!-- Summary Stats -->
+                <div id="benchmarkStats" style="padding: 10px 20px 20px; display: none;">
+                    <div style="display: flex; flex-wrap: wrap; gap: 15px; justify-content: center;" id="benchmarkStatsGrid">
+                    </div>
                 </div>
             </div>
         </main>
@@ -2399,6 +2455,218 @@
         function populateTVChartDropdown() {
             rebuildTVDropdown();
         }
+
+        // ===== Benchmark Comparison =====
+        let benchmarkChart = null;
+        let currentBenchmarkRange = '6mo';
+        const BENCHMARK_COLORS = {
+            portfolio: '#8b5cf6',
+            '^GSPC': '#ef4444',
+            '^IXIC': '#f59e0b',
+            '^TA125.TA': '#10b981',
+            '^TA35.TA': '#3b82f6',
+            'URTH': '#ec4899'
+        };
+        const BENCHMARK_NAMES = {
+            '^GSPC': 'S&P 500',
+            '^IXIC': 'NASDAQ',
+            '^TA125.TA': 'TA-125',
+            '^TA35.TA': 'TA-35',
+            'URTH': 'MSCI World'
+        };
+
+        function setBenchmarkPeriod(range) {
+            currentBenchmarkRange = range;
+            document.querySelectorAll('.benchmark-period').forEach(btn => {
+                btn.style.background = btn.dataset.range === range ? 'var(--color-stocks)' : '';
+                btn.classList.toggle('active', btn.dataset.range === range);
+            });
+            loadBenchmarkChart();
+        }
+
+        async function loadBenchmarkChart() {
+            const selectedBenchmarks = Array.from(document.querySelectorAll('.benchmark-check:checked')).map(cb => cb.value);
+            const loadingEl = document.getElementById('benchmarkLoading');
+            const statsEl = document.getElementById('benchmarkStats');
+            const statsGrid = document.getElementById('benchmarkStatsGrid');
+
+            // Get portfolio holdings
+            const stockData = Storage.getStocks();
+            if (stockData.holdings.length === 0) {
+                statsGrid.innerHTML = `<div style="color: var(--color-text-secondary);">${I18n.t('benchmark.noData')}</div>`;
+                statsEl.style.display = '';
+                if (benchmarkChart) { benchmarkChart.destroy(); benchmarkChart = null; }
+                return;
+            }
+
+            loadingEl.style.display = '';
+
+            try {
+                // Fetch benchmark data
+                const benchmarkPromises = selectedBenchmarks.map(sym => StockAPI.fetchBenchmarkData(sym, currentBenchmarkRange));
+                const benchmarkResults = await Promise.all(benchmarkPromises);
+
+                // Build portfolio value series from the first benchmark's date range
+                // Use the benchmark with the most data points as the date reference
+                let referenceDates = [];
+                const validBenchmarks = benchmarkResults.filter(b => b.success && b.historicalData.length > 0);
+
+                if (validBenchmarks.length > 0) {
+                    const longestBenchmark = validBenchmarks.reduce((a, b) =>
+                        a.historicalData.length > b.historicalData.length ? a : b
+                    );
+                    referenceDates = longestBenchmark.historicalData.map(d => d.date);
+                }
+
+                if (referenceDates.length === 0) {
+                    loadingEl.style.display = 'none';
+                    statsGrid.innerHTML = `<div style="color: var(--color-text-secondary);">${I18n.t('benchmark.noData')}</div>`;
+                    statsEl.style.display = '';
+                    return;
+                }
+
+                // For portfolio performance, compute simple return based on holdings data
+                // We'll use the available price cache data
+                const portfolioHoldings = stockData.holdings;
+                const totalCost = portfolioHoldings.reduce((sum, h) => {
+                    const costPerShare = h.avgPrice || 0;
+                    const qty = h.quantity || 0;
+                    const rate = h.currency === 'ILS' ? 1 : (currencyRates[h.currency] || currencyRates.USD || 3.65);
+                    return sum + (costPerShare * qty * rate);
+                }, 0);
+                const totalValue = portfolioHoldings.reduce((sum, h) => {
+                    if (h.valueILS && h.valueILS > 0) return sum + h.valueILS;
+                    const price = h.currentPrice || h.avgPrice || 0;
+                    const qty = h.quantity || 0;
+                    const rate = h.currency === 'ILS' ? 1 : (currencyRates[h.currency] || currencyRates.USD || 3.65);
+                    return sum + (price * qty * rate);
+                }, 0);
+                const portfolioReturn = totalCost > 0 ? ((totalValue / totalCost) - 1) * 100 : 0;
+
+                // Build chart datasets
+                const datasets = [];
+                const labels = referenceDates.map(d => {
+                    const date = new Date(d);
+                    return `${date.getDate()}/${date.getMonth() + 1}`;
+                });
+
+                // Portfolio line (flat line showing current total return)
+                datasets.push({
+                    label: I18n.t('benchmark.yourPortfolio'),
+                    data: referenceDates.map(() => portfolioReturn),
+                    borderColor: BENCHMARK_COLORS.portfolio,
+                    backgroundColor: 'transparent',
+                    borderWidth: 3,
+                    pointRadius: 0,
+                    borderDash: [6, 3],
+                    tension: 0
+                });
+
+                // Benchmark lines
+                const benchmarkReturns = {};
+                for (const bm of validBenchmarks) {
+                    if (!selectedBenchmarks.includes(bm.symbol)) continue;
+                    const startPrice = bm.historicalData[0].close;
+                    const returns = bm.historicalData.map(d => ((d.close / startPrice) - 1) * 100);
+                    const endReturn = returns[returns.length - 1] || 0;
+                    benchmarkReturns[bm.symbol] = endReturn;
+
+                    // Align to reference dates length
+                    const alignedReturns = [];
+                    let bmIdx = 0;
+                    for (let i = 0; i < referenceDates.length; i++) {
+                        while (bmIdx < bm.historicalData.length - 1 && bm.historicalData[bmIdx].date < referenceDates[i]) {
+                            bmIdx++;
+                        }
+                        alignedReturns.push(bmIdx < returns.length ? returns[bmIdx] : returns[returns.length - 1]);
+                    }
+
+                    datasets.push({
+                        label: BENCHMARK_NAMES[bm.symbol] || bm.symbol,
+                        data: alignedReturns,
+                        borderColor: BENCHMARK_COLORS[bm.symbol] || '#888',
+                        backgroundColor: 'transparent',
+                        borderWidth: 2,
+                        pointRadius: 0,
+                        tension: 0.1
+                    });
+                }
+
+                // Render chart
+                const ctx = document.getElementById('benchmarkChart').getContext('2d');
+                if (benchmarkChart) benchmarkChart.destroy();
+                benchmarkChart = new Chart(ctx, {
+                    type: 'line',
+                    data: { labels, datasets },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: { mode: 'index', intersect: false },
+                        plugins: {
+                            legend: { labels: { color: '#8892b0', usePointStyle: true } },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return `${context.dataset.label}: ${context.parsed.y.toFixed(2)}%`;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                ticks: { color: '#8892b0', maxTicksLimit: 12 },
+                                grid: { color: 'rgba(255,255,255,0.05)' }
+                            },
+                            y: {
+                                ticks: {
+                                    color: '#8892b0',
+                                    callback: v => v.toFixed(1) + '%'
+                                },
+                                grid: { color: 'rgba(255,255,255,0.05)' }
+                            }
+                        }
+                    }
+                });
+
+                // Stats
+                statsGrid.innerHTML = '';
+                const addStat = (label, value, color) => {
+                    const sign = value >= 0 ? '+' : '';
+                    statsGrid.innerHTML += `
+                        <div style="text-align: center; padding: 10px 15px; background: var(--color-bg-card); border-radius: 10px; min-width: 120px;">
+                            <div style="font-size: 0.8rem; color: var(--color-text-secondary); margin-bottom: 4px;">${label}</div>
+                            <div style="font-size: 1.1rem; font-weight: 600; color: ${color};">${sign}${value.toFixed(1)}%</div>
+                        </div>`;
+                };
+
+                addStat(I18n.t('benchmark.yourReturn'), portfolioReturn, portfolioReturn >= 0 ? 'var(--color-positive)' : 'var(--color-negative)');
+
+                for (const [sym, ret] of Object.entries(benchmarkReturns)) {
+                    addStat(BENCHMARK_NAMES[sym] || sym, ret, ret >= 0 ? 'var(--color-positive)' : 'var(--color-negative)');
+                }
+
+                // Show difference with first selected benchmark
+                const firstBmSym = selectedBenchmarks[0];
+                if (firstBmSym && benchmarkReturns[firstBmSym] !== undefined) {
+                    const diff = portfolioReturn - benchmarkReturns[firstBmSym];
+                    const diffLabel = diff >= 0 ? I18n.t('benchmark.beatingMarket') : I18n.t('benchmark.belowMarket');
+                    addStat(I18n.t('benchmark.difference'), diff, diff >= 0 ? 'var(--color-positive)' : 'var(--color-negative)');
+                }
+
+                statsEl.style.display = '';
+            } catch (e) {
+                console.error('Benchmark error:', e);
+                statsGrid.innerHTML = `<div style="color: var(--color-negative);">${I18n.t('benchmark.noData')}</div>`;
+                statsEl.style.display = '';
+            } finally {
+                loadingEl.style.display = 'none';
+            }
+        }
+
+        // Auto-load benchmark on page load (after stocks load)
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => loadBenchmarkChart(), 2000);
+        });
     </script>
 </body>
 </html>

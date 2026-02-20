@@ -21,7 +21,8 @@ const Storage = {
         DASHBOARD_WIDGETS: 'finance_dashboard_widgets',
         IMPORT_TEMPLATES: 'finance_import_templates',
         USER_PROFILE: 'finance_user_profile',
-        DISMISSED_TIPS: 'finance_dismissed_tips'
+        DISMISSED_TIPS: 'finance_dismissed_tips',
+        LOANS: 'finance_loans'
     },
 
     /**
@@ -482,6 +483,47 @@ const Storage = {
         this.set(this.KEYS.USER_PROFILE, profile);
     },
 
+    // Loans
+    getLoans() {
+        return this.get(this.KEYS.LOANS) || [];
+    },
+
+    saveLoans(loans) {
+        this.set(this.KEYS.LOANS, loans);
+    },
+
+    addLoan(loan) {
+        const loans = this.getLoans();
+        loan.id = this.generateId();
+        loans.push(loan);
+        this.saveLoans(loans);
+        return loan;
+    },
+
+    updateLoan(id, updates) {
+        const loans = this.getLoans();
+        const index = loans.findIndex(l => l.id === id);
+        if (index !== -1) {
+            loans[index] = { ...loans[index], ...updates };
+            this.saveLoans(loans);
+            return loans[index];
+        }
+        return null;
+    },
+
+    deleteLoan(id) {
+        const loans = this.getLoans().filter(l => l.id !== id);
+        this.saveLoans(loans);
+    },
+
+    getTotalLoansBalance() {
+        return this.getLoans().reduce((sum, l) => sum + (l.remainingBalance || 0), 0);
+    },
+
+    getTotalMonthlyLoanPayments() {
+        return this.getLoans().reduce((sum, l) => sum + (l.monthlyPayment || 0), 0);
+    },
+
     // Dismissed Tips
     getDismissedTips() {
         return this.get(this.KEYS.DISMISSED_TIPS) || [];
@@ -528,6 +570,7 @@ const Storage = {
             importTemplates: this.getImportTemplates(),
             userProfile: this.getUserProfile(),
             dismissedTips: this.getDismissedTips(),
+            loans: this.getLoans(),
             exportDate: new Date().toISOString()
         };
     },
@@ -546,6 +589,7 @@ const Storage = {
         if (data.importTemplates) this.saveImportTemplates(data.importTemplates);
         if (data.userProfile) this.saveUserProfile(data.userProfile);
         if (data.dismissedTips) this.saveDismissedTips(data.dismissedTips);
+        if (data.loans) this.saveLoans(data.loans);
     },
 
     // Summary calculations
@@ -585,7 +629,8 @@ const Storage = {
         return this.getTotalBankBalance() +
                this.getTotalStocksValue() +
                this.getTotalAssetsValue() +
-               this.getTotalFundsValue();
+               this.getTotalFundsValue() -
+               this.getTotalLoansBalance();
     }
 };
 
