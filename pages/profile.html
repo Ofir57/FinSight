@@ -678,16 +678,14 @@
                     paymentDiscipline: this.calcPaymentDiscipline(loans),
                     creditUtilization: this.calcCreditUtilization(creditData, profile, monthExpenses),
                     debtToIncome: this.calcDebtToIncome(loans, profile, monthExpenses),
-                    financialStability: this.calcFinancialStability(bankBalance, funds, profile, monthExpenses),
-                    creditHistoryLength: this.calcCreditHistoryLength(loans, creditData)
+                    financialStability: this.calcFinancialStability(bankBalance, funds, profile, monthExpenses)
                 };
 
                 const baseWeights = {
                     paymentDiscipline: 0.30,
-                    creditUtilization: 0.25,
-                    debtToIncome: 0.20,
-                    financialStability: 0.15,
-                    creditHistoryLength: 0.10
+                    creditUtilization: 0.30,
+                    debtToIncome: 0.25,
+                    financialStability: 0.15
                 };
 
                 // Separate factors with real data from those without
@@ -779,30 +777,7 @@
                 return Math.max(0, Math.min(100, score));
             },
 
-            calcCreditHistoryLength(loans, creditData) {
-                let oldest = null;
-                for (const loan of loans) {
-                    if (loan.startDate) {
-                        const d = new Date(loan.startDate);
-                        if (!oldest || d < oldest) oldest = d;
-                    }
-                }
-                const numProducts = loans.length + (creditData.cards?.length || 0);
-                // No credit products at all = no data
-                if (!oldest && numProducts === 0) return null;
-
-                let score = 50;
-                if (oldest) {
-                    const years = (Date.now() - oldest.getTime()) / (1000*60*60*24*365);
-                    if (years >= 7) score += 30;
-                    else if (years >= 3) score += 20;
-                    else if (years >= 1) score += 10;
-                }
-                if (numProducts >= 3) score += 15;
-                else if (numProducts >= 1) score += 5;
-
-                return Math.max(0, Math.min(100, score));
-            }
+            // Credit history length removed — requires credit bureau data not available via API
         };
 
         function getScoreColor(score) {
@@ -869,8 +844,7 @@
                 paymentDiscipline: t('paymentDiscipline', 'משמעת תשלום'),
                 creditUtilization: t('creditUtilization', 'ניצול אשראי'),
                 debtToIncome: t('debtToIncome', 'חוב מול הכנסה'),
-                financialStability: t('financialStability', 'יציבות פיננסית'),
-                creditHistoryLength: t('creditHistoryLength', 'ותק אשראי')
+                financialStability: t('financialStability', 'יציבות פיננסית')
             };
 
             const breakdownEl = document.getElementById('factorsBreakdown');
@@ -941,10 +915,6 @@
                 financialStability: {
                     he: 'בנה חיסכון חירום ופזר השקעות לשיפור היציבות הפיננסית',
                     en: 'Build an emergency fund and diversify investments to improve stability'
-                },
-                creditHistoryLength: {
-                    he: 'ותק אשראי ארוך יותר משפר את הדירוג. שמור על מוצרי אשראי קיימים',
-                    en: 'Longer credit history improves your score. Keep existing credit products'
                 }
             };
 
