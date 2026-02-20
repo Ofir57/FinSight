@@ -996,7 +996,11 @@ const ImageImport = {
         // Pension: try pair detection, then individual keyword fallback
         const pensionPair = findContributionPair(['קצבה שכיר', 'קצבה', 'פנסיה']);
         const pensionEmployee = pensionPair?.employee || pensionPair?.single || findAmount(['פנסיה עובד', 'תגמולים עובד', 'תגמולים לקצבה', 'ניכוי פנסיה'], 50, 10000);
-        const pensionEmployer = pensionPair?.employer || findAmount(['פנסיה מעביד', 'פנסיה מעסיק', 'תגמולים מעביד', 'פיצויים'], 50, 10000);
+        const pensionEmployer = pensionPair?.employer || findAmount(['פנסיה מעביד', 'פנסיה מעסיק', 'תגמולים מעביד'], 50, 10000);
+
+        // Severance (פיצויים) — employer-only, use strict regex
+        const severancePair = findContributionPair(['פיצויים']);
+        const severance = severancePair?.single || severancePair?.employer || findAmount(['פיצויים'], 50, 10000);
 
         // Training fund: try pair detection, then individual keyword fallback
         const trainingPair = findContributionPair(['השתלמות']);
@@ -1056,6 +1060,7 @@ const ImageImport = {
             incomeTax,
             nationalInsurance,
             healthInsurance,
+            severance,
             pensionEmployeePct,
             pensionEmployerPct,
             trainingEmployeePct,
@@ -1072,6 +1077,7 @@ const ImageImport = {
             { id: 'psNet', label: 'שכר נטו', labelKey: 'netSalary', value: data.netSalary },
             { id: 'psPensionEmp', label: 'פנסיה עובד', labelKey: 'pensionEmployee', value: data.pensionEmployee, pctId: 'psPensionEmpPct', pctValue: data.pensionEmployeePct },
             { id: 'psPensionEr', label: 'פנסיה מעביד', labelKey: 'pensionEmployer', value: data.pensionEmployer, pctId: 'psPensionErPct', pctValue: data.pensionEmployerPct },
+            { id: 'psSeverance', label: 'פיצויים', labelKey: 'severance', value: data.severance },
             { id: 'psTrainEmp', label: 'קרן השתלמות עובד', labelKey: 'trainingEmployee', value: data.trainingEmployee, pctId: 'psTrainEmpPct', pctValue: data.trainingEmployeePct },
             { id: 'psTrainEr', label: 'קרן השתלמות מעביד', labelKey: 'trainingEmployer', value: data.trainingEmployer, pctId: 'psTrainErPct', pctValue: data.trainingEmployerPct },
             { id: 'psTax', label: 'מס הכנסה', labelKey: 'incomeTax', value: data.incomeTax },
@@ -1135,6 +1141,7 @@ const ImageImport = {
             netSalary: parseFloat(document.getElementById('psNet').value) || 0,
             pensionEmployee: parseFloat(document.getElementById('psPensionEmp').value) || 0,
             pensionEmployer: parseFloat(document.getElementById('psPensionEr').value) || 0,
+            severance: parseFloat(document.getElementById('psSeverance').value) || 0,
             trainingEmployee: parseFloat(document.getElementById('psTrainEmp').value) || 0,
             trainingEmployer: parseFloat(document.getElementById('psTrainEr').value) || 0,
             incomeTax: parseFloat(document.getElementById('psTax').value) || 0,
