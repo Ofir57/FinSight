@@ -963,11 +963,38 @@ const ImageImport = {
         const grossSalary = findAmount(['סה"כ ברוטו', 'סה״כ ברוטו', 'שכר ברוטו', 'סך-כל התשלומים', 'סה"כ תשלומים', 'סה״כ תשלומים', 'ברוטו למס', 'ברוטו'], 500);
         const netSalary = findAmount(['נטו לתשלום', 'שכר 103', 'סה"כ נטו', 'סה״כ נטו', 'נטו'], 500);
 
-        // Contribution fields — min=50 to skip percentages, max=10000 to skip base salary
-        const pensionEmployee = findAmount(['פנסיה עובד', 'תגמולים עובד', 'תגמולי עובד', 'ניכוי פנסיה', 'תגמולים לקצבה', 'קצבה שכיר'], 50, 10000);
-        const pensionEmployer = findAmount(['פנסיה מעביד', 'פנסיה מעסיק', 'תגמולים מעביד', 'תגמולי מעביד', 'פיצויים'], 50, 10000);
-        const trainingEmployee = findAmount(['קרן השתלמות עובד', 'השתלמות עובד', 'ק.השתלמות עובד', 'ק. השתלמות עובד', 'קה"ש עובד', 'קה״ש עובד'], 50, 10000);
-        const trainingEmployer = findAmount(['שכר לקרן השתלמות', 'קרן השתלמות מעביד', 'קרן השתלמות מעסיק', 'השתלמות מעביד', 'ק.השתלמות מעביד', 'קה"ש מעביד', 'קה״ש מעביד'], 50, 10000);
+        // Contribution fields — find employee/employer pairs on same line
+        // In Hilan table format, both amounts appear on one line.
+        // Employer contribution >= employee, so: larger = employer, smaller = employee.
+        const findContributionPair = (keywords) => {
+            for (const keyword of keywords) {
+                for (let i = 0; i < lines.length; i++) {
+                    if (lines[i].includes(keyword)) {
+                        const allNums = lines[i].match(/[\d][,\d]*\.?\d*/g);
+                        if (allNums) {
+                            const vals = allNums.map(n => parseFloat(n.replace(/,/g, '')))
+                                .filter(v => v >= 50 && v <= 10000);
+                            if (vals.length >= 2) {
+                                return { employee: Math.min(...vals), employer: Math.max(...vals) };
+                            } else if (vals.length === 1) {
+                                return { single: vals[0] };
+                            }
+                        }
+                    }
+                }
+            }
+            return null;
+        };
+
+        // Pension: try pair detection, then individual keyword fallback
+        const pensionPair = findContributionPair(['קצבה שכיר', 'קצבה', 'פנסיה']);
+        const pensionEmployee = pensionPair?.employee || pensionPair?.single || findAmount(['פנסיה עובד', 'תגמולים עובד', 'תגמולים לקצבה', 'ניכוי פנסיה'], 50, 10000);
+        const pensionEmployer = pensionPair?.employer || findAmount(['פנסיה מעביד', 'פנסיה מעסיק', 'תגמולים מעביד', 'פיצויים'], 50, 10000);
+
+        // Training fund: try pair detection, then individual keyword fallback
+        const trainingPair = findContributionPair(['השתלמות']);
+        const trainingEmployee = trainingPair?.employee || findAmount(['קרן השתלמות עובד', 'השתלמות עובד', 'ק.השתלמות עובד', 'קה"ש עובד'], 50, 10000);
+        const trainingEmployer = trainingPair?.employer || findAmount(['קרן השתלמות מעביד', 'השתלמות מעביד', 'ק.השתלמות מעביד', 'קה"ש מעביד'], 50, 10000);
 
         // Tax/deduction fields — try Hilan table first, then keyword search
         let incomeTax = 0, nationalInsurance = 0, healthInsurance = 0;
