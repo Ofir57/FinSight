@@ -964,20 +964,27 @@ const ImageImport = {
         const netSalary = findAmount(['נטו לתשלום', 'שכר 103', 'סה"כ נטו', 'סה״כ נטו', 'נטו'], 500);
 
         // Contribution fields — find employee/employer pairs on same line
-        // In Hilan table format, both amounts appear on one line.
+        // Uses strict money-format regex to avoid matching fund IDs (078, 5600, etc.)
         // Employer contribution >= employee, so: larger = employer, smaller = employee.
         const findContributionPair = (keywords) => {
             for (const keyword of keywords) {
                 for (let i = 0; i < lines.length; i++) {
                     if (lines[i].includes(keyword)) {
-                        const allNums = lines[i].match(/[\d][,\d]*\.?\d*/g);
+                        // Strict: only numbers with decimal point (X.XX) or comma thousands (X,XXX)
+                        const allNums = lines[i].match(/\d{1,3}(?:,\d{3})*\.\d{2}/g);
                         if (allNums) {
-                            const vals = allNums.map(n => parseFloat(n.replace(/,/g, '')))
-                                .filter(v => v >= 50 && v <= 10000);
-                            if (vals.length >= 2) {
-                                return { employee: Math.min(...vals), employer: Math.max(...vals) };
-                            } else if (vals.length === 1) {
-                                return { single: vals[0] };
+                            const parsed = allNums.map(n => parseFloat(n.replace(/,/g, '')));
+                            const amounts = parsed.filter(v => v >= 50 && v <= 10000);
+                            const pcts = parsed.filter(v => v > 0 && v < 50);
+                            if (amounts.length >= 2) {
+                                return {
+                                    employee: Math.min(...amounts),
+                                    employer: Math.max(...amounts),
+                                    employeePct: pcts.length >= 2 ? Math.min(...pcts) : (pcts.length === 1 ? pcts[0] : 0),
+                                    employerPct: pcts.length >= 2 ? Math.max(...pcts) : 0
+                                };
+                            } else if (amounts.length === 1) {
+                                return { single: amounts[0], singlePct: pcts.length >= 1 ? pcts[0] : 0 };
                             }
                         }
                     }
@@ -1033,32 +1040,11 @@ const ImageImport = {
         if (!nationalInsurance) nationalInsurance = findAmount(['ביטוח לאומי', 'בט.לאומי', 'בט. לאומי', 'ב.לאומי'], 50, 10000);
         if (!healthInsurance) healthInsurance = findAmount(['ביטוח בריאות', 'בט.בריאות', 'בט. בריאות', 'דמי בריאות'], 50, 10000);
 
-        // Extract percentages — look for X% or bare small numbers on contribution lines
-        const findPercent = (keywords) => {
-            for (const keyword of keywords) {
-                for (let i = 0; i < lines.length; i++) {
-                    if (lines[i].includes(keyword)) {
-                        const searchLines = [lines[i]];
-                        if (i + 1 < lines.length) searchLines.push(lines[i + 1]);
-                        if (i - 1 >= 0) searchLines.push(lines[i - 1]);
-                        for (const sl of searchLines) {
-                            // Try explicit X% pattern first
-                            const pctMatch = sl.match(/([\d][,\d]*\.?\d*)\s*%/);
-                            if (pctMatch) {
-                                const val = parseFloat(pctMatch[1].replace(',', '.'));
-                                if (!isNaN(val) && val > 0 && val < 100) return val;
-                            }
-                        }
-                    }
-                }
-            }
-            return 0;
-        };
-
-        const pensionEmployeePct = findPercent(['פנסיה עובד', 'תגמולים עובד', 'תגמולים לקצבה', 'קצבה שכיר', 'ניכוי פנסיה']);
-        const pensionEmployerPct = findPercent(['פנסיה מעביד', 'פנסיה מעסיק', 'תגמולים מעביד', 'פיצויים']);
-        const trainingEmployeePct = findPercent(['קרן השתלמות עובד', 'השתלמות עובד', 'ק.השתלמות עובד', 'קה"ש עובד']);
-        const trainingEmployerPct = findPercent(['קרן השתלמות מעביד', 'השתלמות מעביד', 'ק.השתלמות מעביד', 'קה"ש מעביד', 'קרן השתלמות']);
+        // Percentages — use pair data (extracted from same line as amounts), fallback to X% search
+        const pensionEmployeePct = pensionPair?.employeePct || 0;
+        const pensionEmployerPct = pensionPair?.employerPct || 0;
+        const trainingEmployeePct = trainingPair?.employeePct || 0;
+        const trainingEmployerPct = trainingPair?.employerPct || 0;
 
         return {
             grossSalary,
