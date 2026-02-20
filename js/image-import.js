@@ -1077,9 +1077,9 @@ const ImageImport = {
      */
     showPayslipPreviewModal(data) {
         const fields = [
-            { id: 'psBase', label: 'שכר בסיס', labelKey: 'baseSalary', value: data.baseSalary },
             { id: 'psGross', label: 'שכר ברוטו', labelKey: 'grossSalary', value: data.grossSalary },
             { id: 'psNet', label: 'שכר נטו', labelKey: 'netSalary', value: data.netSalary },
+            { id: 'psBase', label: 'שכר בסיס לחישוב', labelKey: 'baseSalary', value: data.baseSalary },
             { id: 'psPensionEmp', label: 'פנסיה עובד', labelKey: 'pensionEmployee', value: data.pensionEmployee, pctId: 'psPensionEmpPct', pctValue: data.pensionEmployeePct },
             { id: 'psPensionEr', label: 'פנסיה מעביד', labelKey: 'pensionEmployer', value: data.pensionEmployer, pctId: 'psPensionErPct', pctValue: data.pensionEmployerPct },
             { id: 'psSeverance', label: 'פיצויים', labelKey: 'severance', value: data.severance, pctId: 'psSeverancePct', pctValue: data.severancePct },
