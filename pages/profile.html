@@ -223,6 +223,163 @@
             background: rgba(59,130,246,0.1);
         }
 
+        /* Credit Score Section */
+        .credit-score-section {
+            background: var(--color-bg-card);
+            border: 1px solid var(--color-border);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+        .credit-score-section h2 {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .gauge-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        .gauge-svg { overflow: visible; }
+        .gauge-labels {
+            display: flex;
+            justify-content: space-between;
+            width: 260px;
+            margin-top: 6px;
+            font-size: 0.75rem;
+            color: var(--color-text-secondary);
+        }
+
+        .score-cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .score-card {
+            background: var(--color-bg-primary);
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            padding: 18px;
+            text-align: center;
+        }
+        .score-card .score-label {
+            font-size: 0.85rem;
+            color: var(--color-text-secondary);
+            margin-bottom: 8px;
+        }
+        .score-card .score-value {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+        .score-card .score-max {
+            font-size: 1rem;
+            color: var(--color-text-secondary);
+            font-weight: 400;
+        }
+
+        .factors-breakdown { margin-bottom: 24px; }
+        .factor-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        .factor-name {
+            min-width: 130px;
+            font-size: 0.9rem;
+            color: var(--color-text-secondary);
+        }
+        .factor-bar-bg {
+            flex: 1;
+            height: 10px;
+            background: var(--color-bg-primary);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        .factor-bar {
+            height: 100%;
+            border-radius: 5px;
+            transition: width 0.6s ease;
+        }
+        .factor-score {
+            min-width: 36px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .external-score-form {
+            background: var(--color-bg-primary);
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            padding: 18px;
+            margin-bottom: 24px;
+        }
+        .external-score-form h3 {
+            font-size: 1rem;
+            margin-bottom: 14px;
+            color: var(--color-text);
+        }
+        .external-form-row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: flex-end;
+        }
+        .external-form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .external-form-group label {
+            font-size: 0.8rem;
+            color: var(--color-text-secondary);
+        }
+        .external-form-group input,
+        .external-form-group select {
+            padding: 8px 12px;
+            background: var(--color-bg-card);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            color: white;
+            font-size: 0.9rem;
+        }
+
+        .improvement-tips { margin-top: 20px; }
+        .improvement-tips h3 {
+            font-size: 1rem;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .improvement-tip {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            background: var(--color-bg-primary);
+            border-radius: 10px;
+            border: 1px solid var(--color-border);
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+        .improvement-tip .priority-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .priority-red { background: var(--color-negative); }
+        .priority-yellow { background: #f59e0b; }
+        .priority-green { background: var(--color-positive); }
+
         @media (max-width: 768px) {
             .form-row {
                 flex-direction: column;
@@ -232,6 +389,12 @@
             .form-row .form-control { width: 100%; }
             .risk-selector { flex-wrap: wrap; }
             .payslip-grid { grid-template-columns: 1fr; }
+            .score-cards { grid-template-columns: 1fr; }
+            .factor-name { min-width: 100px; font-size: 0.8rem; }
+            .external-form-row { flex-direction: column; }
+            .external-form-group { width: 100%; }
+            .external-form-group input,
+            .external-form-group select { width: 100%; }
         }
     </style>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -381,6 +544,89 @@
                 </div>
             </div>
 
+            <!-- Credit Score -->
+            <div class="credit-score-section" id="creditScoreSection">
+                <h2>📊 <span data-i18n="profile.creditScore">דירוג אשראי</span></h2>
+
+                <!-- Gauge -->
+                <div class="gauge-container">
+                    <svg class="gauge-svg" width="260" height="150" viewBox="0 0 260 150">
+                        <defs>
+                            <linearGradient id="gaugeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" style="stop-color:#ef4444"/>
+                                <stop offset="35%" style="stop-color:#f59e0b"/>
+                                <stop offset="65%" style="stop-color:#eab308"/>
+                                <stop offset="100%" style="stop-color:#10b981"/>
+                            </linearGradient>
+                        </defs>
+                        <!-- Background arc -->
+                        <path d="M 25 135 A 105 105 0 0 1 235 135" fill="none" stroke="var(--color-border)" stroke-width="18" stroke-linecap="round"/>
+                        <!-- Colored arc -->
+                        <path d="M 25 135 A 105 105 0 0 1 235 135" fill="none" stroke="url(#gaugeGrad)" stroke-width="18" stroke-linecap="round"/>
+                        <!-- Needle -->
+                        <line id="gaugeNeedle" x1="130" y1="135" x2="130" y2="40" stroke="white" stroke-width="3" stroke-linecap="round" transform="rotate(-90, 130, 135)"/>
+                        <circle cx="130" cy="135" r="8" fill="white"/>
+                        <!-- Score text -->
+                        <text id="gaugeScoreText" x="130" y="120" text-anchor="middle" fill="white" font-size="32" font-weight="700">--</text>
+                    </svg>
+                    <div class="gauge-labels">
+                        <span data-i18n="profile.weak">חלש</span>
+                        <span data-i18n="profile.fair">בינוני</span>
+                        <span data-i18n="profile.good">טוב</span>
+                        <span data-i18n="profile.excellent">מצוין</span>
+                    </div>
+                </div>
+
+                <!-- Score Cards -->
+                <div class="score-cards">
+                    <div class="score-card">
+                        <div class="score-label" data-i18n="profile.finsightScore">ציון FinSight</div>
+                        <div class="score-value" id="internalScoreValue">--<span class="score-max">/100</span></div>
+                    </div>
+                    <div class="score-card">
+                        <div class="score-label" data-i18n="profile.externalScore">ציון חיצוני</div>
+                        <div class="score-value" id="externalScoreValue">--<span class="score-max">/100</span></div>
+                    </div>
+                </div>
+
+                <!-- Factor Breakdown -->
+                <div class="factors-breakdown" id="factorsBreakdown">
+                    <!-- Populated by JS -->
+                </div>
+
+                <!-- External Score Form -->
+                <div class="external-score-form">
+                    <h3>📝 <span data-i18n="profile.enterExternalScore">הזן ציון חיצוני</span></h3>
+                    <div class="external-form-row">
+                        <div class="external-form-group">
+                            <label data-i18n="profile.externalScore">ציון</label>
+                            <input type="number" id="extScoreInput" min="1" max="100" placeholder="85">
+                        </div>
+                        <div class="external-form-group">
+                            <label data-i18n="profile.scoreSource">מקור</label>
+                            <select id="extScoreSource">
+                                <option value="BDI">BDI</option>
+                                <option value="CreditInfo">CreditInfo</option>
+                                <option value="DataCheck">DataCheck</option>
+                                <option value="other">אחר</option>
+                            </select>
+                        </div>
+                        <div class="external-form-group">
+                            <label data-i18n="profile.checkDate">תאריך בדיקה</label>
+                            <input type="date" id="extScoreDate">
+                        </div>
+                        <button class="btn btn-primary btn-sm" onclick="saveExternalScore()" style="height: 38px; align-self: flex-end;">
+                            <span data-i18n="profile.saveScore">שמור ציון</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Improvement Tips -->
+                <div class="improvement-tips" id="improvementTips">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
             <!-- Smart Tips -->
             <div class="tips-section">
                 <div class="tips-header">
@@ -397,6 +643,12 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@4.9.155/build/pdf.min.js"></script>
+    <script>
+        if (typeof pdfjsLib !== 'undefined') {
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.9.155/build/pdf.worker.min.js';
+        }
+    </script>
     <script src="../js/storage.js"></script>
     <script src="../js/pin-lock.js"></script>
     <script src="../js/i18n.js"></script>
@@ -409,11 +661,293 @@
     <script src="../js/crypto.js"></script>
     <script src="../js/auth.js"></script>
     <script>
+        // ─── Credit Score Calculator ─────────────────────────
+        const CreditScoreCalculator = {
+            DEFAULT_SCORE: 70,
+
+            calculate() {
+                const profile = Storage.getUserProfile();
+                const loans = Storage.getLoans();
+                const creditData = Storage.getCreditCards();
+                const bankBalance = Storage.getTotalBankBalance();
+                const funds = Storage.getMyFunds();
+                const monthExpenses = SmartTips.getMonthlyExpenses(SmartTips.getCurrentMonth());
+
+                const factors = {
+                    paymentDiscipline: this.calcPaymentDiscipline(loans),
+                    creditUtilization: this.calcCreditUtilization(creditData, profile, monthExpenses),
+                    debtToIncome: this.calcDebtToIncome(loans, profile, monthExpenses),
+                    financialStability: this.calcFinancialStability(bankBalance, funds, profile, monthExpenses),
+                    creditHistoryLength: this.calcCreditHistoryLength(loans, creditData)
+                };
+
+                const weights = {
+                    paymentDiscipline: 0.30,
+                    creditUtilization: 0.25,
+                    debtToIncome: 0.20,
+                    financialStability: 0.15,
+                    creditHistoryLength: 0.10
+                };
+
+                let totalScore = 0;
+                for (const [key, weight] of Object.entries(weights)) {
+                    totalScore += factors[key] * weight;
+                }
+
+                return { score: Math.round(totalScore), factors };
+            },
+
+            calcPaymentDiscipline(loans) {
+                if (loans.length === 0) return this.DEFAULT_SCORE;
+                let score = 85;
+                for (const loan of loans) {
+                    if (!loan.originalAmount || !loan.remainingBalance || !loan.totalMonths || !loan.startDate) continue;
+                    const start = new Date(loan.startDate);
+                    const monthsElapsed = Math.max(1, Math.floor((Date.now() - start.getTime()) / (1000*60*60*24*30)));
+                    const expectedProgress = monthsElapsed / loan.totalMonths;
+                    const actualProgress = 1 - (loan.remainingBalance / loan.originalAmount);
+                    if (actualProgress >= expectedProgress * 0.9) {
+                        score = Math.min(100, score + 3);
+                    } else {
+                        score = Math.max(0, score - 15);
+                    }
+                }
+                return Math.max(0, Math.min(100, score));
+            },
+
+            calcCreditUtilization(creditData, profile, monthExpenses) {
+                const income = profile?.monthlyIncome;
+                if (!income || monthExpenses === 0) return this.DEFAULT_SCORE;
+                const ratio = monthExpenses / income;
+                if (ratio <= 0.3) return 95;
+                if (ratio <= 0.5) return 80;
+                if (ratio <= 0.7) return 60;
+                if (ratio <= 0.9) return 40;
+                return 20;
+            },
+
+            calcDebtToIncome(loans, profile, monthExpenses) {
+                const income = profile?.monthlyIncome;
+                if (!income) return this.DEFAULT_SCORE;
+                const loanPayments = Storage.getTotalMonthlyLoanPayments();
+                const totalObligations = loanPayments + monthExpenses;
+                const ratio = totalObligations / income;
+                if (ratio <= 0.4) return 95;
+                if (ratio <= 0.6) return 75;
+                if (ratio <= 0.8) return 50;
+                return 25;
+            },
+
+            calcFinancialStability(bankBalance, funds, profile, monthExpenses) {
+                let score = 50;
+                // Emergency fund check
+                if (monthExpenses > 0) {
+                    const months = bankBalance / monthExpenses;
+                    if (months >= 6) score += 20;
+                    else if (months >= 3) score += 10;
+                    else score -= 10;
+                }
+                // Has pension/funds
+                if (profile?.hasPension) score += 10;
+                if (profile?.hasTrainingFund) score += 5;
+                // Fund diversification
+                if (funds.length >= 2) score += 10;
+                else if (funds.length === 1) score += 5;
+
+                return Math.max(0, Math.min(100, score));
+            },
+
+            calcCreditHistoryLength(loans, creditData) {
+                let oldest = null;
+                for (const loan of loans) {
+                    if (loan.startDate) {
+                        const d = new Date(loan.startDate);
+                        if (!oldest || d < oldest) oldest = d;
+                    }
+                }
+                const numProducts = loans.length + (creditData.cards?.length || 0);
+                if (!oldest && numProducts === 0) return this.DEFAULT_SCORE;
+
+                let score = 50;
+                if (oldest) {
+                    const years = (Date.now() - oldest.getTime()) / (1000*60*60*24*365);
+                    if (years >= 7) score += 30;
+                    else if (years >= 3) score += 20;
+                    else if (years >= 1) score += 10;
+                }
+                if (numProducts >= 3) score += 15;
+                else if (numProducts >= 1) score += 5;
+
+                return Math.max(0, Math.min(100, score));
+            }
+        };
+
+        function getScoreColor(score) {
+            if (score >= 80) return '#10b981';
+            if (score >= 60) return '#eab308';
+            if (score >= 40) return '#f59e0b';
+            return '#ef4444';
+        }
+
+        function renderCreditScore() {
+            const lang = I18n?.currentLanguage || 'he';
+            const t = (key, fallback) => {
+                try { return I18n.translations[lang].profile[key] || fallback; } catch(e) { return fallback; }
+            };
+
+            const { score, factors } = CreditScoreCalculator.calculate();
+
+            // Save to history
+            Storage.addScoreToHistory(score, factors);
+
+            // Update gauge needle: rotate from -90 (0 score) to +90 (100 score)
+            const angle = -90 + (score / 100) * 180;
+            const needle = document.getElementById('gaugeNeedle');
+            if (needle) needle.setAttribute('transform', `rotate(${angle}, 130, 135)`);
+
+            const scoreText = document.getElementById('gaugeScoreText');
+            if (scoreText) scoreText.textContent = score;
+
+            // Internal score card
+            const internalEl = document.getElementById('internalScoreValue');
+            if (internalEl) {
+                internalEl.innerHTML = `<span style="color:${getScoreColor(score)}">${score}</span><span class="score-max">/100</span>`;
+            }
+
+            // External score card
+            const externalEl = document.getElementById('externalScoreValue');
+            const scoreData = Storage.getCreditScore();
+            if (externalEl) {
+                if (scoreData.external && scoreData.external.score) {
+                    const es = scoreData.external.score;
+                    externalEl.innerHTML = `<span style="color:${getScoreColor(es)}">${es}</span><span class="score-max">/100</span>`;
+                } else {
+                    externalEl.innerHTML = `<span style="color:var(--color-text-secondary)">--</span><span class="score-max">/100</span>`;
+                }
+            }
+
+            // Pre-fill external form if data exists
+            if (scoreData.external) {
+                const inp = document.getElementById('extScoreInput');
+                const src = document.getElementById('extScoreSource');
+                const dt = document.getElementById('extScoreDate');
+                if (inp && scoreData.external.score) inp.value = scoreData.external.score;
+                if (src && scoreData.external.source) src.value = scoreData.external.source;
+                if (dt && scoreData.external.date) dt.value = scoreData.external.date;
+            }
+            // Default date to today
+            const dtEl = document.getElementById('extScoreDate');
+            if (dtEl && !dtEl.value) dtEl.value = new Date().toISOString().split('T')[0];
+
+            // Factor breakdown
+            const factorLabels = {
+                paymentDiscipline: t('paymentDiscipline', 'משמעת תשלום'),
+                creditUtilization: t('creditUtilization', 'ניצול אשראי'),
+                debtToIncome: t('debtToIncome', 'חוב מול הכנסה'),
+                financialStability: t('financialStability', 'יציבות פיננסית'),
+                creditHistoryLength: t('creditHistoryLength', 'ותק אשראי')
+            };
+
+            const breakdownEl = document.getElementById('factorsBreakdown');
+            if (breakdownEl) {
+                breakdownEl.innerHTML = Object.entries(factors).map(([key, val]) => `
+                    <div class="factor-row">
+                        <span class="factor-name">${factorLabels[key]}</span>
+                        <div class="factor-bar-bg">
+                            <div class="factor-bar" style="width:${val}%; background:${getScoreColor(val)};"></div>
+                        </div>
+                        <span class="factor-score" style="color:${getScoreColor(val)}">${val}</span>
+                    </div>
+                `).join('');
+            }
+
+            // Improvement tips (top 3 weakest)
+            renderImprovementTips(factors, factorLabels, lang);
+        }
+
+        function renderImprovementTips(factors, labels, lang) {
+            const container = document.getElementById('improvementTips');
+            if (!container) return;
+
+            const t = (key, fallback) => {
+                try { return I18n.translations[lang].profile[key] || fallback; } catch(e) { return fallback; }
+            };
+
+            const sorted = Object.entries(factors).sort((a, b) => a[1] - b[1]);
+            const weakest = sorted.slice(0, 3).filter(([, val]) => val < 80);
+
+            if (weakest.length === 0) {
+                container.innerHTML = '';
+                return;
+            }
+
+            const tipMessages = {
+                paymentDiscipline: {
+                    he: 'שמור על תשלומי הלוואות בזמן. פיגורים משפיעים מאוד על הדירוג',
+                    en: 'Keep loan payments on time. Late payments significantly affect your score'
+                },
+                creditUtilization: {
+                    he: 'נסה להוריד את ניצול האשראי מתחת ל-30% מההכנסה',
+                    en: 'Try to keep credit utilization below 30% of income'
+                },
+                debtToIncome: {
+                    he: 'שקול להקטין חובות או להגדיל הכנסה כדי לשפר יחס חוב-הכנסה',
+                    en: 'Consider reducing debts or increasing income to improve debt-to-income ratio'
+                },
+                financialStability: {
+                    he: 'בנה חיסכון חירום ופזר השקעות לשיפור היציבות הפיננסית',
+                    en: 'Build an emergency fund and diversify investments to improve stability'
+                },
+                creditHistoryLength: {
+                    he: 'ותק אשראי ארוך יותר משפר את הדירוג. שמור על מוצרי אשראי קיימים',
+                    en: 'Longer credit history improves your score. Keep existing credit products'
+                }
+            };
+
+            container.innerHTML = `
+                <h3>💡 ${t('improvementTips', 'טיפים לשיפור')}</h3>
+                ${weakest.map(([key, val]) => {
+                    const priority = val < 50 ? 'red' : val < 70 ? 'yellow' : 'green';
+                    const msg = tipMessages[key]?.[lang] || tipMessages[key]?.he || '';
+                    return `
+                        <div class="improvement-tip">
+                            <span class="priority-dot priority-${priority}"></span>
+                            <span><strong>${labels[key]}</strong> (${val}/100) — ${msg}</span>
+                        </div>
+                    `;
+                }).join('')}
+            `;
+        }
+
+        function saveExternalScore() {
+            const scoreInput = document.getElementById('extScoreInput');
+            const sourceInput = document.getElementById('extScoreSource');
+            const dateInput = document.getElementById('extScoreDate');
+
+            const score = parseInt(scoreInput?.value);
+            if (!score || score < 1 || score > 100) {
+                App.notify(I18n?.currentLanguage === 'en' ? 'Enter a score between 1-100' : 'הזן ציון בין 1-100', 'warning');
+                return;
+            }
+
+            const source = sourceInput?.value || 'BDI';
+            const date = dateInput?.value || new Date().toISOString().split('T')[0];
+
+            Storage.saveExternalCreditScore(score, source, date);
+            const lang = I18n?.currentLanguage || 'he';
+            const t = (key, fallback) => {
+                try { return I18n.translations[lang].profile[key] || fallback; } catch(e) { return fallback; }
+            };
+            App.notify(t('scoreSaved', 'הציון נשמר בהצלחה'), 'success');
+            renderCreditScore();
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             App.currentPage = 'profile';
             I18n.init();
             loadProfile();
             renderTips();
+            renderCreditScore();
 
             // Risk selector click handlers
             document.querySelectorAll('.risk-btn').forEach(btn => {
@@ -550,14 +1084,15 @@
             };
 
             const fmt = (v) => v ? '₪' + v.toLocaleString('he-IL', { maximumFractionDigits: 0 }) : '₪0';
+            const fmtPct = (v) => v ? ` (${v}%)` : '';
 
             const items = [
                 { label: t('grossSalary', 'שכר ברוטו'), value: data.grossSalary, cls: 'highlight' },
                 { label: t('netSalary', 'שכר נטו'), value: data.netSalary, cls: 'highlight' },
-                { label: t('pensionEmployee', 'פנסיה עובד'), value: data.pensionEmployee, cls: '' },
-                { label: t('pensionEmployer', 'פנסיה מעביד'), value: data.pensionEmployer, cls: '' },
-                { label: t('trainingEmployee', 'קרן השתלמות עובד'), value: data.trainingEmployee, cls: '' },
-                { label: t('trainingEmployer', 'קרן השתלמות מעביד'), value: data.trainingEmployer, cls: '' },
+                { label: t('pensionEmployee', 'פנסיה עובד'), value: data.pensionEmployee, pct: data.pensionEmployeePct, cls: '' },
+                { label: t('pensionEmployer', 'פנסיה מעביד'), value: data.pensionEmployer, pct: data.pensionEmployerPct, cls: '' },
+                { label: t('trainingEmployee', 'קרן השתלמות עובד'), value: data.trainingEmployee, pct: data.trainingEmployeePct, cls: '' },
+                { label: t('trainingEmployer', 'קרן השתלמות מעביד'), value: data.trainingEmployer, pct: data.trainingEmployerPct, cls: '' },
                 { label: t('incomeTax', 'מס הכנסה'), value: data.incomeTax, cls: 'deduction' },
                 { label: t('nationalInsurance', 'ביטוח לאומי'), value: data.nationalInsurance, cls: 'deduction' },
                 { label: t('healthInsurance', 'ביטוח בריאות'), value: data.healthInsurance, cls: 'deduction' }
@@ -566,7 +1101,7 @@
             grid.innerHTML = items.map(item => `
                 <div class="payslip-item ${item.cls}">
                     <span class="label">${item.label}</span>
-                    <span class="value">${fmt(item.value)}</span>
+                    <span class="value">${fmt(item.value)}${fmtPct(item.pct)}</span>
                 </div>
             `).join('');
 

@@ -22,7 +22,8 @@ const Storage = {
         IMPORT_TEMPLATES: 'finance_import_templates',
         USER_PROFILE: 'finance_user_profile',
         DISMISSED_TIPS: 'finance_dismissed_tips',
-        LOANS: 'finance_loans'
+        LOANS: 'finance_loans',
+        CREDIT_SCORE: 'finance_credit_score'
     },
 
     /**
@@ -545,6 +546,37 @@ const Storage = {
         this.saveDismissedTips([]);
     },
 
+    // Credit Score
+    getCreditScore() {
+        return this.get(this.KEYS.CREDIT_SCORE) || { external: null, history: [] };
+    },
+
+    saveCreditScore(data) {
+        this.set(this.KEYS.CREDIT_SCORE, data);
+    },
+
+    saveExternalCreditScore(score, source, date) {
+        const data = this.getCreditScore();
+        data.external = { score, source, date };
+        this.saveCreditScore(data);
+    },
+
+    addScoreToHistory(internalScore, factors) {
+        const data = this.getCreditScore();
+        const today = new Date().toISOString().split('T')[0];
+        // Don't add duplicate for same day
+        if (data.history.length > 0 && data.history[data.history.length - 1].date === today) {
+            data.history[data.history.length - 1] = { date: today, internalScore, factors };
+        } else {
+            data.history.push({ date: today, internalScore, factors });
+        }
+        // Keep last 12 entries
+        if (data.history.length > 12) {
+            data.history = data.history.slice(-12);
+        }
+        this.saveCreditScore(data);
+    },
+
     // Settings
     getSettings() {
         return this.get(this.KEYS.SETTINGS) || { language: 'he', currency: 'ILS' };
@@ -571,6 +603,7 @@ const Storage = {
             userProfile: this.getUserProfile(),
             dismissedTips: this.getDismissedTips(),
             loans: this.getLoans(),
+            creditScore: this.getCreditScore(),
             exportDate: new Date().toISOString()
         };
     },
@@ -590,11 +623,15 @@ const Storage = {
         if (data.userProfile) this.saveUserProfile(data.userProfile);
         if (data.dismissedTips) this.saveDismissedTips(data.dismissedTips);
         if (data.loans) this.saveLoans(data.loans);
+        if (data.creditScore) this.saveCreditScore(data.creditScore);
     },
 
     // Summary calculations
-    getTotalBankBalance() {
-        return this.getBankAccounts().reduce((sum, acc) => sum + (acc.balance || 0), 0);
+    getTotalBankBalance(excludeSecurities = false) {
+        return this.getBankAccounts().reduce((sum, acc) => {
+            if (excludeSecurities && acc.type === 'securities') return sum;
+            return sum + (acc.balance || 0);
+        }, 0);
     },
 
     getTotalCreditExpenses(month = null) {
@@ -626,7 +663,8 @@ const Storage = {
     },
 
     getNetWorth() {
-        return this.getTotalBankBalance() +
+        const hasStocks = this.getTotalStocksValue() > 0;
+        return this.getTotalBankBalance(hasStocks) +
                this.getTotalStocksValue() +
                this.getTotalAssetsValue() +
                this.getTotalFundsValue() -

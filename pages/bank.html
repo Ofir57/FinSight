@@ -598,13 +598,24 @@
                 // Map bank name to internal key
                 const bankKey = mapBankName(bank);
 
+                // Detect account type from name
+                let accountType = 'checking';
+                if (name.includes('ניירות ערך') || name.includes('ני"ע')) {
+                    accountType = 'securities';
+                } else if (name.includes('מטבע חוץ') || name.includes('מט"ח')) {
+                    accountType = 'forex';
+                } else if (name.includes('כ.א. חוץ') || name.includes('כרטיס אשראי')) {
+                    accountType = 'creditcard';
+                }
+
                 Storage.addBankAccount({
                     nameHe: name,
                     nameEn: name,
                     bank: bankKey,
                     accountNumber: accountNumber,
                     balance: balance,
-                    currency: 'ILS'
+                    currency: 'ILS',
+                    type: accountType
                 });
                 imported++;
             }

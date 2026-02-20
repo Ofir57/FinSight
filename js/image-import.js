@@ -403,11 +403,11 @@ const ImageImport = {
     /**
      * Update loading progress
      */
-    updateProgress(percent) {
+    updateProgress(percent, label) {
         const bar = document.getElementById('ocrProgressBar');
         const text = document.getElementById('ocrProgressText');
         if (bar) bar.style.width = percent + '%';
-        if (text) text.textContent = percent + '%';
+        if (text) text.textContent = label || (percent + '%');
     },
 
     /**
@@ -795,11 +795,15 @@ const ImageImport = {
     openPayslipPicker() {
         const input = document.createElement('input');
         input.type = 'file';
-        input.accept = 'image/*';
+        input.accept = 'image/*,.pdf,application/pdf';
         input.onchange = (e) => {
             const file = e.target.files[0];
             if (file) {
-                this.processPayslipImage(file);
+                if (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')) {
+                    this.processPayslipPDF(file);
+                } else {
+                    this.processPayslipImage(file);
+                }
             }
         };
         input.click();
@@ -841,6 +845,75 @@ const ImageImport = {
             this.closeLoadingModal();
             console.error('Payslip OCR error:', error);
             App.notify('שגיאה בזיהוי טקסט: ' + error.message, 'error');
+        }
+    },
+
+    /**
+     * Process payslip PDF with pdf.js + Tesseract OCR
+     */
+    async processPayslipPDF(file) {
+        if (typeof pdfjsLib === 'undefined') {
+            App.notify('PDF.js לא נטען — נא לרענן את הדף', 'error');
+            return;
+        }
+
+        this.showLoadingModal();
+
+        try {
+            const arrayBuffer = await file.arrayBuffer();
+            const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+            const totalPages = pdf.numPages;
+            let combinedText = '';
+
+            for (let pageNum = 1; pageNum <= totalPages; pageNum++) {
+                // Update progress: rendering phase
+                this.updateProgress(0, `עמוד ${pageNum}/${totalPages} — מעבד...`);
+
+                const page = await pdf.getPage(pageNum);
+                const viewport = page.getViewport({ scale: 2.0 });
+                const canvas = document.createElement('canvas');
+                canvas.width = viewport.width;
+                canvas.height = viewport.height;
+                const ctx = canvas.getContext('2d');
+                await page.render({ canvasContext: ctx, viewport }).promise;
+
+                // Convert canvas to blob for Tesseract
+                const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+
+                // OCR this page
+                const result = await Tesseract.recognize(blob, 'heb+eng', {
+                    logger: (info) => {
+                        if (info.status === 'recognizing text') {
+                            const pageProgress = Math.round(info.progress * 100);
+                            this.updateProgress(pageProgress, `עמוד ${pageNum}/${totalPages} — OCR ${pageProgress}%`);
+                        }
+                    }
+                });
+
+                combinedText += result.data.text + '\n';
+            }
+
+            this.closeLoadingModal();
+
+            if (!combinedText || combinedText.trim().length < 5) {
+                App.notify('לא זוהה טקסט ב-PDF', 'error');
+                return;
+            }
+
+            console.log('Payslip PDF OCR raw text:', combinedText);
+
+            const data = this.extractPayslip(combinedText);
+            if (!data) {
+                App.notify('לא זוהה תלוש משכורת ב-PDF', 'error');
+                return;
+            }
+
+            this.showPayslipPreviewModal(data);
+
+        } catch (error) {
+            this.closeLoadingModal();
+            console.error('Payslip PDF error:', error);
+            App.notify('שגיאה בעיבוד PDF: ' + error.message, 'error');
         }
     },
 
@@ -905,6 +978,31 @@ const ImageImport = {
         const nationalInsurance = findAmount(['ביטוח לאומי', 'בט. לאומי', 'ב.לאומי', 'בט.לאומי']);
         const healthInsurance = findAmount(['ביטוח בריאות', 'בט. בריאות', 'בט.בריאות']);
 
+        // Extract percentages for contribution fields
+        const findPercent = (keywords) => {
+            for (const keyword of keywords) {
+                for (let i = 0; i < lines.length; i++) {
+                    if (lines[i].includes(keyword)) {
+                        const searchLines = [lines[i]];
+                        if (i + 1 < lines.length) searchLines.push(lines[i + 1]);
+                        for (const sl of searchLines) {
+                            const pctMatch = sl.match(/([\d][,\d]*\.?\d*)\s*%/);
+                            if (pctMatch) {
+                                const val = parseFloat(pctMatch[1].replace(',', '.'));
+                                if (!isNaN(val) && val > 0 && val < 100) return val;
+                            }
+                        }
+                    }
+                }
+            }
+            return 0;
+        };
+
+        const pensionEmployeePct = findPercent(['פנסיה עובד', 'הפרשה פנסיה עובד', 'פנסיה  עובד']);
+        const pensionEmployerPct = findPercent(['פנסיה מעביד', 'פנסיה מעסיק', 'הפרשה פנסיה מעביד', 'פנסיה  מעביד']);
+        const trainingEmployeePct = findPercent(['קרן השתלמות עובד', 'השתלמות עובד', 'ק. השתלמות עובד']);
+        const trainingEmployerPct = findPercent(['קרן השתלמות מעביד', 'קרן השתלמות מעסיק', 'השתלמות מעביד', 'ק. השתלמות מעביד']);
+
         return {
             grossSalary,
             netSalary,
@@ -914,7 +1012,11 @@ const ImageImport = {
             trainingEmployer,
             incomeTax,
             nationalInsurance,
-            healthInsurance
+            healthInsurance,
+            pensionEmployeePct,
+            pensionEmployerPct,
+            trainingEmployeePct,
+            trainingEmployerPct
         };
     },
 
@@ -925,10 +1027,10 @@ const ImageImport = {
         const fields = [
             { id: 'psGross', label: 'שכר ברוטו', labelKey: 'grossSalary', value: data.grossSalary },
             { id: 'psNet', label: 'שכר נטו', labelKey: 'netSalary', value: data.netSalary },
-            { id: 'psPensionEmp', label: 'פנסיה עובד', labelKey: 'pensionEmployee', value: data.pensionEmployee },
-            { id: 'psPensionEr', label: 'פנסיה מעביד', labelKey: 'pensionEmployer', value: data.pensionEmployer },
-            { id: 'psTrainEmp', label: 'קרן השתלמות עובד', labelKey: 'trainingEmployee', value: data.trainingEmployee },
-            { id: 'psTrainEr', label: 'קרן השתלמות מעביד', labelKey: 'trainingEmployer', value: data.trainingEmployer },
+            { id: 'psPensionEmp', label: 'פנסיה עובד', labelKey: 'pensionEmployee', value: data.pensionEmployee, pctId: 'psPensionEmpPct', pctValue: data.pensionEmployeePct },
+            { id: 'psPensionEr', label: 'פנסיה מעביד', labelKey: 'pensionEmployer', value: data.pensionEmployer, pctId: 'psPensionErPct', pctValue: data.pensionEmployerPct },
+            { id: 'psTrainEmp', label: 'קרן השתלמות עובד', labelKey: 'trainingEmployee', value: data.trainingEmployee, pctId: 'psTrainEmpPct', pctValue: data.trainingEmployeePct },
+            { id: 'psTrainEr', label: 'קרן השתלמות מעביד', labelKey: 'trainingEmployer', value: data.trainingEmployer, pctId: 'psTrainErPct', pctValue: data.trainingEmployerPct },
             { id: 'psTax', label: 'מס הכנסה', labelKey: 'incomeTax', value: data.incomeTax },
             { id: 'psNI', label: 'ביטוח לאומי', labelKey: 'nationalInsurance', value: data.nationalInsurance },
             { id: 'psHealth', label: 'ביטוח בריאות', labelKey: 'healthInsurance', value: data.healthInsurance }
@@ -939,16 +1041,23 @@ const ImageImport = {
             try { return I18n.translations[lang].profile[key]; } catch(e) { return null; }
         };
 
-        let fieldsHTML = fields.map(f => `
+        const inputStyle = 'padding: 6px 10px; background: var(--color-bg-primary); border: 1px solid var(--color-border); border-radius: 8px; color: white; font-size: 0.95rem;';
+
+        let fieldsHTML = fields.map(f => {
+            const pctInput = f.pctId ? `
+                    <span>%</span>
+                    <input type="number" class="form-control" id="${f.pctId}" value="${f.pctValue || 0}" step="0.1"
+                           style="width: 70px; ${inputStyle}">` : '';
+            return `
             <div class="form-group" style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--color-border);">
                 <label style="font-weight: 500;">${t(f.labelKey) || f.label}</label>
                 <div style="display: flex; align-items: center; gap: 6px;">
                     <span>₪</span>
                     <input type="number" class="form-control" id="${f.id}" value="${f.value || 0}" step="0.01"
-                           style="width: 140px; padding: 6px 10px; background: var(--color-bg-primary); border: 1px solid var(--color-border); border-radius: 8px; color: white; font-size: 0.95rem;">
+                           style="width: ${f.pctId ? '100px' : '140px'}; ${inputStyle}">${pctInput}
                 </div>
-            </div>
-        `).join('');
+            </div>`;
+        }).join('');
 
         const modal = document.createElement('div');
         modal.className = 'modal-overlay active';
@@ -988,6 +1097,10 @@ const ImageImport = {
             incomeTax: parseFloat(document.getElementById('psTax').value) || 0,
             nationalInsurance: parseFloat(document.getElementById('psNI').value) || 0,
             healthInsurance: parseFloat(document.getElementById('psHealth').value) || 0,
+            pensionEmployeePct: parseFloat(document.getElementById('psPensionEmpPct').value) || 0,
+            pensionEmployerPct: parseFloat(document.getElementById('psPensionErPct').value) || 0,
+            trainingEmployeePct: parseFloat(document.getElementById('psTrainEmpPct').value) || 0,
+            trainingEmployerPct: parseFloat(document.getElementById('psTrainErPct').value) || 0,
             scannedAt: new Date().toISOString()
         };
 
