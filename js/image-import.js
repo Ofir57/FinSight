@@ -969,10 +969,42 @@ const ImageImport = {
         const trainingEmployee = findAmount(['קרן השתלמות עובד', 'השתלמות עובד', 'ק.השתלמות עובד', 'ק. השתלמות עובד', 'קה"ש עובד', 'קה״ש עובד'], 50, 10000);
         const trainingEmployer = findAmount(['שכר לקרן השתלמות', 'קרן השתלמות מעביד', 'קרן השתלמות מעסיק', 'השתלמות מעביד', 'ק.השתלמות מעביד', 'קה"ש מעביד', 'קה״ש מעביד'], 50, 10000);
 
-        // Tax/deduction fields — min=10 to skip noise
-        const incomeTax = findAmount(['מס רגיל', 'מס הכנסה', 'מ.הכנסה', 'מ. הכנסה'], 10);
-        const nationalInsurance = findAmount(['שכר חייב ב.ל', 'ביטוח לאומי', 'בט.לאומי', 'בט. לאומי', 'ב.לאומי', 'ב. לאומי'], 50, 10000);
-        const healthInsurance = findAmount(['ביטוח בריאות', 'בט.בריאות', 'בט. בריאות', 'דמי בריאות'], 50, 10000);
+        // Tax/deduction fields — try Hilan table first, then keyword search
+        let incomeTax = 0, nationalInsurance = 0, healthInsurance = 0;
+
+        // Hilan format: "ניכויי חובה" section has a line with 4 numbers:
+        // [total, national_insurance, health_insurance, income_tax]
+        for (let i = 0; i < lines.length; i++) {
+            if (lines[i].includes('ניכויי חובה') || lines[i].includes('ניכויי  חובה')) {
+                // Search next 3 lines for a line with 3+ large numbers
+                for (let j = i + 1; j <= Math.min(i + 3, lines.length - 1); j++) {
+                    const nums = lines[j].match(/[\d][,\d]*\.\d{2}/g);
+                    if (nums && nums.length >= 3) {
+                        const vals = nums.map(n => parseFloat(n.replace(/,/g, '')));
+                        // Pattern: total (largest), NI, health, tax
+                        const sorted = [...vals].sort((a, b) => b - a);
+                        const total = sorted[0]; // largest = total
+                        const remaining = vals.filter(v => v !== total && v >= 50);
+                        if (remaining.length >= 3) {
+                            // Order in Hilan: total, NI, health, tax
+                            nationalInsurance = remaining[0];
+                            healthInsurance = remaining[1];
+                            incomeTax = remaining[2];
+                        } else if (remaining.length >= 2) {
+                            nationalInsurance = Math.min(...remaining);
+                            incomeTax = Math.max(...remaining);
+                        }
+                        break;
+                    }
+                }
+                break;
+            }
+        }
+
+        // Fallback to keyword search if Hilan table didn't work
+        if (!incomeTax) incomeTax = findAmount(['מס רגיל', 'מס הכנסה', 'מ.הכנסה', 'מ. הכנסה'], 10);
+        if (!nationalInsurance) nationalInsurance = findAmount(['ביטוח לאומי', 'בט.לאומי', 'בט. לאומי', 'ב.לאומי'], 50, 10000);
+        if (!healthInsurance) healthInsurance = findAmount(['ביטוח בריאות', 'בט.בריאות', 'בט. בריאות', 'דמי בריאות'], 50, 10000);
 
         // Extract percentages — look for X% or bare small numbers on contribution lines
         const findPercent = (keywords) => {
