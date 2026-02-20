@@ -928,37 +928,28 @@ const ImageImport = {
 
         if (!isPayslip) return null;
 
-        const lines = text.split('\n').map(l => l.trim());
+        const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+        console.log('Payslip OCR lines:', lines);
 
         /**
          * Extract a number near a keyword.
-         * Searches the line containing the keyword, then the next line.
+         * Searches the entire line (RTL-aware), then adjacent lines.
+         * min/max filter out base-salary numbers and tiny percentages.
          */
-        const findAmount = (keywords) => {
+        const findAmount = (keywords, min = 0, max = Infinity) => {
             for (const keyword of keywords) {
                 for (let i = 0; i < lines.length; i++) {
                     if (lines[i].includes(keyword)) {
-                        // Search this line and the next for a number
                         const searchLines = [lines[i]];
                         if (i + 1 < lines.length) searchLines.push(lines[i + 1]);
+                        if (i - 1 >= 0) searchLines.push(lines[i - 1]);
 
                         for (const sl of searchLines) {
-                            // Remove the keyword itself to avoid matching numbers within it
-                            const afterKeyword = sl.substring(sl.indexOf(keyword) + keyword.length);
-                            // Match numbers: ₪1,234.56 or 1,234.56 or 1234.56 or 1234 or 1,234
-                            const nums = afterKeyword.match(/₪?\s*[\d][,\d]*\.?\d*/g);
-                            if (nums) {
-                                for (const n of nums) {
-                                    const val = parseFloat(n.replace(/[₪\s,]/g, ''));
-                                    if (!isNaN(val) && val > 0) return val;
-                                }
-                            }
-                            // Also try the whole line
-                            const allNums = sl.match(/₪?\s*[\d][,\d]*\.?\d*/g);
+                            const allNums = sl.match(/[\d][,\d]*\.?\d*/g);
                             if (allNums) {
                                 for (const n of allNums) {
-                                    const val = parseFloat(n.replace(/[₪\s,]/g, ''));
-                                    if (!isNaN(val) && val > 0) return val;
+                                    const val = parseFloat(n.replace(/,/g, ''));
+                                    if (!isNaN(val) && val >= min && val <= max) return val;
                                 }
                             }
                         }
@@ -968,24 +959,31 @@ const ImageImport = {
             return 0;
         };
 
-        const grossSalary = findAmount(['סה"כ ברוטו', 'סה״כ ברוטו', 'ברוטו', 'שכר ברוטו']);
-        const netSalary = findAmount(['נטו לתשלום', 'לתשלום', 'סה"כ נטו', 'סה״כ נטו', 'נטו']);
-        const pensionEmployee = findAmount(['פנסיה עובד', 'הפרשה פנסיה עובד', 'פנסיה  עובד']);
-        const pensionEmployer = findAmount(['פנסיה מעביד', 'פנסיה מעסיק', 'הפרשה פנסיה מעביד', 'פנסיה  מעביד']);
-        const trainingEmployee = findAmount(['קרן השתלמות עובד', 'השתלמות עובד', 'ק. השתלמות עובד']);
-        const trainingEmployer = findAmount(['קרן השתלמות מעביד', 'קרן השתלמות מעסיק', 'השתלמות מעביד', 'ק. השתלמות מעביד']);
-        const incomeTax = findAmount(['מס הכנסה', 'מ. הכנסה', 'מ.הכנסה']);
-        const nationalInsurance = findAmount(['ביטוח לאומי', 'בט. לאומי', 'ב.לאומי', 'בט.לאומי']);
-        const healthInsurance = findAmount(['ביטוח בריאות', 'בט. בריאות', 'בט.בריאות']);
+        // Salary fields — large numbers OK
+        const grossSalary = findAmount(['סה"כ ברוטו', 'סה״כ ברוטו', 'שכר ברוטו', 'סך-כל התשלומים', 'סה"כ תשלומים', 'סה״כ תשלומים', 'ברוטו למס', 'ברוטו'], 500);
+        const netSalary = findAmount(['נטו לתשלום', 'שכר 103', 'סה"כ נטו', 'סה״כ נטו', 'נטו'], 500);
 
-        // Extract percentages for contribution fields
+        // Contribution fields — min=50 to skip percentages, max=10000 to skip base salary
+        const pensionEmployee = findAmount(['פנסיה עובד', 'תגמולים עובד', 'תגמולי עובד', 'ניכוי פנסיה', 'תגמולים לקצבה', 'קצבה שכיר'], 50, 10000);
+        const pensionEmployer = findAmount(['פנסיה מעביד', 'פנסיה מעסיק', 'תגמולים מעביד', 'תגמולי מעביד', 'פיצויים'], 50, 10000);
+        const trainingEmployee = findAmount(['קרן השתלמות עובד', 'השתלמות עובד', 'ק.השתלמות עובד', 'ק. השתלמות עובד', 'קה"ש עובד', 'קה״ש עובד'], 50, 10000);
+        const trainingEmployer = findAmount(['שכר לקרן השתלמות', 'קרן השתלמות מעביד', 'קרן השתלמות מעסיק', 'השתלמות מעביד', 'ק.השתלמות מעביד', 'קה"ש מעביד', 'קה״ש מעביד'], 50, 10000);
+
+        // Tax/deduction fields — min=10 to skip noise
+        const incomeTax = findAmount(['מס רגיל', 'מס הכנסה', 'מ.הכנסה', 'מ. הכנסה'], 10);
+        const nationalInsurance = findAmount(['שכר חייב ב.ל', 'ביטוח לאומי', 'בט.לאומי', 'בט. לאומי', 'ב.לאומי', 'ב. לאומי'], 50, 10000);
+        const healthInsurance = findAmount(['ביטוח בריאות', 'בט.בריאות', 'בט. בריאות', 'דמי בריאות'], 50, 10000);
+
+        // Extract percentages — look for X% or bare small numbers on contribution lines
         const findPercent = (keywords) => {
             for (const keyword of keywords) {
                 for (let i = 0; i < lines.length; i++) {
                     if (lines[i].includes(keyword)) {
                         const searchLines = [lines[i]];
                         if (i + 1 < lines.length) searchLines.push(lines[i + 1]);
+                        if (i - 1 >= 0) searchLines.push(lines[i - 1]);
                         for (const sl of searchLines) {
+                            // Try explicit X% pattern first
                             const pctMatch = sl.match(/([\d][,\d]*\.?\d*)\s*%/);
                             if (pctMatch) {
                                 const val = parseFloat(pctMatch[1].replace(',', '.'));
@@ -998,10 +996,10 @@ const ImageImport = {
             return 0;
         };
 
-        const pensionEmployeePct = findPercent(['פנסיה עובד', 'הפרשה פנסיה עובד', 'פנסיה  עובד']);
-        const pensionEmployerPct = findPercent(['פנסיה מעביד', 'פנסיה מעסיק', 'הפרשה פנסיה מעביד', 'פנסיה  מעביד']);
-        const trainingEmployeePct = findPercent(['קרן השתלמות עובד', 'השתלמות עובד', 'ק. השתלמות עובד']);
-        const trainingEmployerPct = findPercent(['קרן השתלמות מעביד', 'קרן השתלמות מעסיק', 'השתלמות מעביד', 'ק. השתלמות מעביד']);
+        const pensionEmployeePct = findPercent(['פנסיה עובד', 'תגמולים עובד', 'תגמולים לקצבה', 'קצבה שכיר', 'ניכוי פנסיה']);
+        const pensionEmployerPct = findPercent(['פנסיה מעביד', 'פנסיה מעסיק', 'תגמולים מעביד', 'פיצויים']);
+        const trainingEmployeePct = findPercent(['קרן השתלמות עובד', 'השתלמות עובד', 'ק.השתלמות עובד', 'קה"ש עובד']);
+        const trainingEmployerPct = findPercent(['קרן השתלמות מעביד', 'השתלמות מעביד', 'ק.השתלמות מעביד', 'קה"ש מעביד', 'קרן השתלמות']);
 
         return {
             grossSalary,
