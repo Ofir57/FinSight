@@ -19,6 +19,7 @@ const SmartTips = {
             ...this.checkPensionRules(profile),
             ...this.checkFamilyRules(profile),
             ...this.checkGeneralRules(profile),
+            ...this.checkCreditScoreRules(profile),
             ...this.checkDataCompleteness(profile)
         ];
 
@@ -463,6 +464,72 @@ const SmartTips = {
                     description: {
                         he: 'יש לך נכסים בבנק, מניות וקרנות — זה פיזור חכם',
                         en: 'You have assets in bank, stocks and funds — that\'s smart diversification'
+                    }
+                });
+            }
+        }
+
+        return tips;
+    },
+
+    // ─── Credit Score Rules ────────────────────────────────
+
+    checkCreditScoreRules(profile) {
+        const tips = [];
+        if (!profile) return tips;
+
+        const creditData = Storage.getCreditCards();
+        const monthExpenses = this.getMonthlyExpenses(this.getCurrentMonth());
+
+        // Rule: High credit utilization (>50% of income)
+        if (profile.monthlyIncome && monthExpenses > profile.monthlyIncome * 0.5) {
+            const utilPct = Math.round(monthExpenses / profile.monthlyIncome * 100);
+            tips.push({
+                id: 'credit-high-utilization',
+                category: 'spending', icon: '💳', severity: 'yellow', priority: 2,
+                title: {
+                    he: 'ניצול אשראי גבוה',
+                    en: 'High credit utilization'
+                },
+                description: {
+                    he: `ניצול האשראי שלך עומד על ${utilPct}% מההכנסה. מומלץ להישאר מתחת ל-30%`,
+                    en: `Your credit utilization is ${utilPct}% of income. Try to stay below 30%`
+                }
+            });
+        }
+
+        // Rule: No external credit score
+        const scoreData = Storage.getCreditScore();
+        if (!scoreData.external) {
+            tips.push({
+                id: 'credit-no-external',
+                category: 'general', icon: '📋', severity: 'blue', priority: 6,
+                title: {
+                    he: 'כדאי לבדוק דירוג אשראי חיצוני',
+                    en: 'Check your external credit score'
+                },
+                description: {
+                    he: 'בדוק את הדירוג שלך ב-BDI או CreditInfo והזן אותו בעמוד הפרופיל',
+                    en: 'Check your score at BDI or CreditInfo and enter it in your profile page'
+                }
+            });
+        }
+
+        // Rule: Stale external score (>6 months old)
+        if (scoreData.external && scoreData.external.date) {
+            const scoreDate = new Date(scoreData.external.date);
+            const monthsAgo = (Date.now() - scoreDate.getTime()) / (1000 * 60 * 60 * 24 * 30);
+            if (monthsAgo > 6) {
+                tips.push({
+                    id: 'credit-stale-score',
+                    category: 'general', icon: '🔄', severity: 'yellow', priority: 5,
+                    title: {
+                        he: 'הדירוג החיצוני לא עודכן מעל 6 חודשים',
+                        en: 'External credit score is over 6 months old'
+                    },
+                    description: {
+                        he: 'מומלץ לעדכן את דירוג האשראי החיצוני שלך אחת לחצי שנה',
+                        en: 'Update your external credit score at least every 6 months'
                     }
                 });
             }

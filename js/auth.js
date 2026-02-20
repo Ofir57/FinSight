@@ -433,7 +433,8 @@ const Auth = {
                 importTemplates: Storage.getImportTemplates(),
                 userProfile: Storage.getUserProfile(),
                 dismissedTips: Storage.getDismissedTips(),
-                loans: Storage.getLoans()
+                loans: Storage.getLoans(),
+                creditScore: Storage.getCreditScore()
             };
 
             // Encrypt sensitive data before uploading
@@ -524,6 +525,7 @@ const Auth = {
                     if (data.userProfile) Storage.saveUserProfile(data.userProfile);
                     if (data.dismissedTips) Storage.saveDismissedTips(data.dismissedTips);
                     if (data.loans) Storage.saveLoans(data.loans);
+                    if (data.creditScore) Storage.saveCreditScore(data.creditScore);
 
                     localStorage.setItem('finance_last_update', new Date().toISOString());
                     console.log('Data synced from cloud (decrypted)');
