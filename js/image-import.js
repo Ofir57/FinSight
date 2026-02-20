@@ -1002,7 +1002,7 @@ const ImageImport = {
         // Severance (פיצויים) — employer-only, use strict regex
         const severancePair = findContributionPair(['פיצויים']);
         const severance = severancePair?.single || severancePair?.employer || findAmount(['פיצויים'], 50, 10000);
-        const severancePct = severancePair?.singlePct || severancePair?.employerPct || 0;
+        const severancePct = severance > 0 ? 8.33 : 0;
 
         // Training fund: try pair detection, then individual keyword fallback
         const trainingPair = findContributionPair(['השתלמות']);
