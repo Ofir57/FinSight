@@ -960,7 +960,7 @@ const ImageImport = {
         };
 
         // Salary fields — large numbers OK
-        const baseSalary = findAmount(['שכר לקצבה', 'שכר לקרן השתלמות', 'שכר בסיס', 'סה"כ תשלומים בגין משרה', 'סה״כ תשלומים בגין משרה', 'תשלומים בגין משרה'], 500);
+        let baseSalary = findAmount(['שכר לקצבה', 'שכר לקרן השתלמות', 'שכר בסיס'], 500);
         const grossSalary = findAmount(['סה"כ ברוטו', 'סה״כ ברוטו', 'שכר ברוטו', 'סך-כל התשלומים', 'סה"כ תשלומים', 'סה״כ תשלומים', 'ברוטו למס', 'ברוטו'], 500);
         const netSalary = findAmount(['נטו לתשלום', 'שכר 103', 'סה"כ נטו', 'סה״כ נטו', 'נטו'], 500);
 
@@ -1003,6 +1003,20 @@ const ImageImport = {
         const severancePair = findContributionPair(['פיצויים']);
         const severance = severancePair?.single || severancePair?.employer || findAmount(['פיצויים'], 50, 10000);
         const severancePct = severancePair?.singlePct || severancePair?.employerPct || 0;
+
+        // Refine baseSalary: get decimal value from contribution table lines
+        for (const kw of ['השתלמות', 'קצבה שכיר', 'קצבה', 'תגמולים']) {
+            for (let i = 0; i < lines.length; i++) {
+                if (lines[i].includes(kw)) {
+                    const nums = lines[i].match(/\d{1,3}(?:,\d{3})*\.\d{2}/g);
+                    if (nums) {
+                        const base = nums.map(n => parseFloat(n.replace(/,/g, ''))).find(v => v > 10000);
+                        if (base) { baseSalary = base; break; }
+                    }
+                }
+            }
+            if (baseSalary !== Math.floor(baseSalary)) break;
+        }
 
         // Training fund: try pair detection, then individual keyword fallback
         const trainingPair = findContributionPair(['השתלמות']);
