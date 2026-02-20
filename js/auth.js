@@ -510,6 +510,38 @@ const Auth = {
                         data = rawData;
                     }
 
+                    // Safety check: count data items in cloud vs local
+                    const cloudItemCount = this._countDataItems(data);
+                    const localItemCount = this._countDataItems({
+                        bankAccounts: Storage.getBankAccounts(),
+                        creditCards: Storage.getCreditCards(),
+                        stocks: Storage.getStocks(),
+                        assets: Storage.getAssets(),
+                        myFunds: Storage.getMyFunds(),
+                        loans: Storage.getLoans()
+                    });
+
+                    // If cloud is empty but local has data, don't overwrite — upload local instead
+                    if (cloudItemCount === 0 && localItemCount > 0) {
+                        console.log('Cloud data is empty but local has data — uploading local to cloud');
+                        App.notify(I18n.t('auth.localDataPreserved') || 'הנתונים המקומיים נשמרו ועולים לענן', 'info');
+                        await this.saveToCloud();
+                        return true;
+                    }
+
+                    // If cloud has significantly less data, ask user
+                    if (localItemCount > 0 && cloudItemCount < localItemCount * 0.5) {
+                        const lang = I18n?.currentLanguage || 'he';
+                        const msg = lang === 'he'
+                            ? `בענן יש ${cloudItemCount} פריטים, במכשיר הזה יש ${localItemCount}. לדרוס את הנתונים המקומיים?`
+                            : `Cloud has ${cloudItemCount} items, this device has ${localItemCount}. Overwrite local data?`;
+                        if (!confirm(msg)) {
+                            console.log('User chose to keep local data');
+                            await this.saveToCloud();
+                            return true;
+                        }
+                    }
+
                     // Cloud is newer, update local
                     if (data.bankAccounts) Storage.saveBankAccounts(data.bankAccounts);
                     if (data.creditCards) Storage.saveCreditCards(data.creditCards);
@@ -543,9 +575,21 @@ const Auth = {
                     await this.saveToCloud();
                 }
             } else {
-                // No cloud data, save local to cloud
-                console.log('No cloud data found, saving local data');
-                await this.saveToCloud();
+                // No cloud data — only save if local has actual data
+                const localCount = this._countDataItems({
+                    bankAccounts: Storage.getBankAccounts(),
+                    creditCards: Storage.getCreditCards(),
+                    stocks: Storage.getStocks(),
+                    assets: Storage.getAssets(),
+                    myFunds: Storage.getMyFunds(),
+                    loans: Storage.getLoans()
+                });
+                if (localCount > 0) {
+                    console.log('No cloud data found, saving local data');
+                    await this.saveToCloud();
+                } else {
+                    console.log('No cloud data and no local data — nothing to sync');
+                }
             }
 
             return true;
@@ -573,6 +617,26 @@ const Auth = {
 
         await this.saveToCloud();
         App.notify(I18n.t('auth.syncSuccess'), 'success');
+    },
+
+    /**
+     * Count total data items across financial categories
+     */
+    _countDataItems(data) {
+        let count = 0;
+        if (data.bankAccounts) count += Array.isArray(data.bankAccounts) ? data.bankAccounts.length : 0;
+        if (data.creditCards) {
+            const cc = data.creditCards;
+            count += (cc.cards?.length || 0) + (cc.expenses?.length || 0);
+        }
+        if (data.stocks) {
+            const s = data.stocks;
+            count += (s.holdings?.length || 0) + (s.transactions?.length || 0);
+        }
+        if (data.assets) count += Array.isArray(data.assets) ? data.assets.length : 0;
+        if (data.myFunds) count += Array.isArray(data.myFunds) ? data.myFunds.length : 0;
+        if (data.loans) count += Array.isArray(data.loans) ? data.loans.length : 0;
+        return count;
     },
 
     /**
