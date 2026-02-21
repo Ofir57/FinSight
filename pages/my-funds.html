@@ -580,9 +580,35 @@
                 } else if (companyMatches.length > 1) {
                     // Try to narrow down by name keywords
                     const nameWords = nameLower.split(/\s+/).filter(w => w.length > 2);
-                    match = companyMatches.find(f => {
+                    const keywordMatch = companyMatches.find(f => {
                         const fName = f.nameHe.toLowerCase();
                         return nameWords.some(w => fName.includes(w));
+                    });
+                    if (keywordMatch) {
+                        match = keywordMatch;
+                    } else {
+                        // Prefer "כללי" (general) or "מקיפה" (comprehensive) track
+                        match = companyMatches.find(f => {
+                            const n = f.nameHe.toLowerCase();
+                            return n.includes('כללי') || n.includes('מקיפה') || n.includes('מקיפת');
+                        }) || companyMatches[0];
+                    }
+                }
+            }
+
+            // Also try matching by company name directly (for clearinghouse imports)
+            if (!match && company) {
+                const companyLower = (companyDisplay || company).toLowerCase();
+                const companyMatches = sources.filter(f =>
+                    (f.companyHe && f.companyHe.toLowerCase().includes(companyLower)) ||
+                    (f.companyEn && f.companyEn.toLowerCase().includes(companyLower))
+                );
+                if (companyMatches.length === 1) {
+                    match = companyMatches[0];
+                } else if (companyMatches.length > 1) {
+                    match = companyMatches.find(f => {
+                        const n = f.nameHe.toLowerCase();
+                        return n.includes('כללי') || n.includes('מקיפה') || n.includes('מקיפת');
                     }) || companyMatches[0];
                 }
             }

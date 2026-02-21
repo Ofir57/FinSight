@@ -95,6 +95,28 @@ const MyGemelFunds = {
             fee: 0.63
         },
         {
+            nameHe: "מור השתלמות - כללי",
+            nameEn: "Mor Training - General",
+            companyHe: "מור",
+            companyEn: "Mor",
+            month: 0.53,
+            year1: 14.73,
+            year3: 42.35,
+            year5: 53.28,
+            fee: 0.70
+        },
+        {
+            nameHe: "מור השתלמות - מניות",
+            nameEn: "Mor Training - Stocks",
+            companyHe: "מור",
+            companyEn: "Mor",
+            month: 1.46,
+            year1: 25.86,
+            year3: 74.08,
+            year5: 87.76,
+            fee: 0.71
+        },
+        {
             nameHe: "אומגה קרן מניות",
             nameEn: "Omega Fund Stocks",
             companyHe: "אומגה",
@@ -541,6 +563,17 @@ const MyGemelFunds = {
             year3: 75.06,
             year5: 82.20,
             fee: 0.73
+        },
+        {
+            nameHe: "ילין לפידות קופת גמל להשקעה כללי",
+            nameEn: "Yelin Lapidot Gemel General",
+            companyHe: "ילין לפידות",
+            companyEn: "Yelin Lapidot",
+            month: 0.62,
+            year1: 13.52,
+            year3: 44.70,
+            year5: 49.05,
+            fee: 0.68
         },
         {
             nameHe: "הפניקס גמל להשקעה מניות",
