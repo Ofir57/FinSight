@@ -1,4 +1,4 @@
-const CACHE_NAME = 'finsight-v58';
+const CACHE_NAME = 'finsight-v59';
 const ASSETS_TO_CACHE = [
     './',
     './index.html',
@@ -61,10 +61,12 @@ self.addEventListener('install', (event) => {
         caches.open(CACHE_NAME)
             .then((cache) => {
                 console.log('Caching app assets');
-                return cache.addAll(ASSETS_TO_CACHE);
-            })
-            .catch((error) => {
-                console.log('Cache addAll failed:', error);
+                // Cache each asset individually so one failure doesn't block everything
+                return Promise.all(
+                    ASSETS_TO_CACHE.map(url =>
+                        cache.add(url).catch(err => console.warn('Failed to cache:', url, err))
+                    )
+                );
             })
     );
     self.skipWaiting();
@@ -109,8 +111,8 @@ self.addEventListener('fetch', (event) => {
                     });
             })
             .catch(() => {
-                // Return offline page if available
-                return caches.match('/index.html');
+                // Return offline page if available (use relative path to match cache)
+                return caches.match('./index.html') || caches.match('./');
             })
     );
 });
