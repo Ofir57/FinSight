@@ -779,7 +779,8 @@ const I18n = {
                 clearinghouseActive: 'פעיל',
                 clearinghouseInactive: 'לא פעיל',
                 clearinghouseDuplicate: 'קיים',
-                clearinghouseSelectAll: 'בחר הכל'
+                clearinghouseSelectAll: 'בחר הכל',
+                goToClearinghouse: 'הר ההשקעות'
             },
             // Market Products
             marketProducts: {
@@ -1806,7 +1807,8 @@ const I18n = {
                 clearinghouseActive: 'Active',
                 clearinghouseInactive: 'Inactive',
                 clearinghouseDuplicate: 'Exists',
-                clearinghouseSelectAll: 'Select All'
+                clearinghouseSelectAll: 'Select All',
+                goToClearinghouse: 'Har Hashkaot'
             },
             // Market Products
             marketProducts: {

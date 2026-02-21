@@ -273,6 +273,10 @@
                     <span>🏦</span>
                     <span data-i18n="myFunds.importClearinghouse">ייבוא מהמסלקה</span>
                 </button>
+                <a href="https://har-hashkaot.org.il/" target="_blank" rel="noopener" class="btn btn-secondary" style="text-decoration:none;font-size:0.85rem;">
+                    <span>🔗</span>
+                    <span data-i18n="myFunds.goToClearinghouse">הר ההשקעות</span>
+                </a>
             </div>
 
             <!-- Fund Type Tabs -->
@@ -1457,8 +1461,16 @@
                     if (f) {
                         f.value = p.balance;
                         if (p.monthlyDeposit) f.monthlyDeposit = p.monthlyDeposit;
-                        if (p.ytdReturn) {
-                            f.returns = f.returns || {};
+                        // Try to get full returns from market data
+                        const marketReturns = matchMarketFund(p.name, p.companyCode, p.type);
+                        f.returns = f.returns || {};
+                        if (marketReturns) {
+                            if (marketReturns.month != null) f.returns.month = marketReturns.month;
+                            if (marketReturns.year1 != null) f.returns.year1 = marketReturns.year1;
+                            if (marketReturns.year3 != null) f.returns.year3 = marketReturns.year3;
+                            if (marketReturns.year5 != null) f.returns.year5 = marketReturns.year5;
+                            f.returnsSource = 'market';
+                        } else if (p.ytdReturn) {
                             f.returns.year1 = p.ytdReturn;
                             f.returnsSource = 'clearinghouse';
                         }
@@ -1485,12 +1497,21 @@
                         updatedAt: now,
                         history: [{ date: new Date().toISOString().split('T')[0], value: p.balance }]
                     };
-                    if (p.ytdReturn) {
+                    // Try to get full returns from market data
+                    const marketReturns = matchMarketFund(p.name, p.companyCode, p.type);
+                    if (marketReturns) {
+                        newFund.returns = {
+                            month: marketReturns.month,
+                            year1: marketReturns.year1,
+                            year3: marketReturns.year3,
+                            year5: marketReturns.year5
+                        };
+                        newFund.returnsSource = 'market';
+                    } else if (p.ytdReturn) {
                         newFund.returns = { year1: p.ytdReturn };
                         newFund.returnsSource = 'clearinghouse';
                     }
                     if (p.type === 'pension') {
-                        // Store pension-specific data from clearinghouse in notes
                         const fees = [];
                         if (p.feeDeposit) fees.push(`דמ"נ הפקדות: ${p.feeDeposit}%`);
                         if (p.feeSavings) fees.push(`דמ"נ צבירה: ${p.feeSavings}%`);
