@@ -20,6 +20,7 @@ const SmartTips = {
             ...this.checkFamilyRules(profile),
             ...this.checkGeneralRules(profile),
             ...this.checkCreditScoreRules(profile),
+            ...this.checkRecurringRules(profile),
             ...this.checkDataCompleteness(profile)
         ];
 
@@ -533,6 +534,31 @@ const SmartTips = {
                     }
                 });
             }
+        }
+
+        return tips;
+    },
+
+    // ─── Recurring Expenses Rules ─────────────────────────
+
+    checkRecurringRules(profile) {
+        const tips = [];
+        if (!profile?.monthlyIncome) return tips;
+
+        const recurringTotal = Storage.getMonthlyRecurringTotal();
+        if (recurringTotal > 0 && recurringTotal / profile.monthlyIncome > 0.3) {
+            tips.push({
+                id: 'spending-recurring-high',
+                category: 'spending', icon: '🔄', severity: 'yellow', priority: 3,
+                title: {
+                    he: 'הוצאות קבועות גבוהות',
+                    en: 'High recurring expenses'
+                },
+                description: {
+                    he: `ההוצאות הקבועות (${this.fmt(recurringTotal)}) מהוות ${Math.round(recurringTotal / profile.monthlyIncome * 100)}% מההכנסה. שווה לבדוק אילו מנויים אפשר לבטל`,
+                    en: `Recurring expenses (${this.fmt(recurringTotal)}) are ${Math.round(recurringTotal / profile.monthlyIncome * 100)}% of income. Consider reviewing subscriptions`
+                }
+            });
         }
 
         return tips;

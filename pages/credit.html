@@ -98,6 +98,120 @@
             border-radius: 8px;
             transition: width 0.3s;
         }
+        /* Recurring Expenses Section */
+        .recurring-section {
+            margin-bottom: 20px;
+        }
+        .recurring-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            padding: 15px 20px;
+            background: var(--color-bg-card);
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            transition: background 0.2s;
+        }
+        .recurring-toggle:hover {
+            background: var(--color-bg-hover);
+        }
+        .recurring-toggle-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .recurring-toggle .arrow {
+            transition: transform 0.3s;
+            font-size: 0.8rem;
+            color: var(--color-text-secondary);
+        }
+        .recurring-toggle.open .arrow {
+            transform: rotate(180deg);
+        }
+        .recurring-total-badge {
+            background: var(--color-credit);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        .recurring-body {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        .recurring-body.open {
+            max-height: 2000px;
+        }
+        .recurring-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 12px;
+            padding: 15px 0;
+        }
+        .recurring-card {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 16px;
+            background: var(--color-bg-card);
+            border: 1px solid var(--color-border);
+            border-radius: 10px;
+            transition: border-color 0.2s;
+        }
+        .recurring-card:hover {
+            border-color: var(--color-credit);
+        }
+        .recurring-card.upcoming {
+            border-color: #f59e0b;
+            background: rgba(245, 158, 11, 0.05);
+        }
+        .recurring-card-icon {
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+        .recurring-card-info {
+            flex: 1;
+            min-width: 0;
+        }
+        .recurring-card-name {
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .recurring-card-meta {
+            font-size: 0.8rem;
+            color: var(--color-text-secondary);
+            margin-top: 2px;
+        }
+        .recurring-card-amount {
+            font-weight: 700;
+            color: var(--color-credit);
+            white-space: nowrap;
+        }
+        .recurring-card-actions {
+            display: flex;
+            gap: 4px;
+        }
+        .recurring-card-actions button {
+            padding: 4px 6px;
+            font-size: 0.75rem;
+        }
+        .recurring-fields {
+            display: none;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .recurring-fields.visible {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+        }
+        .recurring-fields .form-group {
+            margin-bottom: 0;
+        }
     </style>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
@@ -238,6 +352,25 @@
                 </div>
                 <div id="cardsContainer">
                     <!-- Cards will be populated here -->
+                </div>
+            </div>
+
+            <!-- Recurring Expenses Section -->
+            <div class="recurring-section" id="recurringSection">
+                <div class="recurring-toggle" onclick="toggleRecurringSection()">
+                    <div class="recurring-toggle-right">
+                        <span>🔄</span>
+                        <strong data-i18n="credit.recurringExpenses">הוצאות קבועות</strong>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span class="recurring-total-badge" id="recurringTotalBadge">₪0</span>
+                        <span class="arrow">▼</span>
+                    </div>
+                </div>
+                <div class="recurring-body" id="recurringBody">
+                    <div class="recurring-grid" id="recurringGrid">
+                        <!-- Populated by JS -->
+                    </div>
                 </div>
             </div>
 
@@ -401,9 +534,31 @@
                     </div>
                     <div class="form-group">
                         <label>
-                            <input type="checkbox" id="isRecurring">
+                            <input type="checkbox" id="isRecurring" onchange="toggleRecurringFields()">
                             <span data-i18n="credit.recurring">הוצאה קבועה</span>
                         </label>
+                    </div>
+                    <div class="recurring-fields" id="recurringFields">
+                        <div class="form-group">
+                            <label data-i18n="credit.frequency">תדירות</label>
+                            <select class="form-control" id="recurringFrequency">
+                                <option value="monthly" data-i18n="credit.monthly">חודשי</option>
+                                <option value="weekly" data-i18n="credit.weekly">שבועי</option>
+                                <option value="biweekly" data-i18n="credit.biweekly">דו-שבועי</option>
+                                <option value="bimonthly" data-i18n="credit.bimonthly">דו-חודשי</option>
+                                <option value="quarterly" data-i18n="credit.quarterly">רבעוני</option>
+                                <option value="annually" data-i18n="credit.annually">שנתי</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label data-i18n="credit.chargeDay">יום חיוב</label>
+                            <input type="number" class="form-control" id="recurringDay" min="1" max="31" placeholder="1-31">
+                        </div>
+                        <div class="form-group" style="grid-column: 1 / -1;">
+                            <label data-i18n="credit.endDate">תאריך סיום</label>
+                            <input type="date" class="form-control" id="recurringEndDate">
+                            <small style="color: var(--color-text-secondary);" data-i18n="credit.ongoing">ללא הגבלה</small>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -435,6 +590,7 @@
             initMonthSelector();
             loadCards();
             loadExpenses();
+            renderRecurringSummary();
         });
 
         function initMonthSelector() {
@@ -810,6 +966,7 @@
             document.getElementById('expenseForm').reset();
             document.getElementById('expenseId').value = '';
             document.getElementById('expenseDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('recurringFields').classList.remove('visible');
             document.getElementById('expenseModal').classList.add('active');
         }
 
@@ -829,6 +986,15 @@
             document.getElementById('expenseCategory').value = expense.category;
             document.getElementById('expenseDescription').value = expense.description || '';
             document.getElementById('isRecurring').checked = expense.isRecurring || false;
+            // Load recurring fields
+            if (expense.isRecurring) {
+                document.getElementById('recurringFields').classList.add('visible');
+                document.getElementById('recurringFrequency').value = expense.recurringFrequency || 'monthly';
+                document.getElementById('recurringDay').value = expense.recurringDay || '';
+                document.getElementById('recurringEndDate').value = expense.recurringEndDate || '';
+            } else {
+                document.getElementById('recurringFields').classList.remove('visible');
+            }
             document.getElementById('expenseModal').classList.add('active');
         }
 
@@ -846,14 +1012,27 @@
                 return;
             }
 
-            if (id) {
-                Storage.updateExpense(id, { cardId, date, amount, category, description, isRecurring });
+            const expenseData = { cardId, date, amount, category, description, isRecurring };
+
+            if (isRecurring) {
+                expenseData.recurringFrequency = document.getElementById('recurringFrequency').value;
+                expenseData.recurringDay = parseInt(document.getElementById('recurringDay').value) || null;
+                expenseData.recurringEndDate = document.getElementById('recurringEndDate').value || null;
             } else {
-                Storage.addExpense({ cardId, date, amount, category, description, isRecurring });
+                expenseData.recurringFrequency = null;
+                expenseData.recurringDay = null;
+                expenseData.recurringEndDate = null;
+            }
+
+            if (id) {
+                Storage.updateExpense(id, expenseData);
+            } else {
+                Storage.addExpense(expenseData);
             }
 
             closeExpenseModal();
             loadExpenses();
+            renderRecurringSummary();
             App.notify(I18n.t('common.save') + ' ✓', 'success');
         }
 
@@ -861,6 +1040,7 @@
             if (confirm(I18n.t('common.confirmDelete'))) {
                 Storage.deleteExpense(id);
                 loadExpenses();
+                renderRecurringSummary();
                 App.notify(I18n.t('common.delete') + ' ✓', 'success');
             }
         }
@@ -878,6 +1058,97 @@
                 loadExpenses();
                 App.notify(I18n.t('credit.deletedExpenses') + ' (' + count + ')', 'success');
             }
+        }
+
+        // Recurring Expense Functions
+        function toggleRecurringFields() {
+            const fields = document.getElementById('recurringFields');
+            if (document.getElementById('isRecurring').checked) {
+                fields.classList.add('visible');
+            } else {
+                fields.classList.remove('visible');
+            }
+        }
+
+        function toggleRecurringSection() {
+            const toggle = document.querySelector('.recurring-toggle');
+            const body = document.getElementById('recurringBody');
+            toggle.classList.toggle('open');
+            body.classList.toggle('open');
+        }
+
+        function getNextChargeDate(expense) {
+            const day = expense.recurringDay || new Date(expense.date).getDate();
+            const now = new Date();
+            const freq = expense.recurringFrequency || 'monthly';
+
+            let next = new Date(now.getFullYear(), now.getMonth(), day);
+            if (next <= now) {
+                if (freq === 'weekly') next.setDate(next.getDate() + 7);
+                else if (freq === 'biweekly') next.setDate(next.getDate() + 14);
+                else if (freq === 'bimonthly') next.setMonth(next.getMonth() + 2);
+                else if (freq === 'quarterly') next.setMonth(next.getMonth() + 3);
+                else if (freq === 'annually') next.setFullYear(next.getFullYear() + 1);
+                else next.setMonth(next.getMonth() + 1);
+            }
+
+            if (expense.recurringEndDate && next > new Date(expense.recurringEndDate)) return null;
+            return next;
+        }
+
+        function getCategoryIcon(category) {
+            const icons = { food: '🍔', transport: '🚗', shopping: '🛒', entertainment: '🎬', bills: '📄', health: '💊', education: '📚', other: '📌' };
+            return icons[category] || '📌';
+        }
+
+        function renderRecurringSummary() {
+            const recurring = Storage.getRecurringExpenses();
+            const grid = document.getElementById('recurringGrid');
+            const badge = document.getElementById('recurringTotalBadge');
+            const section = document.getElementById('recurringSection');
+
+            if (recurring.length === 0) {
+                section.style.display = 'none';
+                return;
+            }
+            section.style.display = 'block';
+
+            const monthlyTotal = Storage.getMonthlyRecurringTotal();
+            badge.textContent = I18n.formatCurrency(monthlyTotal);
+
+            const freqLabels = {
+                weekly: I18n.t('credit.weekly'),
+                biweekly: I18n.t('credit.biweekly'),
+                monthly: I18n.t('credit.monthly'),
+                bimonthly: I18n.t('credit.bimonthly'),
+                quarterly: I18n.t('credit.quarterly'),
+                annually: I18n.t('credit.annually')
+            };
+
+            const now = new Date();
+            const in7days = new Date(now);
+            in7days.setDate(in7days.getDate() + 7);
+
+            grid.innerHTML = recurring.map(exp => {
+                const freq = exp.recurringFrequency || 'monthly';
+                const nextDate = getNextChargeDate(exp);
+                const isUpcoming = nextDate && nextDate <= in7days;
+                const nextStr = nextDate ? I18n.formatDate(nextDate.toISOString().split('T')[0]) : '-';
+
+                return `
+                    <div class="recurring-card${isUpcoming ? ' upcoming' : ''}">
+                        <span class="recurring-card-icon">${getCategoryIcon(exp.category)}</span>
+                        <div class="recurring-card-info">
+                            <div class="recurring-card-name">${exp.description || I18n.t('credit.categories.' + exp.category)}</div>
+                            <div class="recurring-card-meta">${freqLabels[freq] || freq} · ${I18n.t('credit.nextCharge')}: ${nextStr}</div>
+                        </div>
+                        <div class="recurring-card-amount">${I18n.formatCurrency(exp.amount)}</div>
+                        <div class="recurring-card-actions">
+                            <button class="btn btn-secondary btn-sm" onclick="editExpense('${exp.id}')" title="${I18n.t('common.edit')}">✏️</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
         }
 
         // Smart Import Function

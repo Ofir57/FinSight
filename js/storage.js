@@ -277,6 +277,29 @@ const Storage = {
         this.saveCreditCards(data);
     },
 
+    // Recurring Expenses
+    getRecurringExpenses() {
+        const data = this.getCreditCards();
+        return data.expenses.filter(e => e.isRecurring);
+    },
+
+    getMonthlyRecurringTotal() {
+        const recurring = this.getRecurringExpenses();
+        const multipliers = {
+            weekly: 52 / 12,
+            biweekly: 26 / 12,
+            monthly: 1,
+            bimonthly: 0.5,
+            quarterly: 1 / 3,
+            annually: 1 / 12
+        };
+        return recurring.reduce((sum, e) => {
+            const freq = e.recurringFrequency || 'monthly';
+            const mult = multipliers[freq] || 1;
+            return sum + (e.amount || 0) * mult;
+        }, 0);
+    },
+
     // Stocks
     getStocks() {
         return this.get(this.KEYS.STOCKS) || { holdings: [], transactions: [] };
