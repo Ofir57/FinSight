@@ -954,7 +954,11 @@ const I18n = {
                 annualReturn: 'תשואה שנתית',
                 removeIndex: 'הסר',
                 alpha: 'אלפא',
-                customBenchmark: 'מדד מותאם'
+                customBenchmark: 'מדד מותאם',
+                compareTarget: 'השווה:',
+                wholePortfolio: 'כל התיק',
+                customTicker: 'טיקר אחר...',
+                tickerNotFound: 'סימול לא נמצא'
             },
             // Common
             common: {
@@ -1956,7 +1960,11 @@ const I18n = {
                 annualReturn: 'Annual Return',
                 removeIndex: 'Remove',
                 alpha: 'Alpha',
-                customBenchmark: 'Custom Index'
+                customBenchmark: 'Custom Index',
+                compareTarget: 'Compare:',
+                wholePortfolio: 'Whole Portfolio',
+                customTicker: 'Other ticker...',
+                tickerNotFound: 'Symbol not found'
             },
             // Common
             common: {
@@ -2296,7 +2304,11 @@ const I18n = {
                 annualReturn: 'Retorno Anual',
                 removeIndex: 'Remover',
                 alpha: 'Alfa',
-                customBenchmark: 'Índice Personalizado'
+                customBenchmark: 'Índice Personalizado',
+                compareTarget: 'Comparar:',
+                wholePortfolio: 'Carteira Inteira',
+                customTicker: 'Outro ticker...',
+                tickerNotFound: 'Símbolo não encontrado'
             },
             // Common
             common: {

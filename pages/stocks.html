@@ -557,6 +557,14 @@
                     </h2>
                 </div>
                 <div style="padding: 15px 20px;">
+                    <!-- Compare Target Selector -->
+                    <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 15px; flex-wrap: wrap;">
+                        <span style="font-size: 0.85rem; color: var(--color-text-secondary); font-weight: 500;" data-i18n="benchmark.compareTarget">השווה:</span>
+                        <select id="benchmarkTargetSelect" onchange="onBenchmarkTargetChange()" style="padding: 6px 10px; border-radius: 8px; border: 1px solid var(--color-border); background: var(--color-bg-card); color: var(--color-text); font-size: 0.85rem; min-width: 140px;">
+                            <option value="portfolio" data-i18n="benchmark.wholePortfolio">כל התיק</option>
+                        </select>
+                        <input type="text" id="customTickerInput" placeholder="AAPL, TSLA..." style="display: none; padding: 6px 10px; border-radius: 8px; border: 1px solid var(--color-border); background: var(--color-bg-card); color: var(--color-text); font-size: 0.85rem; width: 120px;" onkeydown="if(event.key==='Enter')loadBenchmarkChart()">
+                    </div>
                     <!-- Period Selector -->
                     <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 15px;">
                         <button class="btn btn-sm btn-secondary benchmark-period" data-range="1mo" onclick="setBenchmarkPeriod('1mo')" data-i18n="benchmark.period1M">חודש</button>
@@ -2530,6 +2538,55 @@
             loadBenchmarkChart();
         }
 
+        // Populate the compare target dropdown with portfolio holdings
+        function populateBenchmarkTargetSelect() {
+            const select = document.getElementById('benchmarkTargetSelect');
+            const stockData = Storage.getStocks();
+            const holdings = stockData.holdings || [];
+            // Keep current selection
+            const currentVal = select.value;
+            // Clear all except first (portfolio)
+            while (select.options.length > 1) select.remove(1);
+            // Add each holding
+            holdings.forEach(h => {
+                const opt = document.createElement('option');
+                opt.value = h.symbol;
+                opt.textContent = `${h.symbol} (${h.name || h.symbol})`;
+                select.appendChild(opt);
+            });
+            // Add "custom ticker" option
+            const customOpt = document.createElement('option');
+            customOpt.value = '__custom__';
+            customOpt.textContent = I18n.t('benchmark.customTicker');
+            select.appendChild(customOpt);
+            // Restore selection if still valid
+            if ([...select.options].some(o => o.value === currentVal)) {
+                select.value = currentVal;
+            }
+            onBenchmarkTargetChange();
+        }
+
+        function onBenchmarkTargetChange() {
+            const select = document.getElementById('benchmarkTargetSelect');
+            const customInput = document.getElementById('customTickerInput');
+            customInput.style.display = select.value === '__custom__' ? '' : 'none';
+            if (select.value !== '__custom__') {
+                loadBenchmarkChart();
+            } else {
+                customInput.focus();
+            }
+        }
+
+        function getCompareTarget() {
+            const select = document.getElementById('benchmarkTargetSelect');
+            if (select.value === '__custom__') {
+                const ticker = document.getElementById('customTickerInput').value.trim().toUpperCase();
+                return ticker ? { type: 'ticker', symbol: ticker } : { type: 'portfolio' };
+            }
+            if (select.value === 'portfolio') return { type: 'portfolio' };
+            return { type: 'ticker', symbol: select.value };
+        }
+
         function setBenchmarkPeriod(range) {
             currentBenchmarkRange = range;
             document.querySelectorAll('.benchmark-period').forEach(btn => {
@@ -2638,9 +2695,11 @@
             const statsEl = document.getElementById('benchmarkStats');
             const statsGrid = document.getElementById('benchmarkStatsGrid');
 
-            // Get portfolio holdings
+            const compareTarget = getCompareTarget();
             const stockData = Storage.getStocks();
-            if (stockData.holdings.length === 0) {
+
+            // Need holdings for portfolio mode, or at least benchmarks for ticker mode
+            if (compareTarget.type === 'portfolio' && stockData.holdings.length === 0) {
                 statsGrid.innerHTML = `<div style="color: var(--color-text-secondary);">${I18n.t('benchmark.noData')}</div>`;
                 statsEl.style.display = '';
                 if (benchmarkChart) { benchmarkChart.destroy(); benchmarkChart = null; }
@@ -2650,6 +2709,24 @@
             loadingEl.style.display = '';
 
             try {
+                // If comparing a specific ticker, fetch its data too
+                let targetData = null;
+                if (compareTarget.type === 'ticker') {
+                    const cached = getCachedBenchmark(compareTarget.symbol, currentBenchmarkRange);
+                    if (cached) {
+                        targetData = cached;
+                    } else {
+                        targetData = await StockAPI.fetchBenchmarkData(compareTarget.symbol, currentBenchmarkRange);
+                        if (targetData.success) setCachedBenchmark(compareTarget.symbol, currentBenchmarkRange, targetData);
+                    }
+                    if (!targetData.success || !targetData.historicalData || targetData.historicalData.length === 0) {
+                        loadingEl.style.display = 'none';
+                        statsGrid.innerHTML = `<div style="color: var(--color-negative);">⚠ ${compareTarget.symbol} — ${I18n.t('benchmark.tickerNotFound')}</div>`;
+                        statsEl.style.display = '';
+                        return;
+                    }
+                }
+
                 // Fetch benchmark data (with caching)
                 const benchmarkPromises = selectedBenchmarks.map(async sym => {
                     const cached = getCachedBenchmark(sym, currentBenchmarkRange);
@@ -2664,7 +2741,7 @@
                 let referenceDates = [];
                 const validBenchmarks = benchmarkResults.filter(b => b.success && b.historicalData.length > 0);
 
-                // Remove failed custom benchmarks
+                // Track failed custom benchmarks
                 const failedCustoms = [];
                 benchmarkResults.forEach((r, i) => {
                     if (!r.success && customChecked.includes(selectedBenchmarks[i])) {
@@ -2672,11 +2749,15 @@
                     }
                 });
 
-                if (validBenchmarks.length > 0) {
-                    const longestBenchmark = validBenchmarks.reduce((a, b) =>
+                // For reference dates, also consider the target ticker data
+                const allDataSources = [...validBenchmarks];
+                if (targetData && targetData.success) allDataSources.push(targetData);
+
+                if (allDataSources.length > 0) {
+                    const longestSource = allDataSources.reduce((a, b) =>
                         a.historicalData.length > b.historicalData.length ? a : b
                     );
-                    referenceDates = longestBenchmark.historicalData.map(d => d.date);
+                    referenceDates = longestSource.historicalData.map(d => d.date);
                 }
 
                 if (referenceDates.length === 0) {
@@ -2686,8 +2767,32 @@
                     return;
                 }
 
-                // Build portfolio time-series from transactions
-                const { series: portfolioSeries, finalReturn: portfolioReturn } = buildPortfolioTimeSeries(referenceDates, stockData);
+                // Build the main comparison line
+                let mainSeries, mainReturn, mainLabel;
+
+                if (compareTarget.type === 'ticker' && targetData && targetData.success) {
+                    // Specific ticker: use its real historical prices
+                    const startPrice = targetData.historicalData[0].close;
+                    const tickerReturns = targetData.historicalData.map(d => ((d.close / startPrice) - 1) * 100);
+                    mainReturn = tickerReturns[tickerReturns.length - 1] || 0;
+                    mainLabel = compareTarget.symbol;
+
+                    // Align to reference dates
+                    mainSeries = [];
+                    let tIdx = 0;
+                    for (let i = 0; i < referenceDates.length; i++) {
+                        while (tIdx < targetData.historicalData.length - 1 && targetData.historicalData[tIdx].date < referenceDates[i]) {
+                            tIdx++;
+                        }
+                        mainSeries.push(tIdx < tickerReturns.length ? tickerReturns[tIdx] : tickerReturns[tickerReturns.length - 1]);
+                    }
+                } else {
+                    // Whole portfolio
+                    const result = buildPortfolioTimeSeries(referenceDates, stockData);
+                    mainSeries = result.series;
+                    mainReturn = result.finalReturn;
+                    mainLabel = I18n.t('benchmark.yourPortfolio');
+                }
 
                 // Build chart datasets
                 const datasets = [];
@@ -2696,10 +2801,10 @@
                     return `${date.getDate()}/${date.getMonth() + 1}`;
                 });
 
-                // Portfolio line (real time-series curve)
+                // Main comparison line
                 datasets.push({
-                    label: I18n.t('benchmark.yourPortfolio'),
-                    data: portfolioSeries,
+                    label: mainLabel,
+                    data: mainSeries,
                     borderColor: BENCHMARK_COLORS.portfolio,
                     backgroundColor: 'rgba(139, 92, 246, 0.08)',
                     fill: true,
@@ -2803,9 +2908,9 @@
                     return (Math.pow(growth, 1 / yrs) - 1) * 100;
                 };
 
-                const annualPortfolio = annualize(portfolioReturn, years);
-                const annualSublabel = isLongPeriod && annualPortfolio !== null ? `${I18n.t('benchmark.annualReturn')}: ${annualPortfolio >= 0 ? '+' : ''}${annualPortfolio.toFixed(1)}%` : '';
-                addStat(I18n.t('benchmark.yourReturn'), portfolioReturn, portfolioReturn >= 0 ? 'var(--color-positive)' : 'var(--color-negative)', annualSublabel);
+                const annualMain = annualize(mainReturn, years);
+                const annualSublabel = isLongPeriod && annualMain !== null ? `${I18n.t('benchmark.annualReturn')}: ${annualMain >= 0 ? '+' : ''}${annualMain.toFixed(1)}%` : '';
+                addStat(mainLabel, mainReturn, mainReturn >= 0 ? 'var(--color-positive)' : 'var(--color-negative)', annualSublabel);
 
                 for (const [sym, ret] of Object.entries(benchmarkReturns)) {
                     const annualBm = annualize(ret, years);
@@ -2816,7 +2921,7 @@
                 // Alpha (difference with first selected benchmark)
                 const firstBmSym = selectedBenchmarks[0];
                 if (firstBmSym && benchmarkReturns[firstBmSym] !== undefined) {
-                    const alpha = portfolioReturn - benchmarkReturns[firstBmSym];
+                    const alpha = mainReturn - benchmarkReturns[firstBmSym];
                     addStat(`${I18n.t('benchmark.alpha')} (${BENCHMARK_NAMES[firstBmSym] || firstBmSym})`, alpha, alpha >= 0 ? 'var(--color-positive)' : 'var(--color-negative)');
                 }
 
@@ -2838,7 +2943,10 @@
         // Auto-load benchmark on page load (after stocks load)
         document.addEventListener('DOMContentLoaded', () => {
             renderCustomBenchmarkChips();
-            setTimeout(() => loadBenchmarkChart(), 2000);
+            setTimeout(() => {
+                populateBenchmarkTargetSelect();
+                loadBenchmarkChart();
+            }, 2000);
         });
     </script>
 </body>
