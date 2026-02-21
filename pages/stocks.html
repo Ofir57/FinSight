@@ -2684,7 +2684,16 @@
         function getCachedBenchmark(symbol, range) {
             try {
                 const cached = sessionStorage.getItem('benchmark_' + symbol + '_' + range);
-                return cached ? JSON.parse(cached) : null;
+                if (!cached) return null;
+                const data = JSON.parse(cached);
+                // Restore Date objects from serialized strings
+                if (data.historicalData) {
+                    data.historicalData = data.historicalData.map(d => ({
+                        ...d,
+                        date: new Date(d.date)
+                    }));
+                }
+                return data;
             } catch { return null; }
         }
         function setCachedBenchmark(symbol, range, data) {
