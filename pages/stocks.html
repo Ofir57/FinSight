@@ -597,7 +597,7 @@
                     <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 15px;">
                         <input type="text" id="customBenchmarkInput" placeholder="חפש סימול..." data-i18n-placeholder="benchmark.searchSymbol" style="flex: 1; padding: 6px 10px; border-radius: 8px; border: 1px solid var(--color-border); background: var(--color-bg-card); color: var(--color-text); font-size: 0.85rem; max-width: 200px;" onkeydown="if(event.key==='Enter')addCustomBenchmark()">
                         <button class="btn btn-sm" style="background: var(--color-stocks); white-space: nowrap;" onclick="addCustomBenchmark()">
-                            <span data-i18n="benchmark.addIndex">הוסף מדד</span>
+                            <span data-i18n="benchmark.addIndex">הוסף טיקר</span>
                         </button>
                     </div>
                 </div>
@@ -2675,6 +2675,9 @@
             return { series, finalReturn: currentReturn * 100 };
         }
 
+        // Load guard to prevent race conditions between concurrent calls
+        let benchmarkLoadId = 0;
+
         // Benchmark cache helpers
         function getCachedBenchmark(symbol, range) {
             try {
@@ -2687,6 +2690,8 @@
         }
 
         async function loadBenchmarkChart() {
+            const thisLoadId = ++benchmarkLoadId;
+
             const hardcodedChecked = Array.from(document.querySelectorAll('.benchmark-check:not(.benchmark-custom):checked')).map(cb => cb.value);
             const customChecked = Array.from(document.querySelectorAll('.benchmark-custom:checked')).map(cb => cb.value);
             const selectedBenchmarks = [...hardcodedChecked, ...customChecked];
@@ -2736,6 +2741,9 @@
                     return result;
                 });
                 const benchmarkResults = await Promise.all(benchmarkPromises);
+
+                // If a newer load was triggered while we were fetching, abort this one
+                if (thisLoadId !== benchmarkLoadId) return;
 
                 // Use the benchmark with the most data points as the date reference
                 let referenceDates = [];
