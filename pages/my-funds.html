@@ -677,7 +677,7 @@
             tbody.innerHTML = filteredFunds.map(fund => {
                 const returns = fund.returns || calculateReturns(fund);
                 const formatReturn = (val) => {
-                    if (val === null) return '<span style="color: var(--color-text-secondary);">-</span>';
+                    if (val == null) return '<span style="color: var(--color-text-secondary);">-</span>';
                     const num = parseFloat(val);
                     const color = num >= 0 ? '#10b981' : '#ef4444';
                     return `<span style="color: ${color}; font-weight: 600;">${num >= 0 ? '+' : ''}${val}%</span>`;
