@@ -780,7 +780,7 @@ const I18n = {
                 clearinghouseInactive: 'לא פעיל',
                 clearinghouseDuplicate: 'קיים',
                 clearinghouseSelectAll: 'בחר הכל',
-                goToClearinghouse: 'הר ההשקעות'
+                goToClearinghouse: 'המסלקה הפנסיונית'
             },
             // Market Products
             marketProducts: {
