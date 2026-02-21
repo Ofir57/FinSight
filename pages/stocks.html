@@ -106,17 +106,17 @@
             min-width: 0;
         }
 
-        /* Sticky table headers */
+        /* Sticky table headers (only when enabled) */
         .table-container {
             max-height: 600px;
             overflow-y: auto;
         }
-        .table-container table thead {
+        .table-container.sticky-header table thead {
             position: sticky;
             top: 0;
             z-index: 10;
         }
-        .table-container table thead th {
+        .table-container.sticky-header table thead th {
             background: var(--color-bg-card);
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
@@ -384,10 +384,14 @@
                             </select>
                             <button onclick="toggleSortDirection()" id="sortDirBtn" class="btn btn-sm btn-secondary" style="padding: 5px 8px;">⬇️</button>
                         </div>
+                        <label style="display: flex; align-items: center; gap: 4px; cursor: pointer;">
+                            <input type="checkbox" id="stickyHeaderToggle" onchange="toggleStickyHeader()">
+                            <span style="font-size: 0.8rem; color: var(--color-text-secondary);" data-i18n="stocks.stickyHeader">קיבוע כותרת</span>
+                        </label>
                         <span id="lastUpdateTime" style="color: var(--color-text-secondary); font-size: 0.85rem;"></span>
                     </div>
                 </div>
-                <div class="table-container">
+                <div class="table-container" id="holdingsTableContainer">
                     <table>
                         <thead>
                             <tr>
@@ -877,6 +881,13 @@
             loadStocks();
         }
 
+        function toggleStickyHeader() {
+            const enabled = document.getElementById('stickyHeaderToggle').checked;
+            const container = document.getElementById('holdingsTableContainer');
+            container.classList.toggle('sticky-header', enabled);
+            localStorage.setItem('finance_sticky_header', enabled ? '1' : '0');
+        }
+
         function setSortBy(field) {
             const select = document.getElementById('sortBy');
             if (select.value === field) {
@@ -899,6 +910,11 @@
             } catch (e) {
                 console.error('Failed to get currency rates:', e);
             }
+
+            // Restore sticky header preference
+            const stickyPref = localStorage.getItem('finance_sticky_header') === '1';
+            document.getElementById('stickyHeaderToggle').checked = stickyPref;
+            if (stickyPref) document.getElementById('holdingsTableContainer').classList.add('sticky-header');
 
             loadStocks();
             loadWatchlist();
