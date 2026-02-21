@@ -339,13 +339,9 @@
                     <span>🔄</span>
                     <span data-i18n="stocks.refreshPrices">עדכן מחירים</span>
                 </button>
-                <button class="btn btn-secondary" onclick="importCSV()">
+                <button class="btn btn-secondary" onclick="importData()">
                     <span>📥</span>
-                    <span data-i18n="stocks.importCSV">ייבוא CSV</span>
-                </button>
-                <button class="btn btn-secondary" onclick="importBrokerXLS()">
-                    <span>📂</span>
-                    <span data-i18n="stocks.importBroker">ייבוא מברוקר (XLS)</span>
+                    <span data-i18n="stocks.importData">ייבוא נתונים</span>
                 </button>
                 <button class="btn btn-secondary" onclick="exportHoldingsToExcel()">
                     <span>📊</span>
@@ -355,7 +351,7 @@
                     <span>📷</span>
                     <span data-i18n="stocks.importImage">ייבוא מתמונה</span>
                 </button>
-                <input type="file" id="brokerFileInput" accept=".xls,.xlsx,.xml" style="display: none;" onchange="handleBrokerFile(event)">
+                <input type="file" id="dataFileInput" accept=".csv,.txt,.xls,.xlsx,.xml" style="display: none;" onchange="handleDataImport(event)">
                 <label class="auto-refresh-toggle" style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
                     <input type="checkbox" id="autoRefreshToggle" onchange="toggleAutoRefresh()" checked>
                     <span style="font-size: 0.9rem; color: var(--color-text-secondary);" data-i18n="stocks.autoRefresh">רענון אוטומטי</span>
@@ -1765,29 +1761,8 @@
             App.notify('קובץ Excel יוצא בהצלחה ✓', 'success');
         }
 
-        async function importCSV() {
-            const format = CSVImport.showImportHelp('stocks');
-            const confirmed = confirm(
-                `${format.title}\n\n` +
-                `עמודות נדרשות:\n${format.columns.join(', ')}\n\n` +
-                `דוגמה:\n${format.example}\n\n` +
-                `להמשיך?`
-            );
-
-            if (!confirmed) return;
-
-            const result = await CSVImport.openFilePicker('stocks');
-
-            if (result.success) {
-                App.notify(`יובאו ${result.imported} מניות בהצלחה`, 'success');
-                loadStocks();
-            } else {
-                App.notify(result.error || 'שגיאה בייבוא', 'error');
-            }
-
-            if (result.errors && result.errors.length > 0) {
-                console.log('Import errors:', result.errors);
-            }
+        function importData() {
+            document.getElementById('dataFileInput').click();
         }
 
         // ========== Interactive MA150 Chart ==========
@@ -2061,18 +2036,36 @@
             });
         }
 
-        // ========== Broker XLS Import ==========
+        // ========== Unified Data Import ==========
 
-        function importBrokerXLS() {
-            document.getElementById('brokerFileInput').click();
-        }
-
-        async function handleBrokerFile(event) {
+        async function handleDataImport(event) {
             const file = event.target.files[0];
             if (!file) return;
 
+            const ext = file.name.split('.').pop().toLowerCase();
+
+            // CSV/TXT files — use CSVImport module
+            if (ext === 'csv' || ext === 'txt') {
+                try {
+                    const csvText = await CSVImport.readFile(file);
+                    const data = CSVImport.parse(csvText);
+                    const result = await CSVImport.importData('stocks', data);
+                    if (result.success) {
+                        App.notify(`יובאו ${result.imported} מניות בהצלחה`, 'success');
+                        loadStocks();
+                    } else {
+                        App.notify(result.error || 'שגיאה בייבוא', 'error');
+                    }
+                } catch (e) {
+                    console.error('CSV import error:', e);
+                    App.notify('שגיאה בקריאת הקובץ: ' + e.message, 'error');
+                }
+                event.target.value = '';
+                return;
+            }
+
+            // XLS/XLSX/XML files — broker import flow
             try {
-                // Try reading as XLSX first (for FinSight exports and real xlsx)
                 let holdings = [];
                 const arrayBuffer = await file.arrayBuffer();
                 const uint8 = new Uint8Array(arrayBuffer);
