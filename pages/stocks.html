@@ -81,6 +81,30 @@
         .ma150-metric .value.above { color: var(--color-positive); }
         .ma150-metric .value.below { color: var(--color-negative); }
 
+        /* Compact holdings table */
+        .table-container table th,
+        .table-container table td {
+            padding: 8px 5px;
+            font-size: 0.8rem;
+            white-space: nowrap;
+        }
+        .table-container table th {
+            font-size: 0.72rem;
+            letter-spacing: 0;
+        }
+        .table-container .stock-symbol {
+            font-size: 0.85rem;
+        }
+        .table-container .action-buttons {
+            display: flex;
+            gap: 2px;
+        }
+        .table-container .action-buttons .btn-sm {
+            padding: 3px 5px;
+            font-size: 0.7rem;
+            min-width: 0;
+        }
+
         /* Sticky table headers */
         .table-container {
             max-height: 600px;
