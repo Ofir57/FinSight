@@ -84,24 +84,25 @@
         /* Compact holdings table */
         .table-container table th,
         .table-container table td {
-            padding: 8px 5px;
-            font-size: 0.8rem;
+            padding: 8px 6px;
             white-space: nowrap;
         }
-        .table-container table th {
-            font-size: 0.72rem;
-            letter-spacing: 0;
-        }
         .table-container .stock-symbol {
-            font-size: 0.85rem;
+            max-width: 75px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .table-container .stock-name {
+            max-width: 90px;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         .table-container .action-buttons {
             display: flex;
             gap: 2px;
         }
         .table-container .action-buttons .btn-sm {
-            padding: 3px 5px;
-            font-size: 0.7rem;
+            padding: 3px 6px;
             min-width: 0;
         }
 
@@ -966,10 +967,22 @@
                 // Calculate portfolio total for percentages
                 const portfolioTotalILS = holdingsWithCalc.reduce((sum, h) => sum + h.valueILS, 0);
 
-                // Add portfolio percentage
-                holdingsWithCalc.forEach(h => {
-                    h.portfolioPercent = portfolioTotalILS > 0 ? (h.valueILS / portfolioTotalILS) * 100 : 0;
-                });
+                // Add portfolio percentage (with rounding that sums to 100)
+                if (portfolioTotalILS > 0) {
+                    let rawPcts = holdingsWithCalc.map(h => (h.valueILS / portfolioTotalILS) * 100);
+                    let floored = rawPcts.map(p => Math.floor(p * 10) / 10);
+                    let remainder = 100 - floored.reduce((a, b) => a + b, 0);
+                    // Distribute remainder to items with largest fractional loss
+                    let diffs = rawPcts.map((p, i) => ({ i, diff: p - floored[i] }));
+                    diffs.sort((a, b) => b.diff - a.diff);
+                    let steps = Math.round(remainder * 10);
+                    for (let j = 0; j < steps && j < diffs.length; j++) {
+                        floored[diffs[j].i] = Math.round((floored[diffs[j].i] + 0.1) * 10) / 10;
+                    }
+                    holdingsWithCalc.forEach((h, i) => { h.portfolioPercent = floored[i]; });
+                } else {
+                    holdingsWithCalc.forEach(h => { h.portfolioPercent = 0; });
+                }
 
                 // Sort holdings
                 holdingsWithCalc.sort((a, b) => {
@@ -1052,8 +1065,8 @@
 
                     return `
                         <tr>
-                            <td class="col-static stock-symbol">${h.symbol}</td>
-                            <td class="col-static">${h.name || '-'}</td>
+                            <td class="col-static stock-symbol" title="${h.symbol}">${h.symbol}</td>
+                            <td class="col-static stock-name" title="${h.name || ''}">${h.name || '-'}</td>
                             <td class="col-static">${h.quantity.toLocaleString()}</td>
                             <td class="col-static">${currencySymbol}${h.avgPrice.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
                             <td class="col-static">₪${costILS.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}</td>
