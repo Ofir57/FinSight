@@ -277,6 +277,10 @@
                     <span>🔗</span>
                     <span data-i18n="myFunds.goToClearinghouse">המסלקה הפנסיונית</span>
                 </a>
+                <button class="btn btn-secondary" onclick="refreshAllReturns()">
+                    <span>🔄</span>
+                    <span data-i18n="myFunds.refreshReturns">רענן תשואות</span>
+                </button>
             </div>
 
             <!-- Fund Type Tabs -->
@@ -1562,6 +1566,31 @@
 
             document.getElementById('clearinghouseModal').remove();
             delete window._clearinghouseProducts;
+        }
+
+        function refreshAllReturns() {
+            const funds = getFunds();
+            let matched = 0;
+            funds.forEach(f => {
+                const result = matchMarketFund(f.name, f.company, f.type);
+                if (result) {
+                    f.returns = f.returns || {};
+                    f.returns.month = result.month;
+                    f.returns.year1 = result.year1;
+                    f.returns.year3 = result.year3;
+                    f.returns.year5 = result.year5;
+                    f.returnsSource = 'market';
+                    f.updatedAt = new Date().toISOString();
+                    matched++;
+                }
+            });
+            if (matched > 0) {
+                saveFunds(funds);
+                loadFunds();
+                App.notify(I18n.t('myFunds.returnsRefreshed').replace('{count}', matched), 'success');
+            } else {
+                App.notify(I18n.t('myFunds.noReturnsMatched'), 'error');
+            }
         }
     </script>
 </body>

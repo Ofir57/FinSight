@@ -780,7 +780,10 @@ const I18n = {
                 clearinghouseInactive: 'לא פעיל',
                 clearinghouseDuplicate: 'קיים',
                 clearinghouseSelectAll: 'בחר הכל',
-                goToClearinghouse: 'המסלקה הפנסיונית'
+                goToClearinghouse: 'המסלקה הפנסיונית',
+                refreshReturns: 'רענן תשואות',
+                returnsRefreshed: 'עודכנו תשואות ל-{count} קרנות',
+                noReturnsMatched: 'לא נמצאה התאמה לאף קרן בנתוני השוק'
             },
             // Market Products
             marketProducts: {
@@ -1808,7 +1811,10 @@ const I18n = {
                 clearinghouseInactive: 'Inactive',
                 clearinghouseDuplicate: 'Exists',
                 clearinghouseSelectAll: 'Select All',
-                goToClearinghouse: 'Har Hashkaot'
+                goToClearinghouse: 'Pension Clearinghouse',
+                refreshReturns: 'Refresh Returns',
+                returnsRefreshed: 'Returns updated for {count} funds',
+                noReturnsMatched: 'No funds matched in market data'
             },
             // Market Products
             marketProducts: {
