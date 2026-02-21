@@ -2516,19 +2516,43 @@
             `).join('');
         }
 
-        function addCustomBenchmark() {
+        async function addCustomBenchmark() {
             const input = document.getElementById('customBenchmarkInput');
+            const btn = input.nextElementSibling;
             const symbol = input.value.trim().toUpperCase();
             if (!symbol) return;
             const customs = getCustomBenchmarks();
             // Check not already in hardcoded or custom list
             const allExisting = ['^GSPC', '^IXIC', '^TA125.TA', '^TA35.TA', 'URTH', ...customs];
             if (allExisting.includes(symbol)) { input.value = ''; return; }
-            customs.push(symbol);
-            saveCustomBenchmarks(customs);
-            input.value = '';
-            renderCustomBenchmarkChips();
-            loadBenchmarkChart();
+            // Validate ticker exists before adding
+            btn.disabled = true;
+            input.disabled = true;
+            try {
+                const result = await StockAPI.fetchBenchmarkData(symbol, '1mo');
+                if (!result.success || !result.historicalData || result.historicalData.length === 0) {
+                    input.style.borderColor = 'var(--color-negative)';
+                    input.placeholder = I18n.t('benchmark.tickerNotFound');
+                    setTimeout(() => {
+                        input.style.borderColor = '';
+                        input.placeholder = I18n.t('benchmark.searchSymbol');
+                    }, 2000);
+                    return;
+                }
+                // Cache the validated data for the current range too
+                setCachedBenchmark(symbol, '1mo', result);
+                customs.push(symbol);
+                saveCustomBenchmarks(customs);
+                input.value = '';
+                renderCustomBenchmarkChips();
+                loadBenchmarkChart();
+            } catch {
+                input.style.borderColor = 'var(--color-negative)';
+                setTimeout(() => { input.style.borderColor = ''; }, 2000);
+            } finally {
+                btn.disabled = false;
+                input.disabled = false;
+            }
         }
 
         function removeCustomBenchmark(symbol) {
