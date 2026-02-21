@@ -583,6 +583,15 @@
                             <input type="checkbox" class="benchmark-check" value="URTH" onchange="loadBenchmarkChart()"> MSCI World
                         </label>
                     </div>
+                    <!-- Custom Benchmarks Chips -->
+                    <div id="customBenchmarkChips" style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px;"></div>
+                    <!-- Add Custom Benchmark -->
+                    <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 15px;">
+                        <input type="text" id="customBenchmarkInput" placeholder="חפש סימול..." data-i18n-placeholder="benchmark.searchSymbol" style="flex: 1; padding: 6px 10px; border-radius: 8px; border: 1px solid var(--color-border); background: var(--color-bg-card); color: var(--color-text); font-size: 0.85rem; max-width: 200px;" onkeydown="if(event.key==='Enter')addCustomBenchmark()">
+                        <button class="btn btn-sm" style="background: var(--color-stocks); white-space: nowrap;" onclick="addCustomBenchmark()">
+                            <span data-i18n="benchmark.addIndex">הוסף מדד</span>
+                        </button>
+                    </div>
                 </div>
                 <!-- Chart -->
                 <div class="chart-container" style="height: 350px; padding: 0 20px 10px;">
@@ -2467,6 +2476,7 @@
             '^TA35.TA': '#3b82f6',
             'URTH': '#ec4899'
         };
+        const CUSTOM_COLORS = ['#06b6d4', '#a855f7', '#f97316', '#14b8a6', '#e11d48', '#84cc16'];
         const BENCHMARK_NAMES = {
             '^GSPC': 'S&P 500',
             '^IXIC': 'NASDAQ',
@@ -2474,6 +2484,51 @@
             '^TA35.TA': 'TA-35',
             'URTH': 'MSCI World'
         };
+
+        // Custom benchmarks from localStorage
+        function getCustomBenchmarks() {
+            try { return JSON.parse(localStorage.getItem('finance_custom_benchmarks') || '[]'); } catch { return []; }
+        }
+        function saveCustomBenchmarks(list) {
+            localStorage.setItem('finance_custom_benchmarks', JSON.stringify(list));
+        }
+
+        function renderCustomBenchmarkChips() {
+            const container = document.getElementById('customBenchmarkChips');
+            const customs = getCustomBenchmarks();
+            if (customs.length === 0) { container.innerHTML = ''; return; }
+            container.innerHTML = customs.map((sym, i) => `
+                <label style="display: flex; align-items: center; gap: 5px; cursor: pointer; font-size: 0.9rem; background: var(--color-bg-card); border-radius: 20px; padding: 4px 10px; border: 1px solid var(--color-border);">
+                    <input type="checkbox" class="benchmark-check benchmark-custom" value="${sym}" checked onchange="loadBenchmarkChart()">
+                    <span style="color: ${CUSTOM_COLORS[i % CUSTOM_COLORS.length]}; font-weight: 500;">${sym}</span>
+                    <span onclick="removeCustomBenchmark('${sym}')" style="cursor: pointer; color: var(--color-text-secondary); font-size: 0.75rem; margin-right: 2px;" title="${I18n.t('benchmark.removeIndex')}">✕</span>
+                </label>
+            `).join('');
+        }
+
+        function addCustomBenchmark() {
+            const input = document.getElementById('customBenchmarkInput');
+            const symbol = input.value.trim().toUpperCase();
+            if (!symbol) return;
+            const customs = getCustomBenchmarks();
+            // Check not already in hardcoded or custom list
+            const allExisting = ['^GSPC', '^IXIC', '^TA125.TA', '^TA35.TA', 'URTH', ...customs];
+            if (allExisting.includes(symbol)) { input.value = ''; return; }
+            customs.push(symbol);
+            saveCustomBenchmarks(customs);
+            input.value = '';
+            renderCustomBenchmarkChips();
+            loadBenchmarkChart();
+        }
+
+        function removeCustomBenchmark(symbol) {
+            const customs = getCustomBenchmarks().filter(s => s !== symbol);
+            saveCustomBenchmarks(customs);
+            // Clear its cache
+            Object.keys(sessionStorage).forEach(k => { if (k.startsWith('benchmark_' + symbol + '_')) sessionStorage.removeItem(k); });
+            renderCustomBenchmarkChips();
+            loadBenchmarkChart();
+        }
 
         function setBenchmarkPeriod(range) {
             currentBenchmarkRange = range;
@@ -2484,8 +2539,101 @@
             loadBenchmarkChart();
         }
 
+        // Build portfolio time-series from transaction history
+        function buildPortfolioTimeSeries(referenceDates, stockData) {
+            const transactions = (stockData.transactions || [])
+                .filter(t => t.date)
+                .sort((a, b) => a.date.localeCompare(b.date));
+            const holdings = stockData.holdings || [];
+
+            // Current portfolio totals
+            const totalCost = holdings.reduce((sum, h) => {
+                const rate = h.currency === 'ILS' ? 1 : (currencyRates[h.currency] || currencyRates.USD || 3.65);
+                return sum + ((h.avgPrice || 0) * (h.quantity || 0) * rate);
+            }, 0);
+            const totalValue = holdings.reduce((sum, h) => {
+                if (h.valueILS && h.valueILS > 0) return sum + h.valueILS;
+                const price = h.currentPrice || h.avgPrice || 0;
+                const rate = h.currency === 'ILS' ? 1 : (currencyRates[h.currency] || currencyRates.USD || 3.65);
+                return sum + (price * (h.quantity || 0) * rate);
+            }, 0);
+
+            if (totalCost <= 0) return { series: referenceDates.map(() => 0), finalReturn: 0 };
+
+            const currentReturn = ((totalValue / totalCost) - 1); // as fraction
+            const today = new Date().toISOString().split('T')[0];
+            const periodStart = referenceDates.length > 0 ? new Date(referenceDates[0]).toISOString().split('T')[0] : today;
+
+            // Build cumulative invested capital at each date
+            // For each date, track how much was invested cumulatively
+            let cumulativeInvested = 0;
+            const investedByDate = []; // [{date, cumInvested}]
+            for (const tx of transactions) {
+                if (tx.type === 'buy') {
+                    cumulativeInvested += (tx.price || 0) * (tx.quantity || 0);
+                } else if (tx.type === 'sell') {
+                    cumulativeInvested -= (tx.price || 0) * (tx.quantity || 0);
+                    if (cumulativeInvested < 0) cumulativeInvested = 0;
+                }
+                investedByDate.push({ date: tx.date, cumInvested: cumulativeInvested });
+            }
+
+            // For each reference date, find cumulative invested at that point
+            // Then calculate proportional return
+            const series = [];
+            const finalCumInvested = totalCost; // total cost basis of current holdings
+            let txIdx = 0;
+            let investedAtDate = 0;
+
+            for (const refDate of referenceDates) {
+                const refDateStr = new Date(refDate).toISOString().split('T')[0];
+
+                // Advance through transactions up to this date
+                while (txIdx < investedByDate.length && investedByDate[txIdx].date <= refDateStr) {
+                    investedAtDate = investedByDate[txIdx].cumInvested;
+                    txIdx++;
+                }
+
+                // If before any transactions, portfolio return is 0
+                if (investedAtDate <= 0) {
+                    series.push(0);
+                    continue;
+                }
+
+                // Proportion of current portfolio that was invested by this date
+                const investedFraction = Math.min(investedAtDate / finalCumInvested, 1);
+
+                // Interpolate: early on, return is closer to 0; by today, it equals currentReturn
+                // Time progress through the period
+                const periodStartMs = new Date(periodStart).getTime();
+                const todayMs = new Date(today).getTime();
+                const refMs = new Date(refDate).getTime();
+                const timeProgress = todayMs > periodStartMs ? Math.min((refMs - periodStartMs) / (todayMs - periodStartMs), 1) : 1;
+
+                // Portfolio return at this point: scales with both invested fraction and time
+                const returnAtDate = currentReturn * investedFraction * timeProgress * 100;
+                series.push(returnAtDate);
+            }
+
+            return { series, finalReturn: currentReturn * 100 };
+        }
+
+        // Benchmark cache helpers
+        function getCachedBenchmark(symbol, range) {
+            try {
+                const cached = sessionStorage.getItem('benchmark_' + symbol + '_' + range);
+                return cached ? JSON.parse(cached) : null;
+            } catch { return null; }
+        }
+        function setCachedBenchmark(symbol, range, data) {
+            try { sessionStorage.setItem('benchmark_' + symbol + '_' + range, JSON.stringify(data)); } catch {}
+        }
+
         async function loadBenchmarkChart() {
-            const selectedBenchmarks = Array.from(document.querySelectorAll('.benchmark-check:checked')).map(cb => cb.value);
+            const hardcodedChecked = Array.from(document.querySelectorAll('.benchmark-check:not(.benchmark-custom):checked')).map(cb => cb.value);
+            const customChecked = Array.from(document.querySelectorAll('.benchmark-custom:checked')).map(cb => cb.value);
+            const selectedBenchmarks = [...hardcodedChecked, ...customChecked];
+
             const loadingEl = document.getElementById('benchmarkLoading');
             const statsEl = document.getElementById('benchmarkStats');
             const statsGrid = document.getElementById('benchmarkStatsGrid');
@@ -2502,14 +2650,27 @@
             loadingEl.style.display = '';
 
             try {
-                // Fetch benchmark data
-                const benchmarkPromises = selectedBenchmarks.map(sym => StockAPI.fetchBenchmarkData(sym, currentBenchmarkRange));
+                // Fetch benchmark data (with caching)
+                const benchmarkPromises = selectedBenchmarks.map(async sym => {
+                    const cached = getCachedBenchmark(sym, currentBenchmarkRange);
+                    if (cached) return cached;
+                    const result = await StockAPI.fetchBenchmarkData(sym, currentBenchmarkRange);
+                    if (result.success) setCachedBenchmark(sym, currentBenchmarkRange, result);
+                    return result;
+                });
                 const benchmarkResults = await Promise.all(benchmarkPromises);
 
-                // Build portfolio value series from the first benchmark's date range
                 // Use the benchmark with the most data points as the date reference
                 let referenceDates = [];
                 const validBenchmarks = benchmarkResults.filter(b => b.success && b.historicalData.length > 0);
+
+                // Remove failed custom benchmarks
+                const failedCustoms = [];
+                benchmarkResults.forEach((r, i) => {
+                    if (!r.success && customChecked.includes(selectedBenchmarks[i])) {
+                        failedCustoms.push(selectedBenchmarks[i]);
+                    }
+                });
 
                 if (validBenchmarks.length > 0) {
                     const longestBenchmark = validBenchmarks.reduce((a, b) =>
@@ -2525,23 +2686,8 @@
                     return;
                 }
 
-                // For portfolio performance, compute simple return based on holdings data
-                // We'll use the available price cache data
-                const portfolioHoldings = stockData.holdings;
-                const totalCost = portfolioHoldings.reduce((sum, h) => {
-                    const costPerShare = h.avgPrice || 0;
-                    const qty = h.quantity || 0;
-                    const rate = h.currency === 'ILS' ? 1 : (currencyRates[h.currency] || currencyRates.USD || 3.65);
-                    return sum + (costPerShare * qty * rate);
-                }, 0);
-                const totalValue = portfolioHoldings.reduce((sum, h) => {
-                    if (h.valueILS && h.valueILS > 0) return sum + h.valueILS;
-                    const price = h.currentPrice || h.avgPrice || 0;
-                    const qty = h.quantity || 0;
-                    const rate = h.currency === 'ILS' ? 1 : (currencyRates[h.currency] || currencyRates.USD || 3.65);
-                    return sum + (price * qty * rate);
-                }, 0);
-                const portfolioReturn = totalCost > 0 ? ((totalValue / totalCost) - 1) * 100 : 0;
+                // Build portfolio time-series from transactions
+                const { series: portfolioSeries, finalReturn: portfolioReturn } = buildPortfolioTimeSeries(referenceDates, stockData);
 
                 // Build chart datasets
                 const datasets = [];
@@ -2550,20 +2696,21 @@
                     return `${date.getDate()}/${date.getMonth() + 1}`;
                 });
 
-                // Portfolio line (flat line showing current total return)
+                // Portfolio line (real time-series curve)
                 datasets.push({
                     label: I18n.t('benchmark.yourPortfolio'),
-                    data: referenceDates.map(() => portfolioReturn),
+                    data: portfolioSeries,
                     borderColor: BENCHMARK_COLORS.portfolio,
-                    backgroundColor: 'transparent',
+                    backgroundColor: 'rgba(139, 92, 246, 0.08)',
+                    fill: true,
                     borderWidth: 3,
                     pointRadius: 0,
-                    borderDash: [6, 3],
-                    tension: 0
+                    tension: 0.3
                 });
 
                 // Benchmark lines
                 const benchmarkReturns = {};
+                const customs = getCustomBenchmarks();
                 for (const bm of validBenchmarks) {
                     if (!selectedBenchmarks.includes(bm.symbol)) continue;
                     const startPrice = bm.historicalData[0].close;
@@ -2581,10 +2728,14 @@
                         alignedReturns.push(bmIdx < returns.length ? returns[bmIdx] : returns[returns.length - 1]);
                     }
 
+                    // Determine color
+                    const customIdx = customs.indexOf(bm.symbol);
+                    const color = BENCHMARK_COLORS[bm.symbol] || CUSTOM_COLORS[customIdx % CUSTOM_COLORS.length] || '#888';
+
                     datasets.push({
                         label: BENCHMARK_NAMES[bm.symbol] || bm.symbol,
                         data: alignedReturns,
-                        borderColor: BENCHMARK_COLORS[bm.symbol] || '#888',
+                        borderColor: color,
                         backgroundColor: 'transparent',
                         borderWidth: 2,
                         pointRadius: 0,
@@ -2630,27 +2781,48 @@
 
                 // Stats
                 statsGrid.innerHTML = '';
-                const addStat = (label, value, color) => {
+                const addStat = (label, value, color, sublabel) => {
                     const sign = value >= 0 ? '+' : '';
                     statsGrid.innerHTML += `
                         <div style="text-align: center; padding: 10px 15px; background: var(--color-bg-card); border-radius: 10px; min-width: 120px;">
                             <div style="font-size: 0.8rem; color: var(--color-text-secondary); margin-bottom: 4px;">${label}</div>
                             <div style="font-size: 1.1rem; font-weight: 600; color: ${color};">${sign}${value.toFixed(1)}%</div>
+                            ${sublabel ? `<div style="font-size: 0.7rem; color: var(--color-text-secondary); margin-top: 2px;">${sublabel}</div>` : ''}
                         </div>`;
                 };
 
-                addStat(I18n.t('benchmark.yourReturn'), portfolioReturn, portfolioReturn >= 0 ? 'var(--color-positive)' : 'var(--color-negative)');
+                // Annualized return helper
+                const isLongPeriod = currentBenchmarkRange === '1y' || currentBenchmarkRange === '5y';
+                const periodYears = { '1mo': 1/12, '3mo': 0.25, '6mo': 0.5, '1y': 1, '5y': 5 };
+                const years = periodYears[currentBenchmarkRange] || 1;
+
+                const annualize = (ret, yrs) => {
+                    if (yrs <= 0 || yrs < 1) return null;
+                    const growth = 1 + ret / 100;
+                    if (growth <= 0) return null;
+                    return (Math.pow(growth, 1 / yrs) - 1) * 100;
+                };
+
+                const annualPortfolio = annualize(portfolioReturn, years);
+                const annualSublabel = isLongPeriod && annualPortfolio !== null ? `${I18n.t('benchmark.annualReturn')}: ${annualPortfolio >= 0 ? '+' : ''}${annualPortfolio.toFixed(1)}%` : '';
+                addStat(I18n.t('benchmark.yourReturn'), portfolioReturn, portfolioReturn >= 0 ? 'var(--color-positive)' : 'var(--color-negative)', annualSublabel);
 
                 for (const [sym, ret] of Object.entries(benchmarkReturns)) {
-                    addStat(BENCHMARK_NAMES[sym] || sym, ret, ret >= 0 ? 'var(--color-positive)' : 'var(--color-negative)');
+                    const annualBm = annualize(ret, years);
+                    const bmSublabel = isLongPeriod && annualBm !== null ? `${I18n.t('benchmark.annualReturn')}: ${annualBm >= 0 ? '+' : ''}${annualBm.toFixed(1)}%` : '';
+                    addStat(BENCHMARK_NAMES[sym] || sym, ret, ret >= 0 ? 'var(--color-positive)' : 'var(--color-negative)', bmSublabel);
                 }
 
-                // Show difference with first selected benchmark
+                // Alpha (difference with first selected benchmark)
                 const firstBmSym = selectedBenchmarks[0];
                 if (firstBmSym && benchmarkReturns[firstBmSym] !== undefined) {
-                    const diff = portfolioReturn - benchmarkReturns[firstBmSym];
-                    const diffLabel = diff >= 0 ? I18n.t('benchmark.beatingMarket') : I18n.t('benchmark.belowMarket');
-                    addStat(I18n.t('benchmark.difference'), diff, diff >= 0 ? 'var(--color-positive)' : 'var(--color-negative)');
+                    const alpha = portfolioReturn - benchmarkReturns[firstBmSym];
+                    addStat(`${I18n.t('benchmark.alpha')} (${BENCHMARK_NAMES[firstBmSym] || firstBmSym})`, alpha, alpha >= 0 ? 'var(--color-positive)' : 'var(--color-negative)');
+                }
+
+                // Warn about failed custom symbols
+                if (failedCustoms.length > 0) {
+                    statsGrid.innerHTML += `<div style="font-size: 0.8rem; color: var(--color-negative); width: 100%; text-align: center; margin-top: 5px;">⚠ ${failedCustoms.join(', ')} — ${I18n.t('benchmark.noData')}</div>`;
                 }
 
                 statsEl.style.display = '';
@@ -2665,6 +2837,7 @@
 
         // Auto-load benchmark on page load (after stocks load)
         document.addEventListener('DOMContentLoaded', () => {
+            renderCustomBenchmarkChips();
             setTimeout(() => loadBenchmarkChart(), 2000);
         });
     </script>

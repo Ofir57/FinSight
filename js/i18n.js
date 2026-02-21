@@ -948,7 +948,13 @@ const I18n = {
                 beatingMarket: 'מכה את השוק!',
                 belowMarket: 'מתחת לשוק',
                 noData: 'אין מספיק נתונים להשוואה',
-                loading: 'טוען נתוני מדדים...'
+                loading: 'טוען נתוני מדדים...',
+                addIndex: 'הוסף מדד',
+                searchSymbol: 'חפש סימול...',
+                annualReturn: 'תשואה שנתית',
+                removeIndex: 'הסר',
+                alpha: 'אלפא',
+                customBenchmark: 'מדד מותאם'
             },
             // Common
             common: {
@@ -1944,7 +1950,13 @@ const I18n = {
                 beatingMarket: 'Beating the market!',
                 belowMarket: 'Below market',
                 noData: 'Not enough data for comparison',
-                loading: 'Loading benchmark data...'
+                loading: 'Loading benchmark data...',
+                addIndex: 'Add Index',
+                searchSymbol: 'Search symbol...',
+                annualReturn: 'Annual Return',
+                removeIndex: 'Remove',
+                alpha: 'Alpha',
+                customBenchmark: 'Custom Index'
             },
             // Common
             common: {
@@ -2278,7 +2290,13 @@ const I18n = {
                 beatingMarket: 'Superando o mercado!',
                 belowMarket: 'Abaixo do mercado',
                 noData: 'Dados insuficientes para comparação',
-                loading: 'Carregando dados de índice...'
+                loading: 'Carregando dados de índice...',
+                addIndex: 'Adicionar Índice',
+                searchSymbol: 'Buscar símbolo...',
+                annualReturn: 'Retorno Anual',
+                removeIndex: 'Remover',
+                alpha: 'Alfa',
+                customBenchmark: 'Índice Personalizado'
             },
             // Common
             common: {
