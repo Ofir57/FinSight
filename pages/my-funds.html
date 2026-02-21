@@ -269,6 +269,10 @@
                     <span>📄</span>
                     <span data-i18n="profile.scanPayslip">סרוק תלוש משכורת</span>
                 </button>
+                <button class="btn btn-secondary" onclick="importClearinghouse()" style="background: #059669; color: #fff;">
+                    <span>🏦</span>
+                    <span data-i18n="myFunds.importClearinghouse">ייבוא מהמסלקה</span>
+                </button>
             </div>
 
             <!-- Fund Type Tabs -->
@@ -1258,6 +1262,259 @@
             } else {
                 App.notify(I18n.t('myFunds.noFundsToImport'), 'error');
             }
+        }
+
+        // ===== Clearinghouse (מסלקה פנסיונית) Import =====
+        function importClearinghouse() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.xls,.xlsx';
+            input.onchange = async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                try {
+                    const data = await file.arrayBuffer();
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    // Look for the products sheet
+                    const productsSheetName = workbook.SheetNames.find(n =>
+                        n.includes('פרטי המוצרים') || n.includes('מוצרים שלי')
+                    );
+                    if (!productsSheetName) {
+                        App.notify(I18n.t('myFunds.clearinghouseNotFound'), 'error');
+                        return;
+                    }
+                    const sheet = workbook.Sheets[productsSheetName];
+                    const rows = XLSX.utils.sheet_to_json(sheet);
+                    if (rows.length === 0) {
+                        App.notify(I18n.t('myFunds.clearinghouseNoProducts'), 'error');
+                        return;
+                    }
+                    // Also try to read deposit tracking sheet
+                    const depositsSheetName = workbook.SheetNames.find(n =>
+                        n.includes('מעקב הפקדות') || n.includes('הפקדות')
+                    );
+                    let depositRows = [];
+                    if (depositsSheetName) {
+                        depositRows = XLSX.utils.sheet_to_json(workbook.Sheets[depositsSheetName]);
+                    }
+                    showClearinghousePreview(rows, depositRows);
+                } catch (error) {
+                    console.error('Clearinghouse import error:', error);
+                    App.notify(I18n.t('myFunds.importError') + ': ' + error.message, 'error');
+                }
+            };
+            input.click();
+        }
+
+        function mapClearinghouseType(productName) {
+            if (!productName) return 'savings';
+            const p = productName.toLowerCase();
+            if (p.includes('פנסיה') || p.includes('pension')) return 'pension';
+            if (p.includes('השתלמות') || p.includes('training')) return 'training';
+            if (p.includes('גמל') || p.includes('gemel') || p.includes('provident')) return 'gemel';
+            return 'savings';
+        }
+
+        function mapClearinghouseCompany(companyName) {
+            if (!companyName) return 'other';
+            const c = companyName.toLowerCase();
+            if (c.includes('מיטב')) return 'meitav';
+            if (c.includes('אלטשולר')) return 'altshuler';
+            if (c.includes('הראל')) return 'harel';
+            if (c.includes('מגדל')) return 'migdal';
+            if (c.includes('מנורה')) return 'menora';
+            if (c.includes('פניקס') || c.includes('הפניקס')) return 'phoenix';
+            if (c.includes('כלל')) return 'clal';
+            if (c.includes('פסגות')) return 'psagot';
+            if (c.includes('אנליסט')) return 'analyst';
+            if (c.includes('ילין')) return 'yelin';
+            if (c.includes('מור')) return 'more';
+            return 'other';
+        }
+
+        const typeIcons = { pension: '🏛️', training: '🎓', gemel: '💼', savings: '🐷' };
+        const typeNames = { pension: 'פנסיה', training: 'השתלמות', gemel: 'גמל', savings: 'חיסכון' };
+
+        function calcMonthlyDeposit(depositRows, policyNum) {
+            if (!depositRows.length || !policyNum) return 0;
+            // Find deposits for this policy and calculate average monthly
+            const policyDeposits = depositRows.filter(d => {
+                const dp = String(d['מספר פוליסה'] || '');
+                return dp === String(policyNum);
+            });
+            if (policyDeposits.length === 0) return 0;
+            // Get most recent deposit entry
+            const last = policyDeposits[policyDeposits.length - 1];
+            const employee = parseFloat(last['הפקדות עובד']) || 0;
+            const employer = parseFloat(last['הפקדות מעסיק']) || 0;
+            const severance = parseFloat(last['הפקדות מעסיק לפיצויים']) || 0;
+            return employee + employer + severance;
+        }
+
+        function showClearinghousePreview(rows, depositRows) {
+            const existingFunds = getFunds();
+            const products = rows.map((row, idx) => {
+                const name = row['שם מוצר'] || '';
+                const company = row['שם חברה מנהלת'] || '';
+                const policyNum = String(row['מספר פוליסה'] || '');
+                const status = row['סטטוס'] || '';
+                const balance = parseFloat(row['סך הכל חיסכון']) || 0;
+                const feeDeposit = parseFloat(row['שיעור דמי ניהול מהפקדות']) || 0;
+                const feeSavings = parseFloat(row['שיעור דמי ניהול שנתי מחיסכון צבור']) || 0;
+                const ytdReturn = parseFloat(row['תשואה מתחילת השנה']) || 0;
+                const type = mapClearinghouseType(name);
+                const companyCode = mapClearinghouseCompany(company);
+                const monthlyDeposit = calcMonthlyDeposit(depositRows, policyNum);
+                const isActive = status === 'פעיל';
+                // Check if already exists by policy number
+                const existing = existingFunds.find(f => f.accountNumber === policyNum && policyNum);
+                return {
+                    idx, name, company, companyCode, policyNum, status,
+                    balance, feeDeposit, feeSavings, ytdReturn,
+                    type, monthlyDeposit, isActive, existing
+                };
+            }).filter(p => p.balance > 0 || p.isActive);
+
+            if (products.length === 0) {
+                App.notify(I18n.t('myFunds.clearinghouseNoProducts'), 'error');
+                return;
+            }
+
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay active';
+            modal.id = 'clearinghouseModal';
+
+            const productsHTML = products.map((p, i) => {
+                const statusBadge = p.existing
+                    ? `<span style="color:#f59e0b;font-size:0.75rem;">⚠️ ${I18n.t('myFunds.clearinghouseDuplicate')}</span>`
+                    : (p.isActive
+                        ? `<span style="color:#10b981;font-size:0.75rem;">✓ ${I18n.t('myFunds.clearinghouseActive')}</span>`
+                        : `<span style="color:#6b7280;font-size:0.75rem;">✗ ${I18n.t('myFunds.clearinghouseInactive')}</span>`);
+                const checked = (p.isActive || p.balance > 0) ? 'checked' : '';
+                return `
+                    <label style="display:flex;gap:10px;align-items:flex-start;padding:12px;border:1px solid var(--color-border);border-radius:var(--radius-md);margin-bottom:8px;cursor:pointer;background:var(--color-bg-secondary);">
+                        <input type="checkbox" ${checked} data-cidx="${i}" style="margin-top:4px;flex-shrink:0;">
+                        <div style="flex:1;min-width:0;">
+                            <div style="font-weight:600;margin-bottom:2px;">${typeIcons[p.type]} ${p.name}</div>
+                            <div style="font-size:0.85rem;color:var(--color-text-secondary);">${p.company}</div>
+                            <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;font-size:0.8rem;">
+                                <span>💰 ₪${p.balance.toLocaleString()}</span>
+                                ${p.monthlyDeposit ? `<span>📤 ₪${p.monthlyDeposit.toLocaleString()}/חודש</span>` : ''}
+                                ${p.ytdReturn ? `<span>📈 ${p.ytdReturn.toFixed(2)}%</span>` : ''}
+                                ${p.feeDeposit || p.feeSavings ? `<span>🏷️ ${p.feeDeposit}%/${p.feeSavings}%</span>` : ''}
+                            </div>
+                            <div style="margin-top:4px;">${statusBadge} <span style="font-size:0.75rem;color:var(--color-text-secondary);">| ${typeNames[p.type]} | #${p.policyNum}</span></div>
+                        </div>
+                    </label>`;
+            }).join('');
+
+            modal.innerHTML = `
+                <div class="modal" style="max-width:550px;max-height:85vh;overflow-y:auto;">
+                    <div class="modal-header">
+                        <h2>🏦 ${I18n.t('myFunds.clearinghousePreview')}</h2>
+                        <button class="modal-close" onclick="document.getElementById('clearinghouseModal').remove()">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <p style="margin-bottom:12px;color:var(--color-text-secondary);font-size:0.9rem;">${I18n.t('myFunds.clearinghouseDesc')}</p>
+                        <label style="display:flex;align-items:center;gap:6px;margin-bottom:12px;cursor:pointer;font-weight:600;">
+                            <input type="checkbox" id="clearinghouseSelectAll" checked onchange="toggleClearinghouseAll(this.checked)">
+                            ${I18n.t('myFunds.clearinghouseSelectAll')}
+                        </label>
+                        <div id="clearinghouseProducts">${productsHTML}</div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" onclick="document.getElementById('clearinghouseModal').remove()">${I18n.t('common.cancel')}</button>
+                        <button class="btn btn-primary" onclick="applyClearinghouseImport()" style="background:#059669;">${I18n.t('myFunds.clearinghouseImportSelected')}</button>
+                    </div>
+                </div>`;
+            document.body.appendChild(modal);
+            window._clearinghouseProducts = products;
+        }
+
+        function toggleClearinghouseAll(checked) {
+            document.querySelectorAll('#clearinghouseProducts input[type="checkbox"]').forEach(cb => {
+                cb.checked = checked;
+            });
+        }
+
+        function applyClearinghouseImport() {
+            const products = window._clearinghouseProducts;
+            if (!products) return;
+            const checkboxes = document.querySelectorAll('#clearinghouseProducts input[type="checkbox"]');
+            const funds = getFunds();
+            const now = new Date().toISOString();
+            let added = 0, updated = 0;
+
+            checkboxes.forEach(cb => {
+                if (!cb.checked) return;
+                const idx = parseInt(cb.dataset.cidx);
+                const p = products[idx];
+                if (!p) return;
+
+                if (p.existing) {
+                    // Update existing fund
+                    const f = funds.find(f => f.id === p.existing.id);
+                    if (f) {
+                        f.value = p.balance;
+                        if (p.monthlyDeposit) f.monthlyDeposit = p.monthlyDeposit;
+                        if (p.ytdReturn) {
+                            f.returns = f.returns || {};
+                            f.returns.year1 = p.ytdReturn;
+                            f.returnsSource = 'clearinghouse';
+                        }
+                        // Add to history
+                        f.history = f.history || [];
+                        const today = new Date().toISOString().split('T')[0];
+                        if (!f.history.find(h => h.date === today)) {
+                            f.history.push({ date: today, value: p.balance });
+                        }
+                        f.updatedAt = now;
+                        updated++;
+                    }
+                } else {
+                    // Add new fund
+                    const newFund = {
+                        id: 'fund_' + Date.now() + '_' + added + '_' + updated,
+                        type: p.type,
+                        name: p.name,
+                        company: p.companyCode,
+                        value: p.balance,
+                        monthlyDeposit: p.monthlyDeposit || 0,
+                        accountNumber: p.policyNum,
+                        createdAt: now,
+                        updatedAt: now,
+                        history: [{ date: new Date().toISOString().split('T')[0], value: p.balance }]
+                    };
+                    if (p.ytdReturn) {
+                        newFund.returns = { year1: p.ytdReturn };
+                        newFund.returnsSource = 'clearinghouse';
+                    }
+                    if (p.type === 'pension') {
+                        // Store pension-specific data from clearinghouse in notes
+                        const fees = [];
+                        if (p.feeDeposit) fees.push(`דמ"נ הפקדות: ${p.feeDeposit}%`);
+                        if (p.feeSavings) fees.push(`דמ"נ צבירה: ${p.feeSavings}%`);
+                        if (fees.length) newFund.notes = fees.join(' | ');
+                    }
+                    funds.push(newFund);
+                    added++;
+                }
+            });
+
+            if (added > 0 || updated > 0) {
+                saveFunds(funds);
+                loadFunds();
+                if (updated > 0) {
+                    App.notify(I18n.t('myFunds.clearinghouseUpdated').replace('{updated}', updated).replace('{added}', added), 'success');
+                } else {
+                    App.notify(I18n.t('myFunds.clearinghouseImported').replace('{count}', added), 'success');
+                }
+            } else {
+                App.notify(I18n.t('myFunds.noFundsToImport'), 'error');
+            }
+
+            document.getElementById('clearinghouseModal').remove();
+            delete window._clearinghouseProducts;
         }
     </script>
 </body>
