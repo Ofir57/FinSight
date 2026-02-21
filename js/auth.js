@@ -495,32 +495,32 @@ const Auth = {
                 const cloudLastUpdate = rawData.lastUpdated?.toDate?.()?.getTime() || 0;
                 const localTime = localLastUpdate ? new Date(localLastUpdate).getTime() : 0;
 
+                // Decrypt cloud data
+                let data;
+                if (rawData.encrypted && rawData.encryptedData && typeof DataCrypto !== 'undefined') {
+                    data = await DataCrypto.decrypt(rawData.encryptedData, userId);
+                    if (!data) {
+                        console.error('Failed to decrypt cloud data');
+                        App.notify(I18n.t('auth.decryptError'), 'error');
+                        return false;
+                    }
+                } else {
+                    data = rawData;
+                }
+
+                // Count data items in cloud vs local
+                const cloudItemCount = this._countDataItems(data);
+                const localItemCount = this._countDataItems({
+                    bankAccounts: Storage.getBankAccounts(),
+                    creditCards: Storage.getCreditCards(),
+                    stocks: Storage.getStocks(),
+                    assets: Storage.getAssets(),
+                    myFunds: Storage.getMyFunds(),
+                    loans: Storage.getLoans()
+                });
+
                 // Check if cloud data is newer or if this is first sync
                 if (cloudLastUpdate > localTime || !localLastUpdate) {
-                    // Decrypt if encrypted
-                    let data;
-                    if (rawData.encrypted && rawData.encryptedData && typeof DataCrypto !== 'undefined') {
-                        data = await DataCrypto.decrypt(rawData.encryptedData, userId);
-                        if (!data) {
-                            console.error('Failed to decrypt cloud data');
-                            App.notify(I18n.t('auth.decryptError'), 'error');
-                            return false;
-                        }
-                    } else {
-                        data = rawData;
-                    }
-
-                    // Safety check: count data items in cloud vs local
-                    const cloudItemCount = this._countDataItems(data);
-                    const localItemCount = this._countDataItems({
-                        bankAccounts: Storage.getBankAccounts(),
-                        creditCards: Storage.getCreditCards(),
-                        stocks: Storage.getStocks(),
-                        assets: Storage.getAssets(),
-                        myFunds: Storage.getMyFunds(),
-                        loans: Storage.getLoans()
-                    });
-
                     // If cloud is empty but local has data, don't overwrite — upload local instead
                     if (cloudItemCount === 0 && localItemCount > 0) {
                         console.log('Cloud data is empty but local has data — uploading local to cloud');
@@ -571,8 +571,36 @@ const Auth = {
 
                     return true;
                 } else {
-                    console.log('Local data is newer, uploading to cloud');
-                    await this.saveToCloud();
+                    // Local timestamp is newer — but check if local actually has data
+                    if (localItemCount > 0) {
+                        console.log('Local data is newer and has content, uploading to cloud');
+                        await this.saveToCloud();
+                    } else if (cloudItemCount > 0) {
+                        // Local is empty but cloud has data — download from cloud instead
+                        console.log('Local is empty but cloud has data — downloading from cloud');
+                        if (data.bankAccounts) Storage.saveBankAccounts(data.bankAccounts);
+                        if (data.creditCards) Storage.saveCreditCards(data.creditCards);
+                        if (data.stocks) Storage.saveStocks(data.stocks);
+                        if (data.assets) Storage.saveAssets(data.assets);
+                        if (data.myFunds) Storage.saveMyFunds(data.myFunds);
+                        if (data.settings) Storage.saveSettings(data.settings);
+                        if (data.stockAlerts) Storage.set(Storage.KEYS.STOCK_ALERTS, data.stockAlerts);
+                        if (data.tvCustomSymbols) Storage.saveTVCustomSymbols(data.tvCustomSymbols);
+                        if (data.notifications) Storage.saveNotifications(data.notifications);
+                        if (data.dashboardWidgets) Storage.saveDashboardWidgets(data.dashboardWidgets);
+                        if (data.importTemplates) Storage.saveImportTemplates(data.importTemplates);
+                        if (data.userProfile) Storage.saveUserProfile(data.userProfile);
+                        if (data.dismissedTips) Storage.saveDismissedTips(data.dismissedTips);
+                        if (data.loans) Storage.saveLoans(data.loans);
+                        if (data.creditScore) Storage.saveCreditScore(data.creditScore);
+                        localStorage.setItem('finance_last_update', new Date().toISOString());
+                        App.notify(I18n.t('auth.dataSynced'), 'success');
+                        if (typeof loadStocks === 'function') loadStocks();
+                        if (typeof loadWatchlist === 'function') loadWatchlist();
+                        if (typeof loadLoans === 'function') loadLoans();
+                    } else {
+                        console.log('Both local and cloud are empty — nothing to sync');
+                    }
                 }
             } else {
                 // No cloud data — only save if local has actual data
@@ -684,18 +712,36 @@ function resetInactivityTimer() {
 });
 
 // Auto-save to cloud when data changes (debounced)
+// Only track meaningful financial data keys for timestamp updates
+const FINANCIAL_KEYS = ['finance_bank_accounts', 'finance_credit_cards', 'finance_stocks',
+    'finance_assets', 'finance_my_funds', 'finance_loans', 'finance_user_profile',
+    'finance_stock_alerts', 'finance_goals'];
 let saveTimeout = null;
 const originalStorageSet = Storage.set.bind(Storage);
 Storage.set = function(key, data) {
     originalStorageSet(key, data);
-    localStorage.setItem('finance_last_update', new Date().toISOString());
 
-    // Debounced cloud save
-    if (Auth.currentUser) {
+    // Only update timestamp for meaningful financial data changes
+    if (FINANCIAL_KEYS.includes(key)) {
+        localStorage.setItem('finance_last_update', new Date().toISOString());
+    }
+
+    // Debounced cloud save — only if we have actual data to save
+    if (Auth.currentUser && FINANCIAL_KEYS.includes(key)) {
         clearTimeout(saveTimeout);
         saveTimeout = setTimeout(() => {
-            Auth.saveToCloud();
-        }, 2000); // Wait 2 seconds after last change before syncing
+            const count = Auth._countDataItems({
+                bankAccounts: Storage.getBankAccounts(),
+                creditCards: Storage.getCreditCards(),
+                stocks: Storage.getStocks(),
+                assets: Storage.getAssets(),
+                myFunds: Storage.getMyFunds(),
+                loans: Storage.getLoans()
+            });
+            if (count > 0) {
+                Auth.saveToCloud();
+            }
+        }, 2000);
     }
 };
 
