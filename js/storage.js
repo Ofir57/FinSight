@@ -682,7 +682,7 @@ const Storage = {
     },
 
     getTotalFundsValue() {
-        return this.getMyFunds().reduce((sum, f) => sum + (f.currentValue || 0), 0);
+        return this.getMyFunds().reduce((sum, f) => sum + (f.value || f.currentValue || 0), 0);
     },
 
     getNetWorth() {

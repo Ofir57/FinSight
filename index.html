@@ -73,7 +73,7 @@
                             </li>
                             <li class="nav-item">
                                 <a href="pages/my-funds.html" class="nav-link" data-category="my-products">
-                                    <span data-i18n="nav.myProducts">💎 המוצרים שלי</span>
+                                    <span data-i18n="nav.myProducts">💎 החסכונות שלי</span>
                                 </a>
                             </li>
                         </ul>
@@ -178,9 +178,9 @@
                     <div class="value" id="stocksTotal">₪0</div>
                 </a>
 
-                <div class="summary-card funds" onclick="location.href='pages/training.html'">
+                <div class="summary-card funds" onclick="location.href='pages/my-funds.html'">
                     <div class="icon">📊</div>
-                    <div class="label" data-i18n="dashboard.fundsValue">שווי קרנות</div>
+                    <div class="label" data-i18n="dashboard.fundsValue">שווי חסכונות</div>
                     <div class="value" id="fundsTotal">₪0</div>
                 </div>
 
@@ -472,7 +472,7 @@
             const stocksCost = stockData.holdings.reduce((sum, h) => sum + (h.quantity * h.avgPrice), 0);
             const stocksReturn = stocksCost > 0 ? ((stocksTotal - stocksCost) / stocksCost * 100).toFixed(1) : 0;
 
-            const fundsTotal = fundsData.reduce((sum, f) => sum + f.currentValue, 0);
+            const fundsTotal = fundsData.reduce((sum, f) => sum + (f.value || f.currentValue || 0), 0);
             const fundsMonthlyDeposit = fundsData.reduce((sum, f) => sum + (f.monthlyDeposit || 0), 0);
 
             widget.innerHTML = `
