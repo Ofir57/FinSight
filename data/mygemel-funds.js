@@ -8,6 +8,7 @@
 const MyGemelFunds = {
     meta: {
         lastUpdate: '2026-02',
+        dataVersion: 2,
         source: 'iGemel-Net',
         sourceUrls: {
             training: 'https://www.igemel-net.co.il/%D7%A7%D7%A8%D7%A0%D7%95%D7%AA-%D7%94%D7%A9%D7%AA%D7%9C%D7%9E%D7%95%D7%AA/',
@@ -2268,6 +2269,7 @@ const MyGemelFunds = {
 
         this[type] = newData;
         this.meta.lastUpdate = new Date().toISOString().slice(0, 7);
+        if (!this.meta.dataVersion) this.meta.dataVersion = 2;
         this.saveToStorage();
         return true;
     },
@@ -2283,12 +2285,19 @@ const MyGemelFunds = {
         localStorage.setItem('mygemel_fund_data', JSON.stringify(dataToSave));
     },
 
-    // Load from localStorage
+    // Load from localStorage (only if version matches or is newer)
     loadFromStorage() {
         try {
             const stored = localStorage.getItem('mygemel_fund_data');
             if (stored) {
                 const data = JSON.parse(stored);
+                const storedVersion = (data.meta && data.meta.dataVersion) || 0;
+                const builtInVersion = 2;
+                if (storedVersion < builtInVersion) {
+                    // Old data in localStorage — remove it so built-in data is used
+                    localStorage.removeItem('mygemel_fund_data');
+                    return;
+                }
                 if (data.meta) this.meta = data.meta;
                 if (data.training) this.training = data.training;
                 if (data.pension) this.pension = data.pension;
