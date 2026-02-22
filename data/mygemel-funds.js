@@ -2,13 +2,13 @@
  * MyGemel Fund Data - Comprehensive data from igemel-net.co.il
  * Data source: https://www.igemel-net.co.il/
  * Last update: February 2026
- * Total funds: 108 training + 83 pension + 11 gemel + 135 savings = 337
+ * Total funds: 108 training + 83 pension + 11 gemel + 178 savings = 380
  */
 
 const MyGemelFunds = {
     meta: {
         lastUpdate: '2026-02',
-        dataVersion: 4,
+        dataVersion: 5,
         source: 'iGemel-Net',
         sourceUrls: {
             training: 'https://www.igemel-net.co.il/%D7%A7%D7%A8%D7%A0%D7%95%D7%AA-%D7%94%D7%A9%D7%AA%D7%9C%D7%9E%D7%95%D7%AA/',
@@ -3604,6 +3604,437 @@ const MyGemelFunds = {
             year3: 54.46,
             year5: 63.73
         }
+,
+        {
+            nameHe: "הראל מסלול משתתף ברווחים אשראי ואג״ח",
+            nameEn: "הראל מסלול משתתף ברווחים אשראי ואג״ח",
+            companyHe: "הראל",
+            companyEn: "Harel",
+            month: 0.17,
+            year1: 7.23,
+            year3: 15.88,
+            year5: 13.64
+        },
+        {
+            nameHe: "הראל מסלול משתתף ברווחים כספי (שקלי)",
+            nameEn: "הראל מסלול משתתף ברווחים כספי (שקלי)",
+            companyHe: "הראל",
+            companyEn: "Harel",
+            month: 0.36,
+            year1: 4.52,
+            year3: 13.61,
+            year5: 13.82
+        },
+        {
+            nameHe: "איילון חברה לביטוח בע״מ עוקבי מדדים עוקב מדדי מניות",
+            nameEn: "איילון חברה לביטוח בע״מ עוקבי מדדים עוקב מדדי מניות",
+            companyHe: "איילון",
+            companyEn: "Ayalon",
+            month: 2.3,
+            year1: 30.26,
+            year3: 88.14,
+            year5: 94.02
+        },
+        {
+            nameHe: "הכשרה חברה לביטוח בע״מ - כספי (שקלי)",
+            nameEn: "הכשרה חברה לביטוח בע״מ - כספי (שקלי)",
+            companyHe: "הכשרה",
+            companyEn: "Hachshara",
+            month: 0.36,
+            year1: 4.34,
+            year3: 13.32,
+            year5: 13.63
+        },
+        {
+            nameHe: "הכשרה חברה לביטוח בע״מ - מנוהל באמצעות אלטשולר שחם בע״מ - אג״ח ממשלות",
+            nameEn: "הכשרה חברה לביטוח בע״מ - מנוהל באמצעות אלטשולר שחם בע״מ - אג״ח ממשלות",
+            companyHe: "הכשרה",
+            companyEn: "Hachshara",
+            month: -0.09,
+            year1: 5.96,
+            year3: 14.82,
+            year5: 13.61
+        },
+        {
+            nameHe: "איילון חברה לביטוח בע״מ אשראי ואג״ח",
+            nameEn: "איילון חברה לביטוח בע״מ אשראי ואג״ח",
+            companyHe: "איילון",
+            companyEn: "Ayalon",
+            month: 0.43,
+            year1: 6.88,
+            year3: 17.3,
+            year5: 13.71
+        },
+        {
+            nameHe: "אקסלנס אינווסט אשראי ואג״ח (עד 25% מניות)",
+            nameEn: "אקסלנס אינווסט אשראי ואג״ח (עד 25% מניות)",
+            companyHe: "הפניקס",
+            companyEn: "Phoenix",
+            month: 0.5,
+            year1: 9.7,
+            year3: 31.36,
+            year5: 31.92
+        },
+        {
+            nameHe: "הכשרה - מנוהל באמצעות אלטשולר שחם בע״מ - מניות",
+            nameEn: "הכשרה - מנוהל באמצעות אלטשולר שחם בע״מ - מניות",
+            companyHe: "הכשרה",
+            companyEn: "Hachshara",
+            month: -0.03,
+            year1: 19.8,
+            year3: 69.61,
+            year5: 58.69
+        },
+        {
+            nameHe: "הכשרה - אלטשולר שחם בע״מ - כללי",
+            nameEn: "הכשרה - אלטשולר שחם בע״מ - כללי",
+            companyHe: "הכשרה",
+            companyEn: "Hachshara",
+            month: -0.08,
+            year1: 12.52,
+            year3: 39.47,
+            year5: 34.06
+        },
+        {
+            nameHe: "איילון חברה לביטוח בע״מ כספי (שקלי)",
+            nameEn: "איילון חברה לביטוח בע״מ כספי (שקלי)",
+            companyHe: "איילון",
+            companyEn: "Ayalon",
+            month: 0.44,
+            year1: 4.96,
+            year3: 14.13,
+            year5: 5.58
+        },
+        {
+            nameHe: "מנורה מבטחים ביטוח בע״מ אג״ח ממשלתי סחיר",
+            nameEn: "מנורה מבטחים ביטוח בע״מ אג״ח ממשלתי סחיר",
+            companyHe: "מנורה",
+            companyEn: "Menora",
+            month: 0.1,
+            year1: 6.64,
+            year3: 10.94,
+            year5: 3.42
+        },
+        {
+            nameHe: "הראל מסלול אשראי ואג״ח עם מניות (עד 25% מניות)",
+            nameEn: "הראל מסלול אשראי ואג״ח עם מניות (עד 25% מניות)",
+            companyHe: "הראל",
+            companyEn: "Harel",
+            month: 0.04,
+            year1: 4.19,
+            year3: 15.42,
+            year5: 19.27
+        },
+        {
+            nameHe: "מנורה מבטחים ביטוח בע״מ מניות סחיר",
+            nameEn: "מנורה מבטחים ביטוח בע״מ מניות סחיר",
+            companyHe: "מנורה",
+            companyEn: "Menora",
+            month: -0.68,
+            year1: 12.64,
+            year3: 62.87,
+            year5: 68.28
+        },
+        {
+            nameHe: "הפניקס-אקסלנס אינווסט תיק מנוהל אג״ח 2",
+            nameEn: "הפניקס-אקסלנס אינווסט תיק מנוהל אג״ח 2",
+            companyHe: "הפניקס",
+            companyEn: "Phoenix",
+            month: 0.5,
+            year1: 8.05,
+            year3: 25.68,
+            year5: 24.95
+        },
+        {
+            nameHe: "כלל חברה לביטוח בע״מ אשראי ואג״ח עם מניות (עד 25% מניות)",
+            nameEn: "כלל חברה לביטוח בע״מ אשראי ואג״ח עם מניות (עד 25% מניות)",
+            companyHe: "כלל",
+            companyEn: "Clal",
+            month: 0.41,
+            year1: 4.62,
+            year3: 16.84,
+            year5: 19.07
+        },
+        {
+            nameHe: "מנורה מבטחים ביטוח בע״מ כספי (שקלי)",
+            nameEn: "מנורה מבטחים ביטוח בע״מ כספי (שקלי)",
+            companyHe: "מנורה",
+            companyEn: "Menora",
+            month: 0.35,
+            year1: 4.42,
+            year3: 13.31,
+            year5: 13.11
+        },
+        {
+            nameHe: "מנורה מבטחים ביטוח בע״מ אשראי ואג״ח",
+            nameEn: "מנורה מבטחים ביטוח בע״מ אשראי ואג״ח",
+            companyHe: "מנורה",
+            companyEn: "Menora",
+            month: 0.19,
+            year1: 5.86,
+            year3: 17.26,
+            year5: 15.94
+        },
+        {
+            nameHe: "מנורה מבטחים ביטוח בע״מ אג״ח ממשלות",
+            nameEn: "מנורה מבטחים ביטוח בע״מ אג״ח ממשלות",
+            companyHe: "מנורה",
+            companyEn: "Menora",
+            month: -0.23,
+            year1: 3.62,
+            year3: 20.53,
+            year5: 27.2
+        },
+        {
+            nameHe: "איי. די. איי. חברה לביטוח בע״מ מסלול אג״ח ממשלות",
+            nameEn: "איי. די. איי. חברה לביטוח בע״מ מסלול אג״ח ממשלות",
+            companyHe: "אי.ד.י",
+            companyEn: "IDI",
+            month: 0.18,
+            year1: 4.75,
+            year3: 15.79,
+            year5: 18.41
+        },
+        {
+            nameHe: "הכשרה חברה לביטוח בע״מ - אג״ח ממשלות",
+            nameEn: "הכשרה חברה לביטוח בע״מ - אג״ח ממשלות",
+            companyHe: "הכשרה",
+            companyEn: "Hachshara",
+            month: 0.34,
+            year1: 5.03,
+            year3: 12.03,
+            year5: 13.2
+        },
+        {
+            nameHe: "איילון- כללי",
+            nameEn: "איילון- כללי",
+            companyHe: "איילון",
+            companyEn: "Ayalon",
+            month: 1.68,
+            year1: 18.97,
+            year3: 46.98,
+            year5: 53.52
+        },
+        {
+            nameHe: "כלל חברה לביטוח בע״מ כללי",
+            nameEn: "כלל חברה לביטוח בע״מ כללי",
+            companyHe: "כלל",
+            companyEn: "Clal",
+            month: 1.4,
+            year1: 16.34,
+            year3: 39.63,
+            year5: 48.33
+        },
+        {
+            nameHe: "אי.די.אי.-כללי",
+            nameEn: "אי.די.אי.-כללי",
+            companyHe: "אי.ד.י",
+            companyEn: "IDI",
+            month: 1.22,
+            year1: 15.71,
+            year3: 42.98,
+            year5: 40.41
+        },
+        {
+            nameHe: "הפניקס מסלול השקעה כללי",
+            nameEn: "הפניקס מסלול השקעה כללי",
+            companyHe: "הפניקס",
+            companyEn: "Phoenix",
+            month: 1.32,
+            year1: 14.83,
+            year3: 42.24,
+            year5: 53.15
+        },
+        {
+            nameHe: "הראל מסלול כללי",
+            nameEn: "הראל מסלול כללי",
+            companyHe: "הראל",
+            companyEn: "Harel",
+            month: 0.91,
+            year1: 13.86,
+            year3: 36.09,
+            year5: 44.7
+        },
+        {
+            nameHe: "איילון חברה לביטוח בע״מ מניות",
+            nameEn: "איילון חברה לביטוח בע״מ מניות",
+            companyHe: "איילון",
+            companyEn: "Ayalon",
+            month: 2.92,
+            year1: 30.93,
+            year3: 81.9,
+            year5: 89.44
+        },
+        {
+            nameHe: "כלל חברה לביטוח בע״מ מניות",
+            nameEn: "כלל חברה לביטוח בע״מ מניות",
+            companyHe: "כלל",
+            companyEn: "Clal",
+            month: 2.18,
+            year1: 28.23,
+            year3: 70.92,
+            year5: 78.2
+        },
+        {
+            nameHe: "מנורה מבטחים ביטוח בע״מ מניות",
+            nameEn: "מנורה מבטחים ביטוח בע״מ מניות",
+            companyHe: "מנורה",
+            companyEn: "Menora",
+            month: 2.02,
+            year1: 27.77,
+            year3: 75.31,
+            year5: 85.24
+        },
+        {
+            nameHe: "הראל מסלול מניות",
+            nameEn: "הראל מסלול מניות",
+            companyHe: "הראל",
+            companyEn: "Harel",
+            month: 1.94,
+            year1: 26.72,
+            year3: 72.25,
+            year5: 83.5
+        },
+        {
+            nameHe: "הראל מסלול משתתף ברווחים מניות",
+            nameEn: "הראל מסלול משתתף ברווחים מניות",
+            companyHe: "הראל",
+            companyEn: "Harel",
+            month: 1.94,
+            year1: 26.72,
+            year3: 72.23,
+            year5: 83.48
+        },
+        {
+            nameHe: "מגדל מסלול מניות",
+            nameEn: "מגדל מסלול מניות",
+            companyHe: "מגדל",
+            companyEn: "Migdal",
+            month: 1.81,
+            year1: 25.79,
+            year3: 77.23,
+            year5: 86.1
+        },
+        {
+            nameHe: "הפניקס -קרן י'",
+            nameEn: "הפניקס -קרן י'",
+            companyHe: "הפניקס",
+            companyEn: "Phoenix",
+            month: 1.72,
+            year1: 15.98,
+            year3: 42.98,
+            year5: 58.3
+        },
+        {
+            nameHe: "הפניקס -קרן ט'",
+            nameEn: "הפניקס -קרן ט'",
+            companyHe: "הפניקס",
+            companyEn: "Phoenix",
+            month: 1.05,
+            year1: 15.07,
+            year3: 40.8,
+            year5: 47.51
+        },
+        {
+            nameHe: "מגדל אג״ח ממשלות",
+            nameEn: "מגדל אג״ח ממשלות",
+            companyHe: "מגדל",
+            companyEn: "Migdal",
+            month: 0.1,
+            year1: 5.12,
+            year3: 9.57,
+            year5: 2.83
+        },
+        {
+            nameHe: "מגדל מסלול כספי (שקלי)",
+            nameEn: "מגדל מסלול כספי (שקלי)",
+            companyHe: "מגדל",
+            companyEn: "Migdal",
+            month: 0.45,
+            year1: 4.66,
+            year3: 13.46,
+            year5: 13.18
+        },
+        {
+            nameHe: "הראל מסלול כספי (שקלי)",
+            nameEn: "הראל מסלול כספי (שקלי)",
+            companyHe: "הראל",
+            companyEn: "Harel",
+            month: 0.36,
+            year1: 4.52,
+            year3: 13.61,
+            year5: 13.82
+        },
+        {
+            nameHe: "איילון חברה לביטוח בע״מ הלכה",
+            nameEn: "איילון חברה לביטוח בע״מ הלכה",
+            companyHe: "איילון",
+            companyEn: "Ayalon",
+            month: 1.43,
+            year1: 16.79,
+            year3: 38.99,
+            year5: 33.72
+        },
+        {
+            nameHe: "כלל חברה לביטוח בע״מ הלכה",
+            nameEn: "כלל חברה לביטוח בע״מ הלכה",
+            companyHe: "כלל",
+            companyEn: "Clal",
+            month: 1.2,
+            year1: 15.35,
+            year3: 40.09,
+            year5: 40.0
+        },
+        {
+            nameHe: "מגדל מסלול הלכה",
+            nameEn: "מגדל מסלול הלכה",
+            companyHe: "מגדל",
+            companyEn: "Migdal",
+            month: 1.02,
+            year1: 15.21,
+            year3: 41.58,
+            year5: 42.43
+        },
+        {
+            nameHe: "מנורה מבטחים ביטוח בע״מ הלכה",
+            nameEn: "מנורה מבטחים ביטוח בע״מ הלכה",
+            companyHe: "מנורה",
+            companyEn: "Menora",
+            month: 1.01,
+            year1: 14.31,
+            year3: 40.81,
+            year5: 40.42
+        },
+        {
+            nameHe: "הראל מסלול חו״ל",
+            nameEn: "הראל מסלול חו״ל",
+            companyHe: "הראל",
+            companyEn: "Harel",
+            month: 2.28,
+            year1: 2.28,
+            year3: null,
+            year5: null
+        },
+        {
+            nameHe: "מגדל מסלול חו״ל",
+            nameEn: "מגדל מסלול חו״ל",
+            companyHe: "מגדל",
+            companyEn: "Migdal",
+            month: 0.0,
+            year1: null,
+            year3: null,
+            year5: null
+        },
+        {
+            nameHe: "הראל מסלול אג״ח חו״ל",
+            nameEn: "הראל מסלול אג״ח חו״ל",
+            companyHe: "הראל",
+            companyEn: "Harel",
+            month: 1.64,
+            year1: 1.64,
+            year3: null,
+            year5: null
+        }
     ],
 
     // Get data by type
@@ -3648,7 +4079,7 @@ const MyGemelFunds = {
             if (stored) {
                 const data = JSON.parse(stored);
                 const storedVersion = (data.meta && data.meta.dataVersion) || 0;
-                const builtInVersion = 4;
+                const builtInVersion = 5;
                 if (storedVersion < builtInVersion) {
                     // Old data in localStorage — remove it so built-in data is used
                     localStorage.removeItem('mygemel_fund_data');
