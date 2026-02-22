@@ -225,7 +225,7 @@
 
                     <div class="form-group">
                         <label data-i18n="assets.assetType">סוג נכס</label>
-                        <select class="form-control" id="assetType" required>
+                        <select class="form-control" id="assetType" required onchange="togglePropertyFields()">
                             <option value="car">🚗 רכב</option>
                             <option value="property">🏠 נדל״ן</option>
                             <option value="savings">💵 חסכונות</option>
@@ -253,6 +253,21 @@
                     <div class="form-group">
                         <label data-i18n="assets.purchasePrice">מחיר רכישה</label>
                         <input type="number" class="form-control" id="purchasePrice" step="100">
+                    </div>
+
+                    <div id="propertyFields" style="display: none;">
+                        <div class="form-group">
+                            <label data-i18n="assets.area">שטח (מ"ר)</label>
+                            <input type="number" class="form-control" id="assetArea" step="1" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label data-i18n="assets.city">עיר</label>
+                            <input type="text" class="form-control" id="assetCity" placeholder="תל אביב">
+                        </div>
+                        <div class="form-group">
+                            <label data-i18n="assets.neighborhood">שכונה</label>
+                            <input type="text" class="form-control" id="assetNeighborhood" placeholder="פלורנטין">
+                        </div>
                     </div>
                 </form>
             </div>
@@ -303,6 +318,11 @@
             container.innerHTML = assets.map(asset => {
                 const depreciation = asset.purchasePrice ? asset.purchasePrice - asset.value : 0;
                 const name = I18n.currentLanguage === 'he' ? asset.nameHe || asset.nameEn : asset.nameEn || asset.nameHe;
+                const isProperty = asset.type === 'property';
+                const pricePerSqm = isProperty && asset.area > 0 ? Math.round(asset.value / asset.area) : 0;
+                const madlanUrl = isProperty && asset.city && asset.neighborhood
+                    ? `https://www.madlan.co.il/deals/${encodeURIComponent(asset.city)}-${encodeURIComponent(asset.neighborhood)}`
+                    : null;
 
                 return `
                     <div class="asset-card">
@@ -312,7 +332,10 @@
                             <div class="meta">
                                 ${I18n.t('assets.types.' + asset.type)}
                                 ${asset.purchaseDate ? ' • ' + I18n.formatDate(asset.purchaseDate) : ''}
+                                ${isProperty && asset.area ? ' • ' + asset.area + ' ' + I18n.t('assets.sqm') : ''}
                             </div>
+                            ${pricePerSqm > 0 ? `<div class="meta" style="margin-top:4px;">${I18n.t('assets.pricePerSqm')}: ${I18n.formatCurrency(pricePerSqm)}</div>` : ''}
+                            ${madlanUrl ? `<a href="${madlanUrl}" target="_blank" rel="noopener" class="btn btn-secondary btn-sm" style="margin-top:6px;display:inline-block;font-size:0.8rem;">🔍 ${I18n.t('assets.areaTransactions')}</a>` : ''}
                         </div>
                         <div style="text-align: left;">
                             <div class="value">${I18n.formatCurrency(asset.value)}</div>
@@ -385,10 +408,16 @@
             }
         }
 
+        function togglePropertyFields() {
+            const type = document.getElementById('assetType').value;
+            document.getElementById('propertyFields').style.display = type === 'property' ? '' : 'none';
+        }
+
         function openAssetModal() {
             document.getElementById('modalTitle').textContent = I18n.t('assets.addAsset');
             document.getElementById('assetForm').reset();
             document.getElementById('assetId').value = '';
+            togglePropertyFields();
             document.getElementById('assetModal').classList.add('active');
         }
 
@@ -408,6 +437,10 @@
             document.getElementById('assetValue').value = asset.value;
             document.getElementById('purchaseDate').value = asset.purchaseDate || '';
             document.getElementById('purchasePrice').value = asset.purchasePrice || '';
+            document.getElementById('assetArea').value = asset.area || '';
+            document.getElementById('assetCity').value = asset.city || '';
+            document.getElementById('assetNeighborhood').value = asset.neighborhood || '';
+            togglePropertyFields();
             document.getElementById('assetModal').classList.add('active');
         }
 
@@ -424,10 +457,18 @@
                 return;
             }
 
+            const assetData = { type, nameHe, nameEn: nameHe, value, purchaseDate, purchasePrice };
+
+            if (type === 'property') {
+                assetData.area = parseFloat(document.getElementById('assetArea').value) || null;
+                assetData.city = document.getElementById('assetCity').value || null;
+                assetData.neighborhood = document.getElementById('assetNeighborhood').value || null;
+            }
+
             if (id) {
-                Storage.updateAsset(id, { type, nameHe, nameEn: nameHe, value, purchaseDate, purchasePrice });
+                Storage.updateAsset(id, assetData);
             } else {
-                Storage.addAsset({ type, nameHe, nameEn: nameHe, value, purchaseDate, purchasePrice });
+                Storage.addAsset(assetData);
             }
 
             closeAssetModal();

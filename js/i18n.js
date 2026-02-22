@@ -360,7 +360,13 @@ const I18n = {
                 },
                 noAssets: 'אין נכסים',
                 chartTitle: 'חלוקת נכסים לפי סוג',
-                depreciation: 'פחת'
+                depreciation: 'פחת',
+                area: 'שטח (מ"ר)',
+                city: 'עיר',
+                neighborhood: 'שכונה',
+                pricePerSqm: 'מחיר למ"ר',
+                areaTransactions: 'עסקאות באזור',
+                sqm: 'מ"ר'
             },
             // Funds Update
             fundsUpdate: {
@@ -1413,7 +1419,13 @@ const I18n = {
                 },
                 noAssets: 'No assets',
                 chartTitle: 'Asset Distribution by Type',
-                depreciation: 'Depreciation'
+                depreciation: 'Depreciation',
+                area: 'Area (sqm)',
+                city: 'City',
+                neighborhood: 'Neighborhood',
+                pricePerSqm: 'Price per sqm',
+                areaTransactions: 'Area Transactions',
+                sqm: 'sqm'
             },
             // Funds Update
             fundsUpdate: {
