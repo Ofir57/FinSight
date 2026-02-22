@@ -2,18 +2,19 @@
  * MyGemel Fund Data - Comprehensive data from igemel-net.co.il
  * Data source: https://www.igemel-net.co.il/
  * Last update: February 2026
- * Total funds: 108 training + 83 pension + 11 gemel = 202
+ * Total funds: 108 training + 83 pension + 11 gemel + 77 savings = 279
  */
 
 const MyGemelFunds = {
     meta: {
         lastUpdate: '2026-02',
-        dataVersion: 2,
+        dataVersion: 3,
         source: 'iGemel-Net',
         sourceUrls: {
             training: 'https://www.igemel-net.co.il/%D7%A7%D7%A8%D7%A0%D7%95%D7%AA-%D7%94%D7%A9%D7%AA%D7%9C%D7%9E%D7%95%D7%AA/',
             pension: 'https://www.igemel-net.co.il/%D7%A7%D7%A8%D7%A0%D7%95%D7%AA-%D7%A4%D7%A0%D7%A1%D7%99%D7%94/',
-            gemel: 'https://www.igemel-net.co.il/%D7%92%D7%9E%D7%9C-%D7%9C%D7%94%D7%A9%D7%A7%D7%A2%D7%94/'
+            gemel: 'https://www.igemel-net.co.il/%D7%92%D7%9E%D7%9C-%D7%9C%D7%94%D7%A9%D7%A7%D7%A2%D7%94/',
+            savings: 'https://www.igemel-net.co.il/%D7%A4%D7%95%D7%9C%D7%99%D7%A1%D7%95%D7%AA-%D7%97%D7%99%D7%A1%D7%9B%D7%95%D7%9F/'
         }
     },
 
@@ -2251,6 +2252,857 @@ const MyGemelFunds = {
         }
     ],
 
+    // Savings Policies - פוליסות חיסכון
+    savings: [
+        {
+            nameHe: "איילון-קרן י'",
+            nameEn: "איילון-קרן י'",
+            companyHe: "איילון",
+            companyEn: "Ayalon",
+            month: 1.77,
+            year1: 19.51,
+            year3: 47.75,
+            year5: 56.45,
+            fee: 1.47
+        },
+        {
+            nameHe: "איילון-קרן י' חדשה",
+            nameEn: "איילון-קרן י' חדשה",
+            companyHe: "איילון",
+            companyEn: "Ayalon",
+            month: 1.78,
+            year1: 19.44,
+            year3: 47.35,
+            year5: 55.68,
+            fee: 1.44
+        },
+        {
+            nameHe: "הראל-קרן ט'",
+            nameEn: "הראל-קרן ט'",
+            companyHe: "הראל",
+            companyEn: "Harel",
+            month: 0.93,
+            year1: 13.63,
+            year3: 35.85,
+            year5: 45.83,
+            fee: 1.24
+        },
+        {
+            nameHe: "הראל-קרן י'",
+            nameEn: "הראל-קרן י'",
+            companyHe: "הראל",
+            companyEn: "Harel",
+            month: 0.99,
+            year1: 14.28,
+            year3: 37.81,
+            year5: 48.23,
+            fee: 1.25
+        },
+        {
+            nameHe: "הראל-קרן י' חדשה",
+            nameEn: "הראל-קרן י' חדשה",
+            companyHe: "הראל",
+            companyEn: "Harel",
+            month: 0.99,
+            year1: 14.28,
+            year3: 37.81,
+            year5: 48.23,
+            fee: 1.25
+        },
+        {
+            nameHe: "הראל-קרן ח'",
+            nameEn: "הראל-קרן ח'",
+            companyHe: "הראל",
+            companyEn: "Harel",
+            month: 0.91,
+            year1: 13.2,
+            year3: 35.05,
+            year5: 44.12,
+            fee: 1.31
+        },
+        {
+            nameHe: "מגדל-קרן ט'",
+            nameEn: "מגדל-קרן ט'",
+            companyHe: "מגדל",
+            companyEn: "Migdal",
+            month: 0.92,
+            year1: 12.86,
+            year3: 34.34,
+            year5: 43.77,
+            fee: 1.32
+        },
+        {
+            nameHe: "מגדל-קרן י'",
+            nameEn: "מגדל-קרן י'",
+            companyHe: "מגדל",
+            companyEn: "Migdal",
+            month: 1.11,
+            year1: 14.92,
+            year3: 40.95,
+            year5: 52.48,
+            fee: 1.41
+        },
+        {
+            nameHe: "מגדל - כללי",
+            nameEn: "מגדל - כללי",
+            companyHe: "מגדל",
+            companyEn: "Migdal",
+            month: 1.12,
+            year1: 15.16,
+            year3: 40.66,
+            year5: 48.25,
+            fee: 1.25
+        },
+        {
+            nameHe: "מנורה-קרן ט'",
+            nameEn: "מנורה-קרן ט'",
+            companyHe: "מנורה",
+            companyEn: "Menora",
+            month: 1.21,
+            year1: 17.45,
+            year3: 47.38,
+            year5: 55.9,
+            fee: 1.29
+        },
+        {
+            nameHe: "איילון-קרן ט'",
+            nameEn: "איילון-קרן ט'",
+            companyHe: "איילון",
+            companyEn: "Ayalon",
+            month: 1.66,
+            year1: 19.02,
+            year3: 50.38,
+            year5: 58.5,
+            fee: 1.48
+        },
+        {
+            nameHe: "הכשרה - קרן י'",
+            nameEn: "הכשרה - קרן י'",
+            companyHe: "הכשרה",
+            companyEn: "Hachshara",
+            month: 0.66,
+            year1: 11.63,
+            year3: 35.13,
+            year5: 46.36,
+            fee: 1.18
+        },
+        {
+            nameHe: "הכשרה - קרן ט'",
+            nameEn: "הכשרה - קרן ט'",
+            companyHe: "הכשרה",
+            companyEn: "Hachshara",
+            month: 0.75,
+            year1: 11.95,
+            year3: 34.11,
+            year5: 34.31,
+            fee: 0.74
+        },
+        {
+            nameHe: "מנורה-קרן י' חדשה",
+            nameEn: "מנורה-קרן י' חדשה",
+            companyHe: "מנורה",
+            companyEn: "Menora",
+            month: 1.16,
+            year1: 16.18,
+            year3: 41.29,
+            year5: 48.27,
+            fee: 1.2
+        },
+        {
+            nameHe: "מגדל-קרן ח'",
+            nameEn: "מגדל-קרן ח'",
+            companyHe: "מגדל",
+            companyEn: "Migdal",
+            month: 0.95,
+            year1: 13.23,
+            year3: 35.99,
+            year5: 46.92,
+            fee: 1.49
+        },
+        {
+            nameHe: "מנורה-קרן י'",
+            nameEn: "מנורה-קרן י'",
+            companyHe: "מנורה",
+            companyEn: "Menora",
+            month: 1.16,
+            year1: 16.18,
+            year3: 41.29,
+            year5: 48.27,
+            fee: 1.2
+        },
+        {
+            nameHe: "כלל-קרן י'",
+            nameEn: "כלל-קרן י'",
+            companyHe: "כלל",
+            companyEn: "Clal",
+            month: 1.38,
+            year1: 16.54,
+            year3: 39.78,
+            year5: 52.11,
+            fee: 1.27
+        },
+        {
+            nameHe: "כלל-קרן ט'",
+            nameEn: "כלל-קרן ט'",
+            companyHe: "כלל",
+            companyEn: "Clal",
+            month: 1.38,
+            year1: 16.22,
+            year3: 39.46,
+            year5: 52.94,
+            fee: 1.28
+        },
+        {
+            nameHe: "הפניקס מניות",
+            nameEn: "הפניקס מניות",
+            companyHe: "הפניקס",
+            companyEn: "Phoenix",
+            month: 2.08,
+            year1: 26.56,
+            year3: 76.21,
+            year5: 85.65,
+            fee: 1.17
+        },
+        {
+            nameHe: "הפניקס כללי (אקסלנס)",
+            nameEn: "הפניקס כללי (אקסלנס)",
+            companyHe: "הפניקס",
+            companyEn: "Phoenix",
+            month: 0.7,
+            year1: 14.7,
+            year3: 46.09,
+            year5: 47.35,
+            fee: 1.16
+        },
+        {
+            nameHe: "הפניקס הלכה",
+            nameEn: "הפניקס הלכה",
+            companyHe: "הפניקס",
+            companyEn: "Phoenix",
+            month: 1.15,
+            year1: 15.29,
+            year3: 43.59,
+            year5: 44.96,
+            fee: 1.08
+        },
+        {
+            nameHe: "הפניקס עוקב מדדים גמיש",
+            nameEn: "הפניקס עוקב מדדים גמיש",
+            companyHe: "הפניקס",
+            companyEn: "Phoenix",
+            month: 1.28,
+            year1: 17.4,
+            year3: 51.12,
+            year5: 52.88,
+            fee: 1.17
+        },
+        {
+            nameHe: "הפניקס מניות סחיר",
+            nameEn: "הפניקס מניות סחיר",
+            companyHe: "הפניקס",
+            companyEn: "Phoenix",
+            month: -1.07,
+            year1: 5.98,
+            year3: 53.95,
+            year5: 57.9,
+            fee: 0.82
+        },
+        {
+            nameHe: "הפניקס אג״ח סחיר",
+            nameEn: "הפניקס אג״ח סחיר",
+            companyHe: "הפניקס",
+            companyEn: "Phoenix",
+            month: -1.87,
+            year1: -6.33,
+            year3: 21.37,
+            year5: 23.44,
+            fee: 0.06
+        },
+        {
+            nameHe: "הפניקס אשראי ואג״ח עם מניות",
+            nameEn: "הפניקס אשראי ואג״ח עם מניות",
+            companyHe: "הפניקס",
+            companyEn: "Phoenix",
+            month: 0.61,
+            year1: 9.76,
+            year3: 29.74,
+            year5: 31.15,
+            fee: 0.93
+        },
+        {
+            nameHe: "הפניקס לבני 50 ומטה",
+            nameEn: "הפניקס לבני 50 ומטה",
+            companyHe: "הפניקס",
+            companyEn: "Phoenix",
+            month: 1.9,
+            year1: 19.25,
+            year3: 52.7,
+            year5: 64.72,
+            fee: 1.53
+        },
+        {
+            nameHe: "הפניקס לבני 50 עד 60",
+            nameEn: "הפניקס לבני 50 עד 60",
+            companyHe: "הפניקס",
+            companyEn: "Phoenix",
+            month: 1.54,
+            year1: 16.32,
+            year3: 44.79,
+            year5: 53.32,
+            fee: 1.39
+        },
+        {
+            nameHe: "הפניקס לבני 60 ומעלה",
+            nameEn: "הפניקס לבני 60 ומעלה",
+            companyHe: "הפניקס",
+            companyEn: "Phoenix",
+            month: 0.98,
+            year1: 12.05,
+            year3: 31.92,
+            year5: 37.28,
+            fee: 1.15
+        },
+        {
+            nameHe: "הפניקס בסיסי למקבלי קצבה",
+            nameEn: "הפניקס בסיסי למקבלי קצבה",
+            companyHe: "הפניקס",
+            companyEn: "Phoenix",
+            month: 0.72,
+            year1: 9.34,
+            year3: 25.24,
+            year5: 28.53,
+            fee: null
+        },
+        {
+            nameHe: "הפניקס כספי (שקלי)",
+            nameEn: "הפניקס כספי (שקלי)",
+            companyHe: "הפניקס",
+            companyEn: "Phoenix",
+            month: 0.38,
+            year1: 4.51,
+            year3: 13.04,
+            year5: 13.77,
+            fee: -0.38
+        },
+        {
+            nameHe: "הפניקס הלכה למקבלי קצבה",
+            nameEn: "הפניקס הלכה למקבלי קצבה",
+            companyHe: "הפניקס",
+            companyEn: "Phoenix",
+            month: 0.63,
+            year1: 11.21,
+            year3: 29.03,
+            year5: 25.73,
+            fee: null
+        },
+        {
+            nameHe: "הפניקס עוקב מדד S&P 500",
+            nameEn: "הפניקס עוקב מדד S&P 500",
+            companyHe: "הפניקס",
+            companyEn: "Phoenix",
+            month: -1.98,
+            year1: 2.93,
+            year3: 67.45,
+            year5: 92.95,
+            fee: 1.02
+        },
+        {
+            nameHe: "אקסלנס מניות",
+            nameEn: "אקסלנס מניות",
+            companyHe: "אקסלנס",
+            companyEn: "Excellence",
+            month: 0.85,
+            year1: 23.15,
+            year3: 82.32,
+            year5: 92.6,
+            fee: 1.35
+        },
+        {
+            nameHe: "אקסלנס הלכה",
+            nameEn: "אקסלנס הלכה",
+            companyHe: "אקסלנס",
+            companyEn: "Excellence",
+            month: 0.85,
+            year1: 13.2,
+            year3: 38.03,
+            year5: 38.14,
+            fee: 1.05
+        },
+        {
+            nameHe: "אקסלנס כספי (שקלי)",
+            nameEn: "אקסלנס כספי (שקלי)",
+            companyHe: "אקסלנס",
+            companyEn: "Excellence",
+            month: 0.36,
+            year1: 4.27,
+            year3: 13.01,
+            year5: 12.77,
+            fee: -1.2
+        },
+        {
+            nameHe: "הראל מניות",
+            nameEn: "הראל מניות",
+            companyHe: "הראל",
+            companyEn: "Harel",
+            month: 1.94,
+            year1: 26.72,
+            year3: 72.23,
+            year5: 83.48,
+            fee: null
+        },
+        {
+            nameHe: "הראל לבני 50 ומטה",
+            nameEn: "הראל לבני 50 ומטה",
+            companyHe: "הראל",
+            companyEn: "Harel",
+            month: 1.19,
+            year1: 16.34,
+            year3: 40.23,
+            year5: 47.45,
+            fee: 1.11
+        },
+        {
+            nameHe: "הראל לבני 50 עד 60",
+            nameEn: "הראל לבני 50 עד 60",
+            companyHe: "הראל",
+            companyEn: "Harel",
+            month: 0.93,
+            year1: 14.35,
+            year3: 36.63,
+            year5: 42.67,
+            fee: 1.11
+        },
+        {
+            nameHe: "הראל לבני 60 ומעלה",
+            nameEn: "הראל לבני 60 ומעלה",
+            companyHe: "הראל",
+            companyEn: "Harel",
+            month: 0.59,
+            year1: 10.09,
+            year3: 24.52,
+            year5: 27.59,
+            fee: 0.77
+        },
+        {
+            nameHe: "הראל בסיסי למקבלי קצבה",
+            nameEn: "הראל בסיסי למקבלי קצבה",
+            companyHe: "הראל",
+            companyEn: "Harel",
+            month: 0.51,
+            year1: 11.56,
+            year3: 34.03,
+            year5: 37.95,
+            fee: null
+        },
+        {
+            nameHe: "מגדל לבני 50 ומטה",
+            nameEn: "מגדל לבני 50 ומטה",
+            companyHe: "מגדל",
+            companyEn: "Migdal",
+            month: 1.15,
+            year1: 16.15,
+            year3: 45.76,
+            year5: 51.87,
+            fee: 1.19
+        },
+        {
+            nameHe: "מגדל לבני 50 עד 60",
+            nameEn: "מגדל לבני 50 עד 60",
+            companyHe: "מגדל",
+            companyEn: "Migdal",
+            month: 1.02,
+            year1: 14.96,
+            year3: 41.32,
+            year5: 45.93,
+            fee: 1.2
+        },
+        {
+            nameHe: "מגדל לבני 60 ומעלה",
+            nameEn: "מגדל לבני 60 ומעלה",
+            companyHe: "מגדל",
+            companyEn: "Migdal",
+            month: 0.73,
+            year1: 10.91,
+            year3: 29.78,
+            year5: 32.43,
+            fee: 0.95
+        },
+        {
+            nameHe: "מגדל בסיסי למקבלי קצבה",
+            nameEn: "מגדל בסיסי למקבלי קצבה",
+            companyHe: "מגדל",
+            companyEn: "Migdal",
+            month: 0.64,
+            year1: 10.11,
+            year3: 27.21,
+            year5: 27.92,
+            fee: 0.82
+        },
+        {
+            nameHe: "מגדל אשראי ואג״ח",
+            nameEn: "מגדל אשראי ואג״ח",
+            companyHe: "מגדל",
+            companyEn: "Migdal",
+            month: 0.24,
+            year1: 5.64,
+            year3: 16.34,
+            year5: 11.92,
+            fee: -0.03
+        },
+        {
+            nameHe: "כלל לבני 50 ומטה",
+            nameEn: "כלל לבני 50 ומטה",
+            companyHe: "כלל",
+            companyEn: "Clal",
+            month: 1.74,
+            year1: 18.33,
+            year3: 44.76,
+            year5: 54.06,
+            fee: 1.21
+        },
+        {
+            nameHe: "כלל לבני 50 עד 60",
+            nameEn: "כלל לבני 50 עד 60",
+            companyHe: "כלל",
+            companyEn: "Clal",
+            month: 1.33,
+            year1: 15.5,
+            year3: 39.93,
+            year5: 45.22,
+            fee: 1.12
+        },
+        {
+            nameHe: "כלל לבני 60 ומעלה",
+            nameEn: "כלל לבני 60 ומעלה",
+            companyHe: "כלל",
+            companyEn: "Clal",
+            month: 0.98,
+            year1: 11.89,
+            year3: 29.62,
+            year5: 32.31,
+            fee: 0.91
+        },
+        {
+            nameHe: "כלל בסיסי למקבלי קצבה",
+            nameEn: "כלל בסיסי למקבלי קצבה",
+            companyHe: "כלל",
+            companyEn: "Clal",
+            month: 0.68,
+            year1: 10.11,
+            year3: 27.11,
+            year5: 32.75,
+            fee: null
+        },
+        {
+            nameHe: "כלל הלכה",
+            nameEn: "כלל הלכה",
+            companyHe: "כלל",
+            companyEn: "Clal",
+            month: 1.2,
+            year1: 15.35,
+            year3: 40.09,
+            year5: 40.0,
+            fee: 1.04
+        },
+        {
+            nameHe: "כלל כספי (שקלי)",
+            nameEn: "כלל כספי (שקלי)",
+            companyHe: "כלל",
+            companyEn: "Clal",
+            month: 0.39,
+            year1: 5.19,
+            year3: 15.12,
+            year5: 15.84,
+            fee: 1.04
+        },
+        {
+            nameHe: "כלל לבני 50 ומטה פוליסות לפני 2004",
+            nameEn: "כלל לבני 50 ומטה פוליסות לפני 2004",
+            companyHe: "כלל",
+            companyEn: "Clal",
+            month: 1.13,
+            year1: 16.91,
+            year3: 43.48,
+            year5: 48.78,
+            fee: 1.05
+        },
+        {
+            nameHe: "כלל לבני 50-60 פוליסות לפני 2004",
+            nameEn: "כלל לבני 50-60 פוליסות לפני 2004",
+            companyHe: "כלל",
+            companyEn: "Clal",
+            month: 1.17,
+            year1: 15.36,
+            year3: 39.88,
+            year5: 44.75,
+            fee: 1.08
+        },
+        {
+            nameHe: "כלל לבני 60 ומעלה פוליסות לפני 2004",
+            nameEn: "כלל לבני 60 ומעלה פוליסות לפני 2004",
+            companyHe: "כלל",
+            companyEn: "Clal",
+            month: 1.02,
+            year1: 11.85,
+            year3: 29.28,
+            year5: 32.92,
+            fee: 0.91
+        },
+        {
+            nameHe: "כלל בסיסי למקבלי קצבה פוליסות לפני 2004",
+            nameEn: "כלל בסיסי למקבלי קצבה פוליסות לפני 2004",
+            companyHe: "כלל",
+            companyEn: "Clal",
+            month: 0.74,
+            year1: 11.07,
+            year3: 31.61,
+            year5: 35.25,
+            fee: 0.86
+        },
+        {
+            nameHe: "מנורה לבני 50 ומטה",
+            nameEn: "מנורה לבני 50 ומטה",
+            companyHe: "מנורה",
+            companyEn: "Menora",
+            month: 1.5,
+            year1: 18.74,
+            year3: 47.12,
+            year5: 54.56,
+            fee: 1.25
+        },
+        {
+            nameHe: "מנורה לבני 50-60",
+            nameEn: "מנורה לבני 50-60",
+            companyHe: "מנורה",
+            companyEn: "Menora",
+            month: 1.25,
+            year1: 16.22,
+            year3: 41.0,
+            year5: 48.3,
+            fee: 1.25
+        },
+        {
+            nameHe: "מנורה לבני 60 ומעלה",
+            nameEn: "מנורה לבני 60 ומעלה",
+            companyHe: "מנורה",
+            companyEn: "Menora",
+            month: 0.89,
+            year1: 11.33,
+            year3: 28.08,
+            year5: 32.9,
+            fee: 0.98
+        },
+        {
+            nameHe: "מנורה בסיסי למקבלי קצבה",
+            nameEn: "מנורה בסיסי למקבלי קצבה",
+            companyHe: "מנורה",
+            companyEn: "Menora",
+            month: 0.71,
+            year1: 10.58,
+            year3: 23.44,
+            year5: 23.8,
+            fee: 0.77
+        },
+        {
+            nameHe: "מנורה בסיסי למקבלי קצבה (2)",
+            nameEn: "מנורה בסיסי למקבלי קצבה (2)",
+            companyHe: "מנורה",
+            companyEn: "Menora",
+            month: 0.7,
+            year1: 11.01,
+            year3: 27.15,
+            year5: 30.73,
+            fee: 0.97
+        },
+        {
+            nameHe: "מנורה אשראי ואג״ח עם מניות",
+            nameEn: "מנורה אשראי ואג״ח עם מניות",
+            companyHe: "מנורה",
+            companyEn: "Menora",
+            month: 0.44,
+            year1: 9.59,
+            year3: 27.09,
+            year5: 26.59,
+            fee: 0.72
+        },
+        {
+            nameHe: "איילון לבני 50 ומטה",
+            nameEn: "איילון לבני 50 ומטה",
+            companyHe: "איילון",
+            companyEn: "Ayalon",
+            month: 1.85,
+            year1: 21.17,
+            year3: 51.8,
+            year5: 57.92,
+            fee: 1.35
+        },
+        {
+            nameHe: "איילון לבני 50 עד 60",
+            nameEn: "איילון לבני 50 עד 60",
+            companyHe: "איילון",
+            companyEn: "Ayalon",
+            month: 1.77,
+            year1: 18.83,
+            year3: 45.97,
+            year5: 49.46,
+            fee: 1.31
+        },
+        {
+            nameHe: "איילון לבני 60 ומעלה",
+            nameEn: "איילון לבני 60 ומעלה",
+            companyHe: "איילון",
+            companyEn: "Ayalon",
+            month: 1.13,
+            year1: 13.66,
+            year3: 32.37,
+            year5: 34.16,
+            fee: 1.09
+        },
+        {
+            nameHe: "איילון אשראי ואג״ח עם מניות",
+            nameEn: "איילון אשראי ואג״ח עם מניות",
+            companyHe: "איילון",
+            companyEn: "Ayalon",
+            month: 1.22,
+            year1: 12.39,
+            year3: 30.01,
+            year5: 25.32,
+            fee: 0.68
+        },
+        {
+            nameHe: "איילון מניות סחיר",
+            nameEn: "איילון מניות סחיר",
+            companyHe: "איילון",
+            companyEn: "Ayalon",
+            month: -0.49,
+            year1: 12.54,
+            year3: 72.58,
+            year5: 60.53,
+            fee: 0.67
+        },
+        {
+            nameHe: "הכשרה מיטב מניות",
+            nameEn: "הכשרה מיטב מניות",
+            companyHe: "הכשרה",
+            companyEn: "Hachshara",
+            month: 1.54,
+            year1: 20.74,
+            year3: 79.77,
+            year5: 90.31,
+            fee: 1.34
+        },
+        {
+            nameHe: "הכשרה מיטב כללי",
+            nameEn: "הכשרה מיטב כללי",
+            companyHe: "הכשרה",
+            companyEn: "Hachshara",
+            month: 1.25,
+            year1: 16.03,
+            year3: 47.99,
+            year5: 51.55,
+            fee: 1.36
+        },
+        {
+            nameHe: "הכשרה מור מניות",
+            nameEn: "הכשרה מור מניות",
+            companyHe: "הכשרה",
+            companyEn: "Hachshara",
+            month: 2.29,
+            year1: 23.2,
+            year3: 69.24,
+            year5: 69.23,
+            fee: 1.1
+        },
+        {
+            nameHe: "הכשרה מור כללי",
+            nameEn: "הכשרה מור כללי",
+            companyHe: "הכשרה",
+            companyEn: "Hachshara",
+            month: 1.29,
+            year1: 14.27,
+            year3: 40.74,
+            year5: 40.13,
+            fee: 1.08
+        },
+        {
+            nameHe: "הכשרה אנליסט מניות",
+            nameEn: "הכשרה אנליסט מניות",
+            companyHe: "הכשרה",
+            companyEn: "Hachshara",
+            month: 1.26,
+            year1: 21.9,
+            year3: 74.58,
+            year5: null,
+            fee: 0.84
+        },
+        {
+            nameHe: "הכשרה ילין לפידות כללי",
+            nameEn: "הכשרה ילין לפידות כללי",
+            companyHe: "הכשרה",
+            companyEn: "Hachshara",
+            month: 0.6,
+            year1: 12.53,
+            year3: 38.9,
+            year5: 44.37,
+            fee: 1.05
+        },
+        {
+            nameHe: "הכשרה ילין לפידות מניות",
+            nameEn: "הכשרה ילין לפידות מניות",
+            companyHe: "הכשרה",
+            companyEn: "Hachshara",
+            month: 1.33,
+            year1: 21.07,
+            year3: 71.96,
+            year5: 88.2,
+            fee: 1.25
+        },
+        {
+            nameHe: "הכשרה לבני 50 ומטה",
+            nameEn: "הכשרה לבני 50 ומטה",
+            companyHe: "הכשרה",
+            companyEn: "Hachshara",
+            month: 1.05,
+            year1: 13.1,
+            year3: 36.54,
+            year5: 36.85,
+            fee: 0.9
+        },
+        {
+            nameHe: "הכשרה לבני 50-60",
+            nameEn: "הכשרה לבני 50-60",
+            companyHe: "הכשרה",
+            companyEn: "Hachshara",
+            month: 0.68,
+            year1: 12.51,
+            year3: 35.4,
+            year5: 36.31,
+            fee: 0.94
+        },
+        {
+            nameHe: "הכשרה לבני 60 ומעלה",
+            nameEn: "הכשרה לבני 60 ומעלה",
+            companyHe: "הכשרה",
+            companyEn: "Hachshara",
+            month: 0.5,
+            year1: 9.24,
+            year3: 25.24,
+            year5: 28.7,
+            fee: 0.83
+        },
+        {
+            nameHe: "הכשרה בסיסי למקבלי קצבה",
+            nameEn: "הכשרה בסיסי למקבלי קצבה",
+            companyHe: "הכשרה",
+            companyEn: "Hachshara",
+            month: 0.54,
+            year1: 9.39,
+            year3: 25.15,
+            year5: 26.88,
+            fee: 0.88
+        }
+    ],
+
     // Get data by type
     getData(type) {
         this.loadFromStorage();
@@ -2265,7 +3117,7 @@ const MyGemelFunds = {
 
     // Update data for a specific type
     updateData(type, newData) {
-        if (!['training', 'pension', 'gemel'].includes(type)) return false;
+        if (!['training', 'pension', 'gemel', 'savings'].includes(type)) return false;
 
         this[type] = newData;
         this.meta.lastUpdate = new Date().toISOString().slice(0, 7);
@@ -2280,7 +3132,8 @@ const MyGemelFunds = {
             meta: this.meta,
             training: this.training,
             pension: this.pension,
-            gemel: this.gemel
+            gemel: this.gemel,
+            savings: this.savings
         };
         localStorage.setItem('mygemel_fund_data', JSON.stringify(dataToSave));
     },
@@ -2292,7 +3145,7 @@ const MyGemelFunds = {
             if (stored) {
                 const data = JSON.parse(stored);
                 const storedVersion = (data.meta && data.meta.dataVersion) || 0;
-                const builtInVersion = 2;
+                const builtInVersion = 3;
                 if (storedVersion < builtInVersion) {
                     // Old data in localStorage — remove it so built-in data is used
                     localStorage.removeItem('mygemel_fund_data');
@@ -2302,6 +3155,7 @@ const MyGemelFunds = {
                 if (data.training) this.training = data.training;
                 if (data.pension) this.pension = data.pension;
                 if (data.gemel) this.gemel = data.gemel;
+                if (data.savings) this.savings = data.savings;
             }
         } catch (e) {
             console.warn('Failed to load MyGemel data from storage:', e);

@@ -867,7 +867,7 @@
         }
 
         function getMarketData() {
-            if (currentTab === 'savings') return [];
+            if (currentTab === 'savings') return MyGemelFunds.getData('savings') || [];
             if (currentSource === 'themarker') return MarketFunds.getData(currentTab) || [];
             return MyGemelFunds.getData(currentTab) || [];
         }
@@ -881,7 +881,10 @@
         function updateSourceInfo() {
             const srcLabel = I18n.t('marketProducts.source');
             const updateLabel = I18n.t('marketProducts.update');
-            if (currentSource === 'themarker') {
+            if (currentTab === 'savings') {
+                document.getElementById('sourceLabel').textContent = srcLabel + ': iGemel-Net | ' + updateLabel + ': ' + (MyGemelFunds.getLastUpdate() || '');
+                document.getElementById('sourceLink').href = MyGemelFunds.meta.sourceUrls.savings || '#';
+            } else if (currentSource === 'themarker') {
                 document.getElementById('sourceLabel').textContent = srcLabel + ': TheMarker SuperMarker | ' + updateLabel + ': ' + (MarketFunds.getLastUpdate() || '');
                 document.getElementById('sourceLink').href = MarketFunds.getSourceUrl(currentTab) || '#';
             } else {
