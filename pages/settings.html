@@ -7,6 +7,9 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="apple-touch-icon" href="../img/logo.png">
     <meta name="theme-color" content="#6b7280">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://www.gstatic.com https://apis.google.com; style-src 'self' 'unsafe-inline'; img-src 'self' https: data:; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.firebaseapp.com wss://*.firebaseio.com; frame-src https://accounts.google.com https://*.firebaseapp.com; object-src 'none'; base-uri 'self'; form-action 'self' https://accounts.google.com;">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <link rel="manifest" href="../manifest.json">
     <link rel="icon" type="image/png" href="../img/logo.png">
     <title>הגדרות - FinSight</title>
@@ -419,6 +422,37 @@
                 </div>
             </div>
 
+            <!-- Security Status (Live) -->
+            <div class="settings-section" style="border-color: rgba(16, 185, 129, 0.3);">
+                <h2>🛡️ <span data-i18n="security.statusTitle">סטטוס אבטחה</span></h2>
+                <div id="securityStatusPanel">
+                    <div class="setting-row">
+                        <div class="setting-label">
+                            <span data-i18n="security.encryptionStatus">סטטוס הצפנה</span>
+                        </div>
+                        <span id="secStatusPin" style="font-size: 0.9rem;"></span>
+                    </div>
+                    <div class="setting-row">
+                        <div class="setting-label">
+                            <span data-i18n="security.cloudEncryption">הצפנת ענן</span>
+                        </div>
+                        <span id="secStatusCloud" style="font-size: 0.9rem;"></span>
+                    </div>
+                    <div class="setting-row">
+                        <div class="setting-label">
+                            <span data-i18n="security.failedAttempts">ניסיונות כושלים (סשן נוכחי)</span>
+                        </div>
+                        <span id="secStatusFails" style="font-size: 0.9rem;">0</span>
+                    </div>
+                    <div class="setting-row">
+                        <div class="setting-label">
+                            <span data-i18n="security.lastSync">סנכרון אחרון</span>
+                        </div>
+                        <span id="secStatusLastSync" style="font-size: 0.9rem;">—</span>
+                    </div>
+                </div>
+            </div>
+
             <!-- Security & Privacy -->
             <div class="settings-section" style="border-color: rgba(16, 185, 129, 0.3);">
                 <h2>🔒 <span data-i18n="settings.securityPrivacy">אבטחה ופרטיות</span></h2>
@@ -548,7 +582,51 @@
             loadSettings();
             loadNotificationSettings();
             loadPinSettings();
+            loadSecurityStatus();
         });
+
+        function loadSecurityStatus() {
+            const pinEnabled = PinLock.isEnabled();
+            const pinEl = document.getElementById('secStatusPin');
+            if (pinEl) {
+                if (pinEnabled) {
+                    pinEl.textContent = '✅ ' + I18n.t('security.encryptionEnabled');
+                    pinEl.style.color = '#10b981';
+                } else {
+                    pinEl.textContent = '⚠️ ' + I18n.t('security.encryptionDisabled');
+                    pinEl.style.color = '#f59e0b';
+                }
+            }
+
+            const cloudEl = document.getElementById('secStatusCloud');
+            if (cloudEl) {
+                if (typeof Auth !== 'undefined' && Auth.currentUser) {
+                    cloudEl.textContent = '✅ ' + I18n.t('security.cloudEncryptionActive');
+                    cloudEl.style.color = '#10b981';
+                } else {
+                    cloudEl.textContent = '— ' + I18n.t('security.cloudNotConnected');
+                    cloudEl.style.color = 'var(--color-text-secondary)';
+                }
+            }
+
+            const failsEl = document.getElementById('secStatusFails');
+            if (failsEl) {
+                const fails = parseInt(sessionStorage.getItem('pin_fail_count')) || 0;
+                failsEl.textContent = String(fails);
+                failsEl.style.color = fails > 0 ? '#ef4444' : '#10b981';
+            }
+
+            const syncEl = document.getElementById('secStatusLastSync');
+            if (syncEl) {
+                const lastUpdate = localStorage.getItem('finance_last_update');
+                if (lastUpdate) {
+                    const d = new Date(lastUpdate);
+                    syncEl.textContent = d.toLocaleDateString('he-IL') + ' ' + d.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' });
+                } else {
+                    syncEl.textContent = '—';
+                }
+            }
+        }
 
         // PIN Lock Settings
         function loadPinSettings() {

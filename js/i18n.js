@@ -105,7 +105,11 @@ const I18n = {
                 passwordMinLength: 'מינימום 6 תווים',
                 passwordTooShort: 'הסיסמה קצרה מדי (מינימום 6 תווים)',
                 passwordStrong: 'סיסמה חזקה',
-                passwordOk: 'סיסמה תקינה'
+                passwordOk: 'סיסמה תקינה',
+                passwordMinLength8: 'מינימום 8 תווים, אות ומספר',
+                passwordTooShort8: 'הסיסמה חייבת להכיל לפחות 8 תווים',
+                passwordRequirements: 'הסיסמה חייבת להכיל לפחות אות אחת ומספר אחד',
+                passwordPlaceholder8: 'סיסמה (מינימום 8 תווים, אות ומספר)'
             },
             // Bank
             bank: {
@@ -1035,7 +1039,23 @@ const I18n = {
                 minutes: 'דקות',
                 resetAllData: 'אפס את כל הנתונים',
                 pinTooShort: 'קוד PIN חייב להיות 4-6 ספרות',
-                appLockDesc: 'הגן על הנתונים שלך עם קוד PIN'
+                appLockDesc: 'הגן על הנתונים שלך עם קוד PIN',
+                lockoutMessage: 'נסה שוב בעוד {time}'
+            },
+            security: {
+                badgeEncrypted: '🛡️ נתונים מוצפנים',
+                badgeLocalOnly: '🔒 אחסון מקומי',
+                badgeCloudSync: '☁️🔒 מוצפן בענן',
+                badgeCloudEncrypted: '☁️🔒 מוצפן + ענן',
+                statusTitle: 'סטטוס אבטחה',
+                encryptionStatus: 'סטטוס הצפנה',
+                encryptionEnabled: 'הצפנת PIN מופעלת',
+                encryptionDisabled: 'הצפנה לא מופעלת',
+                cloudEncryption: 'הצפנת ענן',
+                cloudEncryptionActive: 'נתונים מוצפנים בענן',
+                cloudNotConnected: 'לא מחובר לענן',
+                failedAttempts: 'ניסיונות כושלים (סשן נוכחי)',
+                lastSync: 'סנכרון אחרון'
             }
         },
         en: {
@@ -1138,7 +1158,11 @@ const I18n = {
                 passwordMinLength: 'Minimum 6 characters',
                 passwordTooShort: 'Password too short (minimum 6 characters)',
                 passwordStrong: 'Strong password',
-                passwordOk: 'Password OK'
+                passwordOk: 'Password OK',
+                passwordMinLength8: 'Minimum 8 characters, letter and number',
+                passwordTooShort8: 'Password must be at least 8 characters',
+                passwordRequirements: 'Password must contain at least one letter and one number',
+                passwordPlaceholder8: 'Password (min 8 chars, letter and number)'
             },
             // Bank
             bank: {
@@ -2068,7 +2092,23 @@ const I18n = {
                 minutes: 'minutes',
                 resetAllData: 'Reset all data',
                 pinTooShort: 'PIN must be 4-6 digits',
-                appLockDesc: 'Protect your data with a PIN code'
+                appLockDesc: 'Protect your data with a PIN code',
+                lockoutMessage: 'Try again in {time}'
+            },
+            security: {
+                badgeEncrypted: '🛡️ Data Encrypted',
+                badgeLocalOnly: '🔒 Local Only',
+                badgeCloudSync: '☁️🔒 Cloud Encrypted',
+                badgeCloudEncrypted: '☁️🔒 Encrypted + Cloud',
+                statusTitle: 'Security Status',
+                encryptionStatus: 'Encryption Status',
+                encryptionEnabled: 'PIN encryption enabled',
+                encryptionDisabled: 'Encryption not enabled',
+                cloudEncryption: 'Cloud Encryption',
+                cloudEncryptionActive: 'Data encrypted in cloud',
+                cloudNotConnected: 'Not connected to cloud',
+                failedAttempts: 'Failed attempts (current session)',
+                lastSync: 'Last sync'
             }
         },
         pt: {
@@ -2411,7 +2451,23 @@ const I18n = {
                 minutes: 'minutos',
                 resetAllData: 'Redefinir todos os dados',
                 pinTooShort: 'O PIN deve ter 4-6 dígitos',
-                appLockDesc: 'Proteja seus dados com um código PIN'
+                appLockDesc: 'Proteja seus dados com um código PIN',
+                lockoutMessage: 'Tente novamente em {time}'
+            },
+            security: {
+                badgeEncrypted: '🛡️ Dados Criptografados',
+                badgeLocalOnly: '🔒 Apenas Local',
+                badgeCloudSync: '☁️🔒 Nuvem Criptografada',
+                badgeCloudEncrypted: '☁️🔒 Criptografado + Nuvem',
+                statusTitle: 'Status de Segurança',
+                encryptionStatus: 'Status de Criptografia',
+                encryptionEnabled: 'Criptografia PIN ativada',
+                encryptionDisabled: 'Criptografia não ativada',
+                cloudEncryption: 'Criptografia em Nuvem',
+                cloudEncryptionActive: 'Dados criptografados na nuvem',
+                cloudNotConnected: 'Não conectado à nuvem',
+                failedAttempts: 'Tentativas falhas (sessão atual)',
+                lastSync: 'Última sincronização'
             }
         }
     },

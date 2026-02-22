@@ -349,13 +349,88 @@ const PinLock = {
         }
     },
 
+    // ── Brute Force Protection ──
+
+    _getFailCount() {
+        return parseInt(sessionStorage.getItem('pin_fail_count')) || 0;
+    },
+
+    _setFailCount(n) {
+        sessionStorage.setItem('pin_fail_count', String(n));
+    },
+
+    _getLockoutUntil() {
+        return parseInt(sessionStorage.getItem('pin_lockout_until')) || 0;
+    },
+
+    _setLockoutUntil(ts) {
+        sessionStorage.setItem('pin_lockout_until', String(ts));
+    },
+
+    _clearLockout() {
+        sessionStorage.removeItem('pin_fail_count');
+        sessionStorage.removeItem('pin_lockout_until');
+    },
+
+    _getLockoutDuration(failCount) {
+        if (failCount >= 12) return 10 * 60 * 1000; // 10 minutes
+        if (failCount >= 8) return 2 * 60 * 1000;   // 2 minutes
+        if (failCount >= 5) return 30 * 1000;        // 30 seconds
+        return 0;
+    },
+
+    _isLockedOut() {
+        const until = this._getLockoutUntil();
+        return until > Date.now();
+    },
+
+    _startLockoutTimer() {
+        if (this._lockoutInterval) clearInterval(this._lockoutInterval);
+        const errorEl = this._overlay?.querySelector('#pinLockError');
+        const keypad = this._overlay?.querySelector('#pinLockKeypad');
+        if (!errorEl) return;
+
+        const tick = () => {
+            const remaining = this._getLockoutUntil() - Date.now();
+            if (remaining <= 0) {
+                clearInterval(this._lockoutInterval);
+                this._lockoutInterval = null;
+                errorEl.textContent = '';
+                if (keypad) keypad.style.opacity = '1';
+                if (keypad) keypad.style.pointerEvents = '';
+                return;
+            }
+            const secs = Math.ceil(remaining / 1000);
+            const mins = Math.floor(secs / 60);
+            const secsPart = secs % 60;
+            const timeStr = mins > 0
+                ? `${mins}:${String(secsPart).padStart(2, '0')}`
+                : `${secs}`;
+            errorEl.textContent = this._t('pinLock.lockoutMessage', `Try again in ${timeStr} seconds`)
+                .replace('{time}', timeStr);
+            if (keypad) keypad.style.opacity = '0.4';
+            if (keypad) keypad.style.pointerEvents = 'none';
+        };
+        tick();
+        this._lockoutInterval = setInterval(tick, 1000);
+    },
+
     async _submitPin(pin) {
         const errorEl = this._overlay.querySelector('#pinLockError');
         const container = this._overlay.querySelector('.pin-lock-container');
 
         if (this._mode === 'unlock' || this._mode === 'verify') {
+            // Check lockout before attempting
+            if (this._isLockedOut()) {
+                this._startLockoutTimer();
+                this._currentPin = '';
+                this._renderDots(0);
+                return;
+            }
+
             const success = await this.verifyPin(pin);
             if (success) {
+                this._clearLockout();
                 if (this._mode === 'unlock') {
                     await this.unlock(pin);
                 } else if (this._mode === 'verify' && this._onVerifySuccess) {
@@ -363,7 +438,15 @@ const PinLock = {
                     this._hideOverlay();
                 }
             } else {
-                errorEl.textContent = this._t('pinLock.wrongPin', 'Wrong PIN');
+                const fails = this._getFailCount() + 1;
+                this._setFailCount(fails);
+                const lockDuration = this._getLockoutDuration(fails);
+                if (lockDuration > 0) {
+                    this._setLockoutUntil(Date.now() + lockDuration);
+                    this._startLockoutTimer();
+                } else {
+                    errorEl.textContent = this._t('pinLock.wrongPin', 'Wrong PIN');
+                }
                 container.classList.add('pin-lock-shake');
                 setTimeout(() => container.classList.remove('pin-lock-shake'), 500);
                 this._currentPin = '';
@@ -411,6 +494,10 @@ const PinLock = {
             this._t('pinLock.forgotPin', 'Forgot PIN?');
         this._overlay.querySelector('#pinLockForgot').style.display = '';
         this._renderDots(0);
+        // Resume lockout timer if still locked
+        if (this._isLockedOut()) {
+            this._startLockoutTimer();
+        }
     },
 
     showSetupScreen(onComplete) {

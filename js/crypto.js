@@ -6,7 +6,7 @@ const DataCrypto = {
     /**
      * Derive encryption key from user UID
      */
-    async getKey(uid) {
+    async getKey(uid, useLegacySalt = false) {
         const encoder = new TextEncoder();
         const keyMaterial = await crypto.subtle.importKey(
             'raw',
@@ -16,10 +16,14 @@ const DataCrypto = {
             ['deriveKey']
         );
 
+        const salt = useLegacySalt
+            ? 'finzilla-salt-v1'
+            : uid + '-finsight-salt-v2';
+
         return crypto.subtle.deriveKey(
             {
                 name: 'PBKDF2',
-                salt: encoder.encode('finzilla-salt-v1'),
+                salt: encoder.encode(salt),
                 iterations: 100000,
                 hash: 'SHA-256'
             },
@@ -60,6 +64,7 @@ const DataCrypto = {
 
     /**
      * Decrypt data string back to object
+     * Tries new per-user salt first, falls back to legacy salt for backward compatibility
      */
     async decrypt(encryptedBase64, uid) {
         try {
@@ -78,8 +83,25 @@ const DataCrypto = {
             const decoder = new TextDecoder();
             return JSON.parse(decoder.decode(plaintext));
         } catch (e) {
-            console.error('Decryption error:', e);
-            return null;
+            // Fall back to legacy salt for data encrypted before per-user salt migration
+            try {
+                const legacyKey = await this.getKey(uid, true);
+                const combined = Uint8Array.from(atob(encryptedBase64), c => c.charCodeAt(0));
+                const iv = combined.slice(0, 12);
+                const ciphertext = combined.slice(12);
+
+                const plaintext = await crypto.subtle.decrypt(
+                    { name: 'AES-GCM', iv: iv },
+                    legacyKey,
+                    ciphertext
+                );
+
+                const decoder = new TextDecoder();
+                return JSON.parse(decoder.decode(plaintext));
+            } catch (legacyErr) {
+                console.error('Decryption error:', e);
+                return null;
+            }
         }
     }
 };

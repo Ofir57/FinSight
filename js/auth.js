@@ -20,11 +20,8 @@ const Auth = {
             this.updateUI();
 
             if (user) {
-                console.log('User signed in:', user.email);
                 // Sync data from cloud on login
                 await this.syncFromCloud();
-            } else {
-                console.log('User signed out');
             }
         });
     },
@@ -58,20 +55,14 @@ const Auth = {
         authSection.style.cssText = 'padding: 10px 15px; border-bottom: 1px solid var(--color-border);';
         authSection.innerHTML = `
             <div id="userInfo" style="display: none; align-items: center; gap: 10px; margin-bottom: 10px;"></div>
-            <div id="authButtons" class="auth-buttons">
-                <button class="btn btn-auth" onclick="Auth.signInWithGoogle()">
-                    <span>G</span> Google
-                </button>
-                <button class="btn btn-auth" onclick="Auth.showEmailLogin()">
-                    <span>📧</span> <span data-i18n="auth.email">${typeof I18n !== 'undefined' ? I18n.t('auth.email') : 'אימייל'}</span>
-                </button>
-            </div>
+            <div id="authButtons" class="auth-buttons" style="display: none;"></div>
             <div id="authLogout" style="display: none;">
                 <button id="authBtn" class="btn btn-secondary btn-sm" style="width: 100%;" onclick="Auth.signOut()">
                     <span data-i18n="auth.signOut">${typeof I18n !== 'undefined' ? I18n.t('auth.signOut') : 'התנתק'}</span>
                 </button>
             </div>
-            <span id="syncStatus" class="sync-status local" data-i18n="auth.local">${typeof I18n !== 'undefined' ? I18n.t('auth.local') : '💾 מקומי'}</span>
+            <span id="syncStatus" class="sync-status local" style="display: none;"></span>
+            <div id="securityBadge" style="cursor: pointer; display: block; font-size: 0.8rem; padding: 6px 10px; border-radius: 10px; text-align: center; user-select: none; -webkit-tap-highlight-color: transparent;"></div>
         `;
 
         // Insert after sidebar-header
@@ -80,6 +71,54 @@ const Auth = {
             sidebarHeader.after(authSection);
         } else {
             sidebar.prepend(authSection);
+        }
+
+        // Security badge click → navigate to settings
+        const badge = authSection.querySelector('#securityBadge');
+        if (badge) {
+            badge.addEventListener('click', () => {
+                const isInPages = window.location.pathname.includes('/pages/');
+                window.location.href = isInPages ? 'settings.html' : 'pages/settings.html';
+            });
+        }
+
+        this.updateSecurityBadge();
+    },
+
+    /**
+     * Update security status badge in sidebar
+     */
+    updateSecurityBadge() {
+        const badge = document.getElementById('securityBadge');
+        if (!badge) return;
+
+        const t = (key, fallback) => {
+            if (typeof I18n !== 'undefined' && I18n.t) {
+                const val = I18n.t(key);
+                return val !== key ? val : fallback;
+            }
+            return fallback;
+        };
+
+        const pinEnabled = typeof PinLock !== 'undefined' && PinLock.isEnabled();
+        const isLoggedIn = !!this.currentUser;
+
+        if (pinEnabled && isLoggedIn) {
+            badge.textContent = t('security.badgeCloudEncrypted', '☁️🔒 מוצפן + ענן');
+            badge.style.background = 'rgba(16, 185, 129, 0.2)';
+            badge.style.color = '#10b981';
+        } else if (pinEnabled) {
+            badge.textContent = t('security.badgeEncrypted', '🛡️ נתונים מוצפנים');
+            badge.style.background = 'rgba(16, 185, 129, 0.2)';
+            badge.style.color = '#10b981';
+        } else if (isLoggedIn) {
+            badge.textContent = t('security.badgeCloudSync', '☁️🔒 מוצפן בענן');
+            badge.style.background = 'rgba(59, 130, 246, 0.2)';
+            badge.style.color = '#3b82f6';
+        } else {
+            badge.textContent = t('security.badgeLocalOnly', '🔒 אחסון מקומי');
+            badge.style.background = 'rgba(245, 158, 11, 0.2)';
+            badge.style.color = '#f59e0b';
         }
     },
 
@@ -184,7 +223,7 @@ const Auth = {
                     <div class="form-group">
                         <label>${I18n.t('auth.password')}</label>
                         <div style="position: relative;">
-                            <input type="password" id="emailAuthPassword" class="form-control" placeholder="${I18n.t('auth.passwordPlaceholder')}" dir="ltr" style="padding-left: 40px;" oninput="Auth.checkPasswordStrength()">
+                            <input type="password" id="emailAuthPassword" class="form-control" placeholder="${I18n.t('auth.passwordPlaceholder8')}" dir="ltr" style="padding-left: 40px;" oninput="Auth.checkPasswordStrength()">
                             <button type="button" id="togglePasswordBtn" onclick="Auth.togglePasswordVisibility()" style="position: absolute; left: 8px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 1.2rem; color: var(--color-text-secondary); padding: 4px;">👁️</button>
                         </div>
                         <div id="passwordStrength" style="display: none; margin-top: 5px; font-size: 0.8rem;"></div>
@@ -266,8 +305,12 @@ const Auth = {
                 App.notify(I18n.t('auth.passwordMismatch'), 'error');
                 return;
             }
-            if (password.length < 6) {
-                App.notify(I18n.t('auth.weakPassword'), 'error');
+            if (password.length < 8) {
+                App.notify(I18n.t('auth.passwordTooShort8'), 'error');
+                return;
+            }
+            if (!/[a-zA-Z]/.test(password) || !/[0-9]/.test(password)) {
+                App.notify(I18n.t('auth.passwordRequirements'), 'error');
                 return;
             }
             this.registerWithEmail(email, password);
@@ -285,14 +328,20 @@ const Auth = {
         if (!el || this._authMode !== 'register') return;
 
         if (password.length === 0) {
-            el.innerHTML = `<span style="color: var(--color-text-secondary);">${I18n.t('auth.passwordMinLength')}</span>`;
+            el.innerHTML = `<span style="color: var(--color-text-secondary);">${I18n.t('auth.passwordMinLength8')}</span>`;
             return;
         }
-        if (password.length < 6) {
-            el.innerHTML = `<span style="color: var(--color-negative);">⚠️ ${I18n.t('auth.passwordTooShort')}</span>`;
+        if (password.length < 8) {
+            el.innerHTML = `<span style="color: var(--color-negative);">⚠️ ${I18n.t('auth.passwordTooShort8')}</span>`;
             return;
         }
-        if (password.length >= 8 && /[A-Z]/.test(password) && /[0-9]/.test(password)) {
+        const hasLetter = /[a-zA-Z]/.test(password);
+        const hasNumber = /[0-9]/.test(password);
+        if (!hasLetter || !hasNumber) {
+            el.innerHTML = `<span style="color: var(--color-negative);">⚠️ ${I18n.t('auth.passwordRequirements')}</span>`;
+            return;
+        }
+        if (password.length >= 10 && /[A-Z]/.test(password)) {
             el.innerHTML = `<span style="color: var(--color-positive);">✅ ${I18n.t('auth.passwordStrong')}</span>`;
         } else {
             el.innerHTML = `<span style="color: #f59e0b;">👍 ${I18n.t('auth.passwordOk')}</span>`;
@@ -393,8 +442,8 @@ const Auth = {
                 syncStatus.className = 'sync-status synced';
             }
         } else {
-            // User is signed out - show login buttons, hide logout
-            if (authButtons) authButtons.style.display = 'flex';
+            // User is signed out - hide logout
+            if (authButtons) authButtons.style.display = 'none';
             if (authLogout) authLogout.style.display = 'none';
 
             if (userInfo) {
@@ -406,6 +455,7 @@ const Auth = {
                 syncStatus.className = 'sync-status local';
             }
         }
+        this.updateSecurityBadge();
     },
 
     /**
@@ -413,7 +463,6 @@ const Auth = {
      */
     async saveToCloud() {
         if (!this.currentUser) {
-            console.log('Not logged in, skipping cloud save');
             return false;
         }
 
@@ -457,7 +506,6 @@ const Auth = {
             }
 
             await firebaseDb.collection('users').doc(userId).set(data, { merge: false });
-            console.log('Data saved to cloud (encrypted)');
 
             // Update sync status
             const syncStatus = document.getElementById('syncStatus');
@@ -523,7 +571,6 @@ const Auth = {
                 if (cloudLastUpdate > localTime || !localLastUpdate) {
                     // If cloud is empty but local has data, don't overwrite — upload local instead
                     if (cloudItemCount === 0 && localItemCount > 0) {
-                        console.log('Cloud data is empty but local has data — uploading local to cloud');
                         App.notify(I18n.t('auth.localDataPreserved') || 'הנתונים המקומיים נשמרו ועולים לענן', 'info');
                         await this.saveToCloud();
                         return true;
@@ -536,7 +583,6 @@ const Auth = {
                             ? `בענן יש ${cloudItemCount} פריטים, במכשיר הזה יש ${localItemCount}. לדרוס את הנתונים המקומיים?`
                             : `Cloud has ${cloudItemCount} items, this device has ${localItemCount}. Overwrite local data?`;
                         if (!confirm(msg)) {
-                            console.log('User chose to keep local data');
                             await this.saveToCloud();
                             return true;
                         }
@@ -560,7 +606,6 @@ const Auth = {
                     if (data.creditScore) Storage.saveCreditScore(data.creditScore);
 
                     localStorage.setItem('finance_last_update', new Date().toISOString());
-                    console.log('Data synced from cloud (decrypted)');
                     App.notify(I18n.t('auth.dataSynced'), 'success');
 
                     // Refresh current page
@@ -573,11 +618,9 @@ const Auth = {
                 } else {
                     // Local timestamp is newer — but check if local actually has data
                     if (localItemCount > 0) {
-                        console.log('Local data is newer and has content, uploading to cloud');
                         await this.saveToCloud();
                     } else if (cloudItemCount > 0) {
                         // Local is empty but cloud has data — download from cloud instead
-                        console.log('Local is empty but cloud has data — downloading from cloud');
                         if (data.bankAccounts) Storage.saveBankAccounts(data.bankAccounts);
                         if (data.creditCards) Storage.saveCreditCards(data.creditCards);
                         if (data.stocks) Storage.saveStocks(data.stocks);
@@ -599,7 +642,6 @@ const Auth = {
                         if (typeof loadWatchlist === 'function') loadWatchlist();
                         if (typeof loadLoans === 'function') loadLoans();
                     } else {
-                        console.log('Both local and cloud are empty — nothing to sync');
                     }
                 }
             } else {
@@ -613,10 +655,8 @@ const Auth = {
                     loans: Storage.getLoans()
                 });
                 if (localCount > 0) {
-                    console.log('No cloud data found, saving local data');
                     await this.saveToCloud();
                 } else {
-                    console.log('No cloud data and no local data — nothing to sync');
                 }
             }
 
