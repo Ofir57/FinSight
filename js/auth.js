@@ -55,13 +55,17 @@ const Auth = {
         authSection.style.cssText = 'padding: 10px 15px; border-bottom: 1px solid var(--color-border);';
         authSection.innerHTML = `
             <div id="userInfo" style="display: none; align-items: center; gap: 10px; margin-bottom: 10px;"></div>
-            <div id="authButtons" class="auth-buttons" style="display: none;"></div>
+            <div id="authButtons" class="auth-buttons">
+                <button class="btn btn-auth" onclick="Auth.showEmailLogin()">
+                    <span>📧</span> <span data-i18n="auth.email">${typeof I18n !== 'undefined' ? I18n.t('auth.email') : 'אימייל'}</span>
+                </button>
+            </div>
             <div id="authLogout" style="display: none;">
                 <button id="authBtn" class="btn btn-secondary btn-sm" style="width: 100%;" onclick="Auth.signOut()">
                     <span data-i18n="auth.signOut">${typeof I18n !== 'undefined' ? I18n.t('auth.signOut') : 'התנתק'}</span>
                 </button>
             </div>
-            <span id="syncStatus" class="sync-status local" style="display: none;"></span>
+            <span id="syncStatus" class="sync-status local" data-i18n="auth.local">${typeof I18n !== 'undefined' ? I18n.t('auth.local') : '💾 מקומי'}</span>
             <div id="securityBadge" style="cursor: pointer; display: block; font-size: 0.8rem; padding: 6px 10px; border-radius: 10px; text-align: center; user-select: none; -webkit-tap-highlight-color: transparent;"></div>
         `;
 
@@ -442,8 +446,8 @@ const Auth = {
                 syncStatus.className = 'sync-status synced';
             }
         } else {
-            // User is signed out - hide logout
-            if (authButtons) authButtons.style.display = 'none';
+            // User is signed out - show email login, hide logout
+            if (authButtons) authButtons.style.display = 'flex';
             if (authLogout) authLogout.style.display = 'none';
 
             if (userInfo) {
