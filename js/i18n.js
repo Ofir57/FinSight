@@ -842,7 +842,9 @@ const I18n = {
                 saveError: 'שגיאה בשמירת הנתונים',
                 openTheMarker: 'פתח את TheMarker',
                 openIGemel: 'פתח את iGemel-Net',
-                update: 'עדכון'
+                update: 'עדכון',
+                labelMine: 'שלי',
+                vsWinner: 'פער מול מוביל השוק'
             },
             // Profile
             profile: {
@@ -1873,7 +1875,9 @@ const I18n = {
                 saveError: 'Error saving data',
                 openTheMarker: 'Open TheMarker',
                 openIGemel: 'Open iGemel-Net',
-                update: 'Update'
+                update: 'Update',
+                labelMine: 'Mine',
+                vsWinner: 'Gap vs market leader'
             },
             // Profile
             profile: {

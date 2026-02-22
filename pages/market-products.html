@@ -115,6 +115,38 @@
         .my-products-link { display: inline-block; margin-top: 10px; color: #00d2ff; text-decoration: none; font-size: 0.9rem; }
         .my-products-link:hover { text-decoration: underline; }
 
+        .my-products-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+        .my-products-table th {
+            padding: 10px 8px;
+            text-align: right;
+            background: rgba(0, 210, 255, 0.08);
+            color: #00d2ff;
+            font-weight: 600;
+            font-size: 0.8rem;
+            border-bottom: 1px solid var(--color-border);
+        }
+        .my-products-table td {
+            padding: 10px 8px;
+            text-align: right;
+            border-bottom: 1px solid var(--color-border);
+        }
+        .my-products-table tr:hover { background: rgba(255, 255, 255, 0.05); }
+        .my-products-table .my-fund-row { background: rgba(0, 210, 255, 0.05); }
+        .my-products-table .my-fund-row td:first-child { border-right: 3px solid #00d2ff; }
+        .my-products-table .winner-row td:first-child { border-right: 3px solid #ffd700; }
+        .my-fund-label {
+            display: inline-block;
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+            margin-right: 4px;
+        }
+        .label-mine { background: rgba(0, 210, 255, 0.2); color: #00d2ff; }
+        .label-winner { background: rgba(255, 215, 0, 0.2); color: #ffd700; }
+        .diff-positive { color: #00ff88; font-size: 0.8rem; }
+        .diff-negative { color: #ff4757; font-size: 0.8rem; }
+
         /* Stats row */
         .stats-row {
             display: grid;
@@ -868,10 +900,77 @@
                 container.innerHTML = `<div class="my-products-empty">${I18n.t('marketProducts.noProductsYet')} <a href="my-funds.html" style="color:#00d2ff;">${I18n.t('marketProducts.addViaMyProducts')}</a></div>`;
                 return;
             }
-            container.innerHTML = filtered.map(f => {
-                const val = f.value ? '₪' + Number(f.value).toLocaleString() : '';
-                return `<div class="my-product-card"><div><div class="name">${f.name || ''}</div><div class="company">${f.company || ''}</div></div><div class="value">${val}</div></div>`;
-            }).join('');
+
+            // Get market data for comparison - find #1 winner by 5-year return
+            const marketData = getMarketData();
+            const winner = marketData.length > 0
+                ? [...marketData].filter(f => f.year5 != null).sort((a, b) => b.year5 - a.year5)[0]
+                : null;
+
+            // Build comparison table
+            let html = `<div style="overflow-x: auto;">
+                <table class="my-products-table">
+                    <thead><tr>
+                        <th>${I18n.t('marketProducts.fundName')}</th>
+                        <th>${I18n.t('marketProducts.company')}</th>
+                        <th>₪</th>
+                        <th>${I18n.t('marketProducts.month')}</th>
+                        <th>${I18n.t('marketProducts.year')}</th>
+                        <th>${I18n.t('marketProducts.threeYears')}</th>
+                        <th>${I18n.t('marketProducts.fiveYears')}</th>
+                    </tr></thead><tbody>`;
+
+            filtered.forEach(f => {
+                const r = f.returns || {};
+                const val = f.value ? '₪' + Number(f.value).toLocaleString() : '-';
+                html += `<tr class="my-fund-row">
+                    <td><span class="my-fund-label label-mine">${I18n.t('marketProducts.labelMine')}</span> ${f.name || ''}</td>
+                    <td class="company-cell">${f.company || ''}</td>
+                    <td style="font-weight:600; color:#00d2ff;">${val}</td>
+                    <td>${fmtPct(r.month)}</td>
+                    <td>${fmtPct(r.year1)}</td>
+                    <td>${fmtPct(r.year3)}</td>
+                    <td>${fmtPct(r.year5)}</td>
+                </tr>`;
+
+                // Show diff vs winner if both have 5-year data
+                if (winner && r.year5 != null && winner.year5 != null) {
+                    const diff5 = r.year5 - winner.year5;
+                    const diff3 = (r.year3 != null && winner.year3 != null) ? r.year3 - winner.year3 : null;
+                    const diff1 = (r.year1 != null && winner.year1 != null) ? r.year1 - winner.year1 : null;
+                    const diffM = (r.month != null && winner.month != null) ? r.month - winner.month : null;
+                    html += `<tr style="background: rgba(255,255,255,0.02);">
+                        <td colspan="3" style="font-size:0.8rem; color:var(--color-text-secondary); padding-right:30px;">${I18n.t('marketProducts.vsWinner')}</td>
+                        <td>${fmtDiff(diffM)}</td>
+                        <td>${fmtDiff(diff1)}</td>
+                        <td>${fmtDiff(diff3)}</td>
+                        <td>${fmtDiff(diff5)}</td>
+                    </tr>`;
+                }
+            });
+
+            // Show the #1 winner for reference
+            if (winner) {
+                html += `<tr class="winner-row">
+                    <td><span class="my-fund-label label-winner">🥇 #1</span> ${winner.nameHe || winner.nameEn}</td>
+                    <td class="company-cell">${winner.companyHe || winner.companyEn}</td>
+                    <td></td>
+                    <td>${fmtPct(winner.month)}</td>
+                    <td>${fmtPct(winner.year1)}</td>
+                    <td>${fmtPct(winner.year3)}</td>
+                    <td>${fmtPct(winner.year5)}</td>
+                </tr>`;
+            }
+
+            html += '</tbody></table></div>';
+            container.innerHTML = html;
+        }
+
+        function fmtDiff(val) {
+            if (val == null) return '<span style="color:var(--color-text-secondary);">-</span>';
+            const cls = val >= 0 ? 'diff-positive' : 'diff-negative';
+            const sign = val >= 0 ? '+' : '';
+            return `<span class="${cls}">${sign}${val.toFixed(2)}%</span>`;
         }
 
         // ========= Analysis Rendering =========
