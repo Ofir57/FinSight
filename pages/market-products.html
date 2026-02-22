@@ -1098,7 +1098,6 @@
                             <th onclick="sortFull('year1')">${I18n.t('marketProducts.year')} <span class="sort-arrow"></span></th>
                             <th onclick="sortFull('year3')">${I18n.t('marketProducts.threeYears')} <span class="sort-arrow"></span></th>
                             <th onclick="sortFull('year5')">${I18n.t('marketProducts.fiveYears')} <span class="sort-arrow"></span></th>
-                            <th onclick="sortFull('fee')">${I18n.t('marketProducts.managementFee')} <span class="sort-arrow"></span></th>
                         </tr></thead>
                         <tbody id="fullTableBody"></tbody>
                     </table>
@@ -1128,7 +1127,6 @@
             ) : sorted;
 
             tbody.innerHTML = filtered.map((f, i) => {
-                const fee = f.fee != null ? f.fee.toFixed(2) + '%' : '-';
                 return `<tr>
                     <td>${i + 1}. ${f.nameHe || f.nameEn || ''}</td>
                     <td class="company-cell">${f.companyHe || f.companyEn || ''}</td>
@@ -1136,14 +1134,13 @@
                     <td>${fmtPct(f.year1)}</td>
                     <td>${fmtPct(f.year3)}</td>
                     <td>${fmtPct(f.year5)}</td>
-                    <td>${fee}</td>
                 </tr>`;
             }).join('');
 
             // Sort arrows
             document.querySelectorAll('.full-table th .sort-arrow').forEach(el => el.textContent = '');
             const ths = document.querySelectorAll('.full-table th');
-            const colMap = ['name', 'company', 'month', 'year1', 'year3', 'year5', 'fee'];
+            const colMap = ['name', 'company', 'month', 'year1', 'year3', 'year5'];
             colMap.forEach((col, idx) => {
                 if (col === fullSortCol) {
                     const arrow = ths[idx]?.querySelector('.sort-arrow');
