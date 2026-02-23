@@ -598,14 +598,9 @@ const Auth = {
                     if (data.creditScore) Storage.saveCreditScore(data.creditScore);
 
                     localStorage.setItem('finance_last_update', new Date().toISOString());
-                    App.notify(I18n.t('auth.dataSynced'), 'success');
 
-                    // Refresh current page
-                    if (typeof loadStocks === 'function') loadStocks();
-                    if (typeof loadWatchlist === 'function') loadWatchlist();
-                    if (typeof rebuildTVDropdown === 'function') rebuildTVDropdown();
-                    if (typeof loadLoans === 'function') loadLoans();
-
+                    // Reload page to reflect synced data on all pages
+                    location.reload();
                     return true;
                 } else {
                     // Local timestamp is newer — but check if local actually has data
@@ -629,10 +624,10 @@ const Auth = {
                         if (data.loans) Storage.saveLoans(data.loans);
                         if (data.creditScore) Storage.saveCreditScore(data.creditScore);
                         localStorage.setItem('finance_last_update', new Date().toISOString());
-                        App.notify(I18n.t('auth.dataSynced'), 'success');
-                        if (typeof loadStocks === 'function') loadStocks();
-                        if (typeof loadWatchlist === 'function') loadWatchlist();
-                        if (typeof loadLoans === 'function') loadLoans();
+
+                        // Reload page to reflect synced data on all pages
+                        location.reload();
+                        return true;
                     } else {
                     }
                 }
