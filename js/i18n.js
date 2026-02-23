@@ -59,7 +59,7 @@ const I18n = {
             },
             // Auth
             auth: {
-                email: 'אימייל',
+                email: 'התחבר',
                 signOut: 'התנתק',
                 local: '💾 מקומי',
                 synced: 'מסונכרן',
@@ -1118,7 +1118,7 @@ const I18n = {
             },
             // Auth
             auth: {
-                email: 'Email',
+                email: 'Sign In',
                 signOut: 'Sign Out',
                 local: '💾 Local',
                 synced: 'Synced',

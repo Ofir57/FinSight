@@ -57,7 +57,7 @@ const Auth = {
             <div id="userInfo" style="display: none; align-items: center; gap: 10px; margin-bottom: 10px;"></div>
             <div id="authButtons" class="auth-buttons">
                 <button class="btn btn-auth" onclick="Auth.showEmailLogin()">
-                    <span>📧</span> <span data-i18n="auth.email">${typeof I18n !== 'undefined' ? I18n.t('auth.email') : 'אימייל'}</span>
+                    <span>📧</span> <span data-i18n="auth.email">${typeof I18n !== 'undefined' ? I18n.t('auth.email') : 'התחבר'}</span>
                 </button>
             </div>
             <div id="authLogout" style="display: none;">
@@ -65,7 +65,6 @@ const Auth = {
                     <span data-i18n="auth.signOut">${typeof I18n !== 'undefined' ? I18n.t('auth.signOut') : 'התנתק'}</span>
                 </button>
             </div>
-            <span id="syncStatus" class="sync-status local" data-i18n="auth.local">${typeof I18n !== 'undefined' ? I18n.t('auth.local') : '💾 מקומי'}</span>
             <div id="securityBadge" style="cursor: pointer; display: block; font-size: 0.8rem; padding: 6px 10px; border-radius: 10px; text-align: center; user-select: none; -webkit-tap-highlight-color: transparent;"></div>
         `;
 
@@ -419,7 +418,6 @@ const Auth = {
         const authButtons = document.getElementById('authButtons');
         const authLogout = document.getElementById('authLogout');
         const userInfo = document.getElementById('userInfo');
-        const syncStatus = document.getElementById('syncStatus');
 
         if (!authButtons && !authLogout) return;
 
@@ -440,11 +438,6 @@ const Auth = {
                 `;
                 userInfo.style.display = 'flex';
             }
-
-            if (syncStatus) {
-                syncStatus.innerHTML = '☁️ ' + I18n.t('auth.cloudSynced');
-                syncStatus.className = 'sync-status synced';
-            }
         } else {
             // User is signed out - show email login, hide logout
             if (authButtons) authButtons.style.display = 'flex';
@@ -452,11 +445,6 @@ const Auth = {
 
             if (userInfo) {
                 userInfo.style.display = 'none';
-            }
-
-            if (syncStatus) {
-                syncStatus.innerHTML = '💾 ' + I18n.t('auth.localOnly');
-                syncStatus.className = 'sync-status local';
             }
         }
         this.updateSecurityBadge();
