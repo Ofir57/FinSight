@@ -368,7 +368,7 @@ const Storage = {
         return null;
     },
 
-    sellStock(symbol, quantity, price) {
+    sellStock(symbol, quantity, price, extras = {}) {
         const data = this.getStocks();
         const holding = data.holdings.find(h => h.symbol === symbol);
         if (holding && holding.quantity >= quantity) {
@@ -382,7 +382,8 @@ const Storage = {
                 type: 'sell',
                 quantity,
                 price,
-                date: new Date().toISOString().split('T')[0]
+                date: new Date().toISOString().split('T')[0],
+                ...extras
             });
             this.saveStocks(data);
             return true;

@@ -564,9 +564,15 @@
                                 <th data-i18n="common.date">תאריך</th>
                                 <th data-i18n="common.type">סוג</th>
                                 <th data-i18n="stocks.symbol">סימול</th>
+                                <th>שם</th>
                                 <th data-i18n="stocks.quantity">כמות</th>
                                 <th data-i18n="stocks.price">מחיר</th>
                                 <th data-i18n="common.total">סה״כ</th>
+                                <th>מחיר קנייה</th>
+                                <th>רווח/הפסד</th>
+                                <th>שינוי יומי</th>
+                                <th>MA150</th>
+                                <th>טרנד</th>
                             </tr>
                         </thead>
                         <tbody id="transactionsTable">
@@ -1163,21 +1169,56 @@
 
             // Load transactions
             if (data.transactions.length === 0) {
-                transactionsTable.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--color-text-secondary);">${I18n.t('common.noData')}</td></tr>`;
+                transactionsTable.innerHTML = `<tr><td colspan="12" style="text-align: center; color: var(--color-text-secondary);">${I18n.t('common.noData')}</td></tr>`;
             } else {
                 transactionsTable.innerHTML = data.transactions
                     .sort((a, b) => new Date(b.date) - new Date(a.date))
                     .slice(0, 20)
-                    .map(tx => `
+                    .map(tx => {
+                        const isSell = tx.type === 'sell';
+                        const hasSnapshot = isSell && tx.avgPrice != null;
+                        const profitLoss = hasSnapshot ? (tx.price - tx.avgPrice) * tx.quantity : null;
+                        const profitClass = profitLoss > 0 ? 'positive' : profitLoss < 0 ? 'negative' : '';
+
+                        // Trend display with color
+                        let trendDisplay = '-';
+                        if (isSell && tx.trend) {
+                            const trendColors = { Bullish: '#4caf50', Bearish: '#f44336', Caution: '#ff9800', Recovery: '#2196f3' };
+                            trendDisplay = `<span style="color: ${trendColors[tx.trend] || 'inherit'}">${tx.trend}</span>`;
+                        }
+
+                        // Daily change display
+                        let dailyDisplay = '-';
+                        if (isSell && tx.dailyChangePercent != null) {
+                            const dc = tx.dailyChangePercent;
+                            const dcClass = dc >= 0 ? 'positive' : 'negative';
+                            dailyDisplay = `<span class="${dcClass}">${dc >= 0 ? '+' : ''}${dc.toFixed(2)}%</span>`;
+                        }
+
+                        // MA150 display
+                        let ma150Display = '-';
+                        if (isSell && tx.ma150PositionPercent != null) {
+                            const mp = tx.ma150PositionPercent;
+                            const mpClass = mp >= 0 ? 'positive' : 'negative';
+                            ma150Display = `<span class="${mpClass}">${mp >= 0 ? '+' : ''}${mp.toFixed(1)}%</span>`;
+                        }
+
+                        return `
                         <tr>
                             <td>${I18n.formatDate(tx.date)}</td>
                             <td class="${tx.type === 'buy' ? 'positive' : 'negative'}">${tx.type === 'buy' ? I18n.t('stocks.buy') : I18n.t('stocks.sell')}</td>
                             <td class="stock-symbol">${tx.symbol}</td>
+                            <td>${isSell && tx.name ? tx.name : '-'}</td>
                             <td>${tx.quantity}</td>
                             <td>₪${tx.price.toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
                             <td>₪${(tx.quantity * tx.price).toLocaleString(undefined, {minimumFractionDigits: 0})}</td>
-                        </tr>
-                    `).join('');
+                            <td>${hasSnapshot ? '₪' + tx.avgPrice.toLocaleString(undefined, {minimumFractionDigits: 2}) : '-'}</td>
+                            <td class="${profitClass}">${profitLoss != null ? (profitLoss >= 0 ? '+' : '') + '₪' + profitLoss.toLocaleString(undefined, {minimumFractionDigits: 0}) : '-'}</td>
+                            <td>${dailyDisplay}</td>
+                            <td>${ma150Display}</td>
+                            <td>${trendDisplay}</td>
+                        </tr>`;
+                    }).join('');
             }
         }
 
@@ -1676,7 +1717,30 @@
                 return;
             }
 
-            const result = Storage.sellStock(symbol, quantity, price);
+            // Snapshot market data at sell time
+            const data = Storage.getStocks();
+            const holding = data.holdings.find(h => h.symbol === symbol);
+            const cached = priceCache[symbol] || {};
+            const extras = {};
+            if (holding) {
+                extras.avgPrice = holding.avgPrice;
+                extras.currency = holding.currency || 'USD';
+                extras.name = holding.name || '';
+            }
+            if (cached.priceChangePercent !== undefined) extras.dailyChangePercent = cached.priceChangePercent;
+            if (cached.ma150 !== undefined) extras.ma150 = cached.ma150;
+            if (cached.ma150PositionPercent !== undefined) extras.ma150PositionPercent = cached.ma150PositionPercent;
+            // Derive trend
+            if (cached.ma150 !== null && cached.ma150 !== undefined && cached.currentPrice) {
+                const aboveMA = cached.currentPrice > cached.ma150;
+                const dailyUp = (cached.priceChangePercent || 0) >= 0;
+                if (aboveMA && dailyUp) extras.trend = 'Bullish';
+                else if (!aboveMA && !dailyUp) extras.trend = 'Bearish';
+                else if (aboveMA && !dailyUp) extras.trend = 'Caution';
+                else extras.trend = 'Recovery';
+            }
+
+            const result = Storage.sellStock(symbol, quantity, price, extras);
             if (result) {
                 closeSellModal();
                 loadStocks();
