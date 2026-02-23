@@ -520,9 +520,30 @@ const Auth = {
     /**
      * Load data from Firestore
      */
+    _refreshPageData() {
+        if (typeof loadAssets === 'function') loadAssets();
+        if (typeof loadAccounts === 'function') loadAccounts();
+        if (typeof loadCards === 'function') loadCards();
+        if (typeof loadExpenses === 'function') loadExpenses();
+        if (typeof loadGoals === 'function') loadGoals();
+        if (typeof loadFunds === 'function') loadFunds();
+        if (typeof loadStocks === 'function') loadStocks();
+        if (typeof loadWatchlist === 'function') loadWatchlist();
+        if (typeof rebuildTVDropdown === 'function') rebuildTVDropdown();
+        if (typeof loadLoans === 'function') loadLoans();
+        if (typeof loadProfile === 'function') loadProfile();
+        if (typeof App !== 'undefined') App.updateDashboard();
+    },
+
     async syncFromCloud() {
         if (!this.currentUser) {
             return false;
+        }
+
+        // Prevent re-syncing right after a sync-triggered reload
+        if (sessionStorage.getItem('finance_just_synced')) {
+            sessionStorage.removeItem('finance_just_synced');
+            return true;
         }
 
         try {
@@ -599,8 +620,10 @@ const Auth = {
 
                     localStorage.setItem('finance_last_update', new Date().toISOString());
 
-                    // Reload page to reflect synced data on all pages
-                    location.reload();
+                    // Refresh all page data after cloud sync
+                    this._refreshPageData();
+                    App.notify(I18n.t('auth.dataSynced'), 'success');
+
                     return true;
                 } else {
                     // Local timestamp is newer — but check if local actually has data
@@ -625,9 +648,9 @@ const Auth = {
                         if (data.creditScore) Storage.saveCreditScore(data.creditScore);
                         localStorage.setItem('finance_last_update', new Date().toISOString());
 
-                        // Reload page to reflect synced data on all pages
-                        location.reload();
-                        return true;
+                        // Refresh all page data after cloud sync
+                        this._refreshPageData();
+                        App.notify(I18n.t('auth.dataSynced'), 'success');
                     } else {
                     }
                 }
