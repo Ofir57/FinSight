@@ -482,6 +482,11 @@ const Auth = {
             let data;
             if (typeof DataCrypto !== 'undefined') {
                 const encrypted = await DataCrypto.encrypt(sensitiveData, userId);
+                if (!encrypted) {
+                    console.error('Encryption failed, aborting cloud save');
+                    App.notify('שגיאה בהצפנה - הנתונים לא נשמרו בענן', 'error');
+                    return false;
+                }
                 data = {
                     encryptedData: encrypted,
                     encrypted: true,

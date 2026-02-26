@@ -55,7 +55,11 @@ const DataCrypto = {
             combined.set(iv);
             combined.set(new Uint8Array(ciphertext), iv.length);
 
-            return btoa(String.fromCharCode(...combined));
+            let binary = '';
+            for (let i = 0; i < combined.length; i++) {
+                binary += String.fromCharCode(combined[i]);
+            }
+            return btoa(binary);
         } catch (e) {
             console.error('Encryption error:', e);
             return null;
