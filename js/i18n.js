@@ -324,7 +324,12 @@ const I18n = {
                 watchlistAddAlertTooltip: 'הוסף התראה',
                 watchlistViewTooltip: 'צפה בהתראות',
                 watchlistRemoveTooltip: 'הסר מהמעקב',
-                loading: 'טוען...'
+                loading: 'טוען...',
+                editTransaction: 'ערוך פעולה',
+                deleteTransaction: 'מחק פעולה',
+                deleteTransactionConfirm: 'האם למחוק פעולה זו?',
+                transactionSaved: 'הפעולה עודכנה',
+                transactionDeleted: 'הפעולה נמחקה'
             },
             // Funds
             funds: {
@@ -1422,7 +1427,12 @@ const I18n = {
                 watchlistAddAlertTooltip: 'Add alert',
                 watchlistViewTooltip: 'View alerts',
                 watchlistRemoveTooltip: 'Remove from watchlist',
-                loading: 'Loading...'
+                loading: 'Loading...',
+                editTransaction: 'Edit Transaction',
+                deleteTransaction: 'Delete Transaction',
+                deleteTransactionConfirm: 'Delete this transaction?',
+                transactionSaved: 'Transaction updated',
+                transactionDeleted: 'Transaction deleted'
             },
             // Funds
             funds: {
@@ -2317,7 +2327,12 @@ const I18n = {
                 transactions: 'Histórico de Transações',
                 buy: 'Comprar',
                 portfolioDistribution: 'Distribuição da Carteira',
-                noStocks: 'Nenhuma ação na carteira'
+                noStocks: 'Nenhuma ação na carteira',
+                editTransaction: 'Editar Transação',
+                deleteTransaction: 'Excluir Transação',
+                deleteTransactionConfirm: 'Excluir esta transação?',
+                transactionSaved: 'Transação atualizada',
+                transactionDeleted: 'Transação excluída'
             },
             // Funds
             funds: {

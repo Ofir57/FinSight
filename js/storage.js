@@ -398,6 +398,23 @@ const Storage = {
         this.saveStocks(data);
     },
 
+    updateTransaction(id, updates) {
+        const data = this.getStocks();
+        const index = data.transactions.findIndex(t => t.id === id);
+        if (index !== -1) {
+            data.transactions[index] = { ...data.transactions[index], ...updates };
+            this.saveStocks(data);
+            return data.transactions[index];
+        }
+        return null;
+    },
+
+    deleteTransaction(id) {
+        const data = this.getStocks();
+        data.transactions = data.transactions.filter(t => t.id !== id);
+        this.saveStocks(data);
+    },
+
     // Assets
     getAssets() {
         return this.get(this.KEYS.ASSETS) || [];

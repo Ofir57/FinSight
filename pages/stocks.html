@@ -579,12 +579,55 @@
                                 <th>שינוי יומי</th>
                                 <th>MA150</th>
                                 <th>טרנד</th>
+                                <th data-i18n="common.actions">פעולות</th>
                             </tr>
                         </thead>
                         <tbody id="transactionsTable">
                             <!-- Will be populated by JS -->
                         </tbody>
                     </table>
+                </div>
+            </div>
+
+            <!-- Edit Transaction Modal -->
+            <div class="modal-overlay" id="editTxModal">
+                <div class="modal">
+                    <div class="modal-header">
+                        <h2 data-i18n="stocks.editTransaction">ערוך פעולה</h2>
+                        <button class="modal-close" onclick="closeEditTxModal()">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="editTxForm">
+                            <input type="hidden" id="editTxId">
+                            <div class="form-group">
+                                <label data-i18n="common.date">תאריך</label>
+                                <input type="date" class="form-control" id="editTxDate" required>
+                            </div>
+                            <div class="form-group">
+                                <label data-i18n="common.type">סוג</label>
+                                <select class="form-control" id="editTxType">
+                                    <option value="buy" data-i18n="stocks.buy">קנייה</option>
+                                    <option value="sell" data-i18n="stocks.sell">מכור</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label data-i18n="stocks.symbol">סימול</label>
+                                <input type="text" class="form-control" id="editTxSymbol" required>
+                            </div>
+                            <div class="form-group">
+                                <label data-i18n="stocks.quantity">כמות</label>
+                                <input type="number" class="form-control" id="editTxQuantity" min="0" step="any" required>
+                            </div>
+                            <div class="form-group">
+                                <label data-i18n="stocks.price">מחיר</label>
+                                <input type="number" class="form-control" id="editTxPrice" min="0" step="0.01" required>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" onclick="closeEditTxModal()" data-i18n="common.cancel">ביטול</button>
+                        <button class="btn btn-primary" onclick="saveEditTx()" data-i18n="common.save">שמור</button>
+                    </div>
                 </div>
             </div>
 
@@ -1175,7 +1218,7 @@
 
             // Load transactions
             if (data.transactions.length === 0) {
-                transactionsTable.innerHTML = `<tr><td colspan="12" style="text-align: center; color: var(--color-text-secondary);">${I18n.t('common.noData')}</td></tr>`;
+                transactionsTable.innerHTML = `<tr><td colspan="13" style="text-align: center; color: var(--color-text-secondary);">${I18n.t('common.noData')}</td></tr>`;
             } else {
                 transactionsTable.innerHTML = data.transactions
                     .sort((a, b) => new Date(b.date) - new Date(a.date))
@@ -1223,6 +1266,10 @@
                             <td>${dailyDisplay}</td>
                             <td>${ma150Display}</td>
                             <td>${trendDisplay}</td>
+                            <td style="white-space: nowrap;">
+                                <button class="btn btn-sm btn-secondary" onclick="openEditTxModal('${tx.id}')" title="${I18n.t('stocks.editTransaction')}">✏️</button>
+                                <button class="btn btn-sm btn-secondary" onclick="deleteTransaction('${tx.id}')" title="${I18n.t('stocks.deleteTransaction')}" style="color: var(--color-negative);">🗑️</button>
+                            </td>
                         </tr>`;
                     }).join('');
             }
@@ -3110,6 +3157,53 @@
                 loadBenchmarkChart();
             }, 2000);
         });
+
+        // Transaction edit/delete
+        function openEditTxModal(txId) {
+            const data = Storage.getStocks();
+            const tx = data.transactions.find(t => t.id === txId);
+            if (!tx) return;
+
+            document.getElementById('editTxId').value = txId;
+            document.getElementById('editTxDate').value = tx.date || '';
+            document.getElementById('editTxType').value = tx.type || 'buy';
+            document.getElementById('editTxSymbol').value = tx.symbol || '';
+            document.getElementById('editTxQuantity').value = tx.quantity || '';
+            document.getElementById('editTxPrice').value = tx.price || '';
+
+            App.openModal('editTxModal');
+        }
+
+        function closeEditTxModal() {
+            App.closeModal('editTxModal');
+        }
+
+        function saveEditTx() {
+            const id = document.getElementById('editTxId').value;
+            if (!id) return;
+
+            const updates = {
+                date: document.getElementById('editTxDate').value,
+                type: document.getElementById('editTxType').value,
+                symbol: document.getElementById('editTxSymbol').value.trim().toUpperCase(),
+                quantity: parseFloat(document.getElementById('editTxQuantity').value) || 0,
+                price: parseFloat(document.getElementById('editTxPrice').value) || 0
+            };
+
+            if (!updates.symbol || !updates.quantity) return;
+
+            Storage.updateTransaction(id, updates);
+            closeEditTxModal();
+            loadStocks();
+            App.notify(I18n.t('stocks.transactionSaved'), 'success');
+        }
+
+        function deleteTransaction(txId) {
+            if (!confirm(I18n.t('stocks.deleteTransactionConfirm'))) return;
+            Storage.deleteTransaction(txId);
+            loadStocks();
+            App.notify(I18n.t('stocks.transactionDeleted'), 'success');
+        }
     </script>
 </body>
 </html>
