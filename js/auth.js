@@ -723,7 +723,7 @@ const Auth = {
     },
 
     /**
-     * Force sync (manual trigger)
+     * Force sync (manual trigger) — downloads from cloud first, then uploads
      */
     async forceSync() {
         if (!this.currentUser) {
@@ -737,6 +737,10 @@ const Auth = {
             syncStatus.className = 'sync-status syncing';
         }
 
+        // First pull from cloud (handles conflict resolution)
+        await this.syncFromCloud();
+
+        // Then push local state to cloud
         await this.saveToCloud();
         App.notify(I18n.t('auth.syncSuccess'), 'success');
     },
