@@ -479,14 +479,34 @@ const Auth = {
                 subscriptions: Storage.getSubscriptions()
             };
 
+            // Trim old transactions to prevent exceeding Firestore 1MB limit
+            if (sensitiveData.stocks && Array.isArray(sensitiveData.stocks.transactions)) {
+                const txs = sensitiveData.stocks.transactions;
+                if (txs.length > 200) {
+                    sensitiveData.stocks.transactions = txs
+                        .sort((a, b) => new Date(b.date) - new Date(a.date))
+                        .slice(0, 200);
+                    console.log(`Cloud sync: trimmed transactions from ${txs.length} to 200`);
+                }
+            }
+
             // Encrypt sensitive data before uploading
             let data;
+            const rawSize = new Blob([JSON.stringify(sensitiveData)]).size;
+            console.log(`Cloud sync: raw data size = ${(rawSize / 1024).toFixed(1)} KB`);
+
             if (typeof DataCrypto !== 'undefined') {
                 const encrypted = await DataCrypto.encrypt(sensitiveData, userId);
                 if (!encrypted) {
                     console.error('Encryption failed, aborting cloud save');
                     App.notify('שגיאה בהצפנה - הנתונים לא נשמרו בענן', 'error');
                     return false;
+                }
+                const encSize = new Blob([encrypted]).size;
+                console.log(`Cloud sync: encrypted size = ${(encSize / 1024).toFixed(1)} KB`);
+                if (encSize > 900000) {
+                    console.warn('Cloud sync: data approaching Firestore 1MB limit!');
+                    App.notify('אזהרה: הנתונים גדולים מאוד, ייתכן שהסנכרון ייכשל', 'warning');
                 }
                 data = {
                     encryptedData: encrypted,
@@ -517,8 +537,13 @@ const Auth = {
 
             return true;
         } catch (error) {
-            console.error('Cloud save error:', error);
-            App.notify(I18n.t('auth.cloudSaveError'), 'error');
+            console.error('Cloud save error:', error.message || error);
+            App.notify(I18n.t('auth.cloudSaveError') + ' — ' + (error.message || ''), 'error');
+            const syncStatus = document.getElementById('syncStatus');
+            if (syncStatus) {
+                syncStatus.innerHTML = '⚠️ שגיאת סנכרון';
+                syncStatus.className = 'sync-status local';
+            }
             return false;
         }
     },
@@ -559,6 +584,7 @@ const Auth = {
 
             if (doc.exists) {
                 const rawData = doc.data();
+                console.log('Cloud sync: document found, encrypted:', !!rawData.encrypted, 'lastUpdated:', rawData.lastUpdated?.toDate?.());
                 const localLastUpdate = localStorage.getItem('finance_last_update');
                 const cloudLastUpdate = rawData.lastUpdated?.toDate?.()?.getTime() || 0;
                 const localTime = localLastUpdate ? new Date(localLastUpdate).getTime() : 0;
@@ -577,6 +603,9 @@ const Auth = {
                 }
 
                 // Count data items in cloud vs local
+                const stockData = data.stocks;
+                console.log('Cloud sync: decrypted data keys:', Object.keys(data).join(', '));
+                console.log('Cloud sync: stocks holdings:', stockData?.holdings?.length || 0, 'transactions:', stockData?.transactions?.length || 0);
                 const cloudItemCount = this._countDataItems(data);
                 const localItemCount = this._countDataItems({
                     bankAccounts: Storage.getBankAccounts(),
@@ -589,6 +618,8 @@ const Auth = {
                 });
 
                 // Check if cloud data is newer or if this is first sync
+                console.log(`Cloud sync: cloud=${cloudItemCount} items, local=${localItemCount} items, cloudTime=${cloudLastUpdate}, localTime=${localTime}`);
+
                 if (cloudLastUpdate > localTime || !localLastUpdate) {
                     // If cloud is empty but local has data, don't overwrite — upload local instead
                     if (cloudItemCount === 0 && localItemCount > 0) {
@@ -610,9 +641,10 @@ const Auth = {
                     }
 
                     // Cloud is newer, update local
+                    console.log('Cloud sync: restoring cloud data to local storage...');
                     if (data.bankAccounts) Storage.saveBankAccounts(data.bankAccounts);
                     if (data.creditCards) Storage.saveCreditCards(data.creditCards);
-                    if (data.stocks) Storage.saveStocks(data.stocks);
+                    if (data.stocks) { Storage.saveStocks(data.stocks); console.log('Cloud sync: stocks restored -', data.stocks.holdings?.length, 'holdings,', data.stocks.transactions?.length, 'transactions'); }
                     if (data.assets) Storage.saveAssets(data.assets);
                     if (data.myFunds) Storage.saveMyFunds(data.myFunds);
                     if (data.settings) Storage.saveSettings(data.settings);
@@ -665,6 +697,7 @@ const Auth = {
                     }
                 }
             } else {
+                console.log('Cloud sync: no document found in cloud');
                 // No cloud data — only save if local has actual data
                 const localCount = this._countDataItems({
                     bankAccounts: Storage.getBankAccounts(),
@@ -683,8 +716,8 @@ const Auth = {
 
             return true;
         } catch (error) {
-            console.error('Cloud sync error:', error);
-            App.notify(I18n.t('auth.cloudSyncError'), 'error');
+            console.error('Cloud sync error:', error.message || error);
+            App.notify(I18n.t('auth.cloudSyncError') + ' — ' + (error.message || ''), 'error');
             return false;
         }
     },
