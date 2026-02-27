@@ -17,6 +17,7 @@
     --color-gemel: #a855f7;
     --color-assets: #f59e0b;
     --color-loans: #ec4899;
+    --color-subscriptions: #06b6d4;
 
     /* Status Colors */
     --color-positive: #00ff88;
@@ -232,6 +233,7 @@ body.ltr .main-content {
 .nav-link.active[data-category="pension"] { background: var(--color-pension); }
 .nav-link.active[data-category="gemel"] { background: var(--color-gemel); }
 .nav-link.active[data-category="assets"] { background: var(--color-assets); }
+.nav-link.active[data-category="subscriptions"] { background: var(--color-subscriptions); }
 
 .nav-link .icon {
     font-size: 1.2rem;

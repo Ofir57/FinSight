@@ -23,7 +23,8 @@ const Storage = {
         USER_PROFILE: 'finance_user_profile',
         DISMISSED_TIPS: 'finance_dismissed_tips',
         LOANS: 'finance_loans',
-        CREDIT_SCORE: 'finance_credit_score'
+        CREDIT_SCORE: 'finance_credit_score',
+        SUBSCRIPTIONS: 'finance_subscriptions'
     },
 
     /**
@@ -601,6 +602,55 @@ const Storage = {
         this.saveCreditScore(data);
     },
 
+    // Subscriptions (recurring payments)
+    getSubscriptions() {
+        return this.get(this.KEYS.SUBSCRIPTIONS) || [];
+    },
+
+    saveSubscriptions(subs) {
+        this.set(this.KEYS.SUBSCRIPTIONS, subs);
+    },
+
+    addSubscription(sub) {
+        const subs = this.getSubscriptions();
+        sub.id = this.generateId();
+        subs.push(sub);
+        this.saveSubscriptions(subs);
+        return sub;
+    },
+
+    updateSubscription(id, updates) {
+        const subs = this.getSubscriptions();
+        const index = subs.findIndex(s => s.id === id);
+        if (index !== -1) {
+            subs[index] = { ...subs[index], ...updates };
+            this.saveSubscriptions(subs);
+            return subs[index];
+        }
+        return null;
+    },
+
+    deleteSubscription(id) {
+        const subs = this.getSubscriptions().filter(s => s.id !== id);
+        this.saveSubscriptions(subs);
+    },
+
+    getTotalSubscriptionsMonthly() {
+        const subs = this.getSubscriptions().filter(s => s.active !== false);
+        const multipliers = {
+            weekly: 52 / 12,
+            monthly: 1,
+            bimonthly: 0.5,
+            quarterly: 1 / 3,
+            semi_annual: 1 / 6,
+            annual: 1 / 12
+        };
+        return subs.reduce((sum, s) => {
+            const mult = multipliers[s.frequency] || 1;
+            return sum + (s.amount || 0) * mult;
+        }, 0);
+    },
+
     // Settings
     getSettings() {
         return this.get(this.KEYS.SETTINGS) || { language: 'he', currency: 'ILS' };
@@ -628,6 +678,7 @@ const Storage = {
             dismissedTips: this.getDismissedTips(),
             loans: this.getLoans(),
             creditScore: this.getCreditScore(),
+            subscriptions: this.getSubscriptions(),
             exportDate: new Date().toISOString()
         };
     },
@@ -648,6 +699,7 @@ const Storage = {
         if (data.dismissedTips) this.saveDismissedTips(data.dismissedTips);
         if (data.loans) this.saveLoans(data.loans);
         if (data.creditScore) this.saveCreditScore(data.creditScore);
+        if (data.subscriptions) this.saveSubscriptions(data.subscriptions);
     },
 
     // Summary calculations

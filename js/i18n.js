@@ -26,7 +26,8 @@ const I18n = {
                 pensionCalc: 'מחשבון פנסיה',
                 marketDataUpdate: 'עדכון נתוני שוק',
                 profile: 'פרופיל פיננסי',
-                loans: 'הלוואות'
+                loans: 'הלוואות',
+                subscriptions: 'תשלומים קבועים'
             },
             // Dashboard
             dashboard: {
@@ -970,6 +971,44 @@ const I18n = {
                 currentMonth: 'חודש נוכחי',
                 totalInterestPaid: 'סה"כ ריבית שתשולם'
             },
+            // Subscriptions (Recurring Payments)
+            subscriptions: {
+                title: 'תשלומים קבועים',
+                addItem: 'הוסף תשלום',
+                editItem: 'ערוך תשלום',
+                name: 'שם',
+                amount: 'סכום',
+                frequency: 'תדירות',
+                category: 'קטגוריה',
+                renewalDate: 'תאריך חידוש',
+                notes: 'הערות',
+                active: 'פעיל',
+                inactive: 'לא פעיל',
+                noItems: 'אין תשלומים קבועים',
+                totalMonthly: 'סה"כ חודשי',
+                totalAnnual: 'סה"כ שנתי',
+                categories: {
+                    all: 'הכל',
+                    subscriptions: '📺 מנויים',
+                    insurance: '🛡️ ביטוחים',
+                    fixed_bills: '🏢 חשבונות קבועים'
+                },
+                frequencies: {
+                    weekly: 'שבועי',
+                    monthly: 'חודשי',
+                    bimonthly: 'דו-חודשי',
+                    quarterly: 'רבעוני',
+                    semi_annual: 'חצי שנתי',
+                    annual: 'שנתי'
+                },
+                dueSoon: 'לחידוש בקרוב',
+                overdue: 'באיחור',
+                daysLeft: 'ימים',
+                filterCategory: 'סנן לפי קטגוריה',
+                saved: 'התשלום נשמר',
+                deleted: 'התשלום נמחק',
+                deleteConfirm: 'האם למחוק תשלום זה?'
+            },
             // Benchmark
             benchmark: {
                 title: 'ביצועים מול מדד',
@@ -1085,7 +1124,8 @@ const I18n = {
                 pensionCalc: 'Pension Calculator',
                 marketDataUpdate: 'Market Data Update',
                 profile: 'Financial Profile',
-                loans: 'Loans'
+                loans: 'Loans',
+                subscriptions: 'Recurring Payments'
             },
             // Dashboard
             dashboard: {
@@ -2029,6 +2069,44 @@ const I18n = {
                 currentMonth: 'Current Month',
                 totalInterestPaid: 'Total Interest to be Paid'
             },
+            // Subscriptions (Recurring Payments)
+            subscriptions: {
+                title: 'Recurring Payments',
+                addItem: 'Add Payment',
+                editItem: 'Edit Payment',
+                name: 'Name',
+                amount: 'Amount',
+                frequency: 'Frequency',
+                category: 'Category',
+                renewalDate: 'Renewal Date',
+                notes: 'Notes',
+                active: 'Active',
+                inactive: 'Inactive',
+                noItems: 'No recurring payments',
+                totalMonthly: 'Total Monthly',
+                totalAnnual: 'Total Annual',
+                categories: {
+                    all: 'All',
+                    subscriptions: '📺 Subscriptions',
+                    insurance: '🛡️ Insurance',
+                    fixed_bills: '🏢 Fixed Bills'
+                },
+                frequencies: {
+                    weekly: 'Weekly',
+                    monthly: 'Monthly',
+                    bimonthly: 'Bimonthly',
+                    quarterly: 'Quarterly',
+                    semi_annual: 'Semi-Annual',
+                    annual: 'Annual'
+                },
+                dueSoon: 'Due Soon',
+                overdue: 'Overdue',
+                daysLeft: 'days',
+                filterCategory: 'Filter by Category',
+                saved: 'Payment saved',
+                deleted: 'Payment deleted',
+                deleteConfirm: 'Delete this payment?'
+            },
             // Benchmark
             benchmark: {
                 title: 'Performance vs Benchmark',
@@ -2138,7 +2216,8 @@ const I18n = {
                 settings: 'Configurações',
                 marketDataUpdate: 'Atualização de Dados de Mercado',
                 profile: 'Perfil Financeiro',
-                loans: 'Empréstimos'
+                loans: 'Empréstimos',
+                subscriptions: 'Pagamentos Recorrentes'
             },
             // Dashboard
             dashboard: {
@@ -2388,6 +2467,44 @@ const I18n = {
                 closeTable: 'Fechar',
                 currentMonth: 'Mês Atual',
                 totalInterestPaid: 'Total de Juros a Pagar'
+            },
+            // Subscriptions (Recurring Payments)
+            subscriptions: {
+                title: 'Pagamentos Recorrentes',
+                addItem: 'Adicionar Pagamento',
+                editItem: 'Editar Pagamento',
+                name: 'Nome',
+                amount: 'Valor',
+                frequency: 'Frequência',
+                category: 'Categoria',
+                renewalDate: 'Data de Renovação',
+                notes: 'Notas',
+                active: 'Ativo',
+                inactive: 'Inativo',
+                noItems: 'Sem pagamentos recorrentes',
+                totalMonthly: 'Total Mensal',
+                totalAnnual: 'Total Anual',
+                categories: {
+                    all: 'Todos',
+                    subscriptions: '📺 Assinaturas',
+                    insurance: '🛡️ Seguros',
+                    fixed_bills: '🏢 Contas Fixas'
+                },
+                frequencies: {
+                    weekly: 'Semanal',
+                    monthly: 'Mensal',
+                    bimonthly: 'Bimestral',
+                    quarterly: 'Trimestral',
+                    semi_annual: 'Semestral',
+                    annual: 'Anual'
+                },
+                dueSoon: 'Vence em Breve',
+                overdue: 'Atrasado',
+                daysLeft: 'dias',
+                filterCategory: 'Filtrar por Categoria',
+                saved: 'Pagamento salvo',
+                deleted: 'Pagamento excluído',
+                deleteConfirm: 'Excluir este pagamento?'
             },
             // Benchmark
             benchmark: {

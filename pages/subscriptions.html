@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="../img/logo.png">
+    <meta name="theme-color" content="#06b6d4">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://www.gstatic.com https://apis.google.com; style-src 'self' 'unsafe-inline'; img-src 'self' https: data:; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.firebaseapp.com wss://*.firebaseio.com https://api.allorigins.win https://corsproxy.io https://api.codetabs.com https://api.exchangerate-api.com; frame-src https://accounts.google.com https://*.firebaseapp.com; object-src 'none'; base-uri 'self'; form-action 'self' https://accounts.google.com;">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <link rel="manifest" href="../manifest.json">
+    <link rel="icon" type="image/png" href="../img/logo.png">
+    <title>תשלומים קבועים - FinSight</title>
+    <link rel="stylesheet" href="../css/app.css">
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <style>
+        .nav-link.active { background: var(--color-subscriptions) !important; }
+        .page-header h1 { color: var(--color-subscriptions); }
+        .btn-primary { background: var(--color-subscriptions); }
+        .btn-primary:hover { background: #0891b2; }
+
+        .sub-cards { display: flex; flex-direction: column; gap: 15px; margin-bottom: 30px; }
+        .sub-card {
+            background: var(--color-bg-card);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            transition: opacity 0.3s;
+        }
+        .sub-card.inactive { opacity: 0.5; }
+        .sub-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+        .sub-card-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .sub-card-title h3 { margin: 0; font-size: 1.1rem; }
+        .sub-card-title .cat-badge {
+            font-size: 0.75rem;
+            padding: 2px 8px;
+            border-radius: 10px;
+            background: rgba(6, 182, 212, 0.2);
+            color: var(--color-subscriptions);
+        }
+        .sub-card-actions { display: flex; gap: 8px; align-items: center; }
+
+        .sub-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 12px;
+        }
+        .sub-detail {
+            text-align: center;
+            padding: 10px;
+            background: var(--color-bg-primary);
+            border-radius: var(--radius-sm);
+        }
+        .sub-detail .label {
+            font-size: 0.75rem;
+            color: var(--color-text-secondary);
+            margin-bottom: 4px;
+        }
+        .sub-detail .value {
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .summary-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        .metric-card {
+            background: var(--color-bg-card);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            padding: 15px;
+            text-align: center;
+        }
+        .metric-card .label {
+            color: var(--color-text-secondary);
+            font-size: 0.85rem;
+            margin-bottom: 5px;
+        }
+        .metric-card .value {
+            font-size: 1.3rem;
+            font-weight: bold;
+        }
+
+        .due-alerts {
+            margin-bottom: 20px;
+        }
+        .due-alert {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 15px;
+            border-radius: var(--radius-sm);
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+        .due-alert.warning {
+            background: rgba(245, 158, 11, 0.15);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            color: #f59e0b;
+        }
+        .due-alert.danger {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+        }
+
+        .filter-bar {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .filter-bar select {
+            background: var(--color-bg-card);
+            color: var(--color-text-primary);
+            border: 1px solid var(--color-border);
+            padding: 8px 12px;
+            border-radius: var(--radius-sm);
+            font-size: 0.9rem;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 44px;
+            height: 24px;
+            cursor: pointer;
+        }
+        .toggle-switch input { display: none; }
+        .toggle-slider {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(255,255,255,0.15);
+            border-radius: 12px;
+            transition: 0.3s;
+        }
+        .toggle-slider::before {
+            content: '';
+            position: absolute;
+            width: 18px; height: 18px;
+            left: 3px; bottom: 3px;
+            background: white;
+            border-radius: 50%;
+            transition: 0.3s;
+        }
+        .toggle-switch input:checked + .toggle-slider {
+            background: var(--color-subscriptions);
+        }
+        .toggle-switch input:checked + .toggle-slider::before {
+            transform: translateX(20px);
+        }
+
+        .sub-notes {
+            margin-top: 8px;
+            font-size: 0.8rem;
+            color: var(--color-text-secondary);
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="brand">
+                    <img src="../img/logo.png" class="brand-icon" alt="FinSight">
+                    <span class="brand-name">Fin<span class="brand-highlight">Sight</span></span>
+                </div>
+            </div>
+            <nav>
+                <ul class="nav-menu">
+                    <li class="nav-item"><a href="../index.html" class="nav-link" data-category="dashboard"><span class="icon">🏠</span><span data-i18n="nav.dashboard">דאשבורד</span></a></li>
+                    <li class="nav-item"><a href="bank.html" class="nav-link" data-category="bank"><span class="icon">🏦</span><span data-i18n="nav.bankAccounts">חשבונות בנק</span></a></li>
+                    <li class="nav-item"><a href="credit.html" class="nav-link" data-category="credit"><span class="icon">💳</span><span data-i18n="nav.creditCards">כרטיסי אשראי</span></a></li>
+                    <li class="nav-item"><a href="stocks.html" class="nav-link" data-category="stocks"><span class="icon">📈</span><span data-i18n="nav.stocks">מניות</span></a></li>
+                    <li class="nav-item">
+                        <span class="nav-link" style="cursor: default;"><span class="icon">📊</span><span data-i18n="nav.financialProducts">מוצרים פיננסיים</span></span>
+                        <ul class="nav-submenu">
+                            <li class="nav-item"><a href="market-products.html" class="nav-link" data-category="market-products"><span data-i18n="nav.marketProducts">🏪 מוצרים בשוק</span></a></li>
+                            <li class="nav-item"><a href="my-funds.html" class="nav-link" data-category="my-products"><span data-i18n="nav.myProducts">💎 החסכונות שלי</span></a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item"><a href="assets.html" class="nav-link" data-category="assets"><span class="icon">🏠</span><span data-i18n="nav.assets">נכסים</span></a></li>
+                    <li class="nav-item"><a href="loans.html" class="nav-link" data-category="loans"><span class="icon">🏦</span><span data-i18n="nav.loans">הלוואות</span></a></li>
+                    <li class="nav-item"><a href="subscriptions.html" class="nav-link active" data-category="subscriptions"><span class="icon">🔄</span><span data-i18n="nav.subscriptions">תשלומים קבועים</span></a></li>
+                    <li class="nav-item"><a href="goals.html" class="nav-link" data-category="goals"><span class="icon">🎯</span><span data-i18n="nav.goals">יעדי חיסכון</span></a></li>
+                    <li class="nav-item"><a href="pension-calc.html" class="nav-link" data-category="pension-calc"><span class="icon">🧮</span><span data-i18n="nav.pensionCalc">מחשבון פנסיה</span></a></li>
+                    <li class="nav-item"><a href="reports.html" class="nav-link" data-category="reports"><span class="icon">📋</span><span data-i18n="nav.reports">דוחות</span></a></li>
+                    <li class="nav-item"><a href="profile.html" class="nav-link"><span class="icon">👤</span><span data-i18n="nav.profile">פרופיל פיננסי</span></a></li>
+                    <li class="nav-item"><a href="settings.html" class="nav-link" data-category="settings"><span class="icon">⚙️</span><span data-i18n="nav.settings">הגדרות</span></a></li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer"></div>
+        </aside>
+
+        <main class="main-content">
+            <div class="logo-hero">
+                <img src="../img/logo.png" alt="FinSight" class="logo-hero-img">
+            </div>
+            <header class="page-header">
+                <h1>
+                    <span>🔄</span>
+                    <span data-i18n="subscriptions.title">תשלומים קבועים</span>
+                </h1>
+            </header>
+
+            <!-- Summary Banner -->
+            <div class="summary-metrics" id="summaryBanner">
+                <div class="metric-card">
+                    <div class="label" data-i18n="subscriptions.totalMonthly">סה"כ חודשי</div>
+                    <div class="value" id="totalMonthly" style="color: var(--color-subscriptions);">₪0</div>
+                </div>
+                <div class="metric-card">
+                    <div class="label" data-i18n="subscriptions.totalAnnual">סה"כ שנתי</div>
+                    <div class="value" id="totalAnnual">₪0</div>
+                </div>
+                <div class="metric-card">
+                    <div class="label" data-i18n="subscriptions.categories.subscriptions">📺 מנויים</div>
+                    <div class="value" id="totalCatSubs">₪0</div>
+                </div>
+                <div class="metric-card">
+                    <div class="label" data-i18n="subscriptions.categories.insurance">🛡️ ביטוחים</div>
+                    <div class="value" id="totalCatInsurance">₪0</div>
+                </div>
+                <div class="metric-card">
+                    <div class="label" data-i18n="subscriptions.categories.fixed_bills">🏢 חשבונות קבועים</div>
+                    <div class="value" id="totalCatBills">₪0</div>
+                </div>
+            </div>
+
+            <!-- Due Soon Alerts -->
+            <div class="due-alerts" id="dueAlerts"></div>
+
+            <!-- Filter + Add -->
+            <div class="filter-bar">
+                <select id="categoryFilter" onchange="loadSubscriptions()">
+                    <option value="all" data-i18n="subscriptions.categories.all">הכל</option>
+                    <option value="subscriptions" data-i18n="subscriptions.categories.subscriptions">📺 מנויים</option>
+                    <option value="insurance" data-i18n="subscriptions.categories.insurance">🛡️ ביטוחים</option>
+                    <option value="fixed_bills" data-i18n="subscriptions.categories.fixed_bills">🏢 חשבונות קבועים</option>
+                </select>
+                <button class="btn btn-primary" onclick="openSubModal()">
+                    <span>➕</span>
+                    <span data-i18n="subscriptions.addItem">הוסף תשלום</span>
+                </button>
+            </div>
+
+            <!-- Cards -->
+            <div class="sub-cards" id="subCards"></div>
+        </main>
+
+        <button class="mobile-menu-toggle">☰</button>
+
+        <div class="mobile-lang-switcher">
+            <button class="lang-btn" data-lang="he" onclick="I18n.setLanguage('he')">HE</button>
+            <button class="lang-btn" data-lang="en" onclick="I18n.setLanguage('en')">EN</button>
+            <button class="lang-btn" data-lang="pt" onclick="I18n.setLanguage('pt')">PT</button>
+        </div>
+    </div>
+
+    <!-- Add/Edit Modal -->
+    <div class="modal-overlay" id="subModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 id="subModalTitle" data-i18n="subscriptions.addItem">הוסף תשלום</h2>
+                <button class="modal-close" onclick="closeSubModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="subForm">
+                    <input type="hidden" id="subId">
+                    <div class="form-group">
+                        <label data-i18n="subscriptions.name">שם</label>
+                        <input type="text" class="form-control" id="subName" required placeholder="Netflix">
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="subscriptions.amount">סכום</label>
+                        <input type="number" class="form-control" id="subAmount" min="0" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="subscriptions.frequency">תדירות</label>
+                        <select class="form-control" id="subFrequency">
+                            <option value="monthly" data-i18n="subscriptions.frequencies.monthly">חודשי</option>
+                            <option value="weekly" data-i18n="subscriptions.frequencies.weekly">שבועי</option>
+                            <option value="bimonthly" data-i18n="subscriptions.frequencies.bimonthly">דו-חודשי</option>
+                            <option value="quarterly" data-i18n="subscriptions.frequencies.quarterly">רבעוני</option>
+                            <option value="semi_annual" data-i18n="subscriptions.frequencies.semi_annual">חצי שנתי</option>
+                            <option value="annual" data-i18n="subscriptions.frequencies.annual">שנתי</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="subscriptions.category">קטגוריה</label>
+                        <select class="form-control" id="subCategory">
+                            <option value="subscriptions" data-i18n="subscriptions.categories.subscriptions">📺 מנויים</option>
+                            <option value="insurance" data-i18n="subscriptions.categories.insurance">🛡️ ביטוחים</option>
+                            <option value="fixed_bills" data-i18n="subscriptions.categories.fixed_bills">🏢 חשבונות קבועים</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="subscriptions.renewalDate">תאריך חידוש</label>
+                        <input type="date" class="form-control" id="subRenewalDate">
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="subscriptions.notes">הערות</label>
+                        <input type="text" class="form-control" id="subNotes" placeholder="">
+                    </div>
+                    <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
+                        <label data-i18n="subscriptions.active" style="margin: 0;">פעיל</label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="subActive" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeSubModal()" data-i18n="common.cancel">ביטול</button>
+                <button class="btn btn-primary" onclick="saveSub()" data-i18n="common.save">שמור</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/storage.js"></script>
+    <script src="../js/pin-lock.js"></script>
+    <script src="../js/i18n.js"></script>
+    <script src="../js/app.js"></script>
+    <script src="../js/firebase-config.js"></script>
+    <script src="../js/crypto.js"></script>
+    <script src="../js/auth.js"></script>
+    <script>
+        const CAT_ICONS = { subscriptions: '📺', insurance: '🛡️', fixed_bills: '🏢' };
+
+        const FREQ_MULTIPLIERS = {
+            weekly: 52 / 12,
+            monthly: 1,
+            bimonthly: 0.5,
+            quarterly: 1 / 3,
+            semi_annual: 1 / 6,
+            annual: 1 / 12
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            App.currentPage = 'subscriptions';
+            loadSubscriptions();
+        });
+
+        function toMonthly(amount, freq) {
+            return (amount || 0) * (FREQ_MULTIPLIERS[freq] || 1);
+        }
+
+        function loadSubscriptions() {
+            const allSubs = Storage.getSubscriptions();
+            const filter = document.getElementById('categoryFilter').value;
+            const subs = filter === 'all' ? allSubs : allSubs.filter(s => s.category === filter);
+            const container = document.getElementById('subCards');
+
+            // Summary - always based on ALL active subs
+            const activeSubs = allSubs.filter(s => s.active !== false);
+            const totalMonthly = activeSubs.reduce((sum, s) => sum + toMonthly(s.amount, s.frequency), 0);
+            document.getElementById('totalMonthly').textContent = I18n.formatCurrency(totalMonthly);
+            document.getElementById('totalAnnual').textContent = I18n.formatCurrency(totalMonthly * 12);
+
+            const catTotals = { subscriptions: 0, insurance: 0, fixed_bills: 0 };
+            activeSubs.forEach(s => {
+                if (catTotals[s.category] !== undefined) {
+                    catTotals[s.category] += toMonthly(s.amount, s.frequency);
+                }
+            });
+            document.getElementById('totalCatSubs').textContent = I18n.formatCurrency(catTotals.subscriptions);
+            document.getElementById('totalCatInsurance').textContent = I18n.formatCurrency(catTotals.insurance);
+            document.getElementById('totalCatBills').textContent = I18n.formatCurrency(catTotals.fixed_bills);
+
+            // Due soon alerts
+            renderDueAlerts(activeSubs);
+
+            if (subs.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state" style="text-align: center; padding: 60px 20px; color: var(--color-text-secondary);">
+                        <div style="font-size: 3rem;">🔄</div>
+                        <p style="margin-top: 15px;" data-i18n="subscriptions.noItems">${I18n.t('subscriptions.noItems')}</p>
+                    </div>`;
+                return;
+            }
+
+            container.innerHTML = subs.map(sub => {
+                const isActive = sub.active !== false;
+                const catName = I18n.t('subscriptions.categories.' + sub.category) || sub.category;
+                const freqName = I18n.t('subscriptions.frequencies.' + sub.frequency) || sub.frequency;
+                const monthly = toMonthly(sub.amount, sub.frequency);
+                const icon = CAT_ICONS[sub.category] || '📄';
+
+                return `
+                <div class="sub-card ${isActive ? '' : 'inactive'}">
+                    <div class="sub-card-header">
+                        <div class="sub-card-title">
+                            <span style="font-size: 1.5rem;">${icon}</span>
+                            <div>
+                                <h3>${sanitize(sub.name)}</h3>
+                                <span class="cat-badge">${sanitize(catName)}</span>
+                            </div>
+                        </div>
+                        <div class="sub-card-actions">
+                            <label class="toggle-switch" title="${isActive ? I18n.t('subscriptions.active') : I18n.t('subscriptions.inactive')}">
+                                <input type="checkbox" ${isActive ? 'checked' : ''} onchange="toggleActive('${sub.id}', this.checked)">
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <button class="btn btn-sm btn-secondary" onclick="editSub('${sub.id}')" title="${I18n.t('common.edit')}">✏️</button>
+                            <button class="btn btn-sm btn-secondary" onclick="deleteSub('${sub.id}')" title="${I18n.t('common.delete')}" style="color: var(--color-negative);">🗑️</button>
+                        </div>
+                    </div>
+                    <div class="sub-details">
+                        <div class="sub-detail">
+                            <div class="label">${I18n.t('subscriptions.amount')}</div>
+                            <div class="value" style="color: var(--color-subscriptions);">${I18n.formatCurrency(sub.amount)}</div>
+                        </div>
+                        <div class="sub-detail">
+                            <div class="label">${I18n.t('subscriptions.frequency')}</div>
+                            <div class="value">${sanitize(freqName)}</div>
+                        </div>
+                        <div class="sub-detail">
+                            <div class="label">${I18n.t('subscriptions.totalMonthly')}</div>
+                            <div class="value">${I18n.formatCurrency(monthly)}</div>
+                        </div>
+                        ${sub.renewalDate ? `
+                        <div class="sub-detail">
+                            <div class="label">${I18n.t('subscriptions.renewalDate')}</div>
+                            <div class="value">${sub.renewalDate}</div>
+                        </div>` : ''}
+                    </div>
+                    ${sub.notes ? `<div class="sub-notes">${sanitize(sub.notes)}</div>` : ''}
+                </div>`;
+            }).join('');
+        }
+
+        function renderDueAlerts(activeSubs) {
+            const container = document.getElementById('dueAlerts');
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const alerts = [];
+
+            activeSubs.forEach(sub => {
+                if (!sub.renewalDate) return;
+                const renewal = new Date(sub.renewalDate + 'T00:00:00');
+                const diffDays = Math.ceil((renewal - today) / (1000 * 60 * 60 * 24));
+
+                if (diffDays < 0) {
+                    alerts.push({ sub, diffDays, type: 'danger' });
+                } else if (diffDays <= 7) {
+                    alerts.push({ sub, diffDays, type: 'warning' });
+                }
+            });
+
+            if (alerts.length === 0) {
+                container.innerHTML = '';
+                return;
+            }
+
+            alerts.sort((a, b) => a.diffDays - b.diffDays);
+            container.innerHTML = alerts.map(a => {
+                const icon = CAT_ICONS[a.sub.category] || '📄';
+                if (a.diffDays < 0) {
+                    return `<div class="due-alert danger">
+                        <span>${icon}</span>
+                        <strong>${sanitize(a.sub.name)}</strong> —
+                        ${I18n.t('subscriptions.overdue')} (${Math.abs(a.diffDays)} ${I18n.t('subscriptions.daysLeft')})
+                    </div>`;
+                }
+                return `<div class="due-alert warning">
+                    <span>${icon}</span>
+                    <strong>${sanitize(a.sub.name)}</strong> —
+                    ${I18n.t('subscriptions.dueSoon')} (${a.diffDays} ${I18n.t('subscriptions.daysLeft')})
+                </div>`;
+            }).join('');
+        }
+
+        function openSubModal() {
+            document.getElementById('subId').value = '';
+            document.getElementById('subForm').reset();
+            document.getElementById('subActive').checked = true;
+            document.getElementById('subModalTitle').textContent = I18n.t('subscriptions.addItem');
+            App.openModal('subModal');
+        }
+
+        function closeSubModal() {
+            App.closeModal('subModal');
+        }
+
+        function saveSub() {
+            const id = document.getElementById('subId').value;
+            const sub = {
+                name: document.getElementById('subName').value.trim(),
+                amount: parseFloat(document.getElementById('subAmount').value) || 0,
+                frequency: document.getElementById('subFrequency').value,
+                category: document.getElementById('subCategory').value,
+                renewalDate: document.getElementById('subRenewalDate').value,
+                notes: document.getElementById('subNotes').value.trim(),
+                active: document.getElementById('subActive').checked
+            };
+
+            if (!sub.name) return;
+
+            if (id) {
+                Storage.updateSubscription(id, sub);
+            } else {
+                Storage.addSubscription(sub);
+            }
+
+            closeSubModal();
+            loadSubscriptions();
+            App.notify(I18n.t('subscriptions.saved'), 'success');
+        }
+
+        function editSub(id) {
+            const subs = Storage.getSubscriptions();
+            const sub = subs.find(s => s.id === id);
+            if (!sub) return;
+
+            document.getElementById('subId').value = id;
+            document.getElementById('subName').value = sub.name || '';
+            document.getElementById('subAmount').value = sub.amount || '';
+            document.getElementById('subFrequency').value = sub.frequency || 'monthly';
+            document.getElementById('subCategory').value = sub.category || 'subscriptions';
+            document.getElementById('subRenewalDate').value = sub.renewalDate || '';
+            document.getElementById('subNotes').value = sub.notes || '';
+            document.getElementById('subActive').checked = sub.active !== false;
+
+            document.getElementById('subModalTitle').textContent = I18n.t('subscriptions.editItem');
+            App.openModal('subModal');
+        }
+
+        function deleteSub(id) {
+            if (!confirm(I18n.t('subscriptions.deleteConfirm'))) return;
+            Storage.deleteSubscription(id);
+            loadSubscriptions();
+            App.notify(I18n.t('subscriptions.deleted'), 'success');
+        }
+
+        function toggleActive(id, active) {
+            Storage.updateSubscription(id, { active });
+            loadSubscriptions();
+        }
+    </script>
+</body>
+</html>

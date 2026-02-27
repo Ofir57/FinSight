@@ -475,7 +475,8 @@ const Auth = {
                 userProfile: Storage.getUserProfile(),
                 dismissedTips: Storage.getDismissedTips(),
                 loans: Storage.getLoans(),
-                creditScore: Storage.getCreditScore()
+                creditScore: Storage.getCreditScore(),
+                subscriptions: Storage.getSubscriptions()
             };
 
             // Encrypt sensitive data before uploading
@@ -536,6 +537,7 @@ const Auth = {
         if (typeof loadWatchlist === 'function') loadWatchlist();
         if (typeof rebuildTVDropdown === 'function') rebuildTVDropdown();
         if (typeof loadLoans === 'function') loadLoans();
+        if (typeof loadSubscriptions === 'function') loadSubscriptions();
         if (typeof loadProfile === 'function') loadProfile();
         if (typeof App !== 'undefined') App.updateDashboard();
     },
@@ -582,7 +584,8 @@ const Auth = {
                     stocks: Storage.getStocks(),
                     assets: Storage.getAssets(),
                     myFunds: Storage.getMyFunds(),
-                    loans: Storage.getLoans()
+                    loans: Storage.getLoans(),
+                    subscriptions: Storage.getSubscriptions()
                 });
 
                 // Check if cloud data is newer or if this is first sync
@@ -622,6 +625,7 @@ const Auth = {
                     if (data.dismissedTips) Storage.saveDismissedTips(data.dismissedTips);
                     if (data.loans) Storage.saveLoans(data.loans);
                     if (data.creditScore) Storage.saveCreditScore(data.creditScore);
+                    if (data.subscriptions) Storage.saveSubscriptions(data.subscriptions);
 
                     localStorage.setItem('finance_last_update', new Date().toISOString());
 
@@ -651,6 +655,7 @@ const Auth = {
                         if (data.dismissedTips) Storage.saveDismissedTips(data.dismissedTips);
                         if (data.loans) Storage.saveLoans(data.loans);
                         if (data.creditScore) Storage.saveCreditScore(data.creditScore);
+                        if (data.subscriptions) Storage.saveSubscriptions(data.subscriptions);
                         localStorage.setItem('finance_last_update', new Date().toISOString());
 
                         // Refresh all page data after cloud sync
@@ -667,7 +672,8 @@ const Auth = {
                     stocks: Storage.getStocks(),
                     assets: Storage.getAssets(),
                     myFunds: Storage.getMyFunds(),
-                    loans: Storage.getLoans()
+                    loans: Storage.getLoans(),
+                    subscriptions: Storage.getSubscriptions()
                 });
                 if (localCount > 0) {
                     await this.saveToCloud();
@@ -719,6 +725,7 @@ const Auth = {
         if (data.assets) count += Array.isArray(data.assets) ? data.assets.length : 0;
         if (data.myFunds) count += Array.isArray(data.myFunds) ? data.myFunds.length : 0;
         if (data.loans) count += Array.isArray(data.loans) ? data.loans.length : 0;
+        if (data.subscriptions) count += Array.isArray(data.subscriptions) ? data.subscriptions.length : 0;
         return count;
     },
 
@@ -770,7 +777,7 @@ function resetInactivityTimer() {
 // Only track meaningful financial data keys for timestamp updates
 const FINANCIAL_KEYS = ['finance_bank_accounts', 'finance_credit_cards', 'finance_stocks',
     'finance_assets', 'finance_my_funds', 'finance_loans', 'finance_user_profile',
-    'finance_stock_alerts', 'finance_goals'];
+    'finance_stock_alerts', 'finance_goals', 'finance_subscriptions'];
 let saveTimeout = null;
 const originalStorageSet = Storage.set.bind(Storage);
 Storage.set = function(key, data) {
@@ -791,7 +798,8 @@ Storage.set = function(key, data) {
                 stocks: Storage.getStocks(),
                 assets: Storage.getAssets(),
                 myFunds: Storage.getMyFunds(),
-                loans: Storage.getLoans()
+                loans: Storage.getLoans(),
+                subscriptions: Storage.getSubscriptions()
             });
             if (count > 0) {
                 Auth.saveToCloud();
