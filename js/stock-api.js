@@ -98,9 +98,9 @@ const StockAPI = {
     },
 
     /**
-     * Try to fetch from Maya API directly (no proxy) using required X-Maya-With header.
-     * Tries company trade data first, then fund details.
-     * Returns parsed price object or null on failure.
+     * Try to fetch from Maya API directly (no proxy).
+     * First attempts a plain GET (no custom headers = no CORS preflight).
+     * If the server returns CORS Allow-Origin, this works without any proxy.
      */
     async _fetchMayaDirectly(id) {
         const endpoints = [
@@ -108,22 +108,38 @@ const StockAPI = {
             `https://mayaapi.tase.co.il/api/company/tradedata?companyId=${id}`
         ];
         for (const url of endpoints) {
+            // Attempt 1: plain GET — no custom headers, no CORS preflight
             try {
-                const response = await fetch(url, {
+                const r = await fetch(url, { signal: AbortSignal.timeout(8000) });
+                if (r.ok) {
+                    const data = await r.json();
+                    console.error(`[TASE Maya] plain GET success from ${url}:`, JSON.stringify(data).slice(0, 600));
+                    const parsed = this._parseMayaPrice(data);
+                    if (parsed) return parsed;
+                    console.error(`[TASE Maya] parse failed, full response:`, data);
+                } else {
+                    console.error(`[TASE Maya] plain GET ${url} → HTTP ${r.status}`);
+                }
+            } catch (e) {
+                console.error(`[TASE Maya] plain GET failed for ${url}:`, e.message);
+            }
+
+            // Attempt 2: with X-Maya-With header (triggers CORS preflight — may be blocked)
+            try {
+                const r = await fetch(url, {
                     headers: { 'X-Maya-With': 'allow' },
                     signal: AbortSignal.timeout(8000)
                 });
-                if (!response.ok) {
-                    console.error(`[TASE Maya] ${url} → HTTP ${response.status}`);
-                    continue;
+                if (r.ok) {
+                    const data = await r.json();
+                    console.error(`[TASE Maya] header GET success from ${url}:`, JSON.stringify(data).slice(0, 600));
+                    const parsed = this._parseMayaPrice(data);
+                    if (parsed) return parsed;
+                } else {
+                    console.error(`[TASE Maya] header GET ${url} → HTTP ${r.status}`);
                 }
-                const data = await response.json();
-                console.error(`[TASE Maya] Raw response from ${url}:`, JSON.stringify(data).slice(0, 600));
-                const parsed = this._parseMayaPrice(data);
-                if (parsed) return parsed;
-                console.error(`[TASE Maya] Could not parse price from response. Full data:`, data);
             } catch (e) {
-                console.error(`[TASE Maya] fetch failed for ${url}:`, e.message);
+                console.error(`[TASE Maya] header GET failed for ${url}:`, e.message);
             }
         }
         return null;
