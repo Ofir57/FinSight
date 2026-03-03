@@ -98,32 +98,81 @@ const StockAPI = {
     },
 
     /**
-     * Fetch live price from TASE official API
-     * @param {string} symbol - Israeli stock symbol (e.g. 'LEUMI.TA')
+     * Try to fetch from Maya API directly (no proxy) using required X-Maya-With header.
+     * Tries company trade data first, then fund details.
+     * Returns parsed price object or null on failure.
+     */
+    async _fetchMayaDirectly(id) {
+        const endpoints = [
+            `https://mayaapi.tase.co.il/api/company/tradedata?companyId=${id}`,
+            `https://mayaapi.tase.co.il/api/fund/details?fundId=${id}`
+        ];
+        for (const url of endpoints) {
+            try {
+                const response = await fetch(url, {
+                    headers: { 'X-Maya-With': 'allow' },
+                    signal: AbortSignal.timeout(8000)
+                });
+                if (!response.ok) continue;
+                const data = await response.json();
+                console.log(`[TASE Maya] Raw response from ${url}:`, JSON.stringify(data).slice(0, 500));
+                const parsed = this._parseMayaPrice(data);
+                if (parsed) return parsed;
+            } catch (e) {
+                console.warn(`[TASE Maya] Direct fetch failed for ${url}:`, e.message);
+            }
+        }
+        return null;
+    },
+
+    /**
+     * Parse a Maya API response into a price object.
+     * Handles nested TradeData/FundDetails structures and flat responses.
+     */
+    _parseMayaPrice(data) {
+        // Flatten nested wrappers
+        const d = data.tradeData || data.TradeData || data.fundDetails || data.FundDetails || data;
+
+        const rawPrice = d.lastPrice ?? d.LastPrice ?? d.tradePrice ?? d.TradePrice
+                      ?? d.navPerUnit ?? d.NavPerUnit ?? d.unitPrice ?? d.UnitPrice
+                      ?? d.currentNAV ?? d.CurrentNAV ?? d.nav ?? d.NAV;
+        if (rawPrice == null) return null;
+
+        const currentPrice = rawPrice > 100000 ? rawPrice : rawPrice / 100;
+
+        const rawPrev = d.basePrice ?? d.BasePrice ?? d.previousClose ?? d.PreviousClose
+                     ?? d.previousNavPerUnit ?? d.PreviousNavPerUnit ?? d.prevNavPerUnit;
+        const previousClose = rawPrev != null ? (rawPrev > 100000 ? rawPrev : rawPrev / 100) : null;
+
+        const priceChange = previousClose !== null ? currentPrice - previousClose : 0;
+        const priceChangePercent = previousClose ? (priceChange / previousClose) * 100 : 0;
+        return { currentPrice, previousClose, priceChange, priceChangePercent, currency: 'ILS' };
+    },
+
+    /**
+     * Fetch live price for an Israeli security.
+     * Strategy: Maya API direct (no proxy, with required header) → api.tase.co.il via proxy
+     * @param {string} symbol - Israeli stock symbol (e.g. 'LEUMI.TA' or '5106810.TA')
      * @returns {Promise<Object>} Live price data in ILS
      */
     async fetchTaseLivePrice(symbol) {
         const id = await this._resolveTaseId(symbol);
-        const url = `${this.TASE_API_URL}/security/data?securityId=${id}`;
-        const data = await this._fetchWithFallback(url);
 
-        const rawPrice = data.lastPrice ?? data.LastPrice ?? data.tradePrice;
-        if (rawPrice === undefined || rawPrice === null) {
-            throw new Error('No price in TASE response');
+        // 1. Try Maya API directly with required X-Maya-With header (no proxy needed)
+        const mayaResult = await this._fetchMayaDirectly(id);
+        if (mayaResult) {
+            console.log(`[TASE Maya] Price fetched for ${symbol}:`, mayaResult.currentPrice);
+            return mayaResult;
         }
 
-        // TASE prices are in agora (1/100 ILS); prices > 100000 are already in ILS
-        const currentPrice = rawPrice > 100000 ? rawPrice : rawPrice / 100;
+        // 2. Fall back to api.tase.co.il via CORS proxy
+        const url = `${this.TASE_API_URL}/security/data?securityId=${id}`;
+        const data = await this._fetchWithFallback(url);
+        console.log(`[TASE proxy] Raw response for ${symbol}:`, JSON.stringify(data).slice(0, 300));
 
-        const rawPrevClose = data.previousClose ?? data.PreviousClose ?? data.basePrice;
-        const previousClose = rawPrevClose != null
-            ? (rawPrevClose > 100000 ? rawPrevClose : rawPrevClose / 100)
-            : null;
-
-        const priceChange = previousClose !== null ? currentPrice - previousClose : 0;
-        const priceChangePercent = previousClose ? (priceChange / previousClose) * 100 : 0;
-
-        return { currentPrice, previousClose, priceChange, priceChangePercent, currency: 'ILS' };
+        const parsed = this._parseMayaPrice(data);
+        if (!parsed) throw new Error('No price in TASE response');
+        return parsed;
     },
 
     /**
