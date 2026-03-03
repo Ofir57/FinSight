@@ -74,6 +74,13 @@ const StockAPI = {
             return this._taseIdCache[cleanSymbol];
         }
 
+        // Numeric symbol is already a TASE security ID — use directly
+        if (/^\d+$/.test(cleanSymbol)) {
+            const id = parseInt(cleanSymbol, 10);
+            this._taseIdCache[cleanSymbol] = id;
+            return id;
+        }
+
         const url = `${this.TASE_API_URL}/security/search?str=${encodeURIComponent(cleanSymbol)}&lang=1`;
         const data = await this._fetchWithFallback(url);
 
@@ -169,7 +176,14 @@ const StockAPI = {
         if (detectedMarket === 'IL') {
             try {
                 const live = await this.fetchTaseLivePrice(symbol);
-                const historical = await this._fetchYahooHistorical(symbol);
+
+                // Historical is best-effort — numeric IDs won't resolve on Yahoo
+                let historical = { historicalPrices: [], historicalData: [], ma150: null, ma150Series: [] };
+                try {
+                    historical = await this._fetchYahooHistorical(symbol);
+                } catch (he) {
+                    console.warn('Yahoo historical unavailable (MA150 skipped):', he.message);
+                }
 
                 const ma150Position = historical.ma150 !== null
                     ? (live.currentPrice > historical.ma150 ? 'above' : 'below')
