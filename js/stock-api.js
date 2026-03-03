@@ -171,21 +171,32 @@ const StockAPI = {
 
     /**
      * Fetch live price for an Israeli security.
-     * Strategy: Maya API direct (no proxy, with required header) → api.tase.co.il via proxy
+     * Strategy: GitHub Actions cache → Maya API direct → api.tase.co.il via proxy
      * @param {string} symbol - Israeli stock symbol (e.g. 'LEUMI.TA' or '5106810.TA')
      * @returns {Promise<Object>} Live price data in ILS
      */
     async fetchTaseLivePrice(symbol) {
         const id = await this._resolveTaseId(symbol);
 
-        // 1. Try Maya API directly with required X-Maya-With header (no proxy needed)
-        const mayaResult = await this._fetchMayaDirectly(id);
-        if (mayaResult) {
-            console.log(`[TASE Maya] Price fetched for ${symbol}:`, mayaResult.currentPrice);
-            return mayaResult;
-        }
+        // 1. Read from GitHub Actions daily cache (tase-prices.json)
+        //    Updated server-side so no CORS issues. Best for mutual funds (numeric IDs).
+        try {
+            const res = await fetch(`./data/tase-prices.json?v=${Math.floor(Date.now() / 300000)}`);
+            if (res.ok) {
+                const cache = await res.json();
+                const cached = cache[String(id)];
+                if (cached && cached.currentPrice) {
+                    console.log(`[TASE cache] ${symbol}: ₪${cached.currentPrice} (updated ${cached.lastUpdate})`);
+                    return { ...cached, fromCache: true };
+                }
+            }
+        } catch {}
 
-        // 2. Fall back to api.tase.co.il via CORS proxy
+        // 2. Try Maya API directly (no proxy) — works only if server allows plain CORS
+        const mayaResult = await this._fetchMayaDirectly(id);
+        if (mayaResult) return mayaResult;
+
+        // 3. Fall back to api.tase.co.il via CORS proxy
         const url = `${this.TASE_API_URL}/security/data?securityId=${id}`;
         const data = await this._fetchWithFallback(url);
         console.log(`[TASE proxy] Raw response for ${symbol}:`, JSON.stringify(data).slice(0, 300));
