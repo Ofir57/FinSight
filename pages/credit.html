@@ -1600,6 +1600,26 @@
                 var items = data.transactions.map(function(tx) {
                     return { date: tx.date, description: tx.description, amount: tx.amount, category: mapBookmarkletCategory(tx.categoryRaw), isRecurring: false };
                 });
+
+                // Update categories for already-imported transactions that were saved as 'other'
+                var existingExpenses = Storage.getCreditCards().expenses;
+                var updatedCount = 0;
+                items.forEach(function(item) {
+                    if (item.category === 'other') return;
+                    var match = existingExpenses.find(function(e) {
+                        return e.date === item.date && e.description === item.description && e.amount === item.amount && e.category === 'other';
+                    });
+                    if (match) {
+                        Storage.updateExpense(match.id, { category: item.category });
+                        updatedCount++;
+                    }
+                });
+                if (updatedCount > 0) {
+                    App.notify('עודכנו קטגוריות ל-' + updatedCount + ' עסקאות', 'success');
+                    loadExpenses();
+                    return;
+                }
+
                 App.notify('נטענו ' + items.length + ' עסקאות מ-' + (data.sourceName || data.source), 'success');
                 importExpensesFromSmartImport(items);
             } catch(e) {
