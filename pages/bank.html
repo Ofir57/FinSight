@@ -97,6 +97,7 @@
                         <a href="reports.html" class="nav-link" data-category="reports">
                             <span class="icon">📋</span>
                             <span data-i18n="nav.reports">דוחות</span>
+                    <li class="nav-item"><a href="health-score.html" class="nav-link"><span class="icon">🩺</span><span data-i18n="nav.healthScore">בריאות פיננסית</span></a></li>
                         </a>
                     </li>
                     <li class="nav-item">
@@ -150,6 +151,10 @@
                     <span>📷</span>
                     <span data-i18n="bank.importImage">ייבוא מתמונה</span>
                 </button>
+                <button class="btn btn-secondary" onclick="importStatementFile()">
+                    <span>📄</span>
+                    <span>ייבוא דף חשבון</span>
+                </button>
             </div>
 
             <!-- Accounts List -->
@@ -195,6 +200,27 @@
                 </div>
                 <div class="chart-container">
                     <canvas id="balanceHistoryChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Transactions History -->
+            <div class="card" id="transactionsCard" style="display: none;">
+                <div class="card-header">
+                    <h2 class="card-title"><span class="icon">📜</span> תנועות אחרונות</h2>
+                    <button class="btn btn-sm btn-secondary" id="showAllTxBtn" onclick="toggleAllTransactions()" style="display:none;">הצג הכל</button>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>תאריך</th>
+                                <th>תיאור</th>
+                                <th>סכום</th>
+                                <th>יתרה</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transactionsTable"></tbody>
+                    </table>
                 </div>
             </div>
         </main>
@@ -355,6 +381,8 @@
             if (combinedHistory.length > 0) {
                 Charts.createBalanceHistory('balanceHistoryChart', combinedHistory, I18n.t('bank.balance'), '#3b82f6');
             }
+
+            renderTransactions(accounts);
         }
 
         function openAddModal() {
@@ -728,6 +756,384 @@
             if (bankLower.includes('מסד') || bankLower.includes('massad')) return 'massad';
 
             return 'other';
+        }
+
+        // ============== STATEMENT IMPORT ==============
+
+        const statementColumnMappings = {
+            date:        ['תאריך', 'תאריך ערך', 'תאריך עסקה', 'date'],
+            description: ['תיאור', 'תיאור פעולה', 'פרטים', 'שם בית העסק', 'description'],
+            debit:       ['חיוב', 'משיכות', 'משיכות/חיובים', 'debit'],
+            credit:      ['זכות', 'הפקדות', 'הפקדות/זיכויים', 'credit'],
+            balance:     ['יתרה', 'יתרה בשח', 'יתרה בש"ח', 'balance'],
+            reference:   ['אסמכתא', 'מסמך', 'reference']
+        };
+
+        function detectBankFormat(rows) {
+            const text = rows.slice(0, 10).map(r => (r || []).join(' ')).join(' ');
+            if (text.includes('לאומי')) return 'leumi';
+            if (text.includes('הפועלים')) return 'hapoalim';
+            if (text.includes('דיסקונט')) return 'discount';
+            if (text.includes('מזרחי')) return 'mizrahi';
+            return null;
+        }
+
+        function detectStatementColumns(headers) {
+            const detected = {};
+            headers.forEach((header, index) => {
+                if (!header) return;
+                const headerLower = String(header).toLowerCase().trim();
+                Object.keys(statementColumnMappings).forEach(field => {
+                    if (detected[field] !== undefined) return;
+                    const matches = statementColumnMappings[field].some(kw =>
+                        headerLower.includes(kw.toLowerCase())
+                    );
+                    if (matches) detected[field] = index;
+                });
+            });
+            return detected;
+        }
+
+        function findStatementHeaderRow(rows) {
+            for (let i = 0; i < Math.min(rows.length, 15); i++) {
+                const row = rows[i];
+                if (!row || row.length < 2) continue;
+                const rowText = row.map(c => String(c || '').toLowerCase()).join(' ');
+                const hasDateWord = statementColumnMappings.date.some(w => rowText.includes(w.toLowerCase()));
+                const hasBalanceWord = statementColumnMappings.balance.some(w => rowText.includes(w.toLowerCase()));
+                if (hasDateWord || hasBalanceWord) return i;
+            }
+            return 0;
+        }
+
+        function parseStatementDate(val) {
+            if (val === null || val === undefined || val === '') return null;
+            if (typeof val === 'number' && val > 1000) {
+                try {
+                    const d = XLSX.SSF.parse_date_code(val);
+                    if (d) return `${d.y}-${String(d.m).padStart(2,'0')}-${String(d.d).padStart(2,'0')}`;
+                } catch(e) {}
+            }
+            if (val instanceof Date) return val.toISOString().split('T')[0];
+            return CSVImport.parseDate(String(val));
+        }
+
+        function previewStatementInfo(rows, headerIdx, detected) {
+            const dataRows = rows.slice(headerIdx + 1);
+            let minDate = null, maxDate = null, count = 0;
+            for (const row of dataRows) {
+                if (!row || detected.date === undefined) continue;
+                const date = parseStatementDate(row[detected.date]);
+                if (!date) continue;
+                count++;
+                if (!minDate || date < minDate) minDate = date;
+                if (!maxDate || date > maxDate) maxDate = date;
+            }
+            return { count, minDate, maxDate };
+        }
+
+        async function importStatementFile() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.xlsx,.xls,.csv,.html,.txt';
+
+            input.onchange = async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                try {
+                    let rows = [];
+                    const content = await file.text();
+
+                    if (content.includes('<HTML') || content.includes('<html') || content.includes('<table')) {
+                        rows = parseHTMLTable(content);
+                    } else if (file.name.endsWith('.xls') || file.name.endsWith('.xlsx')) {
+                        const data = await file.arrayBuffer();
+                        const workbook = XLSX.read(data, { type: 'array' });
+                        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                        rows = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
+                    } else {
+                        rows = SmartImport.parseFile(content, file.name);
+                    }
+
+                    if (rows.length < 2) {
+                        App.notify('הקובץ ריק או לא תקין', 'error');
+                        return;
+                    }
+
+                    const bankFormat = detectBankFormat(rows);
+                    if (bankFormat) {
+                        const bankNames = { leumi: 'בנק לאומי', hapoalim: 'בנק הפועלים', discount: 'בנק דיסקונט', mizrahi: 'בנק מזרחי' };
+                        App.notify('זוהה פורמט: ' + bankNames[bankFormat], 'success');
+                    }
+
+                    const headerIdx = findStatementHeaderRow(rows);
+                    const headers = rows[headerIdx];
+                    const detected = detectStatementColumns(headers);
+
+                    if (detected.balance === undefined) {
+                        showStatementMappingModal(headers, rows, headerIdx);
+                        return;
+                    }
+
+                    showAccountSelectModal(rows, headerIdx, detected);
+                } catch (error) {
+                    console.error('Statement import error:', error);
+                    App.notify('שגיאה בייבוא: ' + error.message, 'error');
+                }
+            };
+
+            input.click();
+        }
+
+        function showAccountSelectModal(rows, headerIdx, detected) {
+            const accounts = Storage.getBankAccounts();
+            const { count, minDate, maxDate } = previewStatementInfo(rows, headerIdx, detected);
+            const fmt = d => d ? d.split('-').reverse().join('/') : '';
+            const preview = count > 0
+                ? `נמצאו ${count} תנועות מ-${fmt(minDate)} עד ${fmt(maxDate)}`
+                : 'לא נמצאו תנועות בקובץ';
+
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay active';
+            modal.id = 'accountSelectModal';
+            modal.innerHTML = `
+                <div class="modal" style="max-width: 480px;">
+                    <div class="modal-header">
+                        <h2>בחר חשבון לייבוא</h2>
+                        <button class="modal-close" onclick="document.getElementById('accountSelectModal').remove()">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <p style="color: var(--color-text-secondary); margin-bottom: 16px;">${preview}</p>
+                        <div class="form-group">
+                            <label>חשבון יעד</label>
+                            <select id="targetAccountSelect" class="form-control">
+                                <option value="new">➕ צור חשבון חדש</option>
+                                ${accounts.map(a => `<option value="${a.id}">${a.nameHe || a.nameEn} – ${I18n.t('bank.banks.' + a.bank) || a.bank}</option>`).join('')}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" onclick="document.getElementById('accountSelectModal').remove()">ביטול</button>
+                        <button class="btn btn-primary" onclick="confirmAccountSelect()">ייבא תנועות</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            window._statementData = { rows, headerIdx, detected };
+        }
+
+        function confirmAccountSelect() {
+            const accountId = document.getElementById('targetAccountSelect').value;
+            document.getElementById('accountSelectModal').remove();
+            const { rows, headerIdx, detected } = window._statementData;
+            importStatementData(accountId, rows, headerIdx, detected);
+        }
+
+        function importStatementData(accountId, rows, headerIdx, detected) {
+            const dataRows = rows.slice(headerIdx + 1);
+            const transactions = [];
+            const historyMap = {};
+
+            for (const row of dataRows) {
+                if (!row || row.length === 0) continue;
+
+                // Skip rows where all relevant cells are empty
+                const relevantVals = [
+                    detected.date !== undefined ? row[detected.date] : undefined,
+                    detected.description !== undefined ? row[detected.description] : undefined,
+                    detected.debit !== undefined ? row[detected.debit] : undefined,
+                    detected.credit !== undefined ? row[detected.credit] : undefined,
+                    detected.balance !== undefined ? row[detected.balance] : undefined
+                ];
+                if (relevantVals.every(v => v === null || v === undefined || v === '')) continue;
+
+                const date = parseStatementDate(detected.date !== undefined ? row[detected.date] : null);
+                if (!date) continue;
+
+                const desc = detected.description !== undefined ? String(row[detected.description] || '').trim() : '';
+
+                const rawDebit  = detected.debit !== undefined ? row[detected.debit] : null;
+                const rawCredit = detected.credit !== undefined ? row[detected.credit] : null;
+                const rawBal    = detected.balance !== undefined ? row[detected.balance] : null;
+
+                const debit  = (rawDebit  !== null && rawDebit  !== undefined && rawDebit  !== '') ? Math.abs(parseFloat(String(rawDebit).replace(/[^\d.-]/g, '')) || 0) : 0;
+                const credit = (rawCredit !== null && rawCredit !== undefined && rawCredit !== '') ? Math.abs(parseFloat(String(rawCredit).replace(/[^\d.-]/g, '')) || 0) : 0;
+                const bal    = (rawBal    !== null && rawBal    !== undefined && rawBal    !== '') ? parseFloat(String(rawBal).replace(/[^\d.-]/g, '')) : NaN;
+
+                const amount = credit - debit;
+                const tx = { date, description: desc, amount };
+                if (!isNaN(bal)) {
+                    tx.balance = bal;
+                    historyMap[date] = bal; // keep latest balance per date
+                }
+                transactions.push(tx);
+            }
+
+            if (transactions.length === 0) {
+                App.notify('לא נמצאו תנועות לייבוא', 'error');
+                return;
+            }
+
+            transactions.sort((a, b) => a.date.localeCompare(b.date));
+            const withBalance = transactions.filter(t => t.balance !== undefined);
+            const latestBalance = withBalance.length > 0 ? withBalance[withBalance.length - 1].balance : undefined;
+
+            let targetId = accountId;
+            if (accountId === 'new') {
+                const newAcc = Storage.addBankAccount({
+                    nameHe: 'חשבון מיובא',
+                    nameEn: 'Imported Account',
+                    bank: 'other',
+                    accountNumber: '',
+                    balance: latestBalance || 0,
+                    currency: 'ILS'
+                });
+                targetId = newAcc.id;
+            }
+
+            const accounts = Storage.getBankAccounts();
+            const acc = accounts.find(a => a.id === targetId);
+            if (!acc) {
+                App.notify('החשבון לא נמצא', 'error');
+                return;
+            }
+
+            // Merge transactions, deduplicate by date+description+amount
+            const txKey = t => `${t.date}|${t.description}|${t.amount}`;
+            const existingTx = acc.transactions || [];
+            const existingKeys = new Set(existingTx.map(txKey));
+            const newTx = transactions.filter(t => !existingKeys.has(txKey(t)));
+            const merged = [...existingTx, ...newTx].sort((a, b) => a.date.localeCompare(b.date));
+
+            // Build updated balance history
+            const histByDate = {};
+            (acc.history || []).forEach(h => { histByDate[h.date] = h.balance; });
+            Object.entries(historyMap).forEach(([date, balance]) => { histByDate[date] = balance; });
+            const updatedHistory = Object.entries(histByDate)
+                .map(([date, balance]) => ({ date, balance }))
+                .sort((a, b) => a.date.localeCompare(b.date));
+
+            const updatePayload = { transactions: merged };
+            if (latestBalance !== undefined) updatePayload.balance = latestBalance;
+            if (updatedHistory.length > 0) updatePayload.history = updatedHistory;
+
+            Storage.updateBankAccount(targetId, updatePayload);
+            App.notify(`יובאו ${newTx.length} תנועות בהצלחה`, 'success');
+            loadAccounts();
+            delete window._statementData;
+        }
+
+        function showStatementMappingModal(headers, rows, headerIdx) {
+            const opts = headers.map((h, i) => `<option value="${i}">${h || 'עמודה ' + (i+1)}</option>`).join('');
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay active';
+            modal.id = 'stmtMappingModal';
+            modal.innerHTML = `
+                <div class="modal" style="max-width: 500px;">
+                    <div class="modal-header">
+                        <h2>מיפוי עמודות דף חשבון</h2>
+                        <button class="modal-close" onclick="document.getElementById('stmtMappingModal').remove()">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <p style="color: var(--color-text-secondary);">לא זוהו עמודות אוטומטית. אנא בחר ידנית:</p>
+                        <div class="form-group">
+                            <label>תאריך *</label>
+                            <select id="smDate" class="form-control"><option value="-1">-- בחר --</option>${opts}</select>
+                        </div>
+                        <div class="form-group">
+                            <label>תיאור</label>
+                            <select id="smDesc" class="form-control"><option value="-1">-- לא רלוונטי --</option>${opts}</select>
+                        </div>
+                        <div class="form-group">
+                            <label>חיוב</label>
+                            <select id="smDebit" class="form-control"><option value="-1">-- לא רלוונטי --</option>${opts}</select>
+                        </div>
+                        <div class="form-group">
+                            <label>זכות</label>
+                            <select id="smCredit" class="form-control"><option value="-1">-- לא רלוונטי --</option>${opts}</select>
+                        </div>
+                        <div class="form-group">
+                            <label>יתרה *</label>
+                            <select id="smBalance" class="form-control"><option value="-1">-- בחר --</option>${opts}</select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" onclick="document.getElementById('stmtMappingModal').remove()">ביטול</button>
+                        <button class="btn btn-primary" onclick="applyStatementMapping()">המשך</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            window._statementData = { rows, headerIdx };
+        }
+
+        function applyStatementMapping() {
+            const dateIdx    = parseInt(document.getElementById('smDate').value);
+            const balanceIdx = parseInt(document.getElementById('smBalance').value);
+            if (dateIdx < 0 || balanceIdx < 0) {
+                App.notify('יש לבחור לפחות תאריך ויתרה', 'error');
+                return;
+            }
+            const detected = {
+                date:        dateIdx,
+                balance:     balanceIdx,
+                description: parseInt(document.getElementById('smDesc').value),
+                debit:       parseInt(document.getElementById('smDebit').value),
+                credit:      parseInt(document.getElementById('smCredit').value)
+            };
+            Object.keys(detected).forEach(k => { if (detected[k] < 0) delete detected[k]; });
+            document.getElementById('stmtMappingModal').remove();
+            const { rows, headerIdx } = window._statementData;
+            showAccountSelectModal(rows, headerIdx, detected);
+        }
+
+        // ============== TRANSACTION HISTORY UI ==============
+
+        let _allTransactions = [];
+        let _showAllTx = false;
+
+        function renderTransactions(accounts) {
+            const card      = document.getElementById('transactionsCard');
+            const tbody     = document.getElementById('transactionsTable');
+            const showAllBtn = document.getElementById('showAllTxBtn');
+
+            _allTransactions = [];
+            accounts.forEach(acc => {
+                (acc.transactions || []).forEach(tx => {
+                    _allTransactions.push({ ...tx, accountName: acc.nameHe || acc.nameEn });
+                });
+            });
+
+            if (_allTransactions.length === 0) {
+                card.style.display = 'none';
+                return;
+            }
+
+            _allTransactions.sort((a, b) => b.date.localeCompare(a.date));
+
+            card.style.display = 'block';
+            const toShow = _showAllTx ? _allTransactions : _allTransactions.slice(0, 15);
+            showAllBtn.style.display = _allTransactions.length > 15 ? 'block' : 'none';
+            showAllBtn.textContent = _showAllTx ? 'הצג פחות' : `הצג הכל (${_allTransactions.length})`;
+
+            tbody.innerHTML = toShow.map(tx => {
+                const amountColor = tx.amount < 0 ? 'color: var(--color-danger)' : 'color: var(--color-success)';
+                const amountSign  = tx.amount >= 0 ? '+' : '';
+                const balance     = tx.balance !== undefined ? I18n.formatCurrency(tx.balance) : '–';
+                const dateDisplay = tx.date ? tx.date.split('-').reverse().join('/') : '';
+                return `<tr>
+                    <td>${dateDisplay}</td>
+                    <td>${tx.description || ''}</td>
+                    <td style="${amountColor}">${amountSign}${I18n.formatCurrency(tx.amount)}</td>
+                    <td>${balance}</td>
+                </tr>`;
+            }).join('');
+        }
+
+        function toggleAllTransactions() {
+            _showAllTx = !_showAllTx;
+            renderTransactions(Storage.getBankAccounts());
         }
     </script>
 </body>

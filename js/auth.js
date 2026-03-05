@@ -560,6 +560,7 @@ const Auth = {
         if (typeof loadFunds === 'function') loadFunds();
         if (typeof loadStocks === 'function') loadStocks();
         if (typeof loadWatchlist === 'function') loadWatchlist();
+        if (typeof refreshAllPrices === 'function') refreshAllPrices();
         if (typeof rebuildTVDropdown === 'function') rebuildTVDropdown();
         if (typeof loadLoans === 'function') loadLoans();
         if (typeof loadSubscriptions === 'function') loadSubscriptions();

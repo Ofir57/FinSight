@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="../img/logo.png">
+    <meta name="theme-color" content="#10b981">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://www.gstatic.com https://apis.google.com; style-src 'self' 'unsafe-inline'; img-src 'self' https: data:; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.firebaseapp.com wss://*.firebaseio.com https://api.allorigins.win https://corsproxy.io https://api.codetabs.com https://api.exchangerate-api.com; frame-src https://accounts.google.com https://*.firebaseapp.com; object-src 'none'; base-uri 'self'; form-action 'self' https://accounts.google.com;">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <link rel="manifest" href="../manifest.json">
+    <link rel="icon" type="image/png" href="../img/logo.png">
+    <title>בריאות פיננסית - FinSight</title>
+    <link rel="stylesheet" href="../css/app.css">
+    <style>
+        .nav-link.active { background: #10b981 !important; }
+        .page-header h1 { color: #10b981; }
+        .btn-primary { background: #10b981; }
+        .btn-primary:hover { background: #059669; }
+
+        /* ── Gauge ── */
+        .gauge-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 30px 20px 10px;
+        }
+
+        .gauge-svg {
+            width: 260px;
+            height: 160px;
+            overflow: visible;
+        }
+
+        .gauge-track {
+            fill: none;
+            stroke: rgba(255,255,255,0.1);
+            stroke-width: 18;
+            stroke-linecap: round;
+        }
+
+        .gauge-fill {
+            fill: none;
+            stroke-width: 18;
+            stroke-linecap: round;
+            transition: stroke-dasharray 1.2s cubic-bezier(0.4,0,0.2,1), stroke 0.5s ease;
+        }
+
+        .gauge-score-text {
+            font-size: 42px;
+            font-weight: bold;
+            fill: white;
+        }
+
+        .gauge-grade-text {
+            font-size: 16px;
+            fill: #8892b0;
+        }
+
+        /* ── Grade Badge ── */
+        .grade-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 24px;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-top: 8px;
+        }
+
+        .grade-A { background: rgba(16,185,129,0.2); color: #10b981; border: 1px solid rgba(16,185,129,0.4); }
+        .grade-B { background: rgba(59,130,246,0.2); color: #3b82f6; border: 1px solid rgba(59,130,246,0.4); }
+        .grade-C { background: rgba(245,158,11,0.2); color: #f59e0b; border: 1px solid rgba(245,158,11,0.4); }
+        .grade-D { background: rgba(239,68,68,0.15); color: #ef4444; border: 1px solid rgba(239,68,68,0.3); }
+        .grade-F { background: rgba(220,38,38,0.15); color: #dc2626; border: 1px solid rgba(220,38,38,0.3); }
+
+        /* ── Category Cards ── */
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin-bottom: 30px;
+        }
+
+        .category-card {
+            background: var(--color-bg-card);
+            border: 1px solid var(--color-border);
+            border-radius: 16px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .category-card::before {
+            content: '';
+            position: absolute;
+            top: 0; right: 0;
+            width: 4px;
+            height: 100%;
+            border-radius: 0 16px 16px 0;
+        }
+
+        .cat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .cat-icon-name {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .cat-icon { font-size: 1.8rem; }
+
+        .cat-name {
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .cat-desc {
+            font-size: 0.8rem;
+            color: var(--color-text-secondary);
+            margin-top: 2px;
+        }
+
+        .cat-score {
+            text-align: left;
+            direction: ltr;
+        }
+
+        .cat-score .pts {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .cat-score .max {
+            font-size: 0.85rem;
+            color: var(--color-text-secondary);
+        }
+
+        .cat-progress-track {
+            background: rgba(255,255,255,0.1);
+            border-radius: 6px;
+            height: 8px;
+            overflow: hidden;
+            margin-top: 12px;
+        }
+
+        .cat-progress-fill {
+            height: 100%;
+            border-radius: 6px;
+            transition: width 1.2s cubic-bezier(0.4,0,0.2,1);
+        }
+
+        .cat-detail {
+            font-size: 0.82rem;
+            color: var(--color-text-secondary);
+            margin-top: 8px;
+        }
+
+        .cat-na {
+            font-size: 0.85rem;
+            color: var(--color-text-secondary);
+            font-style: italic;
+            margin-top: 12px;
+        }
+
+        /* ── Recommendations ── */
+        .recommendations-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .rec-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            background: var(--color-bg-card);
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            padding: 14px 16px;
+        }
+
+        .rec-icon { font-size: 1.4rem; flex-shrink: 0; margin-top: 2px; }
+
+        .rec-body { flex: 1; }
+
+        .rec-title {
+            font-weight: 600;
+            margin-bottom: 3px;
+            font-size: 0.95rem;
+        }
+
+        .rec-desc {
+            font-size: 0.85rem;
+            color: var(--color-text-secondary);
+            line-height: 1.5;
+        }
+
+        .rec-severity-red { border-right: 3px solid #ef4444; }
+        .rec-severity-yellow { border-right: 3px solid #f59e0b; }
+        .rec-severity-blue { border-right: 3px solid #3b82f6; }
+        .rec-severity-green { border-right: 3px solid #10b981; }
+
+        /* ── Profile Banner ── */
+        .profile-banner {
+            background: rgba(245,158,11,0.1);
+            border: 1px solid rgba(245,158,11,0.3);
+            border-radius: 12px;
+            padding: 14px 18px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+            font-size: 0.9rem;
+        }
+
+        .profile-banner a {
+            color: #f59e0b;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+        /* ── Score Hero ── */
+        .score-hero {
+            background: var(--color-bg-card);
+            border: 1px solid var(--color-border);
+            border-radius: 20px;
+            padding: 10px 20px 20px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .score-summary {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+
+        .score-stat { text-align: center; }
+        .score-stat .val { font-size: 1.3rem; font-weight: bold; }
+        .score-stat .lbl { font-size: 0.8rem; color: var(--color-text-secondary); }
+
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: var(--color-text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        @media (max-width: 640px) {
+            .categories-grid { grid-template-columns: 1fr 1fr; }
+            .gauge-svg { width: 220px; height: 140px; }
+        }
+
+        @media (max-width: 400px) {
+            .categories-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="brand">
+                    <img src="../img/logo.png" class="brand-icon" alt="FinSight">
+                    <span class="brand-name">Fin<span class="brand-highlight">Sight</span></span>
+                </div>
+            </div>
+
+            <nav>
+                <ul class="nav-menu">
+                    <li class="nav-item"><a href="../index.html" class="nav-link"><span class="icon">🏠</span><span data-i18n="nav.dashboard">דאשבורד</span></a></li>
+                    <li class="nav-item"><a href="bank.html" class="nav-link"><span class="icon">🏦</span><span data-i18n="nav.bankAccounts">חשבונות בנק</span></a></li>
+                    <li class="nav-item"><a href="credit.html" class="nav-link"><span class="icon">💳</span><span data-i18n="nav.creditCards">כרטיסי אשראי</span></a></li>
+                    <li class="nav-item"><a href="stocks.html" class="nav-link"><span class="icon">📈</span><span data-i18n="nav.stocks">מניות</span></a></li>
+                    <li class="nav-item">
+                        <span class="nav-link" style="cursor: default;"><span class="icon">📊</span><span data-i18n="nav.financialProducts">מוצרים פיננסיים</span></span>
+                        <ul class="nav-submenu">
+                            <li class="nav-item"><a href="market-products.html" class="nav-link"><span>🏪 </span><span data-i18n="nav.marketProducts">מוצרים בשוק</span></a></li>
+                            <li class="nav-item"><a href="my-funds.html" class="nav-link"><span>💎 </span><span data-i18n="nav.myProducts">החסכונות שלי</span></a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item"><a href="assets.html" class="nav-link"><span class="icon">🏠</span><span data-i18n="nav.assets">נכסים</span></a></li>
+                    <li class="nav-item"><a href="loans.html" class="nav-link"><span class="icon">🏦</span><span data-i18n="nav.loans">הלוואות</span></a></li>
+                    <li class="nav-item"><a href="subscriptions.html" class="nav-link"><span class="icon">🔄</span><span data-i18n="nav.subscriptions">תשלומים קבועים</span></a></li>
+                    <li class="nav-item"><a href="goals.html" class="nav-link"><span class="icon">🎯</span><span data-i18n="nav.goals">יעדי חיסכון</span></a></li>
+                    <li class="nav-item"><a href="pension-calc.html" class="nav-link"><span class="icon">🧮</span><span data-i18n="nav.pensionCalc">מחשבון פנסיה</span></a></li>
+                    <li class="nav-item"><a href="reports.html" class="nav-link"><span class="icon">📋</span><span data-i18n="nav.reports">דוחות</span></a></li>
+                    <li class="nav-item"><a href="health-score.html" class="nav-link active"><span class="icon">🩺</span><span data-i18n="nav.healthScore">בריאות פיננסית</span></a></li>
+                    <li class="nav-item"><a href="profile.html" class="nav-link"><span class="icon">👤</span><span data-i18n="nav.profile">פרופיל פיננסי</span></a></li>
+                    <li class="nav-item"><a href="settings.html" class="nav-link"><span class="icon">⚙️</span><span data-i18n="nav.settings">הגדרות</span></a></li>
+                </ul>
+            </nav>
+
+            <div class="sidebar-footer"></div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="logo-hero">
+                <img src="../img/logo.png" alt="FinSight" class="logo-hero-img">
+            </div>
+            <header class="page-header">
+                <h1>🩺 <span data-i18n="healthScore.title">ציון בריאות פיננסית</span></h1>
+                <p data-i18n="healthScore.subtitle">סקירה של המצב הפיננסי שלך</p>
+            </header>
+
+            <!-- Profile incomplete banner -->
+            <div class="profile-banner" id="profileBanner" style="display:none;">
+                <span>⚠️</span>
+                <span data-i18n="healthScore.completeProfile">השלם את הפרופיל הפיננסי לציון מדויק יותר</span>
+                <a href="profile.html" style="margin-right: auto;" data-i18n="nav.profile">פרופיל פיננסי ←</a>
+            </div>
+
+            <!-- Score Hero -->
+            <div class="score-hero">
+                <div class="gauge-container">
+                    <svg class="gauge-svg" viewBox="0 0 260 160">
+                        <!-- Background track: semi-circle M 30,130 A 100,100 0 0,1 230,130 -->
+                        <path class="gauge-track" d="M 30,130 A 100,100 0 0,1 230,130"/>
+                        <!-- Score fill -->
+                        <path class="gauge-fill" id="gaugeFill" d="M 30,130 A 100,100 0 0,1 230,130"
+                              stroke-dasharray="0 400"/>
+                        <!-- Score number -->
+                        <text class="gauge-score-text" x="130" y="118" text-anchor="middle" id="gaugeScoreText">–</text>
+                        <text class="gauge-grade-text" x="130" y="142" text-anchor="middle" id="gaugeGradeText"></text>
+                    </svg>
+                    <div id="gradeBadge" class="grade-badge" style="display:none;"></div>
+                </div>
+
+                <div class="score-summary" id="scoreSummary"></div>
+            </div>
+
+            <!-- Category Cards -->
+            <div class="section-title">📊 <span data-i18n="healthScore.breakdown">פירוט לפי קטגוריה</span></div>
+            <div class="categories-grid" id="categoriesGrid"></div>
+
+            <!-- Recommendations -->
+            <div class="section-title">💡 <span data-i18n="healthScore.recommendations">המלצות לשיפור</span></div>
+            <ul class="recommendations-list" id="recommendationsList"></ul>
+        </main>
+    </div>
+
+    <script src="../js/storage.js"></script>
+    <script src="../js/pin-lock.js"></script>
+    <script src="../js/i18n.js"></script>
+    <script src="../js/smart-tips.js"></script>
+    <script src="../js/app.js"></script>
+    <script src="../js/firebase-config.js"></script>
+    <script src="../js/crypto.js"></script>
+    <script src="../js/auth.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        renderHealthScore();
+    });
+
+    // ─── Helpers ──────────────────────────────────────────────────────────────
+
+    function getMonthlyExpenses() {
+        const now = new Date();
+        const month = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+        const data = Storage.getCreditCards();
+        return data.expenses
+            .filter(e => e.date && e.date.startsWith(month))
+            .reduce((sum, e) => sum + (e.amount || 0), 0);
+    }
+
+    function fmt(n) {
+        if (typeof I18n !== 'undefined' && I18n.formatCurrency) return I18n.formatCurrency(n);
+        return '₪' + Math.round(n).toLocaleString();
+    }
+
+    function t(key) {
+        if (typeof I18n !== 'undefined' && I18n.t) return I18n.t(key) || key;
+        return key;
+    }
+
+    // ─── Score Calculation ────────────────────────────────────────────────────
+
+    function calculateScore() {
+        const profile = Storage.getUserProfile();
+        const bankBalance = Storage.getTotalBankBalance();
+        const monthlyExpenses = getMonthlyExpenses();
+        const netWorth = Storage.getNetWorth();
+        const loanPayments = Storage.getTotalMonthlyLoanPayments();
+        const loans = Storage.getLoans ? Storage.getLoans() : [];
+        const funds = Storage.getMyFunds();
+        const stocks = Storage.getStocks();
+
+        const result = {
+            categories: [],
+            total: 0,
+            maxTotal: 100,
+            missingProfile: !profile || !profile.monthlyIncome
+        };
+
+        // ── 1. Savings (25 pts) ──────────────────────────────────────
+        let savingsScore = null;
+        let savingsDetail = null;
+        if (monthlyExpenses > 0) {
+            const months = bankBalance / monthlyExpenses;
+            savingsScore = months >= 6 ? 25 : months >= 3 ? 18 : months >= 1 ? 10 : 3;
+            savingsDetail = months.toFixed(1) + ' ' + t('healthScore.emergencyMonths');
+        }
+        result.categories.push({
+            key: 'savings', icon: '💰',
+            score: savingsScore, max: 25,
+            detail: savingsDetail
+        });
+
+        // ── 2. Spending (25 pts) ─────────────────────────────────────
+        let spendingScore = null;
+        let spendingDetail = null;
+        if (profile?.monthlyIncome && monthlyExpenses > 0) {
+            const ratio = monthlyExpenses / profile.monthlyIncome;
+            spendingScore = ratio <= 0.50 ? 25
+                          : ratio <= 0.65 ? 20
+                          : ratio <= 0.75 ? 15
+                          : ratio <= 0.85 ? 8
+                          : ratio <= 0.95 ? 3 : 0;
+            spendingDetail = Math.round(ratio * 100) + '% ' + t('healthScore.spendingRatio');
+        }
+        result.categories.push({
+            key: 'spending', icon: '💸',
+            score: spendingScore, max: 25,
+            detail: spendingDetail
+        });
+
+        // ── 3. Debt (20 pts) ─────────────────────────────────────────
+        let debtScore = null;
+        let debtDetail = null;
+        const hasLoans = loans.length > 0 || loanPayments > 0;
+        if (!hasLoans) {
+            debtScore = 20;
+            debtDetail = t('healthScore.debtFree');
+        } else if (profile?.monthlyIncome) {
+            const ratio = loanPayments / profile.monthlyIncome;
+            debtScore = ratio < 0.10 ? 17
+                      : ratio < 0.20 ? 13
+                      : ratio < 0.30 ? 8
+                      : ratio < 0.40 ? 3 : 0;
+            debtDetail = Math.round(ratio * 100) + '% ' + t('healthScore.ofIncome');
+        }
+        result.categories.push({
+            key: 'debt', icon: '📋',
+            score: debtScore, max: 20,
+            detail: debtDetail
+        });
+
+        // ── 4. Investments (20 pts) ──────────────────────────────────
+        const hasPension = funds.some(f => f.type === 'pension') || profile?.hasPension;
+        const hasTraining = funds.some(f => f.type === 'training') || profile?.hasTrainingFund;
+        const hasStocks = stocks.holdings.length > 0 || Storage.getTotalStocksValue() > 0;
+        const investScore = (hasPension ? 8 : 0) + (hasTraining ? 6 : 0) + (hasStocks ? 6 : 0);
+        const investDetails = [
+            hasPension ? '✓ פנסיה' : '✗ פנסיה',
+            hasTraining ? '✓ השתלמות' : '✗ השתלמות',
+            hasStocks ? '✓ מניות' : '✗ מניות'
+        ].join(' · ');
+        result.categories.push({
+            key: 'investments', icon: '📈',
+            score: investScore, max: 20,
+            detail: investDetails
+        });
+
+        // ── 5. Net Worth (10 pts) ────────────────────────────────────
+        let nwScore = 0;
+        let nwDetail = null;
+        if (netWorth > 0) {
+            nwScore = 5;
+            if (profile?.monthlyIncome && netWorth > profile.monthlyIncome * 12) nwScore = 10;
+        }
+        nwDetail = fmt(netWorth);
+        result.categories.push({
+            key: 'networth', icon: '🏦',
+            score: nwScore, max: 10,
+            detail: nwDetail
+        });
+
+        // ── Total ────────────────────────────────────────────────────
+        // Only sum categories that have a score (not null)
+        result.total = result.categories.reduce((sum, c) => sum + (c.score ?? 0), 0);
+        // Adjust max for N/A categories
+        const availableMax = result.categories.reduce((sum, c) => sum + (c.score !== null ? c.max : 0), 0);
+        if (availableMax < result.maxTotal && availableMax > 0) {
+            // Scale score to 100
+            result.scaledTotal = Math.round((result.total / availableMax) * 100);
+        } else {
+            result.scaledTotal = result.total;
+        }
+
+        return result;
+    }
+
+    function getGrade(score) {
+        if (score >= 85) return { grade: 'A', label: t('healthScore.gradeA') };
+        if (score >= 70) return { grade: 'B', label: t('healthScore.gradeB') };
+        if (score >= 55) return { grade: 'C', label: t('healthScore.gradeC') };
+        if (score >= 40) return { grade: 'D', label: t('healthScore.gradeD') };
+        return { grade: 'F', label: t('healthScore.gradeF') };
+    }
+
+    function getScoreColor(score) {
+        if (score >= 70) return '#10b981';
+        if (score >= 40) return '#f59e0b';
+        return '#ef4444';
+    }
+
+    function getCategoryColor(pct) {
+        if (pct >= 0.75) return '#10b981';
+        if (pct >= 0.45) return '#f59e0b';
+        return '#ef4444';
+    }
+
+    // ─── Render ───────────────────────────────────────────────────────────────
+
+    function renderHealthScore() {
+        const data = calculateScore();
+        const score = data.scaledTotal;
+        const { grade, label } = getGrade(score);
+        const color = getScoreColor(score);
+
+        // Profile banner
+        if (data.missingProfile) {
+            document.getElementById('profileBanner').style.display = 'flex';
+        }
+
+        // Gauge animation
+        const arcLength = Math.PI * 100; // r=100
+        const filled = (score / 100) * arcLength;
+        const gaugeFill = document.getElementById('gaugeFill');
+        gaugeFill.setAttribute('stroke', color);
+        // Animate from 0
+        gaugeFill.setAttribute('stroke-dasharray', `0 ${arcLength + 100}`);
+        requestAnimationFrame(() => {
+            setTimeout(() => {
+                gaugeFill.setAttribute('stroke-dasharray', `${filled} ${arcLength - filled + 100}`);
+            }, 50);
+        });
+
+        document.getElementById('gaugeScoreText').textContent = score;
+        document.getElementById('gaugeScoreText').setAttribute('fill', color);
+        document.getElementById('gaugeGradeText').textContent = `${grade} – ${label}`;
+
+        // Grade badge
+        const badge = document.getElementById('gradeBadge');
+        badge.className = `grade-badge grade-${grade}`;
+        badge.textContent = `${grade} · ${label}`;
+        badge.style.display = 'inline-flex';
+
+        // Score summary
+        const netWorth = Storage.getNetWorth();
+        document.getElementById('scoreSummary').innerHTML = `
+            <div class="score-stat">
+                <div class="val" style="color:${color}">${score}<span style="font-size:1rem;color:#8892b0">/100</span></div>
+                <div class="lbl">${t('healthScore.totalScore')}</div>
+            </div>
+            <div class="score-stat">
+                <div class="val">${fmt(netWorth)}</div>
+                <div class="lbl">${t('dashboard.netWorth') || 'שווי נקי'}</div>
+            </div>
+        `;
+
+        // Category cards
+        const grid = document.getElementById('categoriesGrid');
+        grid.innerHTML = data.categories.map(cat => {
+            const name = t(`healthScore.${cat.key}`);
+            const desc = t(`healthScore.${cat.key}Desc`);
+            const isNA = cat.score === null;
+            const pct = isNA ? 0 : cat.score / cat.max;
+            const catColor = isNA ? '#8892b0' : getCategoryColor(pct);
+            const scoreDisplay = isNA
+                ? `<span style="color:#8892b0">${t('healthScore.na')}</span>`
+                : `<span class="pts" style="color:${catColor}">${cat.score}</span><span class="max">/${cat.max}</span>`;
+            const barWidth = isNA ? 0 : Math.round(pct * 100);
+
+            return `
+                <div class="category-card" style="border-right-color:${catColor}">
+                    <div style="position:absolute;top:0;right:0;width:4px;height:100%;background:${catColor};border-radius:0 16px 16px 0;"></div>
+                    <div class="cat-header">
+                        <div class="cat-icon-name">
+                            <span class="cat-icon">${cat.icon}</span>
+                            <div>
+                                <div class="cat-name">${name}</div>
+                                <div class="cat-desc">${desc}</div>
+                            </div>
+                        </div>
+                        <div class="cat-score">${scoreDisplay}</div>
+                    </div>
+                    <div class="cat-progress-track">
+                        <div class="cat-progress-fill" style="width:0%;background:${catColor}" data-width="${barWidth}"></div>
+                    </div>
+                    ${cat.detail ? `<div class="cat-detail">${cat.detail}</div>` : ''}
+                    ${isNA ? `<div class="cat-na">${t('healthScore.needsIncomeData') || 'נדרש נתון הכנסה בפרופיל'}</div>` : ''}
+                </div>
+            `;
+        }).join('');
+
+        // Animate category bars
+        requestAnimationFrame(() => {
+            setTimeout(() => {
+                grid.querySelectorAll('.cat-progress-fill').forEach(el => {
+                    el.style.width = el.dataset.width + '%';
+                });
+            }, 100);
+        });
+
+        // Recommendations
+        renderRecommendations();
+    }
+
+    function renderRecommendations() {
+        const list = document.getElementById('recommendationsList');
+        let tips = [];
+        try {
+            tips = SmartTips.generateTips()
+                .sort((a, b) => (a.priority ?? 99) - (b.priority ?? 99))
+                .slice(0, 6);
+        } catch (e) { /* SmartTips unavailable */ }
+
+        const lang = (typeof I18n !== 'undefined') ? I18n.currentLanguage : 'he';
+
+        if (tips.length === 0) {
+            list.innerHTML = `<li class="rec-item"><span class="rec-icon">⭐</span><div class="rec-body"><div class="rec-title">${t('healthScore.noRecommendations')}</div></div></li>`;
+            return;
+        }
+
+        list.innerHTML = tips.map(tip => {
+            const title = typeof tip.title === 'object' ? (tip.title[lang] || tip.title.he) : tip.title;
+            const desc = typeof tip.description === 'object' ? (tip.description[lang] || tip.description.he) : tip.description;
+            return `
+                <li class="rec-item rec-severity-${tip.severity || 'blue'}">
+                    <span class="rec-icon">${tip.icon || '💡'}</span>
+                    <div class="rec-body">
+                        <div class="rec-title">${title}</div>
+                        <div class="rec-desc">${desc}</div>
+                    </div>
+                </li>
+            `;
+        }).join('');
+    }
+    </script>
+</body>
+</html>

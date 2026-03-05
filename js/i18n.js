@@ -27,7 +27,8 @@ const I18n = {
                 marketDataUpdate: 'עדכון נתוני שוק',
                 profile: 'פרופיל פיננסי',
                 loans: 'הלוואות',
-                subscriptions: 'תשלומים קבועים'
+                subscriptions: 'תשלומים קבועים',
+                healthScore: 'בריאות פיננסית'
             },
             // Dashboard
             dashboard: {
@@ -1106,6 +1107,34 @@ const I18n = {
                 cloudNotConnected: 'לא מחובר לענן',
                 failedAttempts: 'ניסיונות כושלים (סשן נוכחי)',
                 lastSync: 'סנכרון אחרון'
+            },
+            // Health Score
+            healthScore: {
+                title: 'ציון בריאות פיננסית',
+                subtitle: 'סקירה של המצב הפיננסי שלך',
+                totalScore: 'ציון כולל',
+                outOf: 'מתוך 100',
+                gradeA: 'מצוין',
+                gradeB: 'טוב',
+                gradeC: 'בינוני',
+                gradeD: 'דורש שיפור',
+                gradeF: 'חלש',
+                savings: 'חיסכון',
+                spending: 'הוצאות',
+                debt: 'חוב',
+                investments: 'השקעות',
+                networth: 'שווי נקי',
+                recommendations: 'המלצות לשיפור',
+                noRecommendations: 'כל הכבוד! אין המלצות לשיפור כרגע',
+                completeProfile: 'השלם את הפרופיל הפיננסי לציון מדויק יותר',
+                na: 'לא זמין',
+                emergencyMonths: 'חודשי חירום',
+                savingsDesc: 'כיסוי קרן חירום',
+                spendingDesc: 'יחס הוצאות להכנסה',
+                debtDesc: 'עומס החזרי הלוואות',
+                investmentsDesc: 'גיוון וצמיחה',
+                networthDesc: 'שווי נקי כולל',
+                pts: 'נקודות'
             }
         },
         en: {
@@ -1130,7 +1159,8 @@ const I18n = {
                 marketDataUpdate: 'Market Data Update',
                 profile: 'Financial Profile',
                 loans: 'Loans',
-                subscriptions: 'Recurring Payments'
+                subscriptions: 'Recurring Payments',
+                healthScore: 'Financial Health'
             },
             // Dashboard
             dashboard: {
@@ -2209,6 +2239,34 @@ const I18n = {
                 cloudNotConnected: 'Not connected to cloud',
                 failedAttempts: 'Failed attempts (current session)',
                 lastSync: 'Last sync'
+            },
+            // Health Score
+            healthScore: {
+                title: 'Financial Health Score',
+                subtitle: 'Overview of your financial situation',
+                totalScore: 'Total Score',
+                outOf: 'out of 100',
+                gradeA: 'Excellent',
+                gradeB: 'Good',
+                gradeC: 'Average',
+                gradeD: 'Needs Improvement',
+                gradeF: 'Weak',
+                savings: 'Savings',
+                spending: 'Spending',
+                debt: 'Debt',
+                investments: 'Investments',
+                networth: 'Net Worth',
+                recommendations: 'Recommendations',
+                noRecommendations: 'Great job! No recommendations at the moment',
+                completeProfile: 'Complete your financial profile for a more accurate score',
+                na: 'N/A',
+                emergencyMonths: 'emergency months',
+                savingsDesc: 'Emergency fund coverage',
+                spendingDesc: 'Expense-to-income ratio',
+                debtDesc: 'Loan repayment burden',
+                investmentsDesc: 'Diversification & growth',
+                networthDesc: 'Total net worth',
+                pts: 'pts'
             }
         },
         pt: {
