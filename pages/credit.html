@@ -1681,7 +1681,13 @@
                     App.notify('הקליפבורד לא מכיל נתוני FinSight. לחץ על הסימניה באתר האשראי תחילה.', 'error');
                     return;
                 }
-                var items = data.transactions.map(function(tx) {
+                var foreignCount = 0;
+                var ilsCurrencies = ['', 'ils', 'nis', '₪', 'שקל', 'שח'];
+                var items = data.transactions.filter(function(tx) {
+                    var cur = (tx.currency || '').toLowerCase().trim();
+                    if (cur && !ilsCurrencies.includes(cur)) { foreignCount++; return false; }
+                    return true;
+                }).map(function(tx) {
                     return { date: tx.date, description: tx.description, amount: tx.amount, category: mapBookmarkletCategory(tx.categoryRaw, tx.description), isRecurring: false };
                 });
 
@@ -1704,7 +1710,9 @@
                     return;
                 }
 
-                App.notify('נטענו ' + items.length + ' עסקאות מ-' + (data.sourceName || data.source), 'success');
+                var msg = 'נטענו ' + items.length + ' עסקאות מ-' + (data.sourceName || data.source);
+                if (foreignCount > 0) msg += ' (' + foreignCount + ' עסקאות במטבע זר דולגו)';
+                App.notify(msg, 'success');
                 importExpensesFromSmartImport(items);
             } catch(e) {
                 App.notify('תוכן אינו תקין.', 'error');
