@@ -1691,10 +1691,14 @@
                 var ilsCurrencies = ['', 'ils', 'nis', '₪', 'שקל', 'שח'];
                 function isForeign(tx) {
                     var cur = (tx.currency || '').toLowerCase().trim();
-                    if (cur && !ilsCurrencies.includes(cur)) return true;
-                    // Fallback: Max descriptions end with " BR" / " US" etc. for foreign transactions
+                    if (cur === 'ils' || cur === 'nis' || cur === '₪' || cur === 'שח' || cur === 'שקל') return false;
+                    if (cur && cur !== '') return true;
                     var desc = (tx.description || '').trim();
-                    return /\s[A-Z]{2}$/.test(desc) && !/\sIL$/.test(desc);
+                    // Hebrew text = definitely ILS
+                    if (/[\u0590-\u05FF]/.test(desc)) return false;
+                    // Table-fallback: ends with foreign country code (e.g. " BR", " US")
+                    if (/\s[A-Z]{2}$/.test(desc) && !/\sIL$/.test(desc)) return true;
+                    return false;
                 }
                 var items = data.transactions.filter(function(tx) {
                     if (isForeign(tx)) { foreignCount++; return false; }
