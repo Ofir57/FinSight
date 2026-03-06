@@ -1606,7 +1606,7 @@
             if (r.includes('נסיעות') || r.includes('טיסה') || r.includes('מלון') || r.includes('travel'))
                 return 'entertainment';
 
-            // Fallback: infer from business name
+            // Fallback: infer from business name (Hebrew)
             if (d.includes('שופרסל') || d.includes('רמי לוי') || d.includes('מגה') ||
                 d.includes('ויקטורי') || d.includes('קו קופה') || d.includes('יינות ביתן') ||
                 d.includes('חצי חינם') || d.includes('מינימרקט') ||
@@ -1623,17 +1623,53 @@
             if (d.includes('הוט') || d.includes('yes ') || d.includes('בזק') ||
                 d.includes('סלקום') || d.includes('פרטנר') || d.includes('אורנג') ||
                 d.includes('גולן טלקום') || d.includes('012') ||
-                d.includes('netflix') || d.includes('spotify') || d.includes('apple'))
+                d.includes('חברת החשמל') || d.includes('שטראוס מים'))
                 return 'bills';
             if (d.includes('מכבי') || d.includes('כללית') || d.includes('לאומית') ||
                 d.includes('מאוחדת') || d.includes('בית חולים') || d.includes('רופא') ||
                 d.includes('פארמ') || d.includes('סופר פארם') || d.includes('super-pharm') ||
                 d.includes('אופטיקה') || d.includes('שיניים'))
                 return 'health';
+            if (d.includes('פיטנס') || d.includes('כושר') || d.includes('ספורט') ||
+                d.includes('אייקון'))
+                return 'entertainment';
             if (d.includes('אוניברסיטה') || d.includes('מכללה') || d.includes('גן ') ||
                 d.includes('בית ספר') || d.includes('קורס') || d.includes('udemy') ||
                 d.includes('coursera'))
                 return 'education';
+
+            // Fallback: infer from business name (English / international)
+            if (d.includes('pizza') || d.includes('burger') || d.includes('restaur') ||
+                d.includes('churrasco') || d.includes('salgad') || d.includes('comida') ||
+                d.includes('risoto') || d.includes('hortifr') || d.includes('fogao') ||
+                d.includes('fogão') || d.includes('massas') || d.includes('padaria') ||
+                d.includes('bakery') || d.includes('cafe') || d.includes('coffee') ||
+                d.includes('grill') || d.includes('snack') || d.includes('sushi') ||
+                d.includes('steak') || d.includes('food') || d.includes('mercado') ||
+                d.includes('supermark') || d.includes('oakberry') || d.includes('acai') ||
+                d.includes('dengo') || d.includes('banana') || d.includes('mac restaur') ||
+                d.includes('divino') || d.includes('camelias') || d.includes('cabana'))
+                return 'food';
+            if (d.includes('parking') || d.includes('allpark') || d.includes('uber') ||
+                d.includes('taxi') || d.includes('transfer') || d.includes('airline') ||
+                d.includes('airport') || d.includes('flight') || d.includes('rodoviaria'))
+                return 'transport';
+            if (d.includes('anthropic') || d.includes('claude') || d.includes('netflix') ||
+                d.includes('spotify') || d.includes('apple') || d.includes('google') ||
+                d.includes('microsoft') || d.includes('subscription') || d.includes('energia') ||
+                d.includes('electric') || d.includes('telecom') || d.includes('celular'))
+                return 'bills';
+            if (d.includes('clinica') || d.includes('clinic') || d.includes('drogaria') ||
+                d.includes('farmac') || d.includes('pharmacy') || d.includes('hospital') ||
+                d.includes('medic') || d.includes('saude') || d.includes('dental') ||
+                d.includes('odonto'))
+                return 'health';
+            if (d.includes('shopping') || d.includes('daiso') || d.includes('store') ||
+                d.includes('loja') || d.includes('mall'))
+                return 'shopping';
+            if (d.includes('sport') || d.includes('fitness') || d.includes('academia') ||
+                d.includes('gym') || d.includes('cinema') || d.includes('teatro'))
+                return 'entertainment';
 
             return 'other';
         }
