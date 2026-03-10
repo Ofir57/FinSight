@@ -675,7 +675,7 @@
                 .filter(exp => exp.date.startsWith(selectedMonth));
 
             // Calculate total before filtering
-            const totalAll = monthExpenses.reduce((sum, exp) => sum + exp.amount, 0);
+            const totalAll = monthExpenses.reduce((sum, exp) => sum + ((exp.currency || 'ILS') === 'ILS' ? exp.amount : 0), 0);
 
             // Apply category filter
             if (categoryFilter) {
@@ -692,7 +692,7 @@
             // Sort by date
             monthExpenses.sort((a, b) => new Date(b.date) - new Date(a.date));
 
-            const total = monthExpenses.reduce((sum, exp) => sum + exp.amount, 0);
+            const total = monthExpenses.reduce((sum, exp) => sum + ((exp.currency || 'ILS') === 'ILS' ? exp.amount : 0), 0);
             document.getElementById('monthlyTotal').textContent = I18n.formatCurrency(totalAll);
 
             // Show budget progress
@@ -731,7 +731,7 @@
                         <td>${I18n.t('credit.categories.' + exp.category)}</td>
                         <td>${exp.description}${exp.isRecurring ? ' 🔄' : ''}</td>
                         <td>${foreignInfo}</td>
-                        <td class="negative">${I18n.formatCurrency(exp.amount)}</td>
+                        <td class="negative">${I18n.formatCurrency(exp.amount, exp.currency || 'ILS')}</td>
                         <td>
                             <div class="action-buttons">
                                 <button class="btn btn-secondary btn-sm" onclick="editExpense('${exp.id}')" title="${I18n.t('common.edit')}">✏️</button>
@@ -1687,25 +1687,9 @@
                     App.notify('הקליפבורד לא מכיל נתוני FinSight. לחץ על הסימניה באתר האשראי תחילה.', 'error');
                     return;
                 }
-                var foreignCount = 0;
-                var ilsCurrencies = ['', 'ils', 'nis', '₪', 'שקל', 'שח'];
-                function isForeign(tx) {
-                    var cur = (tx.currency || '').toLowerCase().trim();
-                    var desc = (tx.description || '').trim();
-                    // Hebrew description = definitely ILS
-                    if (/[\u0590-\u05FF]/.test(desc)) return false;
-                    // Explicit non-ILS currency (e.g. BRL from Angular path)
-                    if (cur && cur !== 'ils' && cur !== 'nis' && cur !== '₪' && cur !== 'שח' && cur !== 'שקל') return true;
-                    // Table-fallback: description ends with foreign country code (overrides currency field
-                    // because Max table may show ₪ in another column causing false ILS detection)
-                    if (/\s[A-Z]{2}$/.test(desc) && !/\sIL$/.test(desc)) return true;
-                    return false;
-                }
-                var items = data.transactions.filter(function(tx) {
-                    if (isForeign(tx)) { foreignCount++; return false; }
-                    return true;
-                }).map(function(tx) {
-                    return { date: tx.date, description: tx.description, amount: tx.amount, category: mapBookmarkletCategory(tx.categoryRaw, tx.description), isRecurring: false };
+                var items = data.transactions.map(function(tx) {
+                    var cur = (tx.currency || '').toUpperCase() || 'ILS';
+                    return { date: tx.date, description: tx.description, amount: tx.amount, currency: cur, category: mapBookmarkletCategory(tx.categoryRaw, tx.description), isRecurring: false };
                 });
 
                 // Update categories for already-imported transactions that were saved as 'other'
@@ -1727,9 +1711,7 @@
                     return;
                 }
 
-                var msg = 'נטענו ' + items.length + ' עסקאות מ-' + (data.sourceName || data.source);
-                if (foreignCount > 0) msg += ' (' + foreignCount + ' עסקאות במטבע זר דולגו)';
-                App.notify(msg, 'success');
+                App.notify('נטענו ' + items.length + ' עסקאות מ-' + (data.sourceName || data.source), 'success');
                 importExpensesFromSmartImport(items);
             } catch(e) {
                 App.notify('תוכן אינו תקין.', 'error');
