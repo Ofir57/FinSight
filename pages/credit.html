@@ -719,6 +719,10 @@
                     var rate = exp.exchangeRate || (origAmount > 0 ? (exp.amount / origAmount).toFixed(2) : '');
                     var rateText = rate ? ' (' + rate + ')' : '';
                     foreignInfo = '<span title="' + exp.originalCurrency + rateText + '">' + flag + ' ' + origAmount.toLocaleString() + rateText + '</span>';
+                } else if (exp.currency && exp.currency !== 'ILS') {
+                    // Bookmarklet-imported foreign currency transaction
+                    var flag2 = getCurrencyFlag(exp.currency);
+                    foreignInfo = '<span title="' + exp.currency + '">' + flag2 + ' ' + exp.currency + '</span>';
                 } else if (countryCode && countryCode !== 'IL') {
                     // No currency info but has foreign country in description - check for exchange rate
                     var rateInfo = exp.exchangeRate ? ' (' + exp.exchangeRate + ')' : '';
@@ -1206,7 +1210,7 @@
                 I18n.t('credit.foundTransactions') + ': ' + items.length + ' ' + I18n.t('credit.transactions') + '\n' +
                 I18n.t('credit.totalTransactions') + ': ' + I18n.formatCurrency(total) + '\n\n' +
                 items.slice(0, 3).map(function(e) {
-                    return '  ' + e.date + ' - ' + e.description + ' - ' + I18n.formatCurrency(e.amount);
+                    return '  ' + e.date + ' - ' + e.description + ' - ' + I18n.formatCurrency(e.amount, e.currency || 'ILS');
                 }).join('\n') + '\n' +
                 (items.length > 3 ? '  ...' + I18n.t('credit.moreTransactions') + ' ' + (items.length - 3) : '') + '\n\n' +
                 I18n.t('credit.importTransactions')
