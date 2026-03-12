@@ -720,9 +720,10 @@
                     var rateText = rate ? ' (' + rate + ')' : '';
                     foreignInfo = '<span title="' + exp.originalCurrency + rateText + '">' + flag + ' ' + origAmount.toLocaleString('he-IL', {minimumFractionDigits:2,maximumFractionDigits:2}) + ' ' + exp.originalCurrency + rateText + '</span>';
                 } else if (exp.currency && exp.currency !== 'ILS') {
-                    // Bookmarklet-imported foreign currency transaction
+                    // Bookmarklet-imported foreign currency transaction (pending, original currency)
                     var flag2 = getCurrencyFlag(exp.currency);
-                    foreignInfo = '<span title="' + exp.currency + '">' + flag2 + ' ' + exp.currency + '</span>';
+                    var fmtAmt2 = exp.amount.toLocaleString('he-IL', {minimumFractionDigits:2, maximumFractionDigits:2});
+                    foreignInfo = '<span title="' + exp.currency + '">' + flag2 + ' ' + fmtAmt2 + ' ' + exp.currency + '</span>';
                 } else if (countryCode && countryCode !== 'IL') {
                     // No currency info but has foreign country in description
                     var rateInfo = exp.exchangeRate ? ' (' + exp.exchangeRate + ')' : '';
