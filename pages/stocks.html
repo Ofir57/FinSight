@@ -1154,7 +1154,7 @@
                             <td class="col-static">${h.quantity.toLocaleString()}</td>
                             <td class="col-static">${currencySymbol}${h.avgPrice.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
                             <td class="col-static">₪${costILS.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}</td>
-                            <td class="col-dynamic">${currencySymbol}${currentPrice.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                            <td class="col-dynamic">${cached.currentPrice ? `${currencySymbol}${cached.currentPrice.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}` : h.valueILS > 0 ? `<span style="color:var(--color-text-secondary);font-size:0.85rem;">מתעדכן...</span>` : `${currencySymbol}${currentPrice.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`}</td>
                             <td class="col-dynamic">${dailyChangeDisplay}</td>
                             <td class="col-dynamic">${ma150Display}</td>
                             <td class="col-dynamic">${trendDisplay}</td>

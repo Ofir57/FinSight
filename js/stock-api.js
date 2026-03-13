@@ -2,7 +2,11 @@
  * Stock API Module - Fetches stock data from Yahoo Finance + TASE
  */
 const StockAPI = {
-    YAHOO_URL: 'https://query2.finance.yahoo.com/v8/finance/chart',
+    YAHOO_URLS: [
+        'https://query1.finance.yahoo.com/v8/finance/chart',
+        'https://query2.finance.yahoo.com/v8/finance/chart',
+    ],
+    YAHOO_URL: 'https://query1.finance.yahoo.com/v8/finance/chart',
     TASE_API_URL: 'https://api.tase.co.il/api',
     PROXY_URLS: [
         'https://api.allorigins.win/raw?url=',
@@ -214,10 +218,15 @@ const StockAPI = {
     async _fetchYahooHistorical(symbol) {
         const detectedMarket = this.detectMarket(symbol);
         const formattedSymbol = this.formatSymbol(symbol, detectedMarket);
-        const yahooUrl = `${this.YAHOO_URL}/${encodeURIComponent(formattedSymbol)}?interval=1d&range=1y&includePrePost=false`;
-        const data = await this._fetchWithFallback(yahooUrl);
-
-        if (!data.chart || !data.chart.result || data.chart.result.length === 0) {
+        let data = null;
+        for (const base of this.YAHOO_URLS) {
+            const yahooUrl = `${base}/${encodeURIComponent(formattedSymbol)}?interval=1d&range=1y&includePrePost=false`;
+            try {
+                data = await this._fetchWithFallback(yahooUrl);
+                if (data?.chart?.result?.length > 0) break;
+            } catch (e) {}
+        }
+        if (!data?.chart?.result?.length) {
             throw new Error('No historical data found');
         }
 
@@ -289,12 +298,21 @@ const StockAPI = {
             }
         }
 
-        // Yahoo Finance (primary for US, fallback for IL)
+        // Yahoo Finance (primary for US, fallback for IL) — try both query1 and query2
         try {
-            const yahooUrl = `${this.YAHOO_URL}/${encodeURIComponent(formattedSymbol)}?interval=1d&range=1y&includePrePost=false`;
-            const data = await this._fetchWithFallback(yahooUrl);
+            let data = null;
+            for (const base of this.YAHOO_URLS) {
+                const yahooUrl = `${base}/${encodeURIComponent(formattedSymbol)}?interval=1d&range=1y&includePrePost=false`;
+                try {
+                    data = await this._fetchWithFallback(yahooUrl);
+                    if (data?.chart?.result?.length > 0) break;
+                } catch (e) {
+                    console.warn(`Yahoo ${base} failed:`, e.message);
+                }
+            }
+            if (!data) throw new Error('All Yahoo endpoints failed');
 
-            if (!data.chart || !data.chart.result || data.chart.result.length === 0) {
+            if (!data?.chart?.result?.length) {
                 throw new Error('No data found for symbol');
             }
 
@@ -510,10 +528,15 @@ const StockAPI = {
      */
     async fetchBenchmarkData(symbol, range = '1y') {
         try {
-            const yahooUrl = `${this.YAHOO_URL}/${encodeURIComponent(symbol)}?interval=1d&range=${range}&includePrePost=false`;
-            const data = await this._fetchWithFallback(yahooUrl);
-
-            if (!data.chart || !data.chart.result || data.chart.result.length === 0) {
+            let data = null;
+            for (const base of this.YAHOO_URLS) {
+                const yahooUrl = `${base}/${encodeURIComponent(symbol)}?interval=1d&range=${range}&includePrePost=false`;
+                try {
+                    data = await this._fetchWithFallback(yahooUrl);
+                    if (data?.chart?.result?.length > 0) break;
+                } catch (e) {}
+            }
+            if (!data?.chart?.result?.length) {
                 throw new Error('No data found for benchmark');
             }
 
