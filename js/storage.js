@@ -364,9 +364,6 @@ const Storage = {
         const holding = data.holdings.find(h => h.symbol === symbol);
         if (holding) {
             holding.currentPrice = currentPrice;
-            // Clear stale broker-import snapshots so fresh price is used for display
-            delete holding.valueILS;
-            delete holding.profitILS;
             this.saveStocks(data);
             return holding;
         }

@@ -1019,11 +1019,16 @@
                     let valueILS, profitILS, profitInCurrency;
 
                     if (cached.currentPrice) {
-                        // Fresh live price — always recalculate to reflect current market
-                        const valueInCurrency = currentPrice * h.quantity;
-                        valueILS = valueInCurrency * rate;
-                        profitInCurrency = (currentPrice - h.avgPrice) * h.quantity;
-                        profitILS = profitInCurrency * rate;
+                        // Fresh live price — recalculate current value
+                        valueILS = currentPrice * h.quantity * rate;
+                        if (h.valueILS > 0 && h.profitILS !== undefined) {
+                            // Use broker's original ILS cost as baseline (avoids agora/currency issues)
+                            const costILS = h.valueILS - h.profitILS;
+                            profitILS = valueILS - costILS;
+                        } else {
+                            profitILS = (currentPrice - h.avgPrice) * h.quantity * rate;
+                        }
+                        profitInCurrency = profitILS / rate;
                     } else if (h.valueILS && h.valueILS > 0) {
                         // No live price yet — use imported broker snapshot as fallback
                         valueILS = h.valueILS;
@@ -1902,15 +1907,17 @@
 
                 let valueILS, profitILS;
                 if (cached.currentPrice) {
-                    const valueInCurrency = currentPrice * h.quantity;
-                    valueILS = valueInCurrency * rate;
-                    profitILS = (currentPrice - h.avgPrice) * h.quantity * rate;
+                    valueILS = currentPrice * h.quantity * rate;
+                    if (h.valueILS > 0 && h.profitILS !== undefined) {
+                        profitILS = valueILS - (h.valueILS - h.profitILS);
+                    } else {
+                        profitILS = (currentPrice - h.avgPrice) * h.quantity * rate;
+                    }
                 } else if (h.valueILS && h.valueILS > 0) {
                     valueILS = h.valueILS;
                     profitILS = h.profitILS || 0;
                 } else {
-                    const valueInCurrency = currentPrice * h.quantity;
-                    valueILS = valueInCurrency * rate;
+                    valueILS = currentPrice * h.quantity * rate;
                     profitILS = (currentPrice - h.avgPrice) * h.quantity * rate;
                 }
                 const costILS = valueILS - profitILS;
