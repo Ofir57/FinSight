@@ -185,7 +185,8 @@ const StockAPI = {
         // 1. Read from GitHub Actions daily cache (tase-prices.json)
         //    Updated server-side so no CORS issues. Best for mutual funds (numeric IDs).
         try {
-            const res = await fetch(`./data/tase-prices.json?v=${Math.floor(Date.now() / 300000)}`);
+            const dataBase = location.pathname.includes('/pages/') ? '../' : './';
+            const res = await fetch(`${dataBase}data/tase-prices.json?v=${Math.floor(Date.now() / 300000)}`);
             if (res.ok) {
                 const cache = await res.json();
                 const cached = cache[String(id)];
@@ -259,7 +260,8 @@ const StockAPI = {
         // Check GitHub Actions daily price cache (works for any symbol stored there)
         if (detectedMarket !== 'IL') {
             try {
-                const res = await fetch(`./data/tase-prices.json?v=${Math.floor(Date.now() / 300000)}`);
+                const dataBase = location.pathname.includes('/pages/') ? '../' : './';
+                const res = await fetch(`${dataBase}data/tase-prices.json?v=${Math.floor(Date.now() / 300000)}`);
                 if (res.ok) {
                     const cache = await res.json();
                     const entry = cache[formattedSymbol] || cache[symbol.toUpperCase()];
