@@ -54,7 +54,7 @@ const StockAPI = {
             const proxy = this.PROXY_URLS[proxyIndex];
             const url = `${proxy}${encodeURIComponent(targetUrl)}`;
             try {
-                const response = await fetch(url, { signal: AbortSignal.timeout(10000) });
+                const response = await fetch(url, { signal: AbortSignal.timeout(5000) });
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 const data = await response.json();
                 this._currentProxyIndex = proxyIndex;
@@ -218,17 +218,12 @@ const StockAPI = {
     async _fetchYahooHistorical(symbol) {
         const detectedMarket = this.detectMarket(symbol);
         const formattedSymbol = this.formatSymbol(symbol, detectedMarket);
-        let data = null;
-        for (const base of this.YAHOO_URLS) {
-            const yahooUrl = `${base}/${encodeURIComponent(formattedSymbol)}?interval=1d&range=1y&includePrePost=false`;
-            try {
-                data = await this._fetchWithFallback(yahooUrl);
-                if (data?.chart?.result?.length > 0) break;
-            } catch (e) {}
-        }
-        if (!data?.chart?.result?.length) {
-            throw new Error('No historical data found');
-        }
+        const suffix = `/${encodeURIComponent(formattedSymbol)}?interval=1d&range=1y&includePrePost=false`;
+        const data = await Promise.any(
+            this.YAHOO_URLS.map(base => this._fetchWithFallback(base + suffix)
+                .then(d => { if (!d?.chart?.result?.length) throw new Error('empty'); return d; })
+            )
+        ).catch(() => { throw new Error('No historical data found'); });
 
         const result = data.chart.result[0];
         const quotes = result.indicators.quote[0];
@@ -298,19 +293,14 @@ const StockAPI = {
             }
         }
 
-        // Yahoo Finance (primary for US, fallback for IL) — try both query1 and query2
+        // Yahoo Finance (primary for US, fallback for IL) — race query1 vs query2 for speed
         try {
-            let data = null;
-            for (const base of this.YAHOO_URLS) {
-                const yahooUrl = `${base}/${encodeURIComponent(formattedSymbol)}?interval=1d&range=1y&includePrePost=false`;
-                try {
-                    data = await this._fetchWithFallback(yahooUrl);
-                    if (data?.chart?.result?.length > 0) break;
-                } catch (e) {
-                    console.warn(`Yahoo ${base} failed:`, e.message);
-                }
-            }
-            if (!data) throw new Error('All Yahoo endpoints failed');
+            const suffix = `/${encodeURIComponent(formattedSymbol)}?interval=1d&range=1y&includePrePost=false`;
+            const data = await Promise.any(
+                this.YAHOO_URLS.map(base => this._fetchWithFallback(base + suffix)
+                    .then(d => { if (!d?.chart?.result?.length) throw new Error('empty'); return d; })
+                )
+            ).catch(() => { throw new Error('All Yahoo endpoints failed'); });
 
             if (!data?.chart?.result?.length) {
                 throw new Error('No data found for symbol');

@@ -1022,9 +1022,14 @@
                         // Fresh live price — recalculate current value
                         valueILS = currentPrice * h.quantity * rate;
                         if (h.valueILS > 0 && h.profitILS !== undefined) {
-                            // Use broker's original ILS cost as baseline (avoids agora/currency issues)
                             const costILS = h.valueILS - h.profitILS;
-                            profitILS = valueILS - costILS;
+                            // Validate costILS — bad column mapping can produce negative/insane cost
+                            if (costILS > 0 && costILS < h.valueILS * 20) {
+                                profitILS = valueILS - costILS;
+                            } else {
+                                // Fallback: show P&L as change since import
+                                profitILS = valueILS - h.valueILS;
+                            }
                         } else {
                             profitILS = (currentPrice - h.avgPrice) * h.quantity * rate;
                         }
@@ -1909,7 +1914,10 @@
                 if (cached.currentPrice) {
                     valueILS = currentPrice * h.quantity * rate;
                     if (h.valueILS > 0 && h.profitILS !== undefined) {
-                        profitILS = valueILS - (h.valueILS - h.profitILS);
+                        const costILS = h.valueILS - h.profitILS;
+                        profitILS = (costILS > 0 && costILS < h.valueILS * 20)
+                            ? valueILS - costILS
+                            : valueILS - h.valueILS;
                     } else {
                         profitILS = (currentPrice - h.avgPrice) * h.quantity * rate;
                     }
