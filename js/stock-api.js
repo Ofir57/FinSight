@@ -305,14 +305,25 @@ const StockAPI = {
             }
         }
 
-        // Yahoo Finance (primary for US, fallback for IL) — race query1 vs query2 for speed
+        // Yahoo Finance — try direct first (Yahoo supports CORS), then fall back to proxies
         try {
             const suffix = `/${encodeURIComponent(formattedSymbol)}?interval=1d&range=1y&includePrePost=false`;
+
+            // 1. Try both Yahoo endpoints directly (no proxy) — fast and works for most users
+            const directFetch = url => fetch(url, { signal: AbortSignal.timeout(8000) })
+                .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
+                .then(d => { if (!d?.chart?.result?.length) throw new Error('empty'); return d; });
+
             const data = await Promise.any(
-                this.YAHOO_URLS.map(base => this._fetchWithFallback(base + suffix)
-                    .then(d => { if (!d?.chart?.result?.length) throw new Error('empty'); return d; })
-                )
-            ).catch(() => { throw new Error('All Yahoo endpoints failed'); });
+                this.YAHOO_URLS.map(base => directFetch(base + suffix))
+            ).catch(() =>
+                // 2. Direct failed — try via CORS proxies as last resort
+                Promise.any(
+                    this.YAHOO_URLS.map(base => this._fetchWithFallback(base + suffix)
+                        .then(d => { if (!d?.chart?.result?.length) throw new Error('empty'); return d; })
+                    )
+                ).catch(() => { throw new Error('All Yahoo endpoints failed'); })
+            );
 
             if (!data?.chart?.result?.length) {
                 throw new Error('No data found for symbol');
