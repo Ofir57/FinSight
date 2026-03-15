@@ -114,7 +114,7 @@ const StockAPI = {
         for (const url of endpoints) {
             // Attempt 1: plain GET — no custom headers, no CORS preflight
             try {
-                const r = await fetch(url, { signal: AbortSignal.timeout(8000) });
+                const r = await fetch(url, { signal: AbortSignal.timeout(2000) });
                 if (r.ok) {
                     const data = await r.json();
                     console.error(`[TASE Maya] plain GET success from ${url}:`, JSON.stringify(data).slice(0, 600));
@@ -132,7 +132,7 @@ const StockAPI = {
             try {
                 const r = await fetch(url, {
                     headers: { 'X-Maya-With': 'allow' },
-                    signal: AbortSignal.timeout(8000)
+                    signal: AbortSignal.timeout(2000)
                 });
                 if (r.ok) {
                     const data = await r.json();
@@ -201,14 +201,9 @@ const StockAPI = {
         const mayaResult = await this._fetchMayaDirectly(id);
         if (mayaResult) return mayaResult;
 
-        // 3. Fall back to api.tase.co.il via CORS proxy
-        const url = `${this.TASE_API_URL}/security/data?securityId=${id}`;
-        const data = await this._fetchWithFallback(url);
-        console.log(`[TASE proxy] Raw response for ${symbol}:`, JSON.stringify(data).slice(0, 300));
-
-        const parsed = this._parseMayaPrice(data);
-        if (!parsed) throw new Error('No price in TASE response');
-        return parsed;
+        // No more fallbacks — TASE APIs are geo-blocked outside Israel and proxies are broken.
+        // User must update manually via the update-price modal.
+        throw new Error(`TASE ${id}: not in cache, update manually`);
     },
 
     /**
