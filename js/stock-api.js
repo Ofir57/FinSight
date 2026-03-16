@@ -2,6 +2,10 @@
  * Stock API Module - Fetches stock data from Yahoo Finance + TASE
  */
 const StockAPI = {
+    // Cloudflare Worker proxy — set your worker URL here after deploying workers/yahoo-proxy.js
+    // e.g. 'https://finsight-yahoo.YOUR-SUBDOMAIN.workers.dev/v8/finance/chart'
+    CF_WORKER_URL: '',
+
     YAHOO_URLS: [
         'https://query1.finance.yahoo.com/v8/finance/chart',
         'https://query2.finance.yahoo.com/v8/finance/chart',
@@ -305,19 +309,24 @@ const StockAPI = {
             }
         }
 
-        // Yahoo Finance — try direct first (Yahoo supports CORS), then fall back to proxies
+        // Yahoo Finance — Worker proxy → direct → CORS proxies
         try {
             const suffix = `/${encodeURIComponent(formattedSymbol)}?interval=1d&range=1y&includePrePost=false`;
 
-            // 1. Try both Yahoo endpoints directly (no proxy) — fast and works for most users
-            const directFetch = url => fetch(url, { signal: AbortSignal.timeout(8000) })
+            const tryFetch = url => fetch(url, { signal: AbortSignal.timeout(8000) })
                 .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
                 .then(d => { if (!d?.chart?.result?.length) throw new Error('empty'); return d; });
 
-            const data = await Promise.any(
-                this.YAHOO_URLS.map(base => directFetch(base + suffix))
-            ).catch(() =>
-                // 2. Direct failed — try via CORS proxies as last resort
+            // 1. Cloudflare Worker (fastest, no CORS issues, works for all users)
+            const workerPromise = this.CF_WORKER_URL
+                ? tryFetch(this.CF_WORKER_URL + suffix)
+                : Promise.reject(new Error('no worker'));
+
+            // 2. Direct Yahoo (blocked by CORS on most browsers, but try anyway)
+            const directPromise = Promise.any(this.YAHOO_URLS.map(base => tryFetch(base + suffix)));
+
+            const data = await Promise.any([workerPromise, directPromise]).catch(() =>
+                // 3. Last resort: CORS proxies (usually broken)
                 Promise.any(
                     this.YAHOO_URLS.map(base => this._fetchWithFallback(base + suffix)
                         .then(d => { if (!d?.chart?.result?.length) throw new Error('empty'); return d; })
