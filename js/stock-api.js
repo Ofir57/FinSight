@@ -362,15 +362,24 @@ const StockAPI = {
 
             const closePrices = historicalData.map(d => d.close);
 
-            const currentPrice = meta.regularMarketPrice;
+            // GBp/GBX = pence — Yahoo returns UK stocks in pence, convert to GBP (÷100)
+            const rawCurrency = meta.currency || 'USD';
+            const isGBX = rawCurrency === 'GBp' || rawCurrency === 'GBX';
+            const priceScale = isGBX ? 0.01 : 1;
+            const currency = isGBX ? 'GBP' : rawCurrency;
+
+            const currentPrice = meta.regularMarketPrice * priceScale;
             // previousClose from meta is unreliable (often missing or shows chart start price)
             // Use second-to-last close from historical data instead
-            const previousClose = closePrices.length >= 2 ? closePrices[closePrices.length - 2] : meta.previousClose || meta.chartPreviousClose;
-            const currency = meta.currency || 'USD';
-            const ma150 = this.calculateMA150(closePrices);
+            const scaledClosePrices = closePrices.map(p => p * priceScale);
+            const previousClose = scaledClosePrices.length >= 2
+                ? scaledClosePrices[scaledClosePrices.length - 2]
+                : (meta.previousClose || meta.chartPreviousClose || 0) * priceScale;
+            const ma150 = this.calculateMA150(scaledClosePrices);
 
-            // Calculate MA150 series for charting
-            const ma150Series = this.calculateMA150Series(historicalData);
+            // Scale historical data for charting
+            const scaledHistoricalData = historicalData.map(d => ({ ...d, close: d.close * priceScale }));
+            const ma150Series = this.calculateMA150Series(scaledHistoricalData);
 
             // Calculate price change
             const priceChange = currentPrice - previousClose;
@@ -396,8 +405,8 @@ const StockAPI = {
                 ma150,
                 ma150Position,
                 ma150PositionPercent,
-                historicalPrices: closePrices,
-                historicalData,
+                historicalPrices: scaledClosePrices,
+                historicalData: scaledHistoricalData,
                 ma150Series,
                 lastUpdate: new Date().toISOString(),
                 success: true
