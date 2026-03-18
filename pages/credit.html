@@ -416,6 +416,10 @@
                             <span>📋</span>
                             <span>ייבוא מסימניה</span>
                         </button>
+                        <button class="btn btn-secondary btn-sm" onclick="detectRecurringPayments()">
+                            <span>🔄</span>
+                            <span>זהה תשלומים קבועים</span>
+                        </button>
                         <button class="btn btn-danger btn-sm" onclick="deleteAllExpenses()">
                             <span>🗑️</span>
                             <span data-i18n="credit.deleteAll">מחק הכל</span>
@@ -1812,6 +1816,113 @@
                 var text = document.getElementById('__bklt_ta').value;
                 modal.remove();
                 processBookmarkletText(text);
+            };
+        }
+
+        function detectRecurringPayments() {
+            var allExpenses = Storage.getCreditCards().expenses;
+            if (!allExpenses.length) {
+                App.notify('אין הוצאות לניתוח', 'warning');
+                return;
+            }
+
+            // Group by normalized description
+            var groups = {};
+            allExpenses.forEach(function(e) {
+                var key = e.description.trim().toLowerCase();
+                if (!groups[key]) groups[key] = { description: e.description, category: e.category, entries: [] };
+                groups[key].entries.push(e);
+            });
+
+            // Find candidates: appear in 2+ distinct months, median amount
+            var existingSubs = Storage.getSubscriptions().map(function(s) {
+                return s.name.trim().toLowerCase();
+            });
+
+            var candidates = [];
+            Object.values(groups).forEach(function(g) {
+                var months = [...new Set(g.entries.map(function(e) {
+                    return e.date.substring(0, 7); // YYYY-MM
+                }))];
+                if (months.length < 2) return;
+
+                // Calculate median amount
+                var amounts = g.entries.map(function(e) { return e.amount; }).sort(function(a, b) { return a - b; });
+                var median = amounts[Math.floor(amounts.length / 2)];
+
+                // Check amounts are consistent (max 30% variation from median)
+                var consistent = amounts.every(function(a) { return Math.abs(a - median) / median < 0.3; });
+                if (!consistent) return;
+
+                // Skip if already a subscription
+                if (existingSubs.includes(g.description.trim().toLowerCase())) return;
+
+                // Map category
+                var subCategory = 'fixed_bills';
+                if (['entertainment', 'education'].includes(g.category)) subCategory = 'subscriptions';
+                if (g.category === 'health') subCategory = 'insurance';
+
+                candidates.push({
+                    description: g.description,
+                    amount: Math.round(median * 100) / 100,
+                    months: months.length,
+                    category: subCategory
+                });
+            });
+
+            if (!candidates.length) {
+                App.notify('לא נמצאו תשלומים קבועים חדשים', 'info');
+                return;
+            }
+
+            // Sort by amount descending
+            candidates.sort(function(a, b) { return b.amount - a.amount; });
+
+            // Show modal
+            var prev = document.getElementById('__rec_modal');
+            if (prev) prev.remove();
+
+            var modal = document.createElement('div');
+            modal.id = '__rec_modal';
+            modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;';
+
+            var rows = candidates.map(function(c, i) {
+                return '<label style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--color-border);cursor:pointer;">' +
+                    '<input type="checkbox" checked data-i="' + i + '" style="width:16px;height:16px;accent-color:var(--color-credit);">' +
+                    '<span style="flex:1;">' + c.description + '</span>' +
+                    '<span style="color:var(--color-text-secondary);font-size:0.8rem;">' + c.months + ' חודשים</span>' +
+                    '<span style="font-weight:600;min-width:70px;text-align:left;">₪' + c.amount.toLocaleString() + '</span>' +
+                    '</label>';
+            }).join('');
+
+            modal.innerHTML = '<div style="background:var(--color-bg-card);border:1px solid var(--color-border);border-radius:16px;padding:24px;width:100%;max-width:480px;max-height:85vh;overflow-y:auto;direction:rtl;">' +
+                '<div style="font-weight:700;font-size:1.1rem;margin-bottom:6px;">🔄 תשלומים קבועים שזוהו</div>' +
+                '<div style="font-size:0.85rem;color:var(--color-text-secondary);margin-bottom:16px;">נמצאו ' + candidates.length + ' תשלומים שחוזרים על עצמם. סמן את אלה שתרצה להוסיף לתשלומים קבועים:</div>' +
+                '<div id="__rec_rows">' + rows + '</div>' +
+                '<div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px;">' +
+                '<button onclick="document.getElementById(\'__rec_modal\').remove()" style="padding:8px 16px;background:transparent;color:var(--color-text);border:1px solid var(--color-border);border-radius:8px;cursor:pointer;">ביטול</button>' +
+                '<button id="__rec_save" style="padding:8px 20px;background:var(--color-credit);color:white;border:none;border-radius:8px;cursor:pointer;font-weight:600;">הוסף לתשלומים קבועים</button>' +
+                '</div></div>';
+
+            document.body.appendChild(modal);
+
+            document.getElementById('__rec_save').onclick = function() {
+                var checkboxes = document.querySelectorAll('#__rec_rows input[type=checkbox]:checked');
+                var added = 0;
+                checkboxes.forEach(function(cb) {
+                    var c = candidates[parseInt(cb.dataset.i)];
+                    Storage.addSubscription({
+                        name: c.description,
+                        amount: c.amount,
+                        category: c.category,
+                        frequency: 'monthly',
+                        active: true,
+                        nextPayment: new Date().toISOString().substring(0, 10)
+                    });
+                    added++;
+                });
+                modal.remove();
+                if (added > 0) App.notify('נוספו ' + added + ' תשלומים קבועים', 'success');
             };
         }
 
