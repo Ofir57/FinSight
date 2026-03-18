@@ -2905,82 +2905,104 @@
         }
 
         // Build portfolio time-series from transaction history
-        function buildPortfolioTimeSeries(referenceDates, stockData) {
-            const transactions = (stockData.transactions || [])
-                .filter(t => t.date)
-                .sort((a, b) => a.date.localeCompare(b.date));
+        async function buildPortfolioTimeSeries(referenceDates, stockData, range) {
             const holdings = stockData.holdings || [];
+            if (holdings.length === 0) return { series: referenceDates.map(() => 0), finalReturn: 0 };
 
-            // Current portfolio totals
-            const totalCost = holdings.reduce((sum, h) => {
-                const rate = h.currency === 'ILS' ? 1 : (currencyRates[h.currency] || currencyRates.USD || 3.65);
-                return sum + ((h.avgPrice || 0) * (h.quantity || 0) * rate);
-            }, 0);
+            const usdRate = currencyRates.USD || 3.65;
+
+            const getRate = (currency) => currency === 'ILS' ? 1 : (currencyRates[currency] || usdRate);
+
+            const totalCost = holdings.reduce((sum, h) =>
+                sum + (h.avgPrice || 0) * (h.quantity || 0) * getRate(h.currency), 0);
             const totalValue = holdings.reduce((sum, h) => {
-                if (h.valueILS && h.valueILS > 0) return sum + h.valueILS;
-                const price = h.currentPrice || h.avgPrice || 0;
-                const rate = h.currency === 'ILS' ? 1 : (currencyRates[h.currency] || currencyRates.USD || 3.65);
-                return sum + (price * (h.quantity || 0) * rate);
+                if (h.valueILS > 0) return sum + h.valueILS;
+                return sum + (h.currentPrice || h.avgPrice || 0) * (h.quantity || 0) * getRate(h.currency);
             }, 0);
 
             if (totalCost <= 0) return { series: referenceDates.map(() => 0), finalReturn: 0 };
 
-            const currentReturn = ((totalValue / totalCost) - 1); // as fraction
-            const today = new Date().toISOString().split('T')[0];
-            const periodStart = referenceDates.length > 0 ? new Date(referenceDates[0]).toISOString().split('T')[0] : today;
+            const currentReturn = ((totalValue / totalCost) - 1) * 100;
 
-            // Build cumulative invested capital at each date
-            // For each date, track how much was invested cumulatively
-            let cumulativeInvested = 0;
-            const investedByDate = []; // [{date, cumInvested}]
-            for (const tx of transactions) {
-                if (tx.type === 'buy') {
-                    cumulativeInvested += (tx.price || 0) * (tx.quantity || 0);
-                } else if (tx.type === 'sell') {
-                    cumulativeInvested -= (tx.price || 0) * (tx.quantity || 0);
-                    if (cumulativeInvested < 0) cumulativeInvested = 0;
+            // --- Method 1: transaction-based interpolation (when transactions exist) ---
+            const transactions = (stockData.transactions || [])
+                .filter(t => t.date)
+                .sort((a, b) => a.date.localeCompare(b.date));
+
+            if (transactions.length >= 2) {
+                let cumulativeInvested = 0;
+                const investedByDate = [];
+                for (const tx of transactions) {
+                    if (tx.type === 'buy') cumulativeInvested += (tx.price || 0) * (tx.quantity || 0);
+                    else if (tx.type === 'sell') cumulativeInvested = Math.max(0, cumulativeInvested - (tx.price || 0) * (tx.quantity || 0));
+                    investedByDate.push({ date: tx.date, cumInvested: cumulativeInvested });
                 }
-                investedByDate.push({ date: tx.date, cumInvested: cumulativeInvested });
+                const today = new Date().toISOString().split('T')[0];
+                const periodStart = referenceDates[0] ? new Date(referenceDates[0]).toISOString().split('T')[0] : today;
+                const series = [];
+                let txIdx = 0, investedAtDate = 0;
+                for (const refDate of referenceDates) {
+                    const refDateStr = new Date(refDate).toISOString().split('T')[0];
+                    while (txIdx < investedByDate.length && investedByDate[txIdx].date <= refDateStr) {
+                        investedAtDate = investedByDate[txIdx++].cumInvested;
+                    }
+                    if (investedAtDate <= 0) { series.push(0); continue; }
+                    const investedFraction = Math.min(investedAtDate / totalCost, 1);
+                    const periodStartMs = new Date(periodStart).getTime();
+                    const todayMs = new Date(today).getTime();
+                    const timeProgress = todayMs > periodStartMs
+                        ? Math.min((new Date(refDate).getTime() - periodStartMs) / (todayMs - periodStartMs), 1) : 1;
+                    series.push((currentReturn / 100) * investedFraction * timeProgress * 100);
+                }
+                return { series, finalReturn: currentReturn };
             }
 
-            // For each reference date, find cumulative invested at that point
-            // Then calculate proportional return
-            const series = [];
-            const finalCumInvested = totalCost; // total cost basis of current holdings
-            let txIdx = 0;
-            let investedAtDate = 0;
+            // --- Method 2: weighted historical prices per holding (no transactions) ---
+            const totalVal = totalValue;
+            const holdingsWithWeight = holdings
+                .filter(h => h.symbol)
+                .map(h => {
+                    const val = h.valueILS > 0 ? h.valueILS
+                        : (h.currentPrice || h.avgPrice || 0) * (h.quantity || 0) * getRate(h.currency);
+                    return { symbol: h.symbol, weight: totalVal > 0 ? val / totalVal : 0 };
+                })
+                .filter(h => h.weight > 0.001);
 
-            for (const refDate of referenceDates) {
-                const refDateStr = new Date(refDate).toISOString().split('T')[0];
+            // Fetch historical data for each holding in parallel (with cache)
+            const histMap = {};
+            await Promise.all(holdingsWithWeight.map(async h => {
+                try {
+                    const cached = getCachedBenchmark(h.symbol, range);
+                    if (cached && cached.success && cached.historicalData.length > 0) {
+                        histMap[h.symbol] = cached.historicalData; return;
+                    }
+                    const result = await StockAPI.fetchBenchmarkData(h.symbol, range);
+                    if (result.success && result.historicalData.length > 0) {
+                        setCachedBenchmark(h.symbol, range, result);
+                        histMap[h.symbol] = result.historicalData;
+                    }
+                } catch(e) {}
+            }));
 
-                // Advance through transactions up to this date
-                while (txIdx < investedByDate.length && investedByDate[txIdx].date <= refDateStr) {
-                    investedAtDate = investedByDate[txIdx].cumInvested;
-                    txIdx++;
+            // Build weighted return series
+            const series = referenceDates.map(refDate => {
+                const refStr = new Date(refDate).toISOString().split('T')[0];
+                let weightedReturn = 0, usedWeight = 0;
+                for (const h of holdingsWithWeight) {
+                    const hist = histMap[h.symbol];
+                    if (!hist || hist.length < 2) continue;
+                    const startPrice = hist[0].close;
+                    let closest = hist[0];
+                    for (const pt of hist) {
+                        if (pt.date <= refStr) closest = pt; else break;
+                    }
+                    weightedReturn += ((closest.close / startPrice) - 1) * 100 * h.weight;
+                    usedWeight += h.weight;
                 }
+                return usedWeight > 0.05 ? weightedReturn / usedWeight * usedWeight : 0;
+            });
 
-                // If before any transactions, portfolio return is 0
-                if (investedAtDate <= 0) {
-                    series.push(0);
-                    continue;
-                }
-
-                // Proportion of current portfolio that was invested by this date
-                const investedFraction = Math.min(investedAtDate / finalCumInvested, 1);
-
-                // Interpolate: early on, return is closer to 0; by today, it equals currentReturn
-                // Time progress through the period
-                const periodStartMs = new Date(periodStart).getTime();
-                const todayMs = new Date(today).getTime();
-                const refMs = new Date(refDate).getTime();
-                const timeProgress = todayMs > periodStartMs ? Math.min((refMs - periodStartMs) / (todayMs - periodStartMs), 1) : 1;
-
-                // Portfolio return at this point: scales with both invested fraction and time
-                const returnAtDate = currentReturn * investedFraction * timeProgress * 100;
-                series.push(returnAtDate);
-            }
-
-            return { series, finalReturn: currentReturn * 100 };
+            return { series, finalReturn: currentReturn };
         }
 
         // Load guard to prevent race conditions between concurrent calls
@@ -3113,7 +3135,7 @@
                     }
                 } else {
                     // Whole portfolio
-                    const result = buildPortfolioTimeSeries(referenceDates, stockData);
+                    const result = await buildPortfolioTimeSeries(referenceDates, stockData, currentBenchmarkRange);
                     mainSeries = result.series;
                     mainReturn = result.finalReturn;
                     mainLabel = I18n.t('benchmark.yourPortfolio');
