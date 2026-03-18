@@ -3084,6 +3084,30 @@
             loadingEl.style.display = '';
 
             try {
+                // Fetch benchmark data directly via Worker (bypasses cached stock-api.js)
+                const fetchViaWorker = async (sym, range) => {
+                    const cached = getCachedBenchmark(sym, range);
+                    if (cached && cached.success && cached.historicalData && cached.historicalData.length > 0) return cached;
+                    const workerUrl = `${StockAPI.CF_WORKER_URL}/${encodeURIComponent(sym)}?interval=1d&range=${range}&includePrePost=false`;
+                    try {
+                        const res = await fetch(workerUrl);
+                        const json = await res.json();
+                        if (json?.chart?.result?.length > 0) {
+                            const r = json.chart.result[0];
+                            const timestamps = r.timestamp || [];
+                            const closes = r.indicators.quote[0].close;
+                            const historicalData = [];
+                            for (let i = 0; i < timestamps.length; i++) {
+                                if (closes[i] !== null) historicalData.push({ date: new Date(timestamps[i] * 1000), close: closes[i] });
+                            }
+                            const result = { symbol: sym, name: r.meta.shortName || sym, currency: r.meta.currency || 'USD', historicalData, success: true };
+                            setCachedBenchmark(sym, range, result);
+                            return result;
+                        }
+                    } catch(e) {}
+                    return { symbol: sym, success: false, historicalData: [] };
+                };
+
                 // If comparing a specific ticker, fetch its data too
                 let targetData = null;
                 if (compareTarget.type === 'ticker') {
@@ -3091,8 +3115,7 @@
                     if (cached) {
                         targetData = cached;
                     } else {
-                        targetData = await StockAPI.fetchBenchmarkData(compareTarget.symbol, currentBenchmarkRange);
-                        if (targetData.success) setCachedBenchmark(compareTarget.symbol, currentBenchmarkRange, targetData);
+                        targetData = await fetchViaWorker(compareTarget.symbol, currentBenchmarkRange);
                     }
                     if (!targetData.success || !targetData.historicalData || targetData.historicalData.length === 0) {
                         loadingEl.style.display = 'none';
@@ -3102,14 +3125,7 @@
                     }
                 }
 
-                // Fetch benchmark data (with caching)
-                const benchmarkPromises = selectedBenchmarks.map(async sym => {
-                    const cached = getCachedBenchmark(sym, currentBenchmarkRange);
-                    if (cached) return cached;
-                    const result = await StockAPI.fetchBenchmarkData(sym, currentBenchmarkRange);
-                    if (result.success) setCachedBenchmark(sym, currentBenchmarkRange, result);
-                    return result;
-                });
+                const benchmarkPromises = selectedBenchmarks.map(sym => fetchViaWorker(sym, currentBenchmarkRange));
                 const benchmarkResults = await Promise.all(benchmarkPromises);
 
                 // If a newer load was triggered while we were fetching, abort this one
