@@ -3066,6 +3066,7 @@
         }
 
         async function loadBenchmarkChart() {
+            console.error('[BM] loadBenchmarkChart called');
             const thisLoadId = ++benchmarkLoadId;
 
             const hardcodedChecked = Array.from(document.querySelectorAll('.benchmark-check:not(.benchmark-custom):checked')).map(cb => cb.value);
