@@ -107,8 +107,8 @@ const StockAPI = {
         if (!this.CF_WORKER_URL) return null;
         const workerBase = this.CF_WORKER_URL.replace(/\/v8\/finance\/chart$/, '');
         const endpoints = [
-            `${workerBase}/maya/fund/details?fundId=${id}`,
-            `${workerBase}/maya/company/tradedata?companyId=${id}`,
+            `${workerBase}/maya/fund/funddata?fundId=${id}&lang=1`,
+            `${workerBase}/maya/security/securitydata?securityId=${id}&lang=1`,
         ];
         for (const url of endpoints) {
             try {

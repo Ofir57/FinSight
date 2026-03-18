@@ -9,7 +9,7 @@
  */
 
 const YAHOO_BASE = 'https://query1.finance.yahoo.com';
-const MAYA_BASE  = 'https://mayaapi.tase.co.il/api';
+const MAYA_BASE  = 'https://api.tase.co.il/api';
 const ALLOWED_ORIGIN = '*'; // or restrict to 'https://finsightai.github.io'
 
 addEventListener('fetch', event => {
