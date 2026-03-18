@@ -3160,6 +3160,18 @@
                     referenceDates = longestSource.historicalData.map(d => d.date);
                 }
 
+                // Portfolio mode: if no benchmark data loaded, generate synthetic dates for the range
+                if (referenceDates.length === 0 && compareTarget.type === 'portfolio') {
+                    const rangeDays = { '1mo': 30, '3mo': 90, '6mo': 180, '1y': 365, '2y': 730, '5y': 1825 }[currentBenchmarkRange] || 365;
+                    const now = Date.now();
+                    const start = now - rangeDays * 86400000;
+                    const numPoints = Math.min(rangeDays, 120);
+                    for (let i = 0; i <= numPoints; i++) {
+                        referenceDates.push(new Date(start + (now - start) * i / numPoints));
+                    }
+                    console.log('[benchmark] generated', referenceDates.length, 'synthetic dates for portfolio');
+                }
+
                 if (referenceDates.length === 0) {
                     loadingEl.style.display = 'none';
                     statsGrid.innerHTML = `<div style="color: var(--color-text-secondary);">${I18n.t('benchmark.noData')}</div>`;
