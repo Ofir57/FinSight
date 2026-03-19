@@ -385,14 +385,14 @@
                 <h2>🔖 ייבוא מאתרי אשראי</h2>
                 <div class="setting-row">
                     <div class="setting-label">
-                        <span>סימניית ייבוא חכם</span>
-                        <span>גרור לסרגל הסימניות פעם אחת — לחץ עליה בכל פעם שתרצה לייבא עסקאות</span>
+                        <span>סימניית ייבוא אשראי</span>
+                        <span>גרור לסרגל הסימניות — לחץ עליה בדף העסקאות של האשראי</span>
                     </div>
                     <a id="bookmarkletLink" href="#"
                        style="border: 2px dashed var(--color-border); padding: 8px 16px; border-radius: 8px;
                               cursor: grab; text-decoration: none; color: var(--color-text); font-size: 14px;
                               display:inline-flex; align-items:center; gap:6px; user-select:none;">
-                        🔖 FinSight ייבוא
+                        💳 FinSight אשראי
                     </a>
                 </div>
                 <div class="setting-row" style="flex-wrap:wrap; gap:8px;">
@@ -401,14 +401,35 @@
                     <span class="badge">מקס ✅</span>
                     <span class="badge">ישראכרט ✅</span>
                 </div>
+
+                <div class="setting-row" style="margin-top:16px;">
+                    <div class="setting-label">
+                        <span>סימניית ייבוא בנק</span>
+                        <span>גרור לסרגל — לחץ בדף התנועות של הבנק לייבוא יתרה + תנועות</span>
+                    </div>
+                    <a id="bankBookmarkletLink" href="#"
+                       style="border: 2px dashed var(--color-border); padding: 8px 16px; border-radius: 8px;
+                              cursor: grab; text-decoration: none; color: var(--color-text); font-size: 14px;
+                              display:inline-flex; align-items:center; gap:6px; user-select:none;">
+                        🏦 FinSight בנק
+                    </a>
+                </div>
+                <div class="setting-row" style="flex-wrap:wrap; gap:8px;">
+                    <span style="color:var(--color-text-secondary); font-size:13px;">נתמך:</span>
+                    <span class="badge">לאומי ✅</span>
+                    <span class="badge">פועלים ✅</span>
+                    <span class="badge">מזרחי ✅</span>
+                    <span class="badge">דיסקונט ✅</span>
+                </div>
+
                 <details style="margin-top:12px;">
                     <summary style="cursor:pointer; color:var(--color-text-secondary); font-size:13px;">איך מגדירים?</summary>
                     <ol style="font-size:13px; color:var(--color-text-secondary); margin-top:8px; padding-right:20px; line-height:2;">
                         <li>ודא שסרגל הסימניות מוצג בדפדפן (Ctrl+Shift+B)</li>
-                        <li>גרור את הכפתור "🔖 FinSight ייבוא" לסרגל</li>
-                        <li>כנס לאתר כאל / מקס / ישראכרט ועבור לדף העסקאות</li>
+                        <li>גרור את הסימניה הרלוונטית לסרגל</li>
+                        <li>כנס לאתר הבנק / האשראי ועבור לדף התנועות</li>
                         <li>לחץ על הסימניה — תראה הודעת אישור</li>
-                        <li>חזור לפינסייט → דף <strong>כרטיסי אשראי</strong> → לחץ "ייבוא מסימניה"</li>
+                        <li>חזור לפינסייט → הדף המתאים → לחץ "ייבוא מסימניה"</li>
                     </ol>
                 </details>
             </div>
@@ -1089,6 +1110,13 @@
             var bm = `(function(){var h=location.hostname,s=h.indexOf('cal')>-1?'כאל':h.indexOf('max')>-1?'מקס':h.indexOf('isracard')>-1?'ישראכרט':h;function ov(m,e,cat){var d=document.createElement('div');d.setAttribute('style','position:fixed;top:20px;right:20px;z-index:9999;background:#1e293b;color:#fff;padding:16px;border-radius:10px;font-family:Arial;font-size:14px;direction:rtl;max-width:300px');d.textContent=e?'❌ '+m:'✅ הועתקו '+m+' עסקאות! קטג: '+(cat||'לא נמצא')+' | חזור לפינסייט';document.body.appendChild(d);setTimeout(function(){d.remove()},7000)}function pd(v){var m=v.match(/(\\d{1,2})\\D(\\d{1,2})\\D(\\d{2,4})/);if(!m)return null;return(m[3].length==2?'20':'')+m[3]+'-'+('0'+m[2]).slice(-2)+'-'+('0'+m[1]).slice(-2)}var tx=[],dbgCells=[];[].forEach.call(document.querySelectorAll('.row.body'),function(r){if(!dbgCells.length){dbgCells=[].map.call(r.querySelectorAll('[class]'),function(c){return c.className+'='+c.textContent.trim().substring(0,20)});}var de=r.querySelector('.cell.date'),ne=r.querySelector('.cell.name'),ae=r.querySelector('.cell.sum'),cu=r.querySelector('.cell.currency');var ca=r.querySelector('.cell.category')||r.querySelector('[class*="categor"]');if(!ca){var al=[].filter.call(r.querySelectorAll('.cell'),function(c){var n=c.className;return n.indexOf('date')<0&&n.indexOf('name')<0&&n.indexOf('sum')<0&&n.indexOf('currency')<0&&n.indexOf('debit')<0&&n.indexOf('credit')<0&&c.textContent.trim().length>1&&isNaN(parseFloat(c.textContent.trim().replace(/[^\\d.]/g,'')));});ca=al[0]||null;}if(!de||!ae)return;var dt=pd(de.textContent);if(!dt)return;var aeText=ae.textContent.trim();var am=parseFloat(aeText.replace(/[^\\d.]/g,''));var cur=cu?cu.textContent.trim():'';if(!cur){if(/₪/.test(aeText)||/\\bILS\\b/.test(r.innerText))cur='ILS';else if(/R\$/.test(aeText)||/\\bBRL\\b/.test(r.innerText))cur='BRL';else{var cm=r.innerText.match(/\\b(USD|EUR|GBP|JPY|AUD|CAD|CHF)\\b/);if(cm)cur=cm[1];}}if(am>0)tx.push({date:dt,description:ne?ne.textContent.trim():dt,amount:am,categoryRaw:ca?ca.textContent.trim():'',currency:cur})});if(!tx.length){var ts=Array.from(document.querySelectorAll('table')),b=null,bs=0;ts.forEach(function(t){var sc=(t.innerText.match(/(\\d{1,2})\\D(\\d{1,2})/g)||[]).length;if(sc>bs){bs=sc;b=t}});if(b&&bs>1){var rw=b.querySelectorAll('tr'),hi=-1,hc=[];for(var i=0;i<rw.length;i++){var cs=[].map.call(rw[i].querySelectorAll('th,td'),function(c){return c.innerText.trim()});if(cs.join(' ').indexOf('תאריך')>-1){hi=i;hc=cs;break}}if(hi>-1){var dc=-1,mc=-1,ac=-1,cc=-1,kc=-1,oc=-1;hc.forEach(function(v,i){if(dc<0&&v.indexOf('תאריך')>-1)dc=i;if(mc<0&&v.indexOf('שם')>-1)mc=i;if(v.indexOf('חיוב')>-1)ac=i;if(oc<0&&v.indexOf('סכום')>-1&&v.indexOf('חיוב')<0)oc=i;if(cc<0&&(v.indexOf('קטגוריה')>-1||v.indexOf('ענף')>-1||v.indexOf('סוג')>-1))cc=i;if(kc<0&&(v.indexOf('מטבע')>-1||v.toLowerCase().indexOf('currency')>-1))kc=i});if(ac<0&&oc>-1){ac=oc;oc=-1;}if(dc>-1&&ac>-1)for(var j=hi+1;j<rw.length;j++){var c2=[].map.call(rw[j].querySelectorAll('td'),function(c){return c.innerText.trim()});var dt2=pd(c2[dc]||'');var am2=parseFloat((c2[ac]||'').replace(/[^\\d.]/g,''));if(dt2&&am2>0){var desc2=c2[mc]||c2[dc];var origCur2=kc>-1?(c2[kc]||'').trim():'';var oam2=oc>-1?parseFloat((c2[oc]||'').replace(/[^\\d.]/g,'')):0;var obj2={date:dt2,description:desc2,amount:am2,categoryRaw:cc>-1?(c2[cc]||''):'',currency:''};if(origCur2&&origCur2!=='ILS'&&origCur2!=='₪'){obj2.originalCurrency=origCur2;if(oam2>0)obj2.originalAmount=oam2;}tx.push(obj2)}}}}}if(!tx.length){ov('לא נמצאו עסקאות',1);return}var p=JSON.stringify({__finsight:1,source:s,sourceName:s,transactions:tx,_dbgCells:dbgCells,_tableHeaders:hc||[],exportedAt:new Date().toISOString()});navigator.clipboard?navigator.clipboard.writeText(p).then(function(){ov(tx.length,0,tx[0]?tx[0].categoryRaw:'')}).catch(function(){prompt('',p)}):prompt('',p)})()`;
             var link = document.getElementById('bookmarkletLink');
             if (link) link.href = 'javascript:' + bm;
+        })();
+
+        // Bank bookmarklet
+        (function() {
+            var bankBm = `(function(){var h=location.hostname,src=h.indexOf('leumi')>-1?'לאומי':h.indexOf('poalim')>-1?'פועלים':h.indexOf('mizrahi')>-1?'מזרחי-טפחות':h.indexOf('discount')>-1?'דיסקונט':h;function ov(msg,err){var d=document.createElement('div');d.setAttribute('style','position:fixed;top:20px;right:20px;z-index:9999;background:#1e293b;color:#fff;padding:16px;border-radius:10px;font-family:Arial;font-size:14px;direction:rtl;max-width:300px;white-space:pre-wrap;');d.textContent=err?'❌ '+msg:msg;document.body.appendChild(d);setTimeout(function(){d.remove();},8000);}function pd(v){var m=v.match(/(\\d{1,2})[\\/-\\.](\\d{1,2})[\\/-\\.](\\d{2,4})/);if(!m)return null;return(m[3].length==2?'20':'')+m[3]+'-'+('0'+m[2]).slice(-2)+'-'+('0'+m[1]).slice(-2);}var balance=null;var walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);var node;outer:while((node=walker.nextNode())){var txt=node.textContent.trim();if(/יתרה/.test(txt)){var par=node.parentElement;for(var t=0;t<4&&par;t++,par=par.parentElement){var full=par.innerText||'';var nm=full.match(/[-]?[\\d,]+\\.?\\d{0,2}/g);if(nm){for(var ni=0;ni<nm.length;ni++){var vv=parseFloat(nm[ni].replace(/,/g,''));if(!isNaN(vv)&&Math.abs(vv)<10000000&&Math.abs(vv)>0){balance=vv;break outer;}}}}}}var tables=Array.from(document.querySelectorAll('table')),best=null,bs=0;tables.forEach(function(t){var sc=(t.innerText.match(/\\d{1,2}[\\/-\\.]\\d{1,2}/g)||[]).length;if(sc>bs){bs=sc;best=t;}});var txs=[];if(best&&bs>0){var rows=Array.from(best.querySelectorAll('tr'));var hi=-1,hc=[];for(var i=0;i<rows.length;i++){var cs=Array.from(rows[i].querySelectorAll('th,td')).map(function(c){return c.innerText.trim();});if(cs.join(' ').indexOf('תאריך')>-1){hi=i;hc=cs;break;}}if(hi>-1){var dc=-1,mc=-1,dbc=-1,crc=-1,bc=-1;hc.forEach(function(v,i){if(dc<0&&v.indexOf('תאריך')>-1)dc=i;if(mc<0&&(v.indexOf('פרטים')>-1||v.indexOf('תיאור')>-1||v.indexOf('תנועה')>-1||v.indexOf('שם')>-1))mc=i;if(dbc<0&&v.indexOf('חובה')>-1)dbc=i;if(crc<0&&v.indexOf('זכות')>-1)crc=i;if(bc<0&&(v==='יתרה'||v.indexOf('יתרה לאחר')>-1))bc=i;});if(dc>-1){for(var j=hi+1;j<rows.length;j++){var cells=Array.from(rows[j].querySelectorAll('td')).map(function(c){return c.innerText.trim();});var dt=pd(cells[dc]||'');if(!dt)continue;var dbt=dbc>-1?parseFloat((cells[dbc]||'').replace(/[^\\d.]/g,''))||0:0;var crt=crc>-1?parseFloat((cells[crc]||'').replace(/[^\\d.]/g,''))||0:0;var amt=dbt>0?-dbt:crt>0?crt:0;if(amt===0)continue;var bal=bc>-1?parseFloat((cells[bc]||'').replace(/[^\\d.]/g,''))||undefined:undefined;var desc=mc>-1?cells[mc]:cells[1]||'';txs.push({date:dt,description:desc,amount:amt,balance:bal||undefined});}}}}if(txs.length===0&&balance===null){ov('לא נמצאו נתונים. נווט לדף התנועות ונסה שוב.',true);return;}if(balance===null&&txs.length>0&&txs[0].balance)balance=txs[0].balance;var payload=JSON.stringify({__finsight_bank:true,source:src,balance:balance,transactions:txs,exportedAt:new Date().toISOString()});var msg='✅ '+(txs.length>0?txs.length+' תנועות':'')+( balance!==null?' | יתרה: ₪'+Math.abs(balance).toLocaleString('he-IL'):'')+' \\nחזור לפינסייט → חשבונות בנק → ייבוא מסימניה';navigator.clipboard?navigator.clipboard.writeText(payload).then(function(){ov(msg,false);}).catch(function(){prompt('',payload);}):prompt('',payload);})()`;
+            var bankLink = document.getElementById('bankBookmarkletLink');
+            if (bankLink) bankLink.href = 'javascript:' + bankBm;
         })();
     </script>
 </body>
