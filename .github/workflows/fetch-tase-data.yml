@@ -1,0 +1,33 @@
+name: Fetch TASE Fund Data
+
+on:
+  schedule:
+    # Run at 16:00 UTC = ~18:00–19:00 Israel time, Sun–Thu after market closes (17:35 IST)
+    - cron: '0 16 * * 0,1,2,3,4'
+  workflow_dispatch: # Allow manual trigger from GitHub Actions tab
+
+permissions:
+  contents: write
+
+jobs:
+  fetch-tase:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Fetch TASE prices
+        run: node scripts/fetch-tase.js
+
+      - name: Commit updated prices
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/tase-prices.json
+          git diff --staged --quiet || git commit -m "chore: update TASE prices [skip ci]"
+          git push
