@@ -2913,12 +2913,11 @@
 
             const getRate = (currency) => currency === 'ILS' ? 1 : (currencyRates[currency] || usdRate);
 
+            // Use consistent price-based computation (avoid valueILS which may be in foreign currency)
             const totalCost = holdings.reduce((sum, h) =>
                 sum + (h.avgPrice || 0) * (h.quantity || 0) * getRate(h.currency), 0);
-            const totalValue = holdings.reduce((sum, h) => {
-                if (h.valueILS > 0) return sum + h.valueILS;
-                return sum + (h.currentPrice || h.avgPrice || 0) * (h.quantity || 0) * getRate(h.currency);
-            }, 0);
+            const totalValue = holdings.reduce((sum, h) =>
+                sum + (h.currentPrice || h.avgPrice || 0) * (h.quantity || 0) * getRate(h.currency), 0);
 
             console.error('[portfolio] holdings count:', holdings.length, 'totalCost:', totalCost.toFixed(0), 'totalValue:', totalValue.toFixed(0));
             console.error('[portfolio] first holding:', JSON.stringify(holdings[0]));
@@ -2965,8 +2964,7 @@
             const holdingsWithWeight = holdings
                 .filter(h => h.symbol)
                 .map(h => {
-                    const val = h.valueILS > 0 ? h.valueILS
-                        : (h.currentPrice || h.avgPrice || 0) * (h.quantity || 0) * getRate(h.currency);
+                    const val = (h.currentPrice || h.avgPrice || 0) * (h.quantity || 0) * getRate(h.currency);
                     return { symbol: h.symbol, weight: totalVal > 0 ? val / totalVal : 0 };
                 })
                 .filter(h => h.weight > 0.001);
