@@ -1,4 +1,4 @@
-const CACHE_NAME = 'finsight-v132';
+const CACHE_NAME = 'finsight-v137';
 const ASSETS_TO_CACHE = [
     './',
     './index.html',

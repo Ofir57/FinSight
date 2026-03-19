@@ -2910,31 +2910,51 @@
             if (holdings.length === 0) return { series: referenceDates.map(() => 0), finalReturn: 0 };
 
             const usdRate = currencyRates.USD || 3.65;
-
             const getRate = (currency) => currency === 'ILS' ? 1 : (currencyRates[currency] || usdRate);
 
-            // Use consistent price-based computation (avoid valueILS which may be in foreign currency)
-            const totalCost = holdings.reduce((sum, h) =>
-                sum + (h.avgPrice || 0) * (h.quantity || 0) * getRate(h.currency), 0);
-            const totalValue = holdings.reduce((sum, h) =>
-                sum + (h.currentPrice || h.avgPrice || 0) * (h.quantity || 0) * getRate(h.currency), 0);
+            // Mirror the main portfolio view logic (uses broker-imported valueILS/profitILS when available)
+            const calcHolding = (h) => {
+                const rate = getRate(h.currency);
+                const currentPrice = h.currentPrice || h.avgPrice || 0;
+                let valueILS, profitILS;
+                if (h.valueILS > 0 && h.profitILS !== undefined) {
+                    const importedCost = h.valueILS - h.profitILS;
+                    if (importedCost > 0 && importedCost < h.valueILS * 20) {
+                        valueILS = currentPrice * (h.quantity || 0) * rate;
+                        profitILS = valueILS - importedCost;
+                    } else {
+                        valueILS = currentPrice * (h.quantity || 0) * rate;
+                        profitILS = valueILS - h.valueILS;
+                    }
+                } else if (h.valueILS > 0) {
+                    valueILS = h.valueILS;
+                    profitILS = h.profitILS || 0;
+                } else {
+                    valueILS = currentPrice * (h.quantity || 0) * rate;
+                    profitILS = (currentPrice - (h.avgPrice || 0)) * (h.quantity || 0) * rate;
+                }
+                return { valueILS, costILS: valueILS - profitILS };
+            };
+
+            const totalValue = holdings.reduce((s, h) => s + calcHolding(h).valueILS, 0);
+            const totalCost  = holdings.reduce((s, h) => s + calcHolding(h).costILS,  0);
 
             console.error('[portfolio] holdings count:', holdings.length, 'totalCost:', totalCost.toFixed(0), 'totalValue:', totalValue.toFixed(0));
-            console.error('[portfolio] first holding:', JSON.stringify(holdings[0]));
 
             if (totalCost <= 0) return { series: referenceDates.map(() => 0), finalReturn: 0 };
 
             const currentReturn = ((totalValue / totalCost) - 1) * 100;
 
-            // --- Weighted historical prices per holding ---
-            const totalVal = totalValue;
+            // Weights based on corrected per-holding value
             const holdingsWithWeight = holdings
                 .filter(h => h.symbol)
                 .map(h => {
-                    const val = (h.currentPrice || h.avgPrice || 0) * (h.quantity || 0) * getRate(h.currency);
-                    return { symbol: h.symbol, weight: totalVal > 0 ? val / totalVal : 0 };
+                    const val = calcHolding(h).valueILS;
+                    return { symbol: h.symbol, weight: totalValue > 0 ? val / totalValue : 0 };
                 })
                 .filter(h => h.weight > 0.001);
+
+            console.error('[portfolio] currentReturn:', currentReturn.toFixed(2), 'symbols:', holdingsWithWeight.map(h=>h.symbol+':'+(h.weight*100).toFixed(1)+'%').join(' '));
 
             console.error('[portfolio] symbols to fetch:', holdingsWithWeight.map(h => h.symbol).join(', '));
 
@@ -2970,34 +2990,49 @@
             // Normalize each holding's hist dates to "YYYY-MM-DD" strings for easy comparison
             const histMapStr = {};
             for (const sym of Object.keys(histMap)) {
-                histMapStr[sym] = histMap[sym].map(pt => ({
-                    dateStr: (pt.date instanceof Date ? pt.date : new Date(pt.date)).toISOString().split('T')[0],
-                    close: pt.close
-                }));
+                try {
+                    histMapStr[sym] = histMap[sym].map(pt => {
+                        const d = pt.date instanceof Date ? pt.date : new Date(pt.date);
+                        if (isNaN(d.getTime())) return null;
+                        return { dateStr: d.toISOString().split('T')[0], close: pt.close };
+                    }).filter(Boolean);
+                } catch(e) { console.error('[portfolio] histMapStr error', sym, e.message); }
             }
+            console.error('[portfolio] HISTMAP_READY', Object.keys(histMapStr).map(k => k+':'+histMapStr[k].length).join(' '));
 
             // Build weighted return series
             const n = referenceDates.length;
             const series = referenceDates.map((refDate, i) => {
-                const refStr = new Date(refDate).toISOString().split('T')[0];
-                let weightedReturn = 0, usedWeight = 0;
-                for (const h of holdingsWithWeight) {
-                    const hist = histMapStr[h.symbol];
-                    if (!hist || hist.length < 2) continue;
-                    const startPrice = hist[0].close;
-                    let closest = hist[0];
-                    for (const pt of hist) {
-                        if (pt.dateStr <= refStr) closest = pt; else break;
+                try {
+                    const refStr = new Date(refDate).toISOString().split('T')[0];
+                    let weightedReturn = 0, usedWeight = 0;
+                    for (const h of holdingsWithWeight) {
+                        const hist = histMapStr[h.symbol];
+                        if (!hist || hist.length < 2) continue;
+                        const startPrice = hist[0].close;
+                        let closest = hist[0];
+                        for (const pt of hist) {
+                            if (pt.dateStr <= refStr) closest = pt; else break;
+                        }
+                        weightedReturn += ((closest.close / startPrice) - 1) * 100 * h.weight;
+                        usedWeight += h.weight;
                     }
-                    weightedReturn += ((closest.close / startPrice) - 1) * 100 * h.weight;
-                    usedWeight += h.weight;
-                }
-                // Fallback: if no historical data fetched, interpolate linearly to known total return
-                if (usedWeight < 0.05) return currentReturn * (i / (n - 1 || 1));
-                return weightedReturn / usedWeight;
+                    // Fallback only if truly no data at all
+                    if (usedWeight < 0.001) return currentReturn * (i / (n - 1 || 1));
+                    return weightedReturn / usedWeight;
+                } catch(e) { return 0; }
             });
 
-            return { series, finalReturn: currentReturn };
+            const n2 = series.length;
+            console.error('[portfolio] series check — first:', series[0]?.toFixed(2), 'mid:', series[Math.floor(n2/2)]?.toFixed(2), 'last:', series[n2-1]?.toFixed(2), 'currentReturn:', currentReturn.toFixed(2), 'range:', range);
+            // Per-holding breakdown for diagnosis
+            for (const h of holdingsWithWeight) {
+                const hist = histMapStr[h.symbol];
+                if (!hist || hist.length < 2) { console.error('[portfolio] ', h.symbol, 'NO HIST DATA'); continue; }
+                const startP = hist[0].close, endP = hist[hist.length-1].close;
+                console.error('[portfolio]', h.symbol, 'start:', startP.toFixed(2), 'end:', endP.toFixed(2), 'return:', ((endP/startP-1)*100).toFixed(1)+'%', 'weight:', (h.weight*100).toFixed(1)+'%');
+            }
+            return { series, finalReturn: series.length > 0 ? series[series.length - 1] : currentReturn };
         }
 
         // Load guard to prevent race conditions between concurrent calls
