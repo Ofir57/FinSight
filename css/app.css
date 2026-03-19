@@ -869,6 +869,46 @@ body.ltr .mobile-lang-switcher {
     font-size: 0.85rem;
 }
 
+/* ===== Dashboard Budget Alerts ===== */
+#dashboardBudgetAlerts {
+    display: none;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+#dashboardBudgetAlerts.has-alerts {
+    display: flex;
+}
+.dash-budget-alert {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    border-radius: var(--radius-md);
+    font-size: 14px;
+    border: 1px solid transparent;
+}
+.dash-budget-alert.warning {
+    background: rgba(234, 179, 8, 0.12);
+    border-color: rgba(234, 179, 8, 0.4);
+}
+.dash-budget-alert.danger {
+    background: rgba(239, 68, 68, 0.12);
+    border-color: rgba(239, 68, 68, 0.4);
+}
+.dash-budget-alert .alert-dismiss {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--color-text-secondary);
+    font-size: 16px;
+    padding: 0 2px;
+    line-height: 1;
+    opacity: 0.6;
+    flex-shrink: 0;
+}
+.dash-budget-alert .alert-dismiss:hover { opacity: 1; }
+
 /* ===== MA150 Indicators ===== */
 .ma150-na {
     color: var(--color-text-secondary);

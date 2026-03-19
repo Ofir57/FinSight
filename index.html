@@ -204,6 +204,9 @@
                 </div>
             </header>
 
+            <!-- Budget Alerts -->
+            <div id="dashboardBudgetAlerts"></div>
+
             <!-- Net Worth Banner -->
             <div class="net-worth-banner" data-widget="netWorth">
                 <div class="label" data-i18n="dashboard.netWorth">שווי נקי</div>
@@ -453,6 +456,7 @@
             Charts.updateMonthlyExpenses();
             loadRecentTransactions();
             SummarySender.checkAndShowBanner();
+            loadBudgetAlerts();
         });
 
         function loadRecentTransactions() {
@@ -516,6 +520,36 @@
                     <td class="${tx.isPositive ? 'positive' : 'negative'}">${I18n.formatCurrency(Math.abs(tx.amount))}</td>
                 </tr>
             `).join('');
+        }
+
+        function loadBudgetAlerts() {
+            const container = document.getElementById('dashboardBudgetAlerts');
+            if (!container) return;
+
+            const alerts = Alerts.checkBudgets();
+            if (alerts.length === 0) {
+                container.classList.remove('has-alerts');
+                return;
+            }
+
+            const sessionKey = 'budget_alerts_dismissed_' + new Date().toISOString().slice(0, 10);
+            if (sessionStorage.getItem(sessionKey)) return;
+
+            container.innerHTML = alerts.slice(0, 3).map(alert => `
+                <div class="dash-budget-alert ${alert.type}">
+                    <span>${alert.icon}</span>
+                    <span style="flex:1"><strong>${alert.title}</strong> · ${alert.message}</span>
+                    <a href="pages/credit.html" style="font-size:13px;color:var(--color-primary);text-decoration:none;white-space:nowrap;">כרטיסי אשראי ←</a>
+                    <button class="alert-dismiss" onclick="dismissBudgetAlerts()" title="סגור">✕</button>
+                </div>
+            `).join('');
+            container.classList.add('has-alerts');
+        }
+
+        function dismissBudgetAlerts() {
+            sessionStorage.setItem('budget_alerts_dismissed_' + new Date().toISOString().slice(0, 10), '1');
+            const container = document.getElementById('dashboardBudgetAlerts');
+            if (container) container.classList.remove('has-alerts');
         }
 
         // Load goals progress widget
