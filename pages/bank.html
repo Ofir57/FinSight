@@ -1145,6 +1145,39 @@
             renderTransactions(Storage.getBankAccounts());
         }
 
+        const BANK_CODE_MAP = {'לאומי':'leumi','פועלים':'hapoalim','מזרחי-טפחות':'mizrahi','דיסקונט':'discount'};
+
+        // Auto-match: name → bank code → closest balance → single account
+        function findBestBankMatch(accounts, data) {
+            if (!accounts.length) return { match: null, candidates: [] };
+
+            // 1. Account name contains source string
+            const nameMatch = accounts.find(a => a.nameHe && data.source && a.nameHe.includes(data.source));
+            if (nameMatch) return { match: nameMatch, candidates: [] };
+
+            // 2. Match by bank code
+            const bankCode = BANK_CODE_MAP[data.source];
+            if (bankCode) {
+                const byBank = accounts.filter(a => a.bank === bankCode);
+                if (byBank.length === 1) return { match: byBank[0], candidates: [] };
+                if (byBank.length > 1) {
+                    // Prefer the account whose balance is closest to the imported balance
+                    if (data.balance != null) {
+                        const sorted = [...byBank].sort((a, b) =>
+                            Math.abs((a.balance||0) - data.balance) - Math.abs((b.balance||0) - data.balance));
+                        if (Math.abs((sorted[0].balance||0) - data.balance) < 1000)
+                            return { match: sorted[0], candidates: [] };
+                    }
+                    return { match: null, candidates: byBank }; // need picker
+                }
+            }
+
+            // 3. Only one account exists — use it
+            if (accounts.length === 1) return { match: accounts[0], candidates: [] };
+
+            return { match: null, candidates: [] };
+        }
+
         async function importFromBankBookmarklet() {
             try {
                 const text = await navigator.clipboard.readText();
@@ -1155,18 +1188,19 @@
                 }
 
                 const accounts = Storage.getBankAccounts();
-                let target = accounts.find(a => a.nameHe && data.source && a.nameHe.includes(data.source));
-                if (!target && accounts.length === 1) target = accounts[0];
+                const { match, candidates } = findBestBankMatch(accounts, data);
 
-                if (!target) {
-                    // No matching account — offer to create
+                if (candidates.length > 1) {
+                    showBankPickerModal(data, candidates);
+                    return;
+                }
+
+                if (!match) {
+                    // No match — offer to create
                     if (!confirm(`לא נמצא חשבון "${data.source}". ליצור חשבון חדש?`)) return;
                     Storage.addBankAccount({
                         nameHe: data.source, nameEn: data.source,
-                        bank: data.source.includes('לאומי') ? 'leumi' :
-                              data.source.includes('פועלים') ? 'hapoalim' :
-                              data.source.includes('מזרחי') ? 'mizrahi' :
-                              data.source.includes('דיסקונט') ? 'discount' : 'other',
+                        bank: BANK_CODE_MAP[data.source] || 'other',
                         balance: data.balance || 0, currency: 'ILS',
                         transactions: data.transactions || []
                     });
@@ -1175,26 +1209,64 @@
                     return;
                 }
 
-                // Merge transactions (dedup by date+description+amount)
-                const updates = {};
-                if (data.balance !== null && data.balance !== undefined) updates.balance = data.balance;
-
-                const existing = target.transactions || [];
-                const keys = new Set(existing.map(t => `${t.date}|${t.description}|${t.amount}`));
-                const newTxs = (data.transactions || []).filter(t => !keys.has(`${t.date}|${t.description}|${t.amount}`));
-                updates.transactions = [...existing, ...newTxs].sort((a, b) => b.date.localeCompare(a.date));
-
-                Storage.updateBankAccount(target.id, updates);
-                loadAccounts();
-
-                const balStr = data.balance !== null && data.balance !== undefined
-                    ? ` | יתרה: ₪${Math.abs(data.balance).toLocaleString('he-IL')}` : '';
-                App.notify(`✅ ${newTxs.length} תנועות חדשות${balStr}`, 'success');
+                applyBankImport(match, data);
 
             } catch(e) {
                 if (e.name === 'SyntaxError') App.notify('תוכן הקליפבורד אינו תקין', 'error');
                 else App.notify('לא ניתן לקרוא מהקליפבורד', 'error');
             }
+        }
+
+        function showBankPickerModal(data, candidates) {
+            const existing = document.getElementById('bankPickerModal');
+            if (existing) existing.remove();
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay active';
+            modal.id = 'bankPickerModal';
+            modal.innerHTML = `
+                <div class="modal" style="max-width:440px;">
+                    <div class="modal-header">
+                        <h2>בחר חשבון לייבוא</h2>
+                        <button class="modal-close" onclick="document.getElementById('bankPickerModal').remove()">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <p style="color:var(--color-text-secondary);margin-bottom:12px;">
+                            נמצאו ${data.transactions?.length||0} תנועות מ-${data.source}. לאיזה חשבון לייבא?
+                        </p>
+                        <div class="form-group">
+                            <select id="bankPickerSelect" class="form-control">
+                                ${candidates.map(a => `<option value="${a.id}">${a.nameHe||a.nameEn} — ₪${(a.balance||0).toLocaleString('he-IL')}</option>`).join('')}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" onclick="document.getElementById('bankPickerModal').remove()">ביטול</button>
+                        <button class="btn btn-primary" onclick="confirmBankPicker()">ייבא</button>
+                    </div>
+                </div>`;
+            document.body.appendChild(modal);
+            window._pendingBankData = data;
+        }
+
+        function confirmBankPicker() {
+            const id = document.getElementById('bankPickerSelect').value;
+            const data = window._pendingBankData;
+            document.getElementById('bankPickerModal').remove();
+            const account = Storage.getBankAccounts().find(a => a.id === id);
+            if (account) applyBankImport(account, data);
+        }
+
+        function applyBankImport(target, data) {
+            const updates = {};
+            if (data.balance != null) updates.balance = data.balance;
+            const existing = target.transactions || [];
+            const keys = new Set(existing.map(t => `${t.date}|${t.description}|${t.amount}`));
+            const newTxs = (data.transactions||[]).filter(t => !keys.has(`${t.date}|${t.description}|${t.amount}`));
+            updates.transactions = [...existing, ...newTxs].sort((a, b) => b.date.localeCompare(a.date));
+            Storage.updateBankAccount(target.id, updates);
+            loadAccounts();
+            const balStr = data.balance != null ? ` | יתרה: ₪${Math.abs(data.balance).toLocaleString('he-IL')}` : '';
+            App.notify(`✅ ${newTxs.length} תנועות חדשות${balStr}`, 'success');
         }
     </script>
 </body>
