@@ -3187,6 +3187,7 @@
                 }
 
                 // Build the main comparison line
+                console.error('[BM] mode:', compareTarget.type, compareTarget.symbol || '', '| targetData:', targetData?.success, '| referenceDates:', referenceDates.length, '| holdings:', stockData.holdings.length);
                 let mainSeries, mainReturn, mainLabel;
 
                 if (compareTarget.type === 'ticker' && targetData && targetData.success) {
