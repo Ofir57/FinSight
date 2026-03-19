@@ -2,8 +2,8 @@ name: Fetch TASE Fund Data
 
 on:
   schedule:
-    # Sun-Thu 16:00 UTC (TASE closes 17:35 IST), Fri 21:00 UTC (US market closes 16:00 ET)
-    - cron: '0 16 * * 0,1,2,3,4'
+    # Mon-Thu 16:00 UTC (TASE closes ~15:35 UTC / 17:35 IST), Fri 21:00 UTC (US market closes 16:00 ET)
+    - cron: '0 16 * * 1,2,3,4'
     - cron: '0 21 * * 5'
   workflow_dispatch: # Allow manual trigger from GitHub Actions tab
 
