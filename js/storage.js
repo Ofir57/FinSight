@@ -765,7 +765,8 @@ const Storage = {
     getSummarySchedule() {
         return this.get(this.KEYS.SUMMARY_SCHEDULE) || {
             enabled: false, frequency: 'weekly', dayOfWeek: 5,
-            dayOfMonth: 1, lastSentDate: null, recipientPhone: '', recipientEmail: ''
+            dayOfMonth: 1, lastSentDate: null, recipientPhone: '', recipientEmail: '',
+            callmebotApiKey: ''
         };
     },
 

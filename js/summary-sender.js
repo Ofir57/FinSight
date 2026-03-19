@@ -121,8 +121,38 @@ const SummarySender = {
         return lines.join('\n');
     },
 
+    async autoSendWhatsApp() {
+        const schedule = Storage.getSummarySchedule();
+        const phone = (schedule.recipientPhone || '').replace(/\D/g, '');
+        const apiKey = (schedule.callmebotApiKey || '').trim();
+        if (!phone || !apiKey) return false;
+
+        const text = this.formatSummaryText(this.buildSummaryData());
+        const url = `https://api.callmebot.com/whatsapp.php?phone=${phone}&text=${encodeURIComponent(text)}&apikey=${encodeURIComponent(apiKey)}`;
+        try {
+            const res = await fetch(url);
+            if (res.ok) { this.markSent(); return true; }
+            console.warn('CallMeBot response:', res.status);
+            return false;
+        } catch (e) {
+            console.error('CallMeBot error:', e);
+            return false;
+        }
+    },
+
     checkAndShowBanner() {
         if (!this.isDue()) return;
+        const schedule = Storage.getSummarySchedule();
+        if (schedule.callmebotApiKey && schedule.recipientPhone) {
+            // Auto-send silently; fall back to banner only on failure
+            this.autoSendWhatsApp().then(ok => {
+                if (!ok) {
+                    const banner = document.getElementById('summarySenderBanner');
+                    if (banner) banner.style.display = 'flex';
+                }
+            });
+            return;
+        }
         const banner = document.getElementById('summarySenderBanner');
         if (banner) banner.style.display = 'flex';
     },

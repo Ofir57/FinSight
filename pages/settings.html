@@ -589,8 +589,27 @@
                         <input type="email" id="summaryEmail" placeholder="me@example.com" onchange="saveSummarySettings()" style="width:200px;padding:8px 12px;background:var(--color-bg-card);border:1px solid var(--color-border);border-radius:8px;color:white;text-align:left;">
                     </div>
 
-                    <div style="margin-top:15px;">
+                    <div class="setting-row">
+                        <div class="setting-label">
+                            <span>🤖 CallMeBot API Key</span>
+                            <span>לשליחה אוטומטית לגמרי — FinSight שולח בלי לחיצה</span>
+                        </div>
+                        <input type="text" id="callmebotApiKey" placeholder="1234567" onchange="saveSummarySettings()" style="width:120px;padding:8px 12px;background:var(--color-bg-card);border:1px solid var(--color-border);border-radius:8px;color:white;text-align:left;font-family:monospace;">
+                    </div>
+
+                    <details style="margin-top:4px;margin-bottom:8px;">
+                        <summary style="cursor:pointer;color:var(--color-text-secondary);font-size:13px;padding:4px 0;">איך מקבלים API Key מ-CallMeBot?</summary>
+                        <ol style="font-size:13px;color:var(--color-text-secondary);margin:8px 0 0;padding-right:20px;line-height:2;">
+                            <li>שמור את המספר <strong>+34 644 60 46 63</strong> באנשי הקשר שלך בשם "CallMeBot"</li>
+                            <li>שלח לו הודעת WhatsApp: <code style="background:var(--color-bg);padding:2px 6px;border-radius:4px;">I allow callmebot to send me messages</code></li>
+                            <li>תוך דקה תקבל תשובה עם API Key</li>
+                            <li>הזן אותו כאן ולחץ שמור</li>
+                        </ol>
+                    </details>
+
+                    <div style="margin-top:15px;display:flex;gap:10px;flex-wrap:wrap;">
                         <button class="btn btn-primary" onclick="previewSummaryNow()">👁️ תצוגה מקדימה עכשיו</button>
+                        <button class="btn btn-secondary" onclick="testCallMeBot()">🔔 שלח הודעת בדיקה</button>
                     </div>
                 </div>
             </div>
@@ -1012,6 +1031,7 @@
             document.getElementById('summaryDayOfMonth').value = s.dayOfMonth || 1;
             document.getElementById('summaryPhone').value = s.recipientPhone || '';
             document.getElementById('summaryEmail').value = s.recipientEmail || '';
+            document.getElementById('callmebotApiKey').value = s.callmebotApiKey || '';
             document.getElementById('summaryOptions').style.display = s.enabled ? 'block' : 'none';
             onSummaryFreqChange();
         }
@@ -1024,6 +1044,7 @@
                 dayOfMonth: parseInt(document.getElementById('summaryDayOfMonth').value) || 1,
                 recipientPhone: document.getElementById('summaryPhone').value.trim(),
                 recipientEmail: document.getElementById('summaryEmail').value.trim(),
+                callmebotApiKey: document.getElementById('callmebotApiKey').value.trim(),
                 lastSentDate: Storage.getSummarySchedule().lastSentDate
             };
             Storage.saveSummarySchedule(s);
@@ -1040,6 +1061,26 @@
         function previewSummaryNow() {
             if (typeof SummarySender !== 'undefined') {
                 SummarySender.showPreviewModal();
+            }
+        }
+
+        async function testCallMeBot() {
+            const s = Storage.getSummarySchedule();
+            const phone = (s.recipientPhone || '').replace(/\D/g, '');
+            const apiKey = (s.callmebotApiKey || '').trim();
+            if (!phone || !apiKey) {
+                App.notify('הזן מספר טלפון ו-API Key תחילה', 'error');
+                return;
+            }
+            App.notify('שולח הודעת בדיקה...', 'info');
+            const testText = '✅ FinSight — הודעת בדיקה נשלחה בהצלחה!';
+            const url = `https://api.callmebot.com/whatsapp.php?phone=${phone}&text=${encodeURIComponent(testText)}&apikey=${encodeURIComponent(apiKey)}`;
+            try {
+                const res = await fetch(url);
+                if (res.ok) App.notify('✅ הודעה נשלחה! בדוק את WhatsApp', 'success');
+                else App.notify('שגיאה בשליחה — בדוק מספר ו-API Key', 'error');
+            } catch (e) {
+                App.notify('שגיאת רשת: ' + e.message, 'error');
             }
         }
 
