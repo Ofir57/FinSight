@@ -30,9 +30,9 @@
           id: summary
           run: |
             if [ -f scripts/update-summary.txt ]; then
-              echo "body<<EOF" >> $GITHUB_OUTPUT
+              echo "body<<MARKET_DATA_DELIM" >> $GITHUB_OUTPUT
               cat scripts/update-summary.txt >> $GITHUB_OUTPUT
-              echo "EOF" >> $GITHUB_OUTPUT
+              echo "MARKET_DATA_DELIM" >> $GITHUB_OUTPUT
             else
               echo "body=No summary generated" >> $GITHUB_OUTPUT
             fi
