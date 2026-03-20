@@ -95,6 +95,25 @@ function periodIsNotFuture(period) {
 
 // ─── Validation ───────────────────────────────────────────────────────────────
 
+// Clamp obviously-wrong numeric values to null (parsing artifacts like 11934%)
+function sanitizeFund(f) {
+    const ranges = { month: [-30, 30], year1: [-100, 100], year3: [-100, 250], year5: [-100, 350] };
+    for (const [field, [min, max]] of Object.entries(ranges)) {
+        const val = f[field];
+        if (val !== null && val !== undefined) {
+            if (typeof val !== 'number' || isNaN(val) || val < min || val > max) {
+                f[field] = null;
+            }
+        }
+    }
+    if (f.fee !== null && f.fee !== undefined) {
+        if (typeof f.fee !== 'number' || isNaN(f.fee) || f.fee < 0 || f.fee > 10) {
+            f.fee = null;
+        }
+    }
+    return f;
+}
+
 function validateFunds(funds, typeName, currentPeriod, newPeriod) {
     const errors = [];
 
@@ -106,33 +125,6 @@ function validateFunds(funds, typeName, currentPeriod, newPeriod) {
         const f = funds[i];
         if (!f.nameHe || f.nameHe.trim() === '') {
             errors.push(`${typeName}[${i}]: empty nameHe`);
-        }
-        if (!f.companyHe || f.companyHe.trim() === '') {
-            errors.push(`${typeName}[${i}]: empty companyHe`);
-        }
-
-        // Validate numeric ranges
-        const checks = [
-            ['month', -30, 30],
-            ['year1', -60, 100],
-            ['year3', -80, 200],
-            ['year5', -80, 300]
-        ];
-        for (const [field, min, max] of checks) {
-            const val = f[field];
-            if (val !== null && val !== undefined) {
-                if (typeof val !== 'number' || isNaN(val)) {
-                    errors.push(`${typeName}[${i}].${field}: not a number (${val})`);
-                } else if (val < min || val > max) {
-                    errors.push(`${typeName}[${i}].${field}: ${val} out of range [${min},${max}]`);
-                }
-            }
-        }
-
-        if (f.fee !== null && f.fee !== undefined) {
-            if (typeof f.fee !== 'number' || isNaN(f.fee)) {
-                errors.push(`${typeName}[${i}].fee: not a number`);
-            }
         }
     }
 
@@ -389,39 +381,41 @@ function scrapeIGemelFunds($) {
         const tds = $(row).find('td');
         if (tds.length < 5) return;
 
-        // iGemel structure: fund name, month%, year%, 3y%, 5y%, fee%, ...
-        // The managing company is sometimes in the last columns or embedded in the name
+        // iGemel actual structure (observed from site HTML):
+        // td[0] = "השווה" (compare button) — skip
+        // td[1] = fund name
+        // td[2] = month%
+        // td[3] = year1%
+        // td[4] = year3%
+        // td[5] = year5%
+        // td[6] = fee%
+        // td[7..] = assets, sharpe, specialization, company, population...
+        //
+        // Detect the offset: if td[0] text is non-numeric (e.g. "השווה"), offset=1
+        const firstText = $(tds[0]).text().trim();
+        const offset = (firstText === 'השווה' || firstText === 'השווה' || parsePercent(firstText) === null && firstText.length > 0 && isNaN(parseFloat(firstText))) ? 1 : 0;
+
         let nameHe, companyHe, month, year1, year3, year5, fee;
 
-        if (tds.length >= 11) {
-            // Full table: name, month, year, 3y, 5y, fee, assets, sharpe, liquidity, specialization, company
-            nameHe = $(tds[0]).text().trim();
-            month = parsePercent($(tds[1]).text());
-            year1 = parsePercent($(tds[2]).text());
-            year3 = parsePercent($(tds[3]).text());
-            year5 = parsePercent($(tds[4]).text());
-            fee = parsePercent($(tds[5]).text());
-            companyHe = $(tds[tds.length - 1]).text().trim();
-        } else if (tds.length >= 6) {
-            // Compact: name, month, year, 3y, 5y, fee
-            nameHe = $(tds[0]).text().trim();
-            month = parsePercent($(tds[1]).text());
-            year1 = parsePercent($(tds[2]).text());
-            year3 = parsePercent($(tds[3]).text());
-            year5 = parsePercent($(tds[4]).text());
-            fee = parsePercent($(tds[5]).text());
-            companyHe = '';
+        const n = tds.length - offset;
+        if (n >= 6) {
+            nameHe = $(tds[offset]).text().trim();
+            month  = parsePercent($(tds[offset + 1]).text());
+            year1  = parsePercent($(tds[offset + 2]).text());
+            year3  = parsePercent($(tds[offset + 3]).text());
+            year5  = parsePercent($(tds[offset + 4]).text());
+            fee    = parsePercent($(tds[offset + 5]).text());
+            // Company: second-to-last column tends to be full company name
+            companyHe = n >= 10 ? $(tds[tds.length - 2]).text().trim() : '';
         } else {
             return;
         }
 
-        // Try to extract company from name if not available
-        if (!companyHe) {
-            companyHe = guessCompany(nameHe);
-        }
+        // Extract short company name
+        companyHe = guessCompany(companyHe || nameHe);
 
-        if (nameHe && nameHe.length > 1) {
-            funds.push({ nameHe, companyHe, month, year1, year3, year5, fee });
+        if (nameHe && nameHe.length > 1 && nameHe !== 'השווה') {
+            funds.push(sanitizeFund({ nameHe, companyHe, month, year1, year3, year5, fee }));
         }
     });
 
