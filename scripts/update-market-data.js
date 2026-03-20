@@ -841,7 +841,7 @@ async function main() {
 
     // Write summary to file for GitHub Actions to pick up
     const summaryPath = path.join(ROOT, 'scripts', 'update-summary.txt');
-    fs.writeFileSync(summaryPath, summary.join('\n'), 'utf-8');
+    fs.writeFileSync(summaryPath, summary.join('\n') + '\n', 'utf-8');
 
     if (updated) {
         console.log('\n✅ Data files updated. Ready for PR.');
