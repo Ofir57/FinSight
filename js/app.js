@@ -85,6 +85,12 @@ const App = {
         // Pull-to-refresh
         this.setupPullToRefresh();
 
+        // Offline banner
+        this.setupOfflineBanner();
+
+        // Push notification permission + budget check
+        this.setupNotifications();
+
         // Modal close on overlay click
         document.querySelectorAll('.modal-overlay').forEach(overlay => {
             overlay.addEventListener('click', (e) => {
@@ -241,6 +247,94 @@ const App = {
     },
 
     /**
+     * Offline banner — shows when network is lost
+     */
+    setupOfflineBanner() {
+        const banner = document.createElement('div');
+        banner.className = 'offline-banner';
+        banner.innerHTML = '📡 <span>אין חיבור לאינטרנט — האפליקציה פועלת במצב מקוון-לא</span>';
+        document.body.appendChild(banner);
+
+        const update = () => {
+            banner.classList.toggle('visible', !navigator.onLine);
+        };
+
+        window.addEventListener('online',  () => { update(); Haptic.success(); });
+        window.addEventListener('offline', () => { update(); Haptic.warning(); });
+        update(); // check immediately
+    },
+
+    /**
+     * Push notifications — request permission + check budgets on load
+     */
+    async setupNotifications() {
+        if (typeof Notifications === 'undefined' || typeof Alerts === 'undefined') return;
+        if (!Notifications.isSupported()) return;
+
+        // Show a permission prompt once if not yet asked (after 5 seconds)
+        const alreadyAsked = localStorage.getItem('notif_permission_asked');
+        if (!alreadyAsked && Notifications.getPermission() === 'default') {
+            setTimeout(() => this._showNotifPrompt(), 5000);
+        }
+
+        // If already granted, run budget checks
+        if (Notifications.getPermission() === 'granted') {
+            this._checkBudgetNotifications();
+        }
+    },
+
+    _showNotifPrompt() {
+        // Only show on dashboard main page
+        const mainContent = document.querySelector('.main-content');
+        if (!mainContent) return;
+
+        const prompt = document.createElement('div');
+        prompt.className = 'notif-prompt';
+        prompt.innerHTML = `
+            <span>🔔</span>
+            <span class="notif-prompt-text">אפשר התראות תקציב כדי לקבל עדכונים חשובים</span>
+            <div class="notif-prompt-btns">
+                <button class="btn btn-primary btn-sm" id="notifAllow">אפשר</button>
+                <button class="btn btn-secondary btn-sm" id="notifDismiss">לא עכשיו</button>
+            </div>
+        `;
+
+        mainContent.insertBefore(prompt, mainContent.firstChild);
+        localStorage.setItem('notif_permission_asked', '1');
+
+        document.getElementById('notifAllow')?.addEventListener('click', async () => {
+            prompt.remove();
+            const result = await Notifications.requestPermission();
+            if (result.success) this._checkBudgetNotifications();
+        });
+
+        document.getElementById('notifDismiss')?.addEventListener('click', () => prompt.remove());
+    },
+
+    _checkBudgetNotifications() {
+        if (typeof Alerts === 'undefined') return;
+
+        // Only notify once per day per alert
+        const today = new Date().toISOString().slice(0, 10);
+        const lastNotifDay = localStorage.getItem('notif_last_budget_check');
+        if (lastNotifDay === today) return;
+
+        try {
+            const alerts = Alerts.checkBudgets();
+            if (alerts && alerts.length > 0) {
+                const top = alerts[0];
+                Notifications.show(`${top.icon} ${top.title}`, {
+                    body: top.message,
+                    tag: 'budget-check-daily'
+                });
+                localStorage.setItem('notif_last_budget_check', today);
+            }
+        } catch (e) {
+            console.warn('Budget notification check failed:', e);
+        }
+    },
+
+    /**
      * Pull-to-refresh: swipe down at top of page to reload data
      */
     setupPullToRefresh() {
@@ -312,7 +406,10 @@ const App = {
         const loansTotal = Storage.getTotalLoansBalance();
         const netWorth = Storage.getNetWorth();
 
-        // Update summary cards
+        // Update summary cards + remove skeleton loaders
+        const cardIds = ['bankTotal','creditTotal','stocksTotal','fundsTotal','assetsTotal','loansTotal','netWorthTotal'];
+        cardIds.forEach(id => document.getElementById(id)?.classList.remove('skeleton'));
+
         this.updateElement('bankTotal', I18n.formatCurrency(bankTotal));
         this.updateElement('creditTotal', I18n.formatCurrency(creditTotal));
         this.updateElement('stocksTotal', I18n.formatCurrency(stocksTotal));

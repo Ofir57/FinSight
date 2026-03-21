@@ -68,8 +68,17 @@ const Storage = {
         try {
             this._cache[key] = data;
             localStorage.setItem(key, JSON.stringify(data));
+            // Warn if approaching 5MB localStorage limit
+            if (typeof IDB !== 'undefined' && IDB.isNearLimit()) {
+                console.warn(`Storage: localStorage near limit (${IDB.getUsageMB()} MB). Consider clearing old data.`);
+            }
         } catch (error) {
-            console.error('Storage set error:', error);
+            if (error.name === 'QuotaExceededError') {
+                console.error('Storage: localStorage quota exceeded! Triggering IDB migration...');
+                if (typeof IDB !== 'undefined') IDB.migrateIfNeeded();
+            } else {
+                console.error('Storage set error:', error);
+            }
         }
     },
 

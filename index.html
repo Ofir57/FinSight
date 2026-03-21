@@ -218,37 +218,37 @@
                 <a href="pages/bank.html" class="summary-card bank">
                     <div class="icon">🏦</div>
                     <div class="label" data-i18n="dashboard.bankBalance">יתרת בנק</div>
-                    <div class="value" id="bankTotal">₪0</div>
+                    <div class="value skeleton" id="bankTotal">₪0</div>
                 </a>
 
                 <a href="pages/credit.html" class="summary-card credit">
                     <div class="icon">💳</div>
                     <div class="label" data-i18n="dashboard.creditExpenses">הוצאות אשראי</div>
-                    <div class="value" id="creditTotal">₪0</div>
+                    <div class="value skeleton" id="creditTotal">₪0</div>
                 </a>
 
                 <a href="pages/stocks.html" class="summary-card stocks">
                     <div class="icon">📈</div>
                     <div class="label" data-i18n="dashboard.stocksValue">שווי מניות</div>
-                    <div class="value" id="stocksTotal">₪0</div>
+                    <div class="value skeleton" id="stocksTotal">₪0</div>
                 </a>
 
                 <div class="summary-card funds" onclick="location.href='pages/my-funds.html'">
                     <div class="icon">📊</div>
                     <div class="label" data-i18n="dashboard.fundsValue">שווי חסכונות</div>
-                    <div class="value" id="fundsTotal">₪0</div>
+                    <div class="value skeleton" id="fundsTotal">₪0</div>
                 </div>
 
                 <a href="pages/assets.html" class="summary-card assets">
                     <div class="icon">🏠</div>
                     <div class="label" data-i18n="dashboard.assetsValue">שווי נכסים</div>
-                    <div class="value" id="assetsTotal">₪0</div>
+                    <div class="value skeleton" id="assetsTotal">₪0</div>
                 </a>
 
                 <a href="pages/loans.html" class="summary-card" style="border-color: var(--color-loans);">
                     <div class="icon">🏦</div>
                     <div class="label" data-i18n="dashboard.loansBalance">יתרת הלוואות</div>
-                    <div class="value" id="loansTotal" style="color: var(--color-loans);">₪0</div>
+                    <div class="value skeleton" id="loansTotal" style="color: var(--color-loans);">₪0</div>
                 </a>
             </div>
 
@@ -428,6 +428,7 @@
         }
         .summary-share-btns { display: flex; flex-wrap: wrap; gap: 10px; }
     </style>
+    <script src="js/idb.js"></script>
     <script src="js/storage.js"></script>
     <script src="js/pin-lock.js"></script>
     <script src="js/i18n.js"></script>

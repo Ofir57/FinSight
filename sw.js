@@ -1,10 +1,11 @@
-const CACHE_NAME = 'finsight-v149';
+const CACHE_NAME = 'finsight-v150';
 const ASSETS_TO_CACHE = [
     './',
     './index.html',
     './img/logo.png',
     './css/app.css',
     './js/app.js',
+    './js/idb.js',
     './js/storage.js',
     './js/pin-lock.js',
     './js/i18n.js',
