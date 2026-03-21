@@ -172,6 +172,117 @@
             color: var(--color-text-secondary);
             font-style: italic;
         }
+
+        /* ── Auto-detect suggestions ── */
+        .detect-banner {
+            background: rgba(6, 182, 212, 0.08);
+            border: 1px solid rgba(6, 182, 212, 0.25);
+            border-radius: var(--radius-md);
+            padding: 14px var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.9rem;
+            color: var(--color-text-secondary);
+        }
+        .detect-banner .detect-btn {
+            margin-right: auto;
+            background: var(--color-subscriptions);
+            color: #fff;
+            border: none;
+            border-radius: 20px;
+            padding: 7px 16px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: opacity 0.2s;
+        }
+        .detect-btn:active { opacity: 0.8; }
+
+        .suggestions-panel {
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: var(--spacing-lg);
+        }
+        .suggestions-panel.visible { display: flex; }
+
+        .suggestions-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 4px;
+        }
+        .suggestions-header h3 {
+            font-size: 1rem;
+            color: var(--color-subscriptions);
+        }
+        .suggestions-header button {
+            background: none;
+            border: none;
+            color: var(--color-text-secondary);
+            cursor: pointer;
+            font-size: 0.85rem;
+            text-decoration: underline;
+        }
+
+        .suggestion-card {
+            background: var(--color-bg-card);
+            border: 1px solid rgba(6, 182, 212, 0.2);
+            border-radius: var(--radius-md);
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .suggestion-card .sug-info { flex: 1; min-width: 0; }
+        .suggestion-card .sug-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .suggestion-card .sug-meta {
+            font-size: 0.78rem;
+            color: var(--color-text-secondary);
+            margin-top: 3px;
+        }
+        .suggestion-card .sug-amount {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--color-subscriptions);
+            white-space: nowrap;
+        }
+        .suggestion-card .sug-actions {
+            display: flex;
+            gap: 6px;
+        }
+        .suggestion-card .btn-add {
+            background: var(--color-subscriptions);
+            color: #fff;
+            border: none;
+            border-radius: 18px;
+            padding: 6px 14px;
+            font-size: 0.82rem;
+            cursor: pointer;
+        }
+        .suggestion-card .btn-ignore {
+            background: none;
+            border: 1px solid var(--color-border);
+            color: var(--color-text-secondary);
+            border-radius: 18px;
+            padding: 6px 12px;
+            font-size: 0.82rem;
+            cursor: pointer;
+        }
+        .no-suggestions {
+            text-align: center;
+            padding: 24px;
+            color: var(--color-text-secondary);
+            font-size: 0.9rem;
+        }
     </style>
 </head>
 <body>
@@ -247,6 +358,22 @@
 
             <!-- Due Soon Alerts -->
             <div class="due-alerts" id="dueAlerts"></div>
+
+            <!-- Auto-detect banner -->
+            <div class="detect-banner">
+                <span>🔍</span>
+                <span>זהה אוטומטית הוצאות חוזרות מהאשראי שלך</span>
+                <button class="detect-btn" onclick="runDetection()">סרוק עסקאות</button>
+            </div>
+
+            <!-- Suggestions panel (hidden until scan) -->
+            <div class="suggestions-panel" id="suggestionsPanel">
+                <div class="suggestions-header">
+                    <h3>🔄 הוצאות חוזרות שזוהו</h3>
+                    <button onclick="closeSuggestions()">סגור</button>
+                </div>
+                <div id="suggestionsList"></div>
+            </div>
 
             <!-- Filter + Add -->
             <div class="filter-bar">
@@ -340,6 +467,7 @@
         </div>
     </div>
 
+    <script src="../js/idb.js"></script>
     <script src="../js/storage.js"></script>
     <script src="../js/pin-lock.js"></script>
     <script src="../js/i18n.js"></script>
@@ -348,6 +476,173 @@
     <script src="../js/crypto.js"></script>
     <script src="../js/auth.js"></script>
     <script>
+        // ── Recurring detection ──────────────────────────────────────────────
+
+        const IGNORED_SUGGESTIONS_KEY = 'finance_ignored_suggestions';
+
+        function normalizeMerchant(name) {
+            return (name || '')
+                .replace(/\d+/g, '')           // strip digits
+                .replace(/[^\u0590-\u05FFa-zA-Z\s]/g, '') // keep Hebrew + Latin
+                .replace(/\s+/g, ' ')
+                .trim()
+                .toLowerCase()
+                .substring(0, 40);
+        }
+
+        function guessSubCategory(name) {
+            const n = name.toLowerCase();
+            if (/netflix|spotify|apple|google play|microsoft|disney|hbo|youtube|dropbox|adobe|zoom|amazon prime/.test(n)) return 'subscriptions';
+            if (/ביטוח|insurance|מנורה|הראל|הפניקס|מגדל|כלל|מיטב/.test(n)) return 'insurance';
+            return 'fixed_bills';
+        }
+
+        function detectRecurringExpenses() {
+            const expenses = Storage.getCreditCards().expenses || [];
+            const ignored  = JSON.parse(localStorage.getItem(IGNORED_SUGGESTIONS_KEY) || '[]');
+            const existingNames = new Set(
+                Storage.getSubscriptions().map(s => normalizeMerchant(s.name))
+            );
+
+            // Group by normalized merchant name
+            const groups = {};
+            expenses.forEach(e => {
+                const key = normalizeMerchant(e.description);
+                if (!key || key.length < 2) return;
+                if (!groups[key]) groups[key] = [];
+                groups[key].push(e);
+            });
+
+            const candidates = [];
+
+            Object.entries(groups).forEach(([key, txns]) => {
+                if (txns.length < 2) return;
+                if (existingNames.has(key)) return;
+                if (ignored.includes(key)) return;
+
+                // Sort by date
+                txns.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+                // Amount consistency (within 15%)
+                const amounts = txns.map(t => Math.abs(t.amount || 0));
+                const avgAmount = amounts.reduce((a, b) => a + b, 0) / amounts.length;
+                if (avgAmount < 1) return;
+                const amountOk = amounts.every(a => Math.abs(a - avgAmount) / avgAmount < 0.15);
+
+                // Interval analysis
+                const intervals = [];
+                for (let i = 1; i < txns.length; i++) {
+                    const days = (new Date(txns[i].date) - new Date(txns[i-1].date)) / 86400000;
+                    intervals.push(Math.round(days));
+                }
+                const avgInterval = intervals.reduce((a, b) => a + b, 0) / intervals.length;
+                const intervalOk = intervals.every(d => Math.abs(d - avgInterval) <= Math.max(4, avgInterval * 0.15));
+
+                // Map to frequency
+                let frequency = null;
+                if      (avgInterval >= 6   && avgInterval <= 8)   frequency = 'weekly';
+                else if (avgInterval >= 27  && avgInterval <= 34)  frequency = 'monthly';
+                else if (avgInterval >= 55  && avgInterval <= 68)  frequency = 'bimonthly';
+                else if (avgInterval >= 82  && avgInterval <= 98)  frequency = 'quarterly';
+                else if (avgInterval >= 165 && avgInterval <= 195) frequency = 'semi_annual';
+                else if (avgInterval >= 340 && avgInterval <= 390) frequency = 'annual';
+
+                if (!frequency) return;
+                if (!intervalOk && txns.length < 3) return;
+
+                const confidence = txns.length * (intervalOk ? 2 : 1) * (amountOk ? 2 : 1);
+
+                candidates.push({
+                    key,
+                    name: txns[txns.length - 1].description || key,
+                    amount: Math.round(avgAmount * 100) / 100,
+                    frequency,
+                    occurrences: txns.length,
+                    lastDate: txns[txns.length - 1].date,
+                    category: guessSubCategory(key),
+                    confidence
+                });
+            });
+
+            return candidates.sort((a, b) => b.confidence - a.confidence).slice(0, 15);
+        }
+
+        function runDetection() {
+            const panel = document.getElementById('suggestionsPanel');
+            const list  = document.getElementById('suggestionsList');
+            const candidates = detectRecurringExpenses();
+
+            panel.classList.add('visible');
+
+            if (candidates.length === 0) {
+                list.innerHTML = '<div class="no-suggestions">לא נמצאו הוצאות חוזרות חדשות בנתוני האשראי שלך.</div>';
+                return;
+            }
+
+            const freqLabels = {
+                weekly: 'שבועי', monthly: 'חודשי', bimonthly: 'דו-חודשי',
+                quarterly: 'רבעוני', semi_annual: 'חצי שנתי', annual: 'שנתי'
+            };
+
+            list.innerHTML = candidates.map((c, i) => `
+                <div class="suggestion-card" id="sug-${i}">
+                    <div class="sug-info">
+                        <div class="sug-name">${sanitize(c.name)}</div>
+                        <div class="sug-meta">
+                            ${freqLabels[c.frequency] || c.frequency} · הופיע ${c.occurrences} פעמים · אחרון: ${c.lastDate}
+                        </div>
+                    </div>
+                    <div class="sug-amount">${I18n.formatCurrency(c.amount)}</div>
+                    <div class="sug-actions">
+                        <button class="btn-add"    onclick="addSuggestion(${i})">הוסף ✓</button>
+                        <button class="btn-ignore" onclick="ignoreSuggestion(${i}, '${c.key}')">התעלם</button>
+                    </div>
+                </div>
+            `).join('');
+
+            // Store candidates for add/ignore actions
+            window._detectedCandidates = candidates;
+
+            panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function addSuggestion(index) {
+            const c = window._detectedCandidates?.[index];
+            if (!c) return;
+            Storage.addSubscription({
+                name: c.name,
+                amount: c.amount,
+                frequency: c.frequency,
+                category: c.category,
+                active: true,
+                renewalDate: '',
+                notes: `זוהה אוטומטית (${c.occurrences} עסקאות)`
+            });
+            document.getElementById('sug-' + index)?.remove();
+            if (!document.querySelector('.suggestion-card')) {
+                document.getElementById('suggestionsList').innerHTML =
+                    '<div class="no-suggestions">כל ההצעות טופלו ✓</div>';
+            }
+            loadSubscriptions();
+            Haptic?.success();
+        }
+
+        function ignoreSuggestion(index, key) {
+            const ignored = JSON.parse(localStorage.getItem(IGNORED_SUGGESTIONS_KEY) || '[]');
+            if (!ignored.includes(key)) { ignored.push(key); localStorage.setItem(IGNORED_SUGGESTIONS_KEY, JSON.stringify(ignored)); }
+            document.getElementById('sug-' + index)?.remove();
+            if (!document.querySelector('.suggestion-card')) {
+                document.getElementById('suggestionsList').innerHTML =
+                    '<div class="no-suggestions">כל ההצעות טופלו ✓</div>';
+            }
+        }
+
+        function closeSuggestions() {
+            document.getElementById('suggestionsPanel').classList.remove('visible');
+        }
+
+        // ── Existing code ────────────────────────────────────────────────────
+
         const CAT_ICONS = { subscriptions: '📺', insurance: '🛡️', fixed_bills: '🏢' };
 
         const FREQ_MULTIPLIERS = {
