@@ -1,12 +1,12 @@
 /**
  * MyGemel Fund Data - Real data from igemel-net.co.il
  * Data source: https://www.igemel-net.co.il/
- * Last update: February 2025
+ * Last update: February 2026
  */
 
 const MyGemelFunds = {
     meta: {
-        lastUpdate: '2025-02',
+        lastUpdate: '2026-02',
         source: 'iGemel-Net',
         sourceUrls: {
             training: 'https://www.igemel-net.co.il/%D7%A7%D7%A8%D7%A0%D7%95%D7%AA-%D7%94%D7%A9%D7%AA%D7%9C%D7%9E%D7%95%D7%AA/',
@@ -4525,16 +4525,20 @@ const MyGemelFunds = {
         localStorage.setItem('mygemel_fund_data', JSON.stringify(dataToSave));
     },
 
-    // Load from localStorage
+    // Load from localStorage (only if stored data is newer than the built-in file data)
     loadFromStorage() {
         try {
             const stored = localStorage.getItem('mygemel_fund_data');
             if (stored) {
                 const data = JSON.parse(stored);
-                if (data.meta) this.meta = data.meta;
-                if (data.training) this.training = data.training;
-                if (data.pension) this.pension = data.pension;
-                if (data.gemel) this.gemel = data.gemel;
+                const storedPeriod = data.meta && data.meta.lastUpdate;
+                const builtInPeriod = this.meta.lastUpdate;
+                if (storedPeriod && storedPeriod >= builtInPeriod) {
+                    if (data.meta) this.meta = data.meta;
+                    if (data.training) this.training = data.training;
+                    if (data.pension) this.pension = data.pension;
+                    if (data.gemel) this.gemel = data.gemel;
+                }
             }
         } catch (e) {
             console.warn('Failed to load MyGemel data from storage:', e);

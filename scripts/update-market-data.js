@@ -343,14 +343,17 @@ async function fetchIGemelPage(browser, url) {
 
 function extractIGemelDate($) {
     const bodyText = $.text();
-    // Pattern: 'תקופת הדו"ח: דצמבר 2025' or 'תקופת הדו״ח: דצמבר 2025'
-    const datePattern = /תקופת\s+הדו[\u0022\u05F4"״]ח[:\s]+([\u0590-\u05FF]+)\s+(\d{4})/;
-    const match = bodyText.match(datePattern);
-    if (match) {
-        const month = HEBREW_MONTHS[match[1]];
-        if (month) return `${match[2]}-${month}`;
+    // Priority: 'דו"ח מעודכן לתאריך: 02/2026' (MM/YYYY format from rendered page)
+    const numericPattern = /דו[\u0022\u05F4"״]ח\s+מעודכן\s+לתאריך[:\s]+(\d{2})\/(\d{4})/;
+    const numericMatch = bodyText.match(numericPattern);
+    if (numericMatch) return `${numericMatch[2]}-${numericMatch[1]}`;
+    // Fallback: 'תקופת הדו"ח: דצמבר 2025'
+    const hebrewPattern = /תקופת\s+הדו[\u0022\u05F4"״]ח[:\s]+([\u0590-\u05FF]+)\s+(\d{4})/;
+    const hebrewMatch = bodyText.match(hebrewPattern);
+    if (hebrewMatch) {
+        const month = HEBREW_MONTHS[hebrewMatch[1]];
+        if (month) return `${hebrewMatch[2]}-${month}`;
     }
-    // Fallback to generic parsing
     return parseHebrewDate(bodyText);
 }
 
@@ -759,16 +762,20 @@ ${fundsArrayToJS(gemel)}
         localStorage.setItem('mygemel_fund_data', JSON.stringify(dataToSave));
     },
 
-    // Load from localStorage
+    // Load from localStorage (only if stored data is newer than the built-in file data)
     loadFromStorage() {
         try {
             const stored = localStorage.getItem('mygemel_fund_data');
             if (stored) {
                 const data = JSON.parse(stored);
-                if (data.meta) this.meta = data.meta;
-                if (data.training) this.training = data.training;
-                if (data.pension) this.pension = data.pension;
-                if (data.gemel) this.gemel = data.gemel;
+                const storedPeriod = data.meta && data.meta.lastUpdate;
+                const builtInPeriod = this.meta.lastUpdate;
+                if (storedPeriod && storedPeriod >= builtInPeriod) {
+                    if (data.meta) this.meta = data.meta;
+                    if (data.training) this.training = data.training;
+                    if (data.pension) this.pension = data.pension;
+                    if (data.gemel) this.gemel = data.gemel;
+                }
             }
         } catch (e) {
             console.warn('Failed to load MyGemel data from storage:', e);

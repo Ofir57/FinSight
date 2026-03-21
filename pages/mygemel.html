@@ -222,7 +222,7 @@
             <img src="../img/logo.png" alt="FinSight" class="logo-hero-img" style="display: block; margin: 0 auto 15px; width: 160px; height: auto; border-radius: 12px;">
             <h1 data-he="קרנות ופנסיה - iGemel-Net" data-en="Funds & Pension - iGemel-Net">קרנות ופנסיה - iGemel-Net</h1>
             <p data-he="השוואת קופות גמל, קרנות השתלמות וקרנות פנסיה - נתונים אמיתיים" data-en="Compare Provident Funds, Training Funds and Pension Funds - Real Data">השוואת קופות גמל, קרנות השתלמות וקרנות פנסיה - נתונים אמיתיים</p>
-            <span class="source-badge">iGemel-Net - דצמבר 2025</span>
+            <span class="source-badge" id="sourceBadge">iGemel-Net</span>
             <div class="nav-links">
                 <a href="../index.html" data-he="🏠 דאשבורד ראשי" data-en="🏠 Main Dashboard">🏠 דאשבורד ראשי</a>
                 <a href="market-products.html" data-he="🏪 מוצרים בשוק" data-en="🏪 Market Products">🏪 מוצרים בשוק</a>
@@ -329,9 +329,22 @@
             }
         }
 
+        function updateSourceBadge() {
+            const lastUpdate = MyGemelFunds.getLastUpdate();
+            if (!lastUpdate) return;
+            const [year, month] = lastUpdate.split('-');
+            const monthNames = {
+                he: { '01': 'ינואר', '02': 'פברואר', '03': 'מרץ', '04': 'אפריל', '05': 'מאי', '06': 'יוני', '07': 'יולי', '08': 'אוגוסט', '09': 'ספטמבר', '10': 'אוקטובר', '11': 'נובמבר', '12': 'דצמבר' },
+                en: { '01': 'Jan', '02': 'Feb', '03': 'Mar', '04': 'Apr', '05': 'May', '06': 'Jun', '07': 'Jul', '08': 'Aug', '09': 'Sep', '10': 'Oct', '11': 'Nov', '12': 'Dec' }
+            };
+            const monthName = monthNames[currentLang][month] || month;
+            document.getElementById('sourceBadge').textContent = `iGemel-Net - ${monthName} ${year}`;
+        }
+
         // Initialize
         loadLanguage();
         updateCounts();
+        updateSourceBadge();
     </script>
 </body>
 </html>
